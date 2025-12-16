@@ -1,0 +1,61 @@
+/* 默认主题变量定义（亮色主题） */
+:root,
+.theme-light {
+  --bg-color   : #ffffff;
+  --text-color : #1a1a1a;
+  --text-color-tabBtn : #18191D;
+  --bg-page    : #FCFCFC;
+  --bg-card    : #ffffff;
+  --bg-light   : #F5F5F5;
+  --border-color: #E0E0E0;
+  --text-gray  : #666;
+  --text-gray-2  : #5A5F74;
+  --text-dark-gray: #999;
+  --el-bg-color: #121212;
+  --color:#fff;
+  --el-menu-border-color:none;
+  --el-menu-text-color:#fff;
+  --el-menu-bg-color:#151517;
+  --el-menu-active-color:#00CE7A;
+  --el-border-color-light:none;
+}
+
+/* 暗黑主题 */
+.theme-dark {
+  --bg-color   : #1e1e1e;
+  --text-color : #f2f2f2;
+  --text-color-tabBtn : #999999;
+  --bg-page    : #141414;
+  --bg-card    : #1e1e1e;
+  --bg-light   : #2a2a2a;
+  --border-color: #3a3a3a;
+  --text-gray  : #a0a0a0;
+  --text-gray-2  : #5A5F74;
+  --text-dark-gray: #808080;
+  --el-bg-color: #121212;
+  --color:#fff;
+  --el-menu-border-color:none;
+  --el-menu-text-color:#fff;
+  --el-menu-bg-color:#151517;
+  --el-menu-active-color:#00CE7A;
+  --el-border-color-light:none;
+}
+
+/* 全局背景色应用 */
+body {
+  background-color: var(--bg-page);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 蓝色主题 */
+.theme-blue {
+  --bg-color  : #007bff;
+  --text-color: yellow;
+}
+
+/* 绿色主题 */
+.theme-green {
+  --bg-color  : #6aa728;
+  --text-color: #000000;
+}
