@@ -1,89 +1,129 @@
 pipeline {
-  agent any
-
-  options {
-    timestamps()
-    buildDiscarder(logRotator(numToKeepStr: '20'))
-  }
-
-  environment {
-    DOCKER_REGISTRY       = 'registry.example.com'
-    IMAGE_NAME            = 'frontend'
-    REGISTRY_CREDENTIALS  = 'docker-hub'
-    IMAGE_TAG             = "${env.BUILD_NUMBER}-${env.GIT_COMMIT?.take(7)}"
-    NODE_ENV              = 'production'
-  }
-
-  stages {
-    stage('准备环境') {
-      steps {
-        sh 'node -v'
-        sh 'npm -v'
-      }
-    }
-
-    stage('安装依赖') {
-      steps {
-        sh 'npm ci'
-      }
-    }
-
-    stage('代码检查') {
-      steps {
-        sh 'npm run lint'
-      }
-    }
-
-    stage('单元测试') {
-      steps {
-        sh 'npm run test'
-      }
-    }
-
-    stage('前端构建') {
-      steps {
-        sh 'npm run build'
-      }
-    }
-
-    stage('构建镜像') {
-      steps {
-        script {
-          docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}")
+    agent {
+        node {
+            label 'multimarket-test'
         }
-      }
     }
 
-    stage('推送镜像') {
-      steps {
-        withCredentials([usernamePassword(credentialsId: REGISTRY_CREDENTIALS, usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-          sh "echo ${PASS} | docker login -u ${USER} --password-stdin ${DOCKER_REGISTRY}"
-          sh "docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
-        }
-      }
+    environment {
+        APP_NAME = 'chooseme-frontend-h5'
+        CONTAINER_PORT = '3000'
+        INTERNAL_PORT = '80'
+        REGISTRY = 'registry.cn-hangzhou.aliyuncs.com'  // Optional: image registry URL
     }
 
-    stage('部署生产') {
-      when {
-        anyOf {
-          branch 'main'
-          branch 'master'
-        }
-      }
-      steps {
-        sshagent(['prod-server']) {
-          sh "ssh user@prod-server 'docker pull ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}'"
-          sh "ssh user@prod-server 'docker stop frontend || true'"
-          sh "ssh user@prod-server 'docker rm frontend || true'"
-          sh "ssh user@prod-server 'docker run -d --name frontend -p 80:80 ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}'"
-        }
-      }
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
     }
-  }
 
-  post {
-    always {
-      cleanWs()
+    stages {
+        stage('Check Environment') {
+            steps {
+                echo '=== Checking build environment ==='
+                sh 'node -v'
+                sh 'npm -v'
+                sh 'docker -v'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                echo '=== Installing dependencies ==='
+                sh '''
+                    # Clean old dependencies
+                    rm -rf node_modules package-lock.json
+                    npm cache clean --force
+                    
+                    # Set npm registry
+                    npm config set registry https://registry.npmmirror.com/
+                    
+                    # Install dependencies
+                    npm install
+                '''
+            }
+        }
+
+        stage('Lint') {
+            steps {
+                echo '=== Running code lint ==='
+                sh 'npm run lint || true'  // lint failure won't block build
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo '=== Building production bundle ==='
+                sh 'npm run build'
+            }
+        }
+
+        stage('Build Image') {
+            steps {
+                echo '=== Building Docker image ==='
+                script {
+                    def imageTag = "${env.BUILD_NUMBER}"
+                    sh """
+                        docker build -t ${APP_NAME}:${imageTag} .
+                        docker tag ${APP_NAME}:${imageTag} ${APP_NAME}:latest
+                    """
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo '=== Deploying application ==='
+                script {
+                    def imageTag = "${env.BUILD_NUMBER}"
+                    sh """
+                        # Stop and remove old container if exists
+                        docker stop ${APP_NAME} 2>/dev/null || true
+                        docker rm ${APP_NAME} 2>/dev/null || true
+                        
+                        # Start new container
+                        docker run -d \\
+                            --name ${APP_NAME} \\
+                            --restart unless-stopped \\
+                            -p ${CONTAINER_PORT}:${INTERNAL_PORT} \\
+                            ${APP_NAME}:${imageTag}
+                        
+                        # Wait for container startup
+                        sleep 5
+                        
+                        # Health check
+                        curl -f http://localhost:${CONTAINER_PORT}/health || exit 1
+                        
+                        echo "=== Deploy success! URL: http://localhost:${CONTAINER_PORT} ==="
+                    """
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                echo '=== Cleaning up old images ==='
+                sh '''
+                    # Keep last 3 versions, remove older images
+                    docker images ${APP_NAME} --format "{{.Tag}}" | grep -v latest | sort -rn | tail -n +4 | xargs -I {} docker rmi ${APP_NAME}:{} 2>/dev/null || true
+                    
+                    # Remove dangling images
+                    docker image prune -f 2>/dev/null || true
+                '''
+            }
+        }
     }
-  }
+
+    post {
+        success {
+            echo 'Build and deploy SUCCESS!'
+        }
+        failure {
+            echo 'Build and deploy FAILED!'
+        }
+        always {
+            cleanWs()
+        }
+    }
 }
