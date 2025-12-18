@@ -7,6 +7,9 @@ import detail from "../views/detail/index.vue"
 import breaking from "../views/breaking/index.vue"
 import accuracy from "../views/accuracy/index.vue"
 import settings from "../views/settings/index.vue"
+import myNode from "../views/myNode/index.vue"
+import myIncome from "../views/myIncome/index.vue"
+import LPVault from "../views/LPVault/index.vue"
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -50,13 +53,29 @@ const router = createRouter({
       name: 'settings',
       component: settings,
     },
+    {
+      path: '/myNode',
+      name: 'myNode',
+      component: myNode,
+    },
+    // myIncome
 
+    {
+      path: '/myIncome',
+      name: 'myIncome',
+      component: myIncome,
+    },
+    {
+      path: '/LPVault',
+      name: 'LPVault',
+      component: LPVault,
+    }
   ],
   scrollBehavior(to, from, savedPosition) {
     // 处理滚动行为：如果有保存的滚动位置，则恢复到该位置，否则滚动到顶部
-  
-      return { top: 0 }; // 跳转时滚动到顶部
-    
+
+    return { top: 0 }; // 跳转时滚动到顶部
+
   },
 });
 export default router
