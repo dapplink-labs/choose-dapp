@@ -300,6 +300,7 @@ const handleNavClick = (key) => {
 
       .nav-item {
         padding: 8px 8px;
+        margin-right: 10px;
         font-size: 12px;
 
         .nav-icon {
@@ -316,6 +317,9 @@ const handleNavClick = (key) => {
       .nav-divider {
         margin: 0 6px;
         height: 20px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 10px;
       }
     }
   }
@@ -325,43 +329,106 @@ const handleNavClick = (key) => {
   .navbar2 {
     padding: 0;
     height: 44px;
-    top: 56px; // 小屏幕header高度
+    position: static; // 移动端不固定
+    top: auto;
+    overflow: hidden; // 防止整体溢出
 
     .navbar-container {
-      padding: 0 12px;
+      padding: 0;
+      height: 100%;
+      max-width: 100%;
+      overflow: visible; // 允许内部滚动
+      width: 100%;
     }
 
     .nav-section {
-      gap: 10px;
-      overflow-x: auto;
+      overflow-x: auto; // 横向滚动
       overflow-y: hidden;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch; // iOS 平滑滚动
+      scrollbar-width: none; // Firefox 隐藏滚动条
+      -ms-overflow-style: none; // IE/Edge 隐藏滚动条
+      padding: 0 12px;
+      white-space: nowrap; // 不折行
+      width: 100%;
+      height: 100%;
+      display: block; // 不使用 flex
 
       &::-webkit-scrollbar {
-        display: none;
+        display: none; // Chrome/Safari 隐藏滚动条
       }
 
       .nav-item {
-        padding: 8px 10px;
-        font-size: 12px;
-        flex-shrink: 0;
+        display: inline-flex; // 使用 inline-flex 实现横向排列
+        align-items: center;
+        padding: 8px 12px;
+        font-size: 14px;
         min-height: 32px; // 触摸友好的最小高度
+        white-space: nowrap; // 不折行
+        gap: 6px; // 图标和文字之间的间距
+        vertical-align: middle;
 
         .nav-icon {
-          display: none;
+          display: flex; // 移动端显示图标
+          width: 16px;
+          height: 16px;
+          flex-shrink: 0;
+          color: #999999; // 非激活状态使用浅灰色
+
+          svg {
+            fill: currentColor;
+            width: 16px;
+            height: 16px;
+
+            path {
+              fill: currentColor;
+            }
+          }
+
+          // 自定义图标样式
+          &.trends-icon,
+          &.breaking-icon,
+          &.news-icon {
+            fill: currentColor;
+
+            path {
+              fill: currentColor;
+            }
+          }
+        }
+
+        .nav-text {
+          color: #999999; // 非激活状态使用浅灰色
         }
 
         &.active {
+          .nav-icon {
+            color: #C1272E; // 激活状态图标使用红色
+
+            svg {
+              fill: #C1272E;
+
+              path {
+                fill: #C1272E;
+              }
+            }
+
+            &.trends-icon,
+            &.breaking-icon,
+            &.news-icon {
+              fill: #C1272E;
+
+              path {
+                fill: #C1272E;
+              }
+            }
+          }
+
           .nav-text {
-            font-size: 13px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #C1272E; // 激活状态文字使用红色
           }
         }
-      }
-
-      .nav-divider {
-        display: none; // 移动端隐藏分隔符
       }
     }
   }
@@ -370,23 +437,102 @@ const handleNavClick = (key) => {
 @media (max-width: 640px) {
   .navbar2 {
     height: 42px;
-    top: 52px; // 小屏幕header高度
+    position: static; // 移动端不固定
+    top: auto;
+    overflow: hidden;
 
     .navbar-container {
-      padding: 0 10px;
+      padding: 0;
+      max-width: 100%;
+      overflow: visible;
+      width: 100%;
     }
 
     .nav-section {
-      gap: 8px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding: 0 10px;
+      white-space: nowrap;
+      width: 100%;
+      height: 100%;
+      display: block; // 不使用 flex
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
 
       .nav-item {
-        padding: 8px 8px;
-        font-size: 11px;
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 12px;
+        font-size: 13px;
         min-height: 30px;
+        white-space: nowrap;
+        gap: 6px;
+        vertical-align: middle;
+
+        .nav-icon {
+          display: flex;
+          width: 16px;
+          height: 16px;
+          flex-shrink: 0;
+          color: #999999;
+
+          svg {
+            fill: currentColor;
+            width: 16px;
+            height: 16px;
+
+            path {
+              fill: currentColor;
+            }
+          }
+
+          &.trends-icon,
+          &.breaking-icon,
+          &.news-icon {
+            fill: currentColor;
+
+            path {
+              fill: currentColor;
+            }
+          }
+        }
+
+        .nav-text {
+          color: #999999;
+        }
 
         &.active {
+          .nav-icon {
+            color: #C1272E;
+
+            svg {
+              fill: #C1272E;
+
+              path {
+                fill: #C1272E;
+              }
+            }
+
+            &.trends-icon,
+            &.breaking-icon,
+            &.news-icon {
+              fill: #C1272E;
+
+              path {
+                fill: #C1272E;
+              }
+            }
+          }
+
           .nav-text {
-            font-size: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #C1272E;
           }
         }
       }
@@ -397,24 +543,103 @@ const handleNavClick = (key) => {
 @media (max-width: 480px) {
   .navbar2 {
     height: 40px;
-    top: 52px;
+    position: static; // 移动端不固定
+    top: auto;
+    overflow: hidden;
+    background-color: var(--bg-page-h5, #ffffff);
 
     .navbar-container {
-      padding: 0 8px;
+      padding: 0;
+      max-width: 100%;
+      overflow: visible;
+      width: 100%;
     }
 
     .nav-section {
-      gap: 6px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding: 0 8px;
+      white-space: nowrap;
+      width: 100%;
+      height: 100%;
+      display: block; // 不使用 flex
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
 
       .nav-item {
-        padding: 6px 8px;
-        font-size: 11px;
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        font-size: 12px;
         min-height: 28px;
+        white-space: nowrap;
+        gap: 5px;
+        vertical-align: middle;
+
+        .nav-icon {
+          display: flex;
+          width: 14px;
+          height: 14px;
+          flex-shrink: 0;
+          color: #999999;
+
+          svg {
+            fill: currentColor;
+            width: 14px;
+            height: 14px;
+
+            path {
+              fill: currentColor;
+            }
+          }
+
+          &.trends-icon,
+          &.breaking-icon,
+          &.news-icon {
+            fill: currentColor;
+
+            path {
+              fill: currentColor;
+            }
+          }
+        }
+
+        .nav-text {
+          color: #999999;
+        }
 
         &.active {
+          .nav-icon {
+            color: #C1272E;
+
+            svg {
+              fill: #C1272E;
+
+              path {
+                fill: #C1272E;
+              }
+            }
+
+            &.trends-icon,
+            &.breaking-icon,
+            &.news-icon {
+              fill: #C1272E;
+
+              path {
+                fill: #C1272E;
+              }
+            }
+          }
+
           .nav-text {
-            font-size: 11px;
+            font-size: 14px;
             font-weight: 600;
+            color: #C1272E;
           }
         }
       }
