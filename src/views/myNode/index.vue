@@ -76,7 +76,9 @@
 
             </div>
 
-            <div class="tree"></div>
+            <div class="tree">
+                <graph/>
+            </div>
 
             <div class="tableContent">
                 <table>
@@ -118,6 +120,7 @@
 
 <script setup>
 import { ref, onMounted, watch, computed, onUnmounted } from "vue"
+import  graph  from  "../../components/graph.vue"
 const tabArr = ref([
     {
         name: "直推",
@@ -266,10 +269,8 @@ const active = ref(1)
             gap: 32px;
             border-bottom: 1px solid #F3F3F3;
             margin-bottom: 20px;
-            overflow-x: auto;      /* 开启横向滚动 */
-  white-space: nowrap;   /* 防止换行 */
+
             .item {
-                flex-shrink: 0;    
                 font-weight: 400;
                 font-size: 16px;
                 width: 32px;
@@ -279,7 +280,6 @@ const active = ref(1)
             }
 
             .active {
-                flex-shrink: 0;    
                 font-weight: 400;
                 font-size: 16px;
                 color: #000;
