@@ -156,8 +156,8 @@ const userAvatar = computed(() => {
       width: 100%;
       height: 44px;
       border-radius: 10px;
-      border: 1px solid var(--input-border, var(--card-border, #1f1f1f));
-      background: var(--input-bg, var(--bg-card, #ffffff));
+      border: 1px solid var(--border-color, #E0E0E0);
+      background: var(--bg-card, #ffffff);
       color: var(--text-color, #1a1a1a);
       padding: 0 14px;
       outline: none;
@@ -184,9 +184,9 @@ const userAvatar = computed(() => {
     .link-btn {
       height: 44px;
       border-radius: 10px;
-      border: 1px solid var(--input-border, var(--card-border, #1f1f1f));
-      background: var(--input-bg, var(--bg-card, #ffffff));
-      color: var(--text-gray, #8e8e92);
+      border: 1px solid var(--border-color, #E0E0E0);
+      background: var(--bg-card, #ffffff);
+      color: var(--text-color, #1a1a1a);
       padding: 0 14px;
       display: flex;
       align-items: center;

@@ -215,7 +215,7 @@ const currentNodeImg = computed(() =>
   flex: 1;
   display: flex;
   justify-content: center;
-  padding: 40px 16px 32px;
+  padding: 20px 16px 32px;
   box-sizing: border-box;
 }
 

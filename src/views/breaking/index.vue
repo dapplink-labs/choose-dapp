@@ -1,10 +1,11 @@
 <template>
   <div class="breaking-page">
-    <!-- 导航栏 -->
-    <NavBar2 />
 
     <!-- 主要内容区域 -->
     <div class="main-content">
+      <!-- 导航栏 -->
+      <NavBar2 />
+      
       <div class="content-wrapper">
 
         <!-- 左右布局 -->
@@ -99,13 +100,8 @@
       </div>
     </div>
     <!-- 绑定邮箱弹层（从底部升起） -->
-    <BindEmail
-      v-model="showBindEmail"
-      v-model:email="bindEmail"
-      @get-code="handleGetCode"
-      @confirm="handleBindConfirm"
-      @skip="handleBindSkip"
-    />
+    <BindEmail v-model="showBindEmail" v-model:email="bindEmail" @get-code="handleGetCode" @confirm="handleBindConfirm"
+      @skip="handleBindSkip" />
   </div>
 </template>
 
@@ -722,6 +718,7 @@ onMounted(() => {
   .main-content {
     .content-wrapper {
       padding: 24px 20px 48px;
+
       .page-layout {
         flex-direction: column;
         gap: 20px;
@@ -738,7 +735,8 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .main-content {
-    padding-top: 112px;
+    padding-top: 50px;
+
     .content-wrapper {
       padding: 16px 16px 40px;
 
@@ -805,6 +803,7 @@ onMounted(() => {
         }
 
         .right-section {
+
           .subscription-card,
           .live-section {
             padding: 16px;

@@ -1990,7 +1990,7 @@ $text-dark-gray: #999;
 // 480px 及以下设备进一步优化
 @media (max-width: 480px) {
   .detail-page {
-    padding-top: 108px;
+    padding-top: 50px;
 
     .main-content {
       padding: 12px;

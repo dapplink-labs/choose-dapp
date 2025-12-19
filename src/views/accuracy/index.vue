@@ -429,6 +429,7 @@ const updateMetrics = (tabValue) => {
 
 @media (max-width: 768px) {
   .main-content {
+    padding-top: 20px;
     .content-wrapper {
       padding: 16px;
 
