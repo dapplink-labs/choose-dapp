@@ -11,7 +11,9 @@
         <img :src="userAvatar" alt="用户头像" class="avatar" />
         <div class="user-details">
           <div class="username">{{ username }}</div>
-          <div class="wallet-address">{{ walletAddress }}</div>
+          <div class="wallet-address" @click="copyWalletAddress">
+            {{ walletAddress }}
+          </div>
         </div>
       </div>
       <div class="action-icons">
@@ -140,6 +142,32 @@ const userAvatar = computed(() => {
     ? `https://effigy.im/a/${address.value}.svg`
     : '/src/assets/icon/avatar.png'
 })
+
+// 点击钱包地址复制
+const copyWalletAddress = async () => {
+  if (!address.value) return
+  const fullAddress = address.value
+
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(fullAddress)
+    } else {
+      // 兼容旧浏览器
+      const textarea = document.createElement('textarea')
+      textarea.value = fullAddress
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+    }
+    alert('钱包地址已复制到剪贴板')
+  } catch (e) {
+    console.error('复制地址失败', e)
+    alert('复制失败，请手动复制')
+  }
+}
 
 // 顶部操作图标（随主题切换）
 const currentSettingIcon = computed(() =>

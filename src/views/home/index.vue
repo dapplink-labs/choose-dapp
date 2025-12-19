@@ -159,7 +159,7 @@ import router from '@/router'
 
 // 禁止页面滚动
 onMounted(() => {
-  document.body.style.overflow = 'hidden'
+  // document.body.style.overflow = 'hidden'
 })
 
 onUnmounted(() => {
@@ -1293,7 +1293,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
 @media (max-width: 480px) {
   .coming-soon-overlay {
-    display: flex !important;
+    // display: flex !important;
   }
 
   .home-page {
