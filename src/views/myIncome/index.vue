@@ -2,14 +2,21 @@
     <div class="myIncome">
         <div class="header">
             <div class="goback" @click="goBack">
-                <el-icon color="#000000">
+                <el-icon class="goback-icon">
                     <ArrowLeft />
                 </el-icon>
             </div>
 
             <div class="title">我的LP收益</div>
 
-            <!-- <div class="right"></div> -->
+            <div class="right">
+                <button class="theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
+                    <el-icon class="theme-icon">
+                        <Sunny v-if="isDark" />
+                        <Moon v-else />
+                    </el-icon>
+                </button>
+            </div>
         </div>
 
 
@@ -68,7 +75,7 @@
                 <span>节点购买记录</span>
                 <b>
                     查看更多
-                    <el-icon color="#000">
+                    <el-icon class="arrow-icon">
                         <ArrowRightBold />
                     </el-icon>
                 </b>
@@ -127,7 +134,9 @@
 
             </div>
 
-            <div class="tree"></div>
+            <div class="tree">
+                <graph/>
+            </div>
 
             <div class="tableContent">
                 <table>
@@ -169,6 +178,22 @@
 
 <script setup>
 import { ref, onMounted, watch, computed, onUnmounted } from "vue"
+import { ArrowLeft, ArrowRightBold, Sunny, Moon } from '@element-plus/icons-vue'
+import { useThemeStore } from '@/stores/theme'
+import { useRouter } from 'vue-router'
+import  graph  from  "../../components/graph.vue"
+const router = useRouter()
+const themeStore = useThemeStore()
+const isDark = computed(() => themeStore.isDark)
+
+const toggleTheme = () => {
+    themeStore.toggleTheme()
+}
+
+const goBack = () => {
+    router.back()
+}
+
 const tabArr = ref([
     {
         name: "直推",
@@ -178,22 +203,27 @@ const tabArr = ref([
         name: "网体",
         index: 1
     }
-
 ])
+
 function tab(index) {
     active.value = index
-
 }
+
 const active = ref(1)
+
+// 初始化主题
+onMounted(() => {
+    themeStore.applyTheme()
+})
 </script>
 
 <style scoped lang="scss">
 .myIncome {
-    // padding-top: 120px;
     min-height: 100vh;
-
-
-    padding: 120px 10px 0 10px;
+    padding: 20px 10px 0 10px;
+    background-color: var(--bg-page, #FCFCFC);
+    color: var(--text-color, #1a1a1a);
+    transition: background-color 0.3s ease, color 0.3s ease;
 
     .header {
         position: relative;
@@ -201,9 +231,27 @@ const active = ref(1)
         display: flex;
         margin-bottom: 35px;
         align-items: center;
+        justify-content: space-between;
 
         .goback {
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s ease;
+
+            &:hover {
+                transform: translateX(-2px);
+            }
+
+            &:active {
+                transform: translateX(-4px);
+            }
+
+            .goback-icon {
+                color: var(--text-color, #000000);
+                font-size: 20px;
+                transition: color 0.3s ease;
+            }
         }
 
         .title {
@@ -212,9 +260,50 @@ const active = ref(1)
             transform: translateX(-50%);
             font-weight: 600;
             font-size: 16px;
-            color: #000000;
+            color: var(--text-color, #000000);
+            transition: color 0.3s ease;
         }
 
+        .right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-light, #F5F5F5);
+            border: 1px solid var(--border-color, #E0E0E0);
+            border-radius: 8px;
+            color: var(--text-color, #000000);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+
+            &:hover {
+                background-color: var(--bg-card, #ffffff);
+                border-color: var(--text-color, #000000);
+                transform: scale(1.05);
+            }
+
+            &:active {
+                transform: scale(0.95);
+            }
+
+            .theme-icon {
+                font-size: 18px;
+                transition: transform 0.3s ease, color 0.3s ease;
+                color: var(--text-color, #000000);
+            }
+
+            &:hover .theme-icon {
+                transform: rotate(15deg);
+            }
+        }
     }
 
     .banner {
@@ -238,41 +327,51 @@ const active = ref(1)
 
         h3 {
             font-size: 20px;
-            color: #000000;
+            color: var(--text-color, #000000);
             font-weight: 600;
+            transition: color 0.3s ease;
         }
 
         .tableContent {
             table {
                 width: 100%;
-
-                border: 1px solid #F3F3F3;
+                border: 1px solid var(--border-color, #F3F3F3);
+                background: var(--bg-card, #ffffff);
+                border-radius: 8px;
+                overflow: hidden;
+                transition: all 0.3s ease;
 
                 thead {
                     tr {
                         th {
                             font-weight: 400;
                             font-size: 14px;
-                            color: #909090;
+                            color: var(--text-gray, #909090);
                             height: 50px;
-                            border-bottom: 1px solid #F3F3F3;
+                            border-bottom: 1px solid var(--border-color, #F3F3F3);
+                            background: var(--bg-light, #F5F5F5);
+                            transition: all 0.3s ease;
                         }
                     }
                 }
 
                 tbody {
                     tr {
+                        transition: background-color 0.2s ease;
+
+                        &:hover {
+                            background-color: var(--bg-light, #F5F5F5);
+                        }
+
                         td {
                             height: 60px;
                             font-weight: 400;
                             font-size: 14px;
-                            color: #000000;
-                            border-right: 1px solid #F3F3F3;
-                            border-bottom: 1px solid #F3F3F3;
+                            color: var(--text-color, #000000);
+                            border-right: 1px solid var(--border-color, #F3F3F3);
+                            border-bottom: 1px solid var(--border-color, #F3F3F3);
+                            transition: all 0.3s ease;
                         }
-
-                       
-
                     }
                 }
             }
@@ -286,16 +385,36 @@ const active = ref(1)
 
             span {
                 font-size: 20px;
-                color: #000000;
+                color: var(--text-color, #000000);
                 font-weight: 600;
+                transition: color 0.3s ease;
             }
 
             b {
                 font-weight: 400;
                 font-size: 14px;
-                color: #000000;
-            }
+                color: var(--text-color, #000000);
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                cursor: pointer;
+                transition: all 0.3s ease;
 
+                &:hover {
+                    color: var(--text-color, #000000);
+                    transform: translateX(4px);
+                }
+
+                .arrow-icon {
+                    color: var(--text-color, #000000);
+                    font-size: 14px;
+                    transition: all 0.3s ease;
+                }
+
+                &:hover .arrow-icon {
+                    transform: translateX(2px);
+                }
+            }
         }
 
         .processDiv {
@@ -306,7 +425,8 @@ const active = ref(1)
                 align-content: center;
                 font-weight: 600;
                 font-size: 12px;
-                color: #909090;
+                color: var(--text-gray, #909090);
+                transition: color 0.3s ease;
             }
         }
 
@@ -319,26 +439,33 @@ const active = ref(1)
 
             .item {
                 height: 80px;
-                background: #F4F4F4;
+                background: var(--bg-light, #F4F4F4);
                 flex: 1;
                 border-radius: 8px;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
+                transition: background-color 0.3s ease, transform 0.2s ease;
+
+                &:hover {
+                    transform: translateY(-2px);
+                }
 
                 b {
                     font-weight: 400;
                     font-size: 12px;
-                    color: #999999;
+                    color: var(--text-dark-gray, #999999);
                     line-height: 22px;
+                    transition: color 0.3s ease;
                 }
 
                 p {
                     font-weight: bold;
                     font-size: 24px;
-                    color: #000;
+                    color: var(--text-color, #000);
                     line-height: 20px;
+                    transition: color 0.3s ease;
                 }
             }
         }
@@ -354,13 +481,21 @@ const active = ref(1)
                 padding: 0 10px;
                 display: flex;
                 border-radius: 8px;
-                border: 1px solid #F3F3F3;
+                border: 1px solid var(--border-color, #F3F3F3);
                 margin-bottom: 10px;
+                background: var(--bg-card, #ffffff);
+                transition: all 0.3s ease;
+
+                &:hover {
+                    border-color: var(--text-color, #000000);
+                    transform: translateX(4px);
+                }
 
                 span {
                     font-weight: 400;
                     font-size: 14px;
-                    color: #000000;
+                    color: var(--text-color, #000000);
+                    transition: color 0.3s ease;
                 }
 
                 button {
@@ -369,39 +504,61 @@ const active = ref(1)
                     background: #C1272E;
                     border-radius: 24px;
                     outline: none;
-                    border: #C1272E;
+                    border: 1px solid #C1272E;
                     font-weight: 400;
                     font-size: 14px;
                     color: #FFFFFF;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+
+                    &:hover {
+                        background: #a01f25;
+                        transform: scale(1.05);
+                    }
+
+                    &:active {
+                        transform: scale(0.95);
+                    }
                 }
             }
         }
     }
 
     .content {
-
         .tab {
             display: flex;
             gap: 32px;
-            border-bottom: 1px solid #F3F3F3;
+            border-bottom: 1px solid var(--border-color, #F3F3F3);
             margin-bottom: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+            transition: border-color 0.3s ease;
 
             .item {
+                flex-shrink: 0;
                 font-weight: 400;
                 font-size: 16px;
                 width: 32px;
-                color: #909090;
+                color: var(--text-gray, #909090);
                 padding-bottom: 15px;
                 border-bottom: 2px solid transparent;
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    color: var(--text-color, #000000);
+                }
             }
 
             .active {
+                flex-shrink: 0;
                 font-weight: 400;
                 font-size: 16px;
-                color: #000;
+                color: var(--text-color, #000);
                 width: 32px;
                 padding-bottom: 15px;
-                border-bottom: 2px solid #000;
+                border-bottom: 2px solid var(--text-color, #000);
+                transition: all 0.3s ease;
             }
         }
 
@@ -411,18 +568,21 @@ const active = ref(1)
             align-items: center;
             height: 50px;
             margin-bottom: 16px;
-            background: #F4F4F4;
+            background: var(--bg-light, #F4F4F4);
             border-radius: 8px;
             padding: 0 10px;
             font-weight: 600;
             font-size: 14px;
+            transition: background-color 0.3s ease;
 
             span {
-                color: #909090;
+                color: var(--text-gray, #909090);
+                transition: color 0.3s ease;
             }
 
             b {
-                color: #000;
+                color: var(--text-color, #000);
+                transition: color 0.3s ease;
             }
         }
 
@@ -430,40 +590,50 @@ const active = ref(1)
             height: 354px;
             border-radius: 8px;
             overflow: hidden;
-            background: #000;
+            background: var(--bg-card, #000);
+            transition: background-color 0.3s ease;
         }
 
         .tableContent {
             table {
                 width: 100%;
-
-                border: 1px solid #F3F3F3;
+                border: 1px solid var(--border-color, #F3F3F3);
+                background: var(--bg-card, #ffffff);
+                border-radius: 8px;
+                overflow: hidden;
+                transition: all 0.3s ease;
 
                 thead {
                     tr {
                         th {
                             font-weight: 400;
                             font-size: 14px;
-                            color: #909090;
+                            color: var(--text-gray, #909090);
                             height: 50px;
-                            border-bottom: 1px solid #F3F3F3;
+                            border-bottom: 1px solid var(--border-color, #F3F3F3);
+                            background: var(--bg-light, #F5F5F5);
+                            transition: all 0.3s ease;
                         }
                     }
                 }
 
                 tbody {
                     tr {
+                        transition: background-color 0.2s ease;
+
+                        &:hover {
+                            background-color: var(--bg-light, #F5F5F5);
+                        }
+
                         td {
                             height: 60px;
                             font-weight: 400;
                             font-size: 14px;
-                            color: #000000;
-                            border-right: 1px solid #F3F3F3;
-                            border-bottom: 1px solid #F3F3F3;
+                            color: var(--text-color, #000000);
+                            border-right: 1px solid var(--border-color, #F3F3F3);
+                            border-bottom: 1px solid var(--border-color, #F3F3F3);
+                            transition: all 0.3s ease;
                         }
-
-                       
-
                     }
                 }
             }

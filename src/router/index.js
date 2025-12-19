@@ -7,6 +7,9 @@ import detail from "../views/detail/index.vue"
 import breaking from "../views/breaking/index.vue"
 import accuracy from "../views/accuracy/index.vue"
 import settings from "../views/settings/index.vue"
+import userInformationListH5 from "../views/userInformationListH5/index.vue"
+import linkWallet from "../views/linkWallet/index.vue"
+import computingPowerServices from "../views/computingPowerServices/index.vue"
 import myNode from "../views/myNode/index.vue"
 import myIncome from "../views/myIncome/index.vue"
 import LPVault from "../views/LPVault/index.vue"
@@ -54,21 +57,59 @@ const router = createRouter({
       component: settings,
     },
     {
+      path: '/computing-power-services',
+      name: 'computingPowerServices',
+      component: computingPowerServices,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/link-wallet',
+      name: 'linkWallet',
+      component: linkWallet,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/user-info',
+      name: 'userInformationListH5',
+      component: userInformationListH5,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
       path: '/myNode',
       name: 'myNode',
       component: myNode,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
     },
     // myIncome
-
     {
       path: '/myIncome',
       name: 'myIncome',
       component: myIncome,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
     },
     {
       path: '/LPVault',
       name: 'LPVault',
       component: LPVault,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
     }
   ],
   scrollBehavior(to, from, savedPosition) {

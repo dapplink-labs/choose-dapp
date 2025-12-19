@@ -98,6 +98,14 @@
         </div>
       </div>
     </div>
+    <!-- 绑定邮箱弹层（从底部升起） -->
+    <BindEmail
+      v-model="showBindEmail"
+      v-model:email="bindEmail"
+      @get-code="handleGetCode"
+      @confirm="handleBindConfirm"
+      @skip="handleBindSkip"
+    />
   </div>
 </template>
 
@@ -105,6 +113,7 @@
 import { ref, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import NavBar2 from '@/components/navBar2.vue'
+import BindEmail from '@/components/BindEmail.vue'
 import { TopRight, BottomRight } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -272,17 +281,36 @@ const breakingNews = ref([
   }
 ])
 
-// 邮箱输入
+// 邮箱输入（右侧表单）
 const email = ref('')
 
-// 订阅处理
+// 绑定邮箱弹层控制
+const showBindEmail = ref(false)
+const bindEmail = ref('')
+
+// 点击「获取更新」按钮，从底部弹出绑定邮箱组件
 const handleSubscribe = () => {
-  if (email.value) {
-    console.log('订阅邮箱:', email.value)
-    // 这里可以添加实际的订阅逻辑
-    alert('订阅成功！')
-    email.value = ''
-  }
+  bindEmail.value = email.value
+  showBindEmail.value = true
+}
+
+// 绑定邮箱组件：获取验证码
+const handleGetCode = (val) => {
+  console.log('获取邮箱验证码:', val)
+  // TODO: 在此调用后端接口发送验证码
+}
+
+// 绑定邮箱组件：确认绑定
+const handleBindConfirm = (val) => {
+  console.log('确认绑定邮箱:', val)
+  // TODO: 在此提交绑定邮箱到后端
+  showBindEmail.value = false
+}
+
+// 绑定邮箱组件：跳过
+const handleBindSkip = () => {
+  console.log('跳过绑定邮箱')
+  showBindEmail.value = false
 }
 
 // 查看全部
@@ -538,6 +566,7 @@ onMounted(() => {
             .email-input {
               width: 100%;
               padding: 12px;
+              box-sizing: border-box;
               border: 1px solid var(--border-color, #E0E0E0);
               border-radius: 6px;
               font-size: 14px;

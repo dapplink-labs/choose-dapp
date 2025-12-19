@@ -1,10 +1,12 @@
 <template>
   <div class="multimarket-header">
+
+    <!-- PC端 -->
     <div class="header-container">
 
       <div class="logo-section">
         <div class="logo" @click="handleLogoClick">
-          <img src="@/assets/logo.png" alt="multimarket" class="logo-img" />
+          <img src="@/assets/logo-Dark.png" alt="multimarket" class="logo-img" />
         </div>
       </div>
 
@@ -40,7 +42,7 @@
           {{ $t('header.deposit') || '存入' }}
         </button>
 
-        <!-- 未连接钱包时显示“连接钱包”按钮 -->
+        <!-- 未连接钱包时显示"连接钱包"按钮 -->
         <button v-if="!isConnected" class="connect-wallet-btn" @click="showConnet = true">
           连接钱包
         </button>
@@ -55,6 +57,40 @@
       </div>
     </div>
 
+    <!-- 移动端 -->
+    <div class="header-h5">
+      <div class="h5-logo-section">
+        <div class="logo" @click="handleLogoClick">
+          <img :src="logoUrl" alt="multimarket" class="logo-img" />
+        </div>
+      </div>
+
+      <div class="h5-finance-section" v-if="isConnected">
+        <span class="finance-label">{{ $t('header.portfolio') || '投资组合' }}: </span>
+        <span class="finance-amount">${{ portfolioAmount }}</span>
+      </div>
+
+      <div class="h5-user-section">
+        <!-- 主题切换按钮 -->
+        <button class="h5-theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
+          <el-icon class="theme-icon" :class="{ 'icon-light': !isDark, 'icon-dark': isDark }">
+            <Sunny v-if="!isDark" />
+            <Moon v-else />
+          </el-icon>
+        </button>
+
+        <!-- 未连接钱包时显示"连接钱包"按钮（跳转到 LinkWallet 页面） -->
+        <button v-if="!isConnected" class="h5-connect-wallet-btn" @click="goLinkWallet">
+          连接钱包
+        </button>
+
+        <!-- 已连接钱包显示头像 -->
+        <div v-else class="h5-user-avatar" @click="handleUserInfo">
+          <img :src="userAvatar" alt="User Avatar" />
+        </div>
+      </div>
+    </div>
+
     <!-- 连接钱包弹窗 -->
     <transition name="fade">
       <div class="popup" v-if="showConnet">
@@ -63,7 +99,7 @@
             <CloseBold />
           </el-icon>
           <div class="headerlogo">
-            <img src="@/assets/logo.png" alt="logo">
+            <img :src="logoUrl" alt="logo">
               <h4>连接钱包</h4>
           </div>
           <ul class="scroll-area">
@@ -101,6 +137,8 @@ import { useThemeStore } from '@/stores/theme'
 import { useCounterStore } from '@/stores/counter'
 import img from "../assets/wallconnect.svg";
 import router from "@/router";
+import logoLight from "@/assets/logo.png";
+import logoDark from "@/assets/logo-Dark.png";
 
 
 const { disconnect } = useDisconnect();
@@ -137,6 +175,11 @@ const showConnet = ref(false)
 // 主题管理
 const themeStore = useThemeStore()
 const isDark = computed(() => themeStore.isDark)
+
+// 根据主题返回对应的logo
+const logoUrl = computed(() => {
+  return isDark.value ? logoDark : logoLight
+})
 
 const wallets = [
 
@@ -258,6 +301,11 @@ const toggleUserMenu = () => {
   showUserMenu.value = !showUserMenu.value
 }
 
+const handleUserInfo = () => {
+  router.push('/user-info')
+  closeUserMenu()
+}
+
 const closeUserMenu = () => {
   showUserMenu.value = false
 }
@@ -266,6 +314,9 @@ const handleProfile = () => { closeUserMenu() }
 const handleSettings = () => {
   router.push('/settings')
   closeUserMenu()
+}
+const goLinkWallet = () => {
+  router.push('/link-wallet')
 }
 const handleLogout = () => {
   disconnect();
@@ -313,6 +364,143 @@ onBeforeUnmount(() => {
     justify-content: space-between;
     gap: 24px;
     box-sizing: border-box;
+  }
+
+  // 移动端头部
+  .header-h5 {
+    width: 100%;
+    display: none; // 默认隐藏，移动端显示
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-sizing: border-box;
+
+    .h5-logo-section {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+
+      .logo {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: opacity 0.2s;
+
+        &:hover {
+          opacity: 0.8;
+        }
+
+        .logo-img {
+          height: 28px;
+          width: auto;
+          object-fit: contain;
+          display: block;
+        }
+      }
+    }
+
+    .h5-finance-section {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      white-space: nowrap;
+
+      .finance-label {
+        color: var(--text-color, #fff);
+        margin-right: 4px;
+      }
+
+      .finance-amount {
+        color: #10b981;
+        font-weight: 500;
+      }
+    }
+
+    .h5-user-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+
+      .h5-theme-toggle-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: transparent;
+        border: 1px solid #3a3a3a;
+        border-radius: 8px;
+        color: #ffffff;
+        cursor: pointer;
+        transition: all 0.2s;
+        flex-shrink: 0;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+          border-color: #5a5a5a;
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+
+        .theme-icon {
+          font-size: 16px;
+          transition: color 0.3s ease;
+
+          // 亮色模式：太阳图标使用橙色/黄色
+          &.icon-light {
+            color: #000;
+          }
+
+          // 暗色模式：月亮图标使用白色/浅色
+          &.icon-dark {
+            color: #FFFFFF;
+          }
+        }
+      }
+
+      .h5-connect-wallet-btn {
+        height: 32px;
+        padding: 0 12px;
+        border: none;
+        background: #C1272E;
+        color: #ffffff;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        line-height: 1;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.08);
+        }
+      }
+
+      .h5-user-avatar {
+        cursor: pointer;
+        padding: 2px;
+        border-radius: 50%;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        img {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid #3a3a3a;
+        }
+      }
+    }
   }
 
   // Logo 区域
@@ -545,30 +733,30 @@ onBeforeUnmount(() => {
 }
 
 // popup 弹窗样式（仅连接弹窗）
-  .popup {
-    font-size: 14px;
-    position: fixed;
-    top: 0;
-    right: 0;
-    z-index: 2000;
-    width: 100%;
-    height: 100vh;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.popup {
+  font-size: 14px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 2000;
+  width: 100%;
+  height: 100vh;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    .content1 {
-      width: 90%;
-      max-width: 360px;
-      border-radius: 16px;
-      background: #151517;
-      padding: 24px;
-      position: absolute;
-      cursor: pointer;
-      animation: fadeIn 0.4s ease forwards;
-      box-sizing: border-box;
+  .content1 {
+    width: 90%;
+    max-width: 360px;
+    border-radius: 16px;
+    background: #151517;
+    padding: 24px;
+    position: absolute;
+    cursor: pointer;
+    animation: fadeIn 0.4s ease forwards;
+    box-sizing: border-box;
 
     h4 {
       margin: 0 0 24px 0;
@@ -714,6 +902,10 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 480px) {
+  .multimarket-header {
+    background-color: var(--bg-color,#fff);
+  }
+
   .popup {
     .content1 {
       width: 90%;
@@ -835,75 +1027,53 @@ onBeforeUnmount(() => {
     padding: 0 16px;
     height: 56px;
 
+    // PC端头部在移动端隐藏
     .header-container {
-      gap: 10px;
+      display: none;
     }
 
-    .logo-section {
-      .logo {
-        .logo-img {
-          height: 28px;
+    // 移动端头部显示
+    .header-h5 {
+      display: flex;
+
+      .h5-logo-section {
+        .logo {
+          .logo-img {
+            height: 28px;
+          }
         }
       }
-    }
 
-    .search-section {
-      max-width: 180px;
-      flex: 0 0 auto;
+      .h5-finance-section {
+        font-size: 13px;
+      }
 
-      .search-input-wrapper {
-        .search-icon {
-          left: 10px;
-          font-size: 16px;
+      .h5-user-section {
+        gap: 8px;
+
+        .h5-theme-toggle-btn {
+          width: 32px;
+          height: 32px;
+          min-width: 32px;
+
+          .theme-icon {
+            font-size: 15px;
+          }
         }
 
-        .search-input {
-          height: 36px;
-          padding: 0 10px 0 34px;
-          font-size: 13px;
-          border-radius: 6px;
+        .h5-connect-wallet-btn {
+          height: 32px;
+          padding: 0 12px;
+          font-size: 12px;
+          min-width: 70px;
         }
-      }
-    }
 
-    .right-section {
-      gap: 8px;
-    }
-
-    .theme-toggle-btn {
-      width: 32px;
-      height: 32px;
-      min-width: 32px; // 触摸友好的最小宽度
-
-      .theme-icon {
-        font-size: 15px;
-      }
-    }
-
-    .deposit-btn {
-      height: 36px;
-      padding: 0 12px;
-      font-size: 12px;
-      min-width: 60px; // 触摸友好的最小宽度
-    }
-
-    .connect-wallet-btn {
-      height: 36px;
-      padding: 0 12px;
-      font-size: 12px;
-      min-width: 80px; // 触摸友好的最小宽度
-    }
-
-    .user-section {
-      padding: 2px;
-
-      .user-avatar {
-        width: 30px;
-        height: 30px;
-      }
-
-      .dropdown-icon {
-        font-size: 12px;
+        .h5-user-avatar {
+          img {
+            width: 30px;
+            height: 30px;
+          }
+        }
       }
     }
 
@@ -924,47 +1094,45 @@ onBeforeUnmount(() => {
     padding: 0 12px;
     height: 56px;
 
-    .header-container {
+    .header-h5 {
       gap: 8px;
-    }
 
-    .logo-section {
-      .logo {
-        .logo-img {
-          height: 24px;
+      .h5-logo-section {
+        .logo {
+          .logo-img {
+            height: 24px;
+          }
         }
       }
-    }
 
-    .search-section {
-      display: none;
-    }
+      .h5-finance-section {
+        font-size: 12px;
+      }
 
-    .right-section {
-      gap: 6px;
-    }
+      .h5-user-section {
+        gap: 6px;
 
-    .theme-toggle-btn {
-      width: 32px;
-      height: 32px;
-    }
+        .h5-theme-toggle-btn {
+          width: 30px;
+          height: 30px;
 
-    .deposit-btn {
-      padding: 0 10px;
-      font-size: 11px;
-      min-width: 50px;
-    }
+          .theme-icon {
+            font-size: 14px;
+          }
+        }
 
-    .connect-wallet-btn {
-      padding: 0 10px;
-      font-size: 11px;
-      min-width: 70px;
-    }
+        .h5-connect-wallet-btn {
+          padding: 0 10px;
+          font-size: 11px;
+          min-width: 60px;
+        }
 
-    .user-section {
-      .user-avatar {
-        width: 28px;
-        height: 28px;
+        .h5-user-avatar {
+          img {
+            width: 28px;
+            height: 28px;
+          }
+        }
       }
     }
   }
@@ -975,49 +1143,47 @@ onBeforeUnmount(() => {
     padding: 0 10px;
     height: 52px;
 
-    .logo-section {
-      .logo {
-        .logo-img {
-          height: 22px;
+    .header-h5 {
+      gap: 6px;
+
+      .h5-logo-section {
+        .logo {
+          .logo-img {
+            height: 22px;
+          }
         }
       }
-    }
 
-    .right-section {
-      gap: 4px;
-    }
-
-    .theme-toggle-btn {
-      width: 30px;
-      height: 30px;
-
-      .theme-icon {
-        font-size: 14px;
-      }
-    }
-
-    .deposit-btn {
-      height: 32px;
-      padding: 0 8px;
-      font-size: 11px;
-      min-width: 45px;
-    }
-
-    .connect-wallet-btn {
-      height: 32px;
-      padding: 0 8px;
-      font-size: 11px;
-      min-width: 65px;
-    }
-
-    .user-section {
-      .user-avatar {
-        width: 26px;
-        height: 26px;
-      }
-
-      .dropdown-icon {
+      .h5-finance-section {
         font-size: 11px;
+      }
+
+      .h5-user-section {
+        gap: 4px;
+
+        .h5-theme-toggle-btn {
+          width: 28px;
+          height: 28px;
+          min-width: 28px;
+
+          .theme-icon {
+            font-size: 13px;
+          }
+        }
+
+        .h5-connect-wallet-btn {
+          height: 30px;
+          padding: 0 8px;
+          font-size: 11px;
+          min-width: 55px;
+        }
+
+        .h5-user-avatar {
+          img {
+            width: 26px;
+            height: 26px;
+          }
+        }
       }
     }
 

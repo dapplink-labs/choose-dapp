@@ -81,7 +81,7 @@
     const { nodes, links } = generateGraphData();
   
     const option = {
-      backgroundColor: '#050508',
+    //   backgroundColor: '#050508',
       
       // --- 核心修改：Tooltip 配置 ---
       tooltip: {
@@ -166,8 +166,8 @@
             edgeLength: [50, 150]
           },
           lineStyle: {
-            color: '#ffffff',
-            opacity: 0.15,
+            color: '#ccc',
+            opacity: 0.6,
             width: 0.8
           },
           categories: [
@@ -227,7 +227,7 @@
   .graph-container {
     width: 100%;
     height: 100%;
-    background: #000;
+    // background: #000;
     position: relative;
     .chart-instance { width: 100%; height: 100%; }
   }
@@ -236,14 +236,14 @@
   <!-- Tooltip 样式 -->
   <style lang="scss">
   .custom-tooltip-card {
-    background: rgba(45, 45, 48, 0.95);
+    background: var(--bg-light, #F4F4F4);
     backdrop-filter: blur(10px);
     border-radius: 6px;
     padding: 12px 16px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px  var(--bg-light, #F4F4F4);
+    border: 1px solid  var(--bg-light, #F4F4F4);
     font-family: sans-serif;
-    color: #fff;
+    color: var(--text-color, #000000);
     min-width: 280px;
     pointer-events: none;
   
