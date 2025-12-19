@@ -10,6 +10,9 @@ import settings from "../views/settings/index.vue"
 import userInformationListH5 from "../views/userInformationListH5/index.vue"
 import linkWallet from "../views/linkWallet/index.vue"
 import computingPowerServices from "../views/computingPowerServices/index.vue"
+import myNode from "../views/myNode/index.vue"
+import myIncome from "../views/myIncome/index.vue"
+import LPVault from "../views/LPVault/index.vue"
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -57,7 +60,7 @@ const router = createRouter({
       path: '/computing-power-services',
       name: 'computingPowerServices',
       component: computingPowerServices,
-      meta:{
+      meta: {
         hideHeader: true,
         hideFooterNav: true
       }
@@ -80,13 +83,28 @@ const router = createRouter({
         hideFooterNav: true
       }
     },
-
+    {
+      path: '/myNode',
+      name: 'myNode',
+      component: myNode,
+    },
+    // myIncome
+    {
+      path: '/myIncome',
+      name: 'myIncome',
+      component: myIncome,
+    },
+    {
+      path: '/LPVault',
+      name: 'LPVault',
+      component: LPVault,
+    }
   ],
   scrollBehavior(to, from, savedPosition) {
     // 处理滚动行为：如果有保存的滚动位置，则恢复到该位置，否则滚动到顶部
-  
-      return { top: 0 }; // 跳转时滚动到顶部
-    
+
+    return { top: 0 }; // 跳转时滚动到顶部
+
   },
 });
 export default router
