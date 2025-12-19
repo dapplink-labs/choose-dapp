@@ -87,17 +87,29 @@ const router = createRouter({
       path: '/myNode',
       name: 'myNode',
       component: myNode,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
     },
     // myIncome
     {
       path: '/myIncome',
       name: 'myIncome',
       component: myIncome,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
     },
     {
       path: '/LPVault',
       name: 'LPVault',
       component: LPVault,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
     }
   ],
   scrollBehavior(to, from, savedPosition) {

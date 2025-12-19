@@ -160,6 +160,7 @@ const handleOpenMore = () => {
 }
 
 const handleMyNodes = () => {
+  router.push('/myNode')
   console.log('查看我的节点')
 }
 

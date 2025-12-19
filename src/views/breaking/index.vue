@@ -566,6 +566,7 @@ onMounted(() => {
             .email-input {
               width: 100%;
               padding: 12px;
+              box-sizing: border-box;
               border: 1px solid var(--border-color, #E0E0E0);
               border-radius: 6px;
               font-size: 14px;

@@ -60,6 +60,15 @@
     <div class="disconnect-section">
       <button class="disconnect-btn" @click="handleDisconnect">断开链接</button>
     </div>
+
+    <!-- Invite邀请码组件 -->
+    <Invite
+      v-model="showInvite"
+      v-model:invite-code="inviteCode"
+      @confirm="handleInviteConfirm"
+      @skip="handleInviteSkip"
+      @close="handleInviteClose"
+    />
   </div>
 </template>
 
@@ -68,6 +77,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAccount, useDisconnect } from '@wagmi/vue'
 import { useThemeStore } from '@/stores/theme'
+import Invite from '@/components/Invite.vue'
 
 // 图标资源 - 亮色
 import settingIcon from '@/assets/icon/setting.png'
@@ -81,12 +91,12 @@ import icon6 from '@/assets/icon/6.png'
 import icon7 from '@/assets/icon/7.png'
 import icon8 from '@/assets/icon/8.png'
 import icon9 from '@/assets/icon/9.png'
-import friend1 from '@/assets/icon/facebook.png'
+import friend1 from '@/assets/icon/Facebook.png'
 import friend2 from '@/assets/icon/ins.png'
 import friend3 from '@/assets/icon/in.png'
 import friend4 from '@/assets/icon/dy.png'
-import friend5 from '@/assets/icon/twitter.png'
-import friend6 from '@/assets/icon/youtube.png'
+import friend5 from '@/assets/icon/Twitter.png'
+import friend6 from '@/assets/icon/YouTube.png'
 // 图标资源 - 暗色
 import settingIconDark from '@/assets/icon/settingDark.png'
 import closeIconDark from '@/assets/icon/closeDark.png'
@@ -99,18 +109,22 @@ import icon6Dark from '@/assets/icon/6Dark.png'
 import icon7Dark from '@/assets/icon/7Dark.png'
 import icon8Dark from '@/assets/icon/8Dark.png'
 import icon9Dark from '@/assets/icon/9Dark.png'
-import friend1Dark from '@/assets/icon/facebookDark.png'
+import friend1Dark from '@/assets/icon/FacebookDark.png'
 import friend2Dark from '@/assets/icon/insDark.png'
 import friend3Dark from '@/assets/icon/inDark.png'
 import friend4Dark from '@/assets/icon/dyDark.png'
-import friend5Dark from '@/assets/icon/twitterDark.png'
-import friend6Dark from '@/assets/icon/youtubeDark.png'
+import friend5Dark from '@/assets/icon/TwitterDark.png'
+import friend6Dark from '@/assets/icon/YouTubeDark.png'
 
 const router = useRouter()
 const { address } = useAccount()
 const { disconnect } = useDisconnect()
 const themeStore = useThemeStore()
 const isDark = computed(() => themeStore.isDark)
+
+// Invite组件控制
+const showInvite = ref(false)
+const inviteCode = ref('')
 
 // 用户信息
 const username = ref('johnsmith2025')
@@ -138,18 +152,18 @@ const currentCloseIcon = computed(() =>
 // 菜单项基础配置（包含明暗两套图标）
 const baseMenuItems = [
   {
-    key: 'staking',
+    key: 'computing-power-services',
     label: '节点质押',
     icon: icon1,
     iconDark: icon1Dark,
-    path: '/staking'
+    path: '/computing-power-services'
   },
   {
-    key: 'vault',
+    key: 'LPVault',
     label: 'LP金库',
     icon: icon2,
     iconDark: icon2Dark,
-    path: '/vault'
+    path: '/LPVault'
   },
   {
     key: 'dashboard',
@@ -177,7 +191,7 @@ const baseMenuItems = [
     label: '奖励',
     icon: icon5,
     iconDark: icon5Dark,
-    path: '/fund'
+    path: '/'
   },
   {
     key: 'accuracy',
@@ -244,6 +258,15 @@ const handleClose = () => {
 
 // 处理菜单项点击
 const handleMenuClick = (item) => {
+  console.log('点击菜单项：', item)
+  
+  // 如果是奖励菜单项，打开Invite组件
+  if (item.key === 'fund') {
+    showInvite.value = true
+    return
+  }
+  
+  // 其他菜单项的路由跳转
   if (item.path) {
     router.push(item.path)
   }
@@ -255,6 +278,24 @@ const handleDisconnect = () => {
   disconnect()
   // 返回首页，header 会根据连接状态自动更新
   router.push('/')
+}
+
+// 处理邀请码确定
+const handleInviteConfirm = (code) => {
+  console.log('确认邀请码：', code)
+  showInvite.value = false
+}
+
+// 处理邀请码跳过
+const handleInviteSkip = () => {
+  console.log('跳过邀请码')
+  showInvite.value = false
+}
+
+// 处理邀请码关闭
+const handleInviteClose = () => {
+  console.log('关闭邀请码弹窗')
+  showInvite.value = false
 }
 </script>
 
