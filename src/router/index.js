@@ -13,6 +13,7 @@ import computingPowerServices from "../views/computingPowerServices/index.vue"
 import myNode from "../views/myNode/index.vue"
 import myIncome from "../views/myIncome/index.vue"
 import LPVault from "../views/LPVault/index.vue"
+import dashboard from "../views/dashboard/index.vue"
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -106,6 +107,15 @@ const router = createRouter({
       path: '/LPVault',
       name: 'LPVault',
       component: LPVault,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: dashboard,
       meta: {
         hideHeader: true,
         hideFooterNav: true

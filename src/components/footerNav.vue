@@ -166,7 +166,9 @@ const handleNavClick = (item) => {
     })
     // 可以在这里添加滚动到搜索框的逻辑
   } else if (item.path) {
-    router.push(item.path).then(() => {
+    // 如果是"更多"页面，传递from=footer参数
+    const path = item.key === 'more' ? `${item.path}?from=footer` : item.path
+    router.push(path).then(() => {
       // 路由跳转后，根据实际路由更新激活状态
       updateActiveNavFromRoute()
     })

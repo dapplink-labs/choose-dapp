@@ -228,7 +228,7 @@ const currentNodeImg = computed(() =>
 
 .node-content {
   width: 100%;
-  border: 1px solid #F4F4F4;
+  border: 1px solid var(--border-color, #E0E0E0);
   border-radius: 12px;
   overflow: hidden;
 
@@ -312,7 +312,7 @@ const currentNodeImg = computed(() =>
   margin-top: 8px;
   background-color: var(--bg-card, #ffffff);
   border-radius: 18px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--border-color, #E0E0E0);
   padding: 16px 16px 20px;
   box-sizing: border-box;
 }
@@ -475,7 +475,7 @@ const currentNodeImg = computed(() =>
 .record-card {
   background-color: var(--bg-card, #ffffff);
   border-radius: 12px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid var(--border-color, #E0E0E0);
   overflow: hidden;
 }
 
@@ -506,7 +506,7 @@ const currentNodeImg = computed(() =>
 }
 
 .record-row:not(.record-row--head) {
-  border-top: 1px solid #f4f4f4;
+  border-top: 1px solid var(--border-color, #E0E0E0);
 }
 
 .cell {
@@ -521,8 +521,8 @@ const currentNodeImg = computed(() =>
 
 .cell.type {
   flex: 0.8;
-  border-left: 1px solid #F3F3F3;
-  border-right: 1px solid #F3F3F3;
+  border-left: 1px solid var(--border-color, #E0E0E0);
+  border-right: 1px solid var(--border-color, #E0E0E0);
 }
 
 .record-row--head>.cell.type {

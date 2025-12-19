@@ -107,7 +107,7 @@ const handleConfirm = () => {
   width: 40px;
   height: 4px;
   border-radius: 999px;
-  background-color: #e5e5e5;
+  background-color: var(--border-color, #E0E0E0);
   margin: 4px auto 16px;
 }
 
@@ -126,7 +126,7 @@ const handleConfirm = () => {
   width: 100%;
   height: 44px;
   border-radius: 8px;
-  border: 1px solid #f1f1f1;
+  border: 1px solid var(--border-color, #E0E0E0);
   padding: 0 12px;
   font-size: 14px;
   background-color: var(--bg-page-h5, #ffffff);
@@ -163,7 +163,7 @@ const handleConfirm = () => {
 
 .skip-btn {
   background-color: var(--bg-page-h5, #ffffff);
-  border-color: #f1f1f1;
+  border-color: var(--border-color, #E0E0E0);
   color: var(--text-color, #000000);
 }
 
