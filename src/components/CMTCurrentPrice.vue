@@ -229,7 +229,8 @@ const initChart = () => {
     // 使用canvas渲染器初始化
     chartInstance.value = echarts.init(chartRef.value, null, {
         renderer: 'canvas',
-        useDirtyRect: false
+        useDirtyRect: false,
+        clearBeforeRender: true
     })
 
     const { dates, data, volumes, ma5, ma10, ma20 } = generateKlineData(activePeriod.value)
@@ -237,6 +238,7 @@ const initChart = () => {
     const option = {
         backgroundColor: '#000000', // 纯黑色背景
         animation: false,
+        useUTC: false,
         legend: {
             data: ['K线', 'MA5', 'MA10', 'MA20', '成交量'],
             top: 8,
@@ -389,9 +391,12 @@ const initChart = () => {
                 maxValueSpan: 100,
                 moveOnMouseMove: false,
                 moveOnMouseWheel: !isMobile.value,
-                preventDefaultMouseMove: false,
+                preventDefaultMouseMove: true,
                 zoomOnMouseWheel: !isMobile.value,
                 zoomLock: false,
+                filterMode: 'empty',
+                throttle: 50,
+                realtime: true,
                 // 移动端触摸优化
                 ...(isMobile.value ? {
                     moveOnMouseMove: false,
@@ -437,7 +442,10 @@ const initChart = () => {
                         color: 'rgba(255, 255, 255, 0.05)'
                     }
                 },
-                showDetail: false
+                showDetail: false,
+                filterMode: 'empty',
+                throttle: 50,
+                realtime: true
             }
         ],
         series: [
@@ -588,7 +596,11 @@ const initChart = () => {
         }
     }
 
-    chartInstance.value.setOption(option, true)
+    chartInstance.value.setOption(option, {
+        notMerge: true,
+        lazyUpdate: false,
+        silent: false
+    })
 }
 
 // 处理时间周期切换
@@ -633,6 +645,9 @@ const handlePeriodChange = (period) => {
                     end: 100
                 }
             ]
+        }, {
+            notMerge: false,
+            lazyUpdate: false
         })
     }
 }
@@ -769,6 +784,7 @@ const handleResize = () => {
 onMounted(() => {
     checkIsMobile()
     initChart()
+    handlePeriodChange("1d")
     window.addEventListener('resize', handleResize)
     window.addEventListener('resize', checkIsMobile)
     
@@ -892,13 +908,13 @@ onUnmounted(() => {
                 color: #999;
                 cursor: pointer;
                 padding: 4px 8px;
-                border-radius: 4px;
+                border-radius: 20px;
                 transition: all 0.3s ease;
                 user-select: none;
 
                 &.active {
-                    color: var(--text-color, #000000);
-                    background-color: var(--bg-light,#F5F5F5);
+                    color: white;
+                    background-color: #383838;
                 }
 
                 &:hover {
