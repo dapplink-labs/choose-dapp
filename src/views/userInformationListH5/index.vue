@@ -33,13 +33,13 @@
 
       <div class="menu-divider"></div>
       <!-- 中部分（普通列表） -->
-      <div class="menu-group menu-group-bottom">
+      <div v-if="isFromFooter" class="menu-group menu-group-bottom">
         <div v-for="item in middleMenuItems" :key="item.key" class="menu-item" @click="handleMenuClick(item)">
           <img :src="item.icon" :alt="item.label" class="menu-icon" />
           <span class="menu-text">{{ item.label }}</span>
         </div>
       </div>
-      <div class="menu-divider"></div>
+      <div v-if="isFromFooter" class="menu-divider"></div>
 
       <!-- 下半部分（普通列表） -->
       <div class="menu-group menu-group-bottom">
@@ -50,8 +50,8 @@
       </div>
     </div>
 
-    <!-- 友链模块 -->
-    <div class="friend-links">
+    <!-- 友链模块（仅底部导航"更多"页面显示） -->
+    <div v-if="isFromFooter" class="friend-links">
       <a v-for="(link, idx) in friendLinks" :key="idx" href="javascript:void(0)" class="friend-link"
         :aria-label="link.label">
         <img :src="link.icon" :alt="link.label" />
@@ -76,7 +76,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAccount, useDisconnect } from '@wagmi/vue'
 import { useThemeStore } from '@/stores/theme'
 import Invite from '@/components/Invite.vue'
@@ -119,10 +119,16 @@ import friend5Dark from '@/assets/icon/TwitterDark.png'
 import friend6Dark from '@/assets/icon/YouTubeDark.png'
 
 const router = useRouter()
+const route = useRoute()
 const { address } = useAccount()
 const { disconnect } = useDisconnect()
 const themeStore = useThemeStore()
 const isDark = computed(() => themeStore.isDark)
+
+// 判断是否来自底部导航的"更多"页面
+const isFromFooter = computed(() => {
+  return route.query.from === 'footer' || route.meta?.fromFooter
+})
 
 // Invite组件控制
 const showInvite = ref(false)
@@ -177,8 +183,68 @@ const currentCloseIcon = computed(() =>
   isDark.value ? closeIconDark : closeIcon
 )
 
-// 菜单项基础配置（包含明暗两套图标）
-const baseMenuItems = [
+// 第一张图的菜单配置（8个菜单项，无友链）
+const baseMenuItems1 = [
+  {
+    key: 'computing-power-services',
+    label: '节点质押',
+    icon: icon1,
+    iconDark: icon1Dark,
+    path: '/computing-power-services'
+  },
+  {
+    key: 'LPVault',
+    label: 'LP金库',
+    icon: icon2,
+    iconDark: icon2Dark,
+    path: '/LPVault'
+  },
+  {
+    key: 'dashboard',
+    label: '数据看板',
+    icon: icon3,
+    iconDark: icon3Dark,
+    path: '/dashboard'
+  },
+  {
+    key: 'create',
+    label: '创建预测市场',
+    icon: icon4,
+    iconDark: icon4Dark,
+    path: '/create'
+  },
+  {
+    key: 'fund',
+    label: '资金管理',
+    icon: icon5,
+    iconDark: icon5Dark,
+    path: '/'
+  },
+  {
+    key: 'accuracy',
+    label: '准确度',
+    icon: icon6,
+    iconDark: icon6Dark,
+    path: '/accuracy'
+  },
+  {
+    key: 'leaderboard',
+    label: '领先看板',
+    icon: icon7,
+    iconDark: icon7Dark,
+    path: '/leaderboard'
+  },
+  {
+    key: 'terms',
+    label: '使用条款',
+    icon: icon8,
+    iconDark: icon8Dark,
+    path: '/terms'
+  }
+]
+
+// 第二张图的菜单配置（9个菜单项，有友链）
+const baseMenuItems2 = [
   {
     key: 'computing-power-services',
     label: '节点质押',
@@ -229,11 +295,11 @@ const baseMenuItems = [
     path: '/accuracy'
   },
   {
-    key: 'accuracy',
+    key: 'doc',
     label: '文档',
     icon: icon9,
     iconDark: icon9Dark,
-    path: '/accuracy'
+    path: '/doc'
   },
   {
     key: 'terms',
@@ -244,18 +310,46 @@ const baseMenuItems = [
   }
 ]
 
+// 根据来源选择菜单配置
+const baseMenuItems = computed(() => {
+  return isFromFooter.value ? baseMenuItems2 : baseMenuItems1
+})
+
 // 根据主题返回实际使用的菜单项（图标随主题切换）
 const menuItems = computed(() =>
-  baseMenuItems.map(item => ({
+  baseMenuItems.value.map(item => ({
     ...item,
     icon: isDark.value ? item.iconDark : item.icon
   }))
 )
 
-// 上半部分（前 4 条）与下半部分（其余）
-const topMenuItems = computed(() => menuItems.value.slice(0, 4))
-const middleMenuItems = computed(() => menuItems.value.slice(4, 6))
-const bottomMenuItems = computed(() => menuItems.value.slice(6))
+// 根据来源分组菜单项
+const topMenuItems = computed(() => {
+  if (isFromFooter.value) {
+    // 第二张图：前4个一组
+    return menuItems.value.slice(0, 4)
+  } else {
+    // 第一张图：前4个一组
+    return menuItems.value.slice(0, 4)
+  }
+})
+
+const middleMenuItems = computed(() => {
+  if (isFromFooter.value) {
+    // 第二张图：中间2个一组（领先看板、奖励）
+    return menuItems.value.slice(4, 6)
+  }
+})
+
+const bottomMenuItems = computed(() => {
+  if (isFromFooter.value) {
+    // 第二张图：最后3个一组（准确度、文档、使用条款）
+    return menuItems.value.slice(6)
+  } else {
+    // 第一张图：最后2个一组（领先看板、使用条款）
+    return menuItems.value.slice(4)
+  }
+})
 
 // 友链图标（使用 assets/icon 中的图片，随主题切换）
 const baseFriendLinks = [
@@ -344,7 +438,7 @@ const handleInviteClose = () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #F4F4F4;
+    border-bottom: 1px solid var(--border-color, #E0E0E0);
 
     .user-info {
       display: flex;
@@ -453,7 +547,7 @@ const handleInviteClose = () => {
       width: 100%;
       height: 48px;
       border-radius: 8px;
-      border: 1px solid #F3F3F3;
+      border: 1px solid var(--border-color, #E0E0E0);
       background: var(--bg-page-h5, #ffffff);
       color: #C1272E;
       font-size: 16px;
@@ -513,6 +607,6 @@ const handleInviteClose = () => {
 .menu-divider {
   width: 100%;
   height: 1px;
-  background-color: #F4F4F4;
+  background-color: var(--border-color, #E0E0E0);
 }
 </style>

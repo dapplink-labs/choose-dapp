@@ -1858,7 +1858,7 @@ const listData = ref([
 
 @media (max-width: 480px) {
   .main-content {
-    padding-top: 90px;
+    padding-top: 20px;
 
     .content-wrapper {
       padding: 12px 12px 32px;

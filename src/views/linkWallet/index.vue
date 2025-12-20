@@ -122,7 +122,7 @@ const { logoUrl, isConnectingFromPage, handleConnect, handleClose } = useLinkWal
 .subtitle-line {
   flex: 1;
   height: 1px;
-  background-color: #E5E5E5;
+  background-color: var(--border-color, #E0E0E0);
 }
 
 .welcome-subtitle {
@@ -141,11 +141,11 @@ const { logoUrl, isConnectingFromPage, handleConnect, handleClose } = useLinkWal
   align-items: center;
   justify-content: space-between;
   padding: 14px 18px;
-  background-color: var(--bg-card, #f7f7f7);
+  background-color: var(--bg-card, #ffffff);
   border-radius: 16px;
   box-sizing: border-box;
   cursor: pointer;
-  border: 1px solid #f1f1f1;
+  border: 1px solid var(--border-color, #E0E0E0);
 }
 
 .wallet-info {

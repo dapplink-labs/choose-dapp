@@ -1293,7 +1293,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
 @media (max-width: 480px) {
   .coming-soon-overlay {
-    // display: flex !important;
+    display: flex !important;
   }
 
   .home-page {
@@ -1780,8 +1780,8 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
   right: 0;
   bottom: 0;
   background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
   justify-content: center;
   z-index: 1000;
   padding-top: 100px;

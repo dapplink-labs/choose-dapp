@@ -1,10 +1,9 @@
 <template>
   <div class="accuracy-page">
-    <!-- 导航栏 -->
-    <NavBar2 />
-
     <!-- 主要内容区域 -->
     <div class="main-content">
+      <!-- 导航栏 -->
+      <NavBar2 />
       <div class="content-wrapper">
         <!-- 左右布局 -->
         <div class="page-layout">
@@ -429,6 +428,8 @@ const updateMetrics = (tabValue) => {
 
 @media (max-width: 768px) {
   .main-content {
+    padding-top: 50px;
+
     .content-wrapper {
       padding: 16px;
 

@@ -289,7 +289,7 @@ const formatNumber = (num) => {
 <style scoped lang="scss">
 .leaderboard-page {
   min-height: 100vh;
-  background-color: #F5F5F5;
+  background-color: var(--bg-page-h5, #F5F5F5);
   padding-top: 128px; // header(80px) + navbar2(48px)
 
   .main-content {
@@ -307,7 +307,7 @@ const formatNumber = (num) => {
       // 左侧主排行榜区域
       .left-leaderboard {
         flex: 1;
-        background: white;
+        background: var(--bg-page-h5, #ffffff);
         border-radius: 8px;
         padding: 24px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -315,7 +315,7 @@ const formatNumber = (num) => {
         .page-title {
           font-size: 28px;
           font-weight: 700;
-          color: #000;
+          color: var(--text-color, #000000);
           margin: 0 0 24px 0;
         }
 
@@ -333,8 +333,8 @@ const formatNumber = (num) => {
             .time-filter-btn {
               padding: 8px 16px;
               border: none;
-              background: white;
-              color: #000;
+              background: transparent;
+              color: var(--text-color, #000000);
               border-radius: 4px;
               font-size: 14px;
               cursor: pointer;
@@ -346,9 +346,9 @@ const formatNumber = (num) => {
               }
 
               &.active {
-                background: #000;
-                color: white;
-                border-color: #000;
+                background: var(--text-color, #000000);
+                color: var(--bg-card, #ffffff);
+                border-color: var(--text-color, #000000);
               }
             }
           }
@@ -361,9 +361,9 @@ const formatNumber = (num) => {
               padding: 8px 12px;
               border: 1px solid #E0E0E0;
               border-radius: 6px;
-              background: white;
+              background: var(--bg-page-h5, #ffffff);
               font-size: 14px;
-              color: #333;
+              color: var(--text-color, #333333);
               cursor: pointer;
               outline: none;
 
@@ -383,7 +383,7 @@ const formatNumber = (num) => {
           border-bottom: 1px solid #E0E0E0;
           font-size: 14px;
           font-weight: 600;
-          color: #666;
+          color: var(--text-dark-gray, #666666);
           margin-bottom: 8px;
 
           .header-search {
@@ -405,7 +405,7 @@ const formatNumber = (num) => {
                 background: transparent;
                 outline: none;
                 font-size: 14px;
-                color: #333;
+                color: var(--text-color, #333333);
                 width: 100%;
 
                 &::placeholder {
@@ -433,7 +433,7 @@ const formatNumber = (num) => {
             transition: background-color 0.2s;
 
             &.current-user {
-              background-color: #E8F5E9;
+              background-color: var(--bg-current-user, #E8F5E9);
               border-radius: 4px;
               padding: 16px;
               margin: 8px 0;
@@ -447,7 +447,7 @@ const formatNumber = (num) => {
               .item-rank {
                 font-size: 16px;
                 font-weight: 600;
-                color: #000;
+                color: var(--text-color, #000000);
                 min-width: 30px;
               }
 
@@ -460,7 +460,7 @@ const formatNumber = (num) => {
 
               .user-name {
                 font-size: 14px;
-                color: #000;
+                color: var(--text-color, #000000);
               }
             }
 
@@ -475,7 +475,7 @@ const formatNumber = (num) => {
                 font-family: PingFang SC, PingFang SC;
                 font-weight: 600;
                 font-size: 16px;
-                color: #000000;
+                color: var(--text-color, #000000);
                 line-height: 20px;
                 font-style: normal;
                 text-transform: none;
@@ -486,7 +486,7 @@ const formatNumber = (num) => {
               font-family: PingFang SC, PingFang SC;
               font-weight: 600;
               font-size: 16px;
-              color: #909090;
+              color: var(--text-dark-gray, #909090);
               line-height: 20px;
               font-style: normal;
               text-transform: none;
@@ -503,7 +503,7 @@ const formatNumber = (num) => {
       // 右侧本月最大胜利区域
       .right-wins {
         flex: 0 0 320px;
-        background: white;
+        background: var(--bg-page-h5, #ffffff);
         border-radius: 8px;
         padding: 24px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -523,7 +523,7 @@ const formatNumber = (num) => {
           .wins-title {
             font-size: 18px;
             font-weight: 600;
-            color: #000;
+            color: var(--text-color, #000000);
             margin: 0;
           }
         }
@@ -543,7 +543,7 @@ const formatNumber = (num) => {
             .wins-rank {
               font-size: 14px;
               font-weight: 600;
-              color: #666;
+              color: var(--text-dark-gray, #666666);
               min-width: 24px;
               padding-top: 2px;
             }
@@ -571,7 +571,7 @@ const formatNumber = (num) => {
 
               .wins-name {
                 font-size: 14px;
-                color: #000;
+                color: var(--text-color, #000000);
               }
             }
 
@@ -582,7 +582,7 @@ const formatNumber = (num) => {
               font-size: 14px;
 
               .amount-from {
-                color: #666;
+                color: var(--text-dark-gray, #666666);
               }
 
               .arrow {
@@ -720,7 +720,7 @@ const formatNumber = (num) => {
 
               .search-box {
                 width: 100%;
-                background: #F5F5F5;
+                background: var(--bg-page-h5, #F5F5F5);
                 border: 1px solid #E0E0E0;
                 padding: 10px 12px;
                 border-radius: 8px;
@@ -742,11 +742,11 @@ const formatNumber = (num) => {
               border: 1px solid #F0F0F0;
               border-radius: 8px;
               margin-bottom: 12px;
-              background: #FAFAFA;
+              background: var(--bg-card, #FAFAFA);
 
               &.current-user {
-                background-color: #E8F5E9;
-                border-color: #C8E6C9;
+                background-color: var(--bg-current-user, #E8F5E9);
+                border-color: var(--bg-current-user-border, #C8E6C9);
                 margin: 12px 0;
               }
 
@@ -787,7 +787,7 @@ const formatNumber = (num) => {
                 .quantity-label {
                   display: inline-block; // 移动端显示标签
                   font-size: 12px;
-                  color: #666;
+                  color: var(--text-dark-gray, #666666);
                   font-weight: 500;
                 }
 
@@ -871,7 +871,7 @@ const formatNumber = (num) => {
 
 @media (max-width: 480px) {
   .leaderboard-page {
-    padding-top: 96px;
+    padding-top: 50px;
 
     .main-content {
       box-sizing: border-box;
