@@ -495,6 +495,7 @@ onBeforeUnmount(() => {
         img {
           width: 32px;
           height: 32px;
+          display: block;
           border-radius: 50%;
           object-fit: cover;
           border: 2px solid #3a3a3a;
