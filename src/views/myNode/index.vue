@@ -1,23 +1,30 @@
 <template>
     <div class="myNode">
-        <div class="header">
-            <div class="goback" @click="goBack">
-                <el-icon class="goback-icon"><ArrowLeftBold /></el-icon>
-            </div>
 
-            <div class="title">我的节点</div>
 
-            <div class="right">
-                <button class="theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
-                    <el-icon class="theme-icon">
-                        <Sunny v-if="isDark" />
-                        <Moon v-else />
+        <div class="banner1" style="height: 120px;margin: 0  -10px;">
+            <div class="header">
+                <div class="goback" @click="goBack">
+                    <el-icon class="goback-icon">
+                        <ArrowLeftBold />
                     </el-icon>
-                </button>
+                </div>
+
+                <div class="title">我的节点</div>
+
+                <div class="right">
+                    <button class="theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
+                        <el-icon class="theme-icon">
+                            <Sunny v-if="isDark" />
+                            <Moon v-else />
+                        </el-icon>
+                    </button>
+                </div>
             </div>
+            <h3>集群节点</h3>
         </div>
         <div class="banner">
-            <h3>集群节点</h3>
+
             <img src="../../assets/images/myNode/1.png" alt="">
         </div>
 
@@ -68,7 +75,8 @@
 
         <div class="content">
             <div class="tab">
-                <div v-for="(item, index) in tabArr" :class="item.index == active ? 'active' : 'item'" @click="tab(item.index)">{{ item.name }}</div>
+                <div v-for="(item, index) in tabArr" :class="item.index == active ? 'active' : 'item'"
+                    @click="tab(item.index)">{{ item.name }}</div>
             </div>
             <div class="myLevel">
                 <div>
@@ -84,7 +92,7 @@
             </div>
 
             <div class="tree">
-                <graph/>
+                <graph />
             </div>
 
             <div class="tableContent">
@@ -127,7 +135,7 @@
 
 <script setup>
 import { ref, onMounted, watch, computed, onUnmounted } from "vue"
-import  graph  from  "../../components/graph.vue"
+import graph from "../../components/graph.vue"
 import { ArrowLeftBold, Sunny, Moon } from '@element-plus/icons-vue'
 import { useThemeStore } from '@/stores/theme'
 import { useRouter } from 'vue-router'
@@ -175,12 +183,29 @@ onMounted(() => {
     color: var(--text-color, #1a1a1a);
     transition: background-color 0.3s ease, color 0.3s ease;
 
+    .banner1 {
+        background: url("../../assets/images/banner1.png");
+        background-size: cover;
+        background-repeat: no-repeat;
+        flex-direction: column;
+        display: flex;
+        height: 100%;
+        /* 或 height: 100vh */
+        justify-content: space-between;
+
+        h3 {
+            padding: 0 10px;
+            margin-bottom: 20px;
+        }
+    }
+
     .header {
         position: relative;
         height: 22px;
         display: flex;
         margin-bottom: 35px;
         align-items: center;
+        padding: 0 10px;
         justify-content: space-between;
 
         .goback {

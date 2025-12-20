@@ -31,6 +31,9 @@
             <CMTPledge v-if="activeTab === 1" />
             <!-- LP金库组件 -->
             <LPVault v-if="activeTab === 2" />
+            <computepowerpool  v-if="activeTab === 3"/>
+
+            <MarketReturns v-if="activeTab === 4"></MarketReturns>
         </div>
     </div>
 </template>
@@ -42,7 +45,8 @@ import { ArrowLeft } from '@element-plus/icons-vue'
 import CMTCurrentPrice from '@/components/CMTCurrentPrice.vue'
 import CMTPledge from '@/components/CMTPledge.vue'
 import LPVault from '@/components/LPVault.vue'
-
+import  computepowerpool  from '@/components/computepowerpool.vue'
+import   MarketReturns  from  '@/components/MarketReturns.vue'
 const router = useRouter()
 const tabNavRef = ref(null)
 const activeTab = ref(0)

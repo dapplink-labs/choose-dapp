@@ -1,6 +1,8 @@
 <template>
     <div class="LPVault">
-        <div class="header">
+        
+        <div class="banner1" style="height: 200px;margin: 0  -10px;">
+            <div class="header">
             <div class="goback" @click="goBack">
                 <el-icon class="goback-icon">
                     <ArrowLeft />
@@ -23,6 +25,7 @@
             <p>全球⾸创⼀套链上循环进场，循环组LP底池，循环销毁、循环出局、循环应⽤上永动机。每个投资档位按照组LP→销毁底池的循环模式，合约⾃动执⾏
                 <a href="">了解更多</a>。
             </p>
+        </div>
         </div>
         <h3>
             <span>质押</span>
@@ -311,7 +314,21 @@ onMounted(() => {
     background-color: var(--bg-page, #FCFCFC);
     color: var(--text-color, #1a1a1a);
     transition: background-color 0.3s ease, color 0.3s ease;
+.banner1 {
+        background: url("../../assets/images/banner3.png");
+        background-size: cover;
+        background-repeat: no-repeat;
+        flex-direction: column;
+        display: flex;
+        height: 100%;
+        /* 或 height: 100vh */
+        justify-content: space-between;
 
+        h3 {
+            padding: 0 10px;
+            margin-bottom: 20px;
+        }
+    }
     .hide-scroll {
         overflow: auto;
         scrollbar-width: none;
@@ -366,7 +383,7 @@ onMounted(() => {
         margin-bottom: 13px;
         align-items: center;
         justify-content: space-between;
-
+ padding: 0  10px;
         .goback {
             cursor: pointer;
             display: flex;
@@ -443,6 +460,7 @@ onMounted(() => {
     }
 
     .intro {
+        padding: 0  10px;
         h1 {
             font-weight: bold;
             font-size: 28px;
@@ -510,7 +528,7 @@ onMounted(() => {
     }
 
     .details {
-        height: 674px;
+       
         border: 1px solid var(--border-color, #F3F3F3);
         border-radius: 8px;
         padding: 13px 15px;
@@ -520,10 +538,11 @@ onMounted(() => {
         .card {
             border-radius: 12px;
             min-height: 222px;
-            border: 1px solid var(--border-color, #F5F5F5);
+           
             background: var(--bg-card, #ffffff);
             transition: all 0.3s ease;
- padding-bottom: 20px;
+            padding-bottom: 20px;
+
             .imgContiner {
                 height: 160px;
                 border-radius: 8px;
@@ -544,7 +563,10 @@ onMounted(() => {
 
             ul {
                 list-style: none;
-
+                border: 1px solid var(--border-color, #F5F5F5);
+                border-radius: 0 0  8px 8px;
+                // background: #2E2E2E;
+                background: var(--bg-card, #ffffff);
                 li {
                     height: 60px;
                     display: flex;
@@ -580,7 +602,8 @@ onMounted(() => {
 
             .pline {
                 margin: 15px 0 28px 0;
- padding: 0  10px;
+                padding: 0 10px;
+
                 p {
                     font-weight: 400;
                     font-size: 12px;
@@ -619,7 +642,8 @@ onMounted(() => {
                 align-items: center;
                 justify-content: space-between;
                 margin-top: 17px;
- padding: 0  10px;
+                padding: 0 10px;
+
                 .item {
                     font-weight: 400;
                     font-size: 12px;

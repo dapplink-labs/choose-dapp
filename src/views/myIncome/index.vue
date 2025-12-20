@@ -1,27 +1,31 @@
 <template>
     <div class="myIncome">
-        <div class="header">
-            <div class="goback" @click="goBack">
-                <el-icon class="goback-icon">
-                    <ArrowLeft />
-                </el-icon>
-            </div>
+        
 
-            <div class="title">我的LP收益</div>
 
-            <div class="right">
-                <button class="theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
-                    <el-icon class="theme-icon">
-                        <Sunny v-if="isDark" />
-                        <Moon v-else />
+        <div class="banner1" style="height: 120px;margin: 0  -10px;">
+            <div class="header">
+                <div class="goback" @click="goBack">
+                    <el-icon class="goback-icon">
+                        <ArrowLeftBold />
                     </el-icon>
-                </button>
+                </div>
+
+                <div class="title"></div>
+
+                <div class="right">
+                    <button class="theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
+                        <el-icon class="theme-icon">
+                            <Sunny v-if="isDark" />
+                            <Moon v-else />
+                        </el-icon>
+                    </button>
+                </div>
             </div>
-        </div>
-
-
-        <div class="income">
             <h3>我的LP收益</h3>
+        </div>
+        <div class="income">
+           
 
             <div class="box">
                 <div class="item">
@@ -224,6 +228,21 @@ onMounted(() => {
     background-color: var(--bg-page, #FCFCFC);
     color: var(--text-color, #1a1a1a);
     transition: background-color 0.3s ease, color 0.3s ease;
+    .banner1 {
+        background: url("../../assets/images/banner3.png");
+        background-size: cover;
+        background-repeat: no-repeat;
+        flex-direction: column;
+        display: flex;
+        height: 100%;
+        /* 或 height: 100vh */
+        justify-content: space-between;
+
+        h3 {
+            padding: 0 10px;
+            margin-bottom: 20px;
+        }
+    }
 
     .header {
         position: relative;
@@ -232,7 +251,7 @@ onMounted(() => {
         margin-bottom: 35px;
         align-items: center;
         justify-content: space-between;
-
+        padding: 0 10px;
         .goback {
             cursor: pointer;
             display: flex;
@@ -431,7 +450,7 @@ onMounted(() => {
         }
 
         .box {
-            margin-top: 14px;
+            margin-top: 0px;
             display: flex;
             justify-content: space-between;
             gap: 10px;
