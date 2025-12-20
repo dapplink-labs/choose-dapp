@@ -2,7 +2,7 @@
     <div class="myNode">
 
 
-        <div class="banner1" style="height: 120px;margin: 0  -10px;">
+        <div class="banner1" style="height: 150px;margin: 0  -10px;">
             <div class="header">
                 <div class="goback" @click="goBack">
                     <el-icon class="goback-icon">
