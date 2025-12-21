@@ -1,6 +1,6 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { useConnect, useChainId, useAccount, useConfig } from '@wagmi/vue'
+import { useConnect, useChainId, useAccount, useConfig, useDisconnect } from '@wagmi/vue'
 // @ts-ignore 路径别名在 TS 中无类型声明
 import { useThemeStore } from '../../stores/theme'
 
@@ -252,6 +252,7 @@ export const useLinkWallet = () => {
   const router = useRouter()
   const wagmiConfig = useConfig()
   const { connect, connectors } = useConnect()
+  const { disconnect } = useDisconnect()
   const chainId = useChainId()
   const { status } = useAccount()
   const themeStore = useThemeStore()
@@ -301,26 +302,18 @@ export const useLinkWallet = () => {
             isConnectingFromPage.value = false
           }
         } else {
-          try {
-            await openWalletApp(wallet)
-            const walletConnectConnector = safeConnectors.value.find((c) => c.type === 'walletConnect')
+          // 不使用深度链接，直接尝试连接注入的钱包
+          const injectedConnector = findConnectorByWalletKey(wallet.key, safeConnectors.value)
 
-            if (walletConnectConnector && connect) {
-              try {
-                await new Promise((resolve) => setTimeout(resolve, 500))
-                await connect({ connector: walletConnectConnector as any, chainId: chainId.value as any })
-              } catch (error: any) {
-                if (error.message && !error.message.includes('User rejected')) {
-                  alert(`连接失败: ${error.message}`)
-                }
-                isConnectingFromPage.value = false
-              }
-            } else {
-              alert('未找到WalletConnect连接器')
+          if (injectedConnector && connect) {
+            try {
+              await connect({ connector: injectedConnector as any, chainId: chainId.value as any })
+            } catch (error: any) {
+              alert(`连接失败: ${error?.message || '未知错误'}`)
               isConnectingFromPage.value = false
             }
-          } catch (error) {
-            showDownloadPrompt(wallet)
+          } else {
+            alert('未找到钱包连接器')
             isConnectingFromPage.value = false
           }
         }

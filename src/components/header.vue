@@ -264,6 +264,18 @@ const shortAddress = (addr) => {
 const wallconnects = async (id, chainId) => {
   const connectMetaMask = async () => {
     try {
+      // 如果已经连接了钱包，先断开连接
+      if (status.value === 'connected') {
+        try {
+          await disconnect()
+          // 等待断开完成
+          await new Promise((resolve) => setTimeout(resolve, 300))
+        } catch (error) {
+          console.error('断开连接失败:', error)
+          // 即使断开失败也继续尝试连接新钱包
+        }
+      }
+
       const connector = connectors.find(c => c.id === id)
       if (connect) {
         await connect({ connector, chainId })
