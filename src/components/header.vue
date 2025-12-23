@@ -671,6 +671,8 @@ onBeforeUnmount(() => {
     transition: all 0.2s ease;
     white-space: nowrap;
     line-height: 1;
+    opacity: 1;
+    visibility: visible;
 
     &:hover {
       background: rgba(255, 255, 255, 0.08);
@@ -1077,8 +1079,16 @@ onBeforeUnmount(() => {
         .h5-connect-wallet-btn {
           height: 32px;
           padding: 0 12px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid #C1272E !important;
+          background: #C1272E !important;
+          color: #ffffff !important;
           font-size: 12px;
           min-width: 70px;
+          opacity: 1;
+          visibility: visible;
         }
 
         .h5-user-avatar {
@@ -1138,6 +1148,9 @@ onBeforeUnmount(() => {
           padding: 0 10px;
           font-size: 11px;
           min-width: 60px;
+          border: 1px solid #C1272E !important;
+          background: #C1272E !important;
+          color: #ffffff !important;
         }
 
         .h5-user-avatar {

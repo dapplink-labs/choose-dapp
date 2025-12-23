@@ -1783,7 +1783,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
   backdrop-filter: blur(1px);
   -webkit-backdrop-filter: blur(1px);
   justify-content: center;
-  z-index: 1000;
+  z-index: 90;
   padding-top: 100px;
   box-sizing: border-box;
 }

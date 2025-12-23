@@ -14,6 +14,7 @@ import myNode from "../views/myNode/index.vue"
 import myIncome from "../views/myIncome/index.vue"
 import LPVault from "../views/LPVault/index.vue"
 import dashboard from "../views/dashboard/index.vue"
+import myPromotions from "../views/myPromotions/index.vue"
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -116,6 +117,15 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: dashboard,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/my-promotions',
+      name: 'myPromotions',
+      component: myPromotions,
       meta: {
         hideHeader: true,
         hideFooterNav: true

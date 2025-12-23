@@ -22,7 +22,7 @@
     <div class="wallet-list">
       <div
         v-for="wallet in wallets"
-        :key="wallet.key"
+        :key="wallet.id"
         class="wallet-card"
         @click="handleConnect(wallet)"
       >
