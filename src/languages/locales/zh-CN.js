@@ -327,6 +327,377 @@ export default {
   },
   home: {
     welcome: "欢迎来到 Multimarket",
-    description: "探索最新的市场趋势、新闻和资讯"
+    description: "探索最新的市场趋势、新闻和资讯",
+    comingSoon: "预测功能即将上线",
+    comingSoonAlt: "暂不开放",
+    searchPlaceholder: "搜索",
+    userAvatar: "用户头像",
+    opportunity: "机会",
+    filterTags: {
+      all: "全部",
+      premium: "王牌",
+      ukraine: "乌克兰",
+      afghanistan: "爱泼斯坦",
+      trump: "特朗普",
+      fed: "美联储",
+      token: "代币销售"
+    }
+  },
+  footerNav: {
+    home: "首页",
+    search: "搜索",
+    breaking: "突发",
+    more: "更多"
+  },
+  userInfo: {
+    close: "关闭",
+    userAvatar: "用户头像",
+    settings: "设置",
+    disconnect: "断开链接",
+    ecosystem: "生态系统",
+    others: "其他",
+    nodeStaking: "节点质押",
+    stakingPool: "质押池",
+    lpVault: "LP 金库",
+    onChainData: "链上数据",
+    predictionMarket: "预测市场",
+    assets: "资产",
+    eventPool: "事件池",
+    audit: "审计",
+    developerDocs: "开发者文档",
+    alpha: "Alpha 测试",
+    developerContributions: "开发者贡献",
+    tokenomics: "代币经济",
+    launchpad: "启动平台",
+    smartMoney: "聪明资金",
+    bugBounty: "漏洞赏金",
+    github: "GitHub",
+    technicalSupport: "技术支持",
+    support: "支持",
+    officialVerification: "官方认证",
+    productFeedback: "产品反馈",
+    apiManagement: "API 管理",
+    helpCenter: "帮助中心",
+    customerSupport: "客服支持",
+    selfService: "自助服务",
+    disconnectWallet: "断开钱包",
+    dashboard: "数据看板",
+    createMarket: "创建预测市场",
+    fundManagement: "资金管理",
+    reward: "奖励",
+    accuracy: "准确度",
+    leaderboard: "领先看板",
+    terms: "使用条款",
+    doc: "文档",
+    walletAddressCopied: "钱包地址已复制到剪贴板",
+    copyFailed: "复制失败，请手动复制",
+    disconnectWallet: "断开钱包"
+  },
+  settings: {
+    title: "个人设置",
+    email: "邮箱",
+    emailPlaceholder: "请输入邮箱地址",
+    emailHelper: "用来接收multimarket重要更新信息",
+    username: "用户名",
+    usernamePlaceholder: "请输入用户名",
+    twitter: "Twitter",
+    bindTwitter: "去绑定",
+    save: "保存编辑"
+  },
+  breaking: {
+    ad: "广告",
+    avatar: "头像",
+    chartAd: "图表广告",
+    tabs: {
+      all: "全部",
+      politics: "政治",
+      crypto: "加密货币",
+      finance: "金融"
+    },
+    subscription: {
+      title: "获取每日更新",
+      description: "我们会每天向您发送电子邮件,告知您 multimarket 的最新动态。",
+      emailPlaceholder: "请输入您的电子邮箱地址",
+      submit: "获取更新"
+    },
+    live: {
+      title: "Live on Multimarket",
+      followBtn: "follow on X",
+      breakingNews: "突发新闻",
+      viewAll: "查看全部"
+    }
+  },
+  detail: {
+    avatar: "头像",
+    prediction: "预测",
+    daysClose: "天后关闭",
+    orderBook: "订单簿",
+    graph: "图形",
+    volume: "交易量",
+    price: "价格",
+    shares: "股",
+    all: "全部",
+    last: "最后",
+    spread: "价差",
+    rules: "规则",
+    viewMore: "查看更多",
+    buy: "买入",
+    sell: "卖出",
+    amount: "金额",
+    balance: "余额",
+    winningAmount: "赢取金额",
+    averagePrice: "平均价格",
+    maximumLeverage: "最大杠杆",
+    maximumReturn: "最大收益",
+    popularity: "人气",
+    whatDoYouPredict: "你预测什么？",
+    outcome: "结果",
+    chance: "概率",
+    buyYes: "买入是",
+    buyNo: "买入否",
+    comments: "评论",
+    holds: "持仓",
+    activity: "活动",
+    yesHolders: "是持仓者",
+    noHolders: "否持仓者",
+    bought: "买入",
+    timeRanges: {
+      "1D": "1天",
+      "1W": "1周",
+      "1M": "1个月",
+      "ALL": "全部"
+    }
+  },
+  payment: {
+    cashUsed: "已用现金",
+    maxTradeSize: "最大交易规模：",
+    usableBonusAmount: "可用奖励金额：",
+    leverage: "杠杆",
+    maxAvailableLeverage: "最大可用杠杆",
+    predictionOutcome: "下降超过 50 个基点",
+    leveragedSize: "杠杆规模",
+    cashUsedLabel: "已用现金",
+    projectedPnl: "预估盈亏（ROI）",
+    tradedProbability: "你的成交概率",
+    marketImpact: "市场冲击",
+    continue: "继续"
+  },
+  earnings: {
+    userAvatar: "用户头像",
+    totalWinnings: "中奖总金额",
+    maxWinning: "最大奖金额",
+    predictionEvents: "预测事件",
+    profitLoss: "盈亏金额",
+    searchPositions: "搜索仓位事件",
+    searchActivities: "搜索交易活动",
+    market: "市场",
+    average: "平均值",
+    currentPrice: "现价",
+    value: "价值",
+    result: "结果",
+    totalBet: "总投注额",
+    winningPrize: "赢得奖金",
+    joined: "加入",
+    views: "浏览人数"
+  },
+  leaderboard: {
+    title: "排行榜",
+    allCategories: "所有类别",
+    category1: "类别1",
+    category2: "类别2",
+    searchByName: "按名称搜索",
+    profitLoss: "利润/亏损",
+    quantity: "数量",
+    userAvatar: "用户头像",
+    thisMonthBiggestWin: "本月最大胜利"
+  },
+  accuracy: {
+    overallAccuracy: "总体准确率",
+    expectedVsActual: "预期值与实际值",
+    title: "Multimarket 的准确性如何?",
+    accuracy4Hours: "4小时准确率",
+    accuracy1Month: "1个月的准确率",
+    brierScore: "布里尔评分",
+    accuracyBeforeResolution: "分辨率之前的准确性",
+    expectedVsActualChart: "预期值与实际值图表"
+  },
+  linkWallet: {
+    welcome: "欢迎来到 CHOOSEME",
+    selectLoginMethod: "请选择登录方式",
+    connect: "链接"
+  },
+  computingPower: {
+    title: "算力服务商",
+    desc: "1、分布式节点算力服务商 500U，享受数据节点收益、交易全网手续费买卖 0.5% 收益，子币手续费 3%。二级市场分润 10% 收益，分布式算力节点推分布式算力节点。",
+    learnMore: "了解更多",
+    buyNode: "购买节点",
+    myNodes: "我的节点",
+    tabs: {
+      distributed: "分布节点",
+      cluster: "集群节点"
+    },
+    nodeImageAlt: "节点插图",
+    priceLabel: "价格：",
+    buyBtn: "购买",
+    record: {
+      title: "节点激活记录",
+      more: "查看更多",
+      time: "操作时间",
+      type: "产品类型",
+      amount: "消耗USDT",
+      types: {
+        distributed: "分布节点",
+        cluster: "集群节点"
+      }
+    },
+    benefits: {
+      item1: "享受数据节点收益",
+      item2: "交易全网手续费买卖 0.5% 收益",
+      item3: "子币手续费 3%",
+      item4: "二级市场盈利 10% 收益",
+      item5: "分布式算力节点推分布式算力节点"
+    },
+    purchaseTitle: {
+      distributed: "分布节点-500 USDT",
+      cluster: "集群节点-10000 USDT"
+    },
+    activationMsg: "地址 {address} 已成功激活 {nodeType}",
+    activateBtn: "激活节点",
+    products: {
+      distributedDescTemplate: "享受数据节点收益，交易全网手续费买卖 {fee}% 收益，子币手续费 {subFee}% 。二级市场分润 {marketShare}% 收益，分布式算力节点推分布式算力节点。",
+      clusterDescTemplate: "享受数据节点收益，全网交易手续费 {fee}% 分润，子币手续费 {subFee}% 分润，二级市场业绩 {marketShare}% 分润，享受生态级节点推广与治理参与。"
+    }
+  },
+  lpVault: {
+    title: "LP金库",
+    desc: "这里是奖励规则，这里是奖励规则，这里是奖励规则，这里是奖励规则，这里是奖励规则，这里是奖励规则",
+    learnMore: "了解更多",
+    nodeStaking: "节点质押",
+    myLPIncome: "我的LP收益",
+    activationPrice: "激活价格:",
+    dailyEarnings: "日化收益",
+    cycleDays: "周期天数",
+    totalEarnings: "总收益",
+    activateComputingPower: "激活算力",
+    activationMsg: "地址 {address} 已激活 LP 金库",
+    nodeTypes: {
+      T1: "信息节点",
+      T2: "数据节点",
+      T3: "认证节点",
+      T4: "共识节点",
+      T5: "超级节点",
+      T6: "创世节点"
+    },
+    days: "天"
+  },
+  myNode: {
+    title: "集群节点",
+    choIncome: "CHO收益",
+    subCoinIncome: "子币收益",
+    earnPrompt: "地址 ç 赚取收益",
+    pendingIncome: "待领取收益",
+    nodeIncome: "节点收益",
+    networkFeeIncome: "全网手续费买卖收益",
+    subCoinFeeIncome: "子币手续费收益",
+    secondaryMarketIncome: "二级市场盈利收益",
+    directReferralIncome: "直推收益",
+    networkIncome: "网体收益",
+    claimAll: "一键领取收益",
+    claim: "Claim",
+    myTeam: "我的团队",
+    inviteAddressCount: "邀请地址数",
+    directAddress: "直推地址",
+    teamAddress: "团队地址",
+    activated: "激活了",
+    nodeTypes: {
+      distributed: "分布节点",
+      cluster: "集群节点"
+    }
+  },
+  myIncome: {
+    title: "我的收益",
+    myIncomeCMT: "我的收益(CMT)",
+    computingPowerIncomeCMT: "算力收益(CMT)",
+    networkIncomeCMT: "网络收益(CMT)",
+    earnPrompt: "地址 {address} 赚取收益",
+    pendingIncome: "待领取收益",
+    staticIncomeCHO: "静态收益(CHO)",
+    directReferralIncomeCHO: "直推收益(CHO)",
+    teamIncomeCHO: "团队收益(CHO)",
+    genesisNodeIncomeCHO: "创世节点5%收益(CHO)",
+    claimAll: "一键领取收益",
+    myTeam: "我的团队",
+    mySuperior: "我的上级",
+    totalInvites: "邀请总人数"
+  },
+  dashboard: {
+    title: "仪表盘",
+    tabs: {
+      currentPrice: "CMT现价",
+      pledge: "CMT质押",
+      marketReturns: "市场收益"
+    }
+  },
+  cmtCurrentPrice: {
+    latestPrice: "最新价格",
+    high24h: "24H高",
+    low24h: "24H低",
+    volume24hCMT: "24H量CMT",
+    volume24hUSDT: "24H量USDT",
+    timePeriods: {
+      "5m": "5分",
+      "1h": "1时",
+      "4h": "4时",
+      "1d": "1日"
+    },
+    tooltip: {
+      open: "开盘",
+      close: "收盘",
+      low: "最低",
+      high: "最高",
+      volume: "成交量"
+    }
+  },
+  cmtPledge: {
+    pledgeTotal: "质押总额",
+    lpPledgeDestroy: "LP质押销毁(USDT)",
+    timePeriods: {
+      "7d": "7日",
+      "30d": "30日",
+      "90d": "90日",
+      "1y": "1年",
+      "all": "全部"
+    }
+  },
+  marketReturns: {
+    secondaryMarketProfit: "二级市场盈利金额",
+    userProfit: "用户盈利金额",
+    destroyedCMT: "销毁的CMT数量",
+    myProfit: "我的盈利金额",
+    profit24hCHO: "24小时盈利(CHO)",
+    profit24hUSDT: "24小时盈利(USDT)",
+    fomoProfit: "FOMO盈利金额",
+    fomoVolume24hCMT: "24小时FOMO量(CMT)",
+    fomoVolume24hUSDT: "24小时FOMO量(USDT)",
+    latestMarketValue: "最新市值",
+    volume24hCMT: "24小时量(CMT)",
+    volume24hUSDT: "24小时量(USDT)"
+  },
+  purchaseNodeRecord: {
+    title: "节点购买记录",
+    informationNode: "信息节点",
+    price: "价格"
+  },
+  tabNode: {
+    purchaseTime: "购买时间"
+  },
+  myNodes: {
+    title: "我的节点"
+  },
+  collectEarnings: {
+    title: "Claim Method",
+    allNodeRewards: "All Node Rewards",
+    tip: "* You can claim all node rewards, or choose to claim rewards from a single node",
+    confirm: "Confirm"
   }
 };

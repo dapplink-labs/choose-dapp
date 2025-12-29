@@ -3,7 +3,7 @@
         <!-- 价格信息区域 -->
         <div class="price-info">
             <div class="price-left">
-                <div class="price-title">最新价格</div>
+                <div class="price-title">{{ $t('cmtCurrentPrice.latestPrice') }}</div>
                 <div class="price-main">
                     <span class="price-value">${{ currentPrice }}</span>
                 </div>
@@ -13,19 +13,19 @@
             </div>
             <div class="price-stats">
                 <div class="stat-item">
-                    <div class="stat-label">24H高</div>
+                    <div class="stat-label">{{ $t('cmtCurrentPrice.high24h') }}</div>
                     <div class="stat-value">${{ high24h }}</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">24H量CMT</div>
+                    <div class="stat-label">{{ $t('cmtCurrentPrice.volume24hCMT') }}</div>
                     <div class="stat-value">{{ volume24hCMT }}万</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">24H低</div>
+                    <div class="stat-label">{{ $t('cmtCurrentPrice.low24h') }}</div>
                     <div class="stat-value">${{ low24h }}</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-label">24H量USDT</div>
+                    <div class="stat-label">{{ $t('cmtCurrentPrice.volume24hUSDT') }}</div>
                     <div class="stat-value">{{ volume24hUSDT }}亿</div>
                 </div>
             </div>
@@ -75,8 +75,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Setting } from '@element-plus/icons-vue'
+
+const { t } = useI18n()
 
 // 按需引入 ECharts
 import * as echarts from 'echarts/core'
@@ -135,12 +138,12 @@ const volume24hCMT = ref('41.947')
 const volume24hUSDT = ref('451.37')
 
 // 时间周期选项
-const timePeriods = [
-    { label: '5分', value: '5m' },
-    { label: '1时', value: '1h' },
-    { label: '4时', value: '4h' },
-    { label: '1日', value: '1d' },
-]
+const timePeriods = computed(() => [
+    { label: t('cmtCurrentPrice.timePeriods.5m'), value: '5m' },
+    { label: t('cmtCurrentPrice.timePeriods.1h'), value: '1h' },
+    { label: t('cmtCurrentPrice.timePeriods.4h'), value: '4h' },
+    { label: t('cmtCurrentPrice.timePeriods.1d'), value: '1d' },
+])
 
 // 根据时间周期生成日期
 const generateDates = (period, count) => {
@@ -578,16 +581,16 @@ const initChart = () => {
                         const changeColor = data[1] >= data[0] ? '#26a69a' : '#ef5350'
                         result += `
                             <div style="margin-top: 6px;">
-                                <div style="color: #8E8E93; font-size: 11px; margin-bottom: 4px;">开盘: <span style="color: #FFFFFF;">$${data[0].toFixed(2)}</span></div>
-                                <div style="color: #8E8E93; font-size: 11px; margin-bottom: 4px;">收盘: <span style="color: #FFFFFF;">$${data[1].toFixed(2)}</span> <span style="color: ${changeColor}; font-weight: 600;">(${change >= 0 ? '+' : ''}${change}%)</span></div>
-                                <div style="color: #8E8E93; font-size: 11px; margin-bottom: 4px;">最低: <span style="color: #FFFFFF;">$${data[2].toFixed(2)}</span></div>
-                                <div style="color: #8E8E93; font-size: 11px;">最高: <span style="color: #FFFFFF;">$${data[3].toFixed(2)}</span></div>
+                                <div style="color: #8E8E93; font-size: 11px; margin-bottom: 4px;">${t('cmtCurrentPrice.tooltip.open')}: <span style="color: #FFFFFF;">$${data[0].toFixed(2)}</span></div>
+                                <div style="color: #8E8E93; font-size: 11px; margin-bottom: 4px;">${t('cmtCurrentPrice.tooltip.close')}: <span style="color: #FFFFFF;">$${data[1].toFixed(2)}</span> <span style="color: ${changeColor}; font-weight: 600;">(${change >= 0 ? '+' : ''}${change}%)</span></div>
+                                <div style="color: #8E8E93; font-size: 11px; margin-bottom: 4px;">${t('cmtCurrentPrice.tooltip.low')}: <span style="color: #FFFFFF;">$${data[2].toFixed(2)}</span></div>
+                                <div style="color: #8E8E93; font-size: 11px;">${t('cmtCurrentPrice.tooltip.high')}: <span style="color: #FFFFFF;">$${data[3].toFixed(2)}</span></div>
                             </div>
                         `
                     } else if (param.seriesName.startsWith('MA') && param.value !== '-') {
                         result += `<div style="margin-top: 4px; color: ${param.color}; font-size: 11px;">${param.seriesName}: <span style="color: #FFFFFF;">$${Number(param.value).toFixed(2)}</span></div>`
                     } else if (param.seriesName === '成交量' && param.value) {
-                        result += `<div style="margin-top: 4px; color: #8E8E93; font-size: 11px;">成交量: <span style="color: #FFFFFF;">${(param.value / 10000).toFixed(2)}万</span></div>`
+                        result += `<div style="margin-top: 4px; color: #8E8E93; font-size: 11px;">${t('cmtCurrentPrice.tooltip.volume')}: <span style="color: #FFFFFF;">${(param.value / 10000).toFixed(2)}万</span></div>`
                     }
                 })
                 
@@ -1007,25 +1010,89 @@ onUnmounted(() => {
 }
 
 // 暗色主题适配
-:global(.dark) {
+:deep(.theme-dark) {
     .cmt-current-price {
-        background-color: var(--bg-page-h5-dark, #1a1a1a);
-        color: var(--text-color-dark, #ffffff);
+        background-color: var(--bg-page-h5, #141414);
+        color: var(--text-color, #f2f2f2);
     }
 
     .price-info {
         .price-title {
-            color: var(--text-gray-dark, #909090);
+            color: var(--text-gray, #a0a0a0);
         }
 
         .price-stats {
             .stat-item {
                 .stat-label {
-                    color: var(--text-gray-dark, #909090);
+                    color: var(--text-gray, #a0a0a0);
                 }
 
                 .stat-value {
-                    color: var(--text-color-dark, #ffffff);
+                    color: var(--text-color, #f2f2f2);
+                }
+            }
+        }
+    }
+
+    .chart-controls {
+        .time-periods {
+            .period-item {
+                color: rgba(255, 255, 255, 0.6);
+                border-color: rgba(255, 255, 255, 0.2);
+
+                &.active {
+                    background-color: #2F2F2F;
+                    color: #FFFFFF;
+                    border-color: #2F2F2F;
+                }
+
+                &:hover {
+                    color: #FFFFFF;
+                }
+            }
+        }
+    }
+}
+
+// 浅色主题适配
+:deep(.theme-light) {
+    .cmt-current-price {
+        background-color: var(--bg-page-h5, #FFFFFF);
+        color: var(--text-color, #1a1a1a);
+    }
+
+    .price-info {
+        .price-title {
+            color: var(--text-gray, #666);
+        }
+
+        .price-stats {
+            .stat-item {
+                .stat-label {
+                    color: var(--text-gray, #666);
+                }
+
+                .stat-value {
+                    color: var(--text-color, #1a1a1a);
+                }
+            }
+        }
+    }
+
+    .chart-controls {
+        .time-periods {
+            .period-item {
+                color: rgba(0, 0, 0, 0.6);
+                border-color: rgba(0, 0, 0, 0.2);
+
+                &.active {
+                    background-color: #F5F5F5;
+                    color: #000000;
+                    border-color: #F5F5F5;
+                }
+
+                &:hover {
+                    color: #000000;
                 }
             }
         }

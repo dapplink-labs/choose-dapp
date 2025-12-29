@@ -14,7 +14,7 @@
           <div class="left-section">
             <!-- 广告图片 -->
             <div class="ad-image-top">
-              <img src="https://picsum.photos/seed/ad1/800/200" alt="广告" />
+              <img src="https://picsum.photos/seed/ad1/800/200" :alt="$t('breaking.ad')" />
             </div>
 
             <!-- Tab导航 -->
@@ -29,7 +29,7 @@
             <div class="news-list">
               <div v-for="(item, index) in newsList" :key="item.id" class="news-item" @click="handleItemClick(item)">
                 <div class="item-number">{{ index + 1 }}</div>
-                <img :src="item.avatar" alt="头像" class="item-avatar" />
+                <img :src="item.avatar" :alt="$t('breaking.avatar')" class="item-avatar" />
                 <div class="item-content">
                   <div class="item-title">{{ item.title }}</div>
                   <div class="item-stats">
@@ -68,32 +68,32 @@
                     d="M864.10445369 802.99470279c-102.19894784 88.52652487-565.95981085 39.48007197-565.95981084 39.4800731s-153.64778439-11.74476117-153.31691748-103.08879587c0.23427869-64.55405909 87.97165454-69.47391147 99.4924123-123.95604196 8.21825081-38.86149405 8.48130048-146.03372658 40.77477092-238.12786289 28.91492466-82.45993927 145.97001899-181.76328477 220.03291591-193.44433835 86.3132069-13.61488099 195.93303609 99.85821582 231.18787129 179.81301646 18.61282702 42.21126883 26.03781803 196.51256775 30.93300906 234.35679858 5.52815502 42.75586389 86.53104583 87.91411143 105.35965582 120.15826033 17.45170887 29.88492003 21.17550649 59.09988579-8.50390698 84.8088906zM595.18127104 915.53479566c0 39.63420331-32.13111865 71.76532195-71.76532195 71.76532196s-71.76326713-32.13111865-71.76326714-71.76532196 32.12906382-30.98849621 71.76326714-30.98849735 71.76532195-8.64570595 71.76532195 30.98849735zM579.68599495 127.64523293c0 28.31484245-25.19318073 24.60953941-56.27004586 24.60953941s-56.27004587 3.70530304-56.27004587-24.60953941c0-28.31278763 25.19318073-51.26593536 56.27004587-51.26593536s56.27004587 22.95109291 56.27004586 51.26593536zM299.34480725 254.6859429c-29.00740323 33.92725561-44.67119445 66.87629539-49.72051683 62.56268971-5.04726755-4.31566051 2.44143104-44.26018019 31.44472348-78.18743467 29.00534727-33.92725561 67.11262891-46.43856043 72.15784164-42.12290105 5.04932238 4.31360569-24.87669987 23.81833557-53.88204829 57.74764601zM724.81343261 255.75869326c-22.64899698-38.46280875-48.71353003-63.99302315-42.99219741-67.36540331 5.72133262-3.36827051 41.05837113 16.70366094 63.70942293 55.16441487 22.64899698 38.46280875 22.08796103 78.56762425 16.36662841 81.93589475-5.72133262 3.37032533-14.43280099-31.27209757-37.08385393-69.73490631z"
                     p-id="7841" fill="#909090"></path>
                 </svg>
-                <h3 class="card-title">获取每日更新</h3>
+                <h3 class="card-title">{{ $t('breaking.subscription.title') }}</h3>
               </div>
-              <p class="card-description">我们会每天向您发送电子邮件,告知您 multimarket 的最新动态。</p>
+              <p class="card-description">{{ $t('breaking.subscription.description') }}</p>
               <div class="card-form">
-                <input v-model="email" type="email" placeholder="请输入您的电子邮箱地址" class="email-input" />
-                <button class="submit-btn" @click="handleSubscribe">获取更新</button>
+                <input v-model="email" type="email" :placeholder="$t('breaking.subscription.emailPlaceholder')" class="email-input" />
+                <button class="submit-btn" @click="handleSubscribe">{{ $t('breaking.subscription.submit') }}</button>
               </div>
             </div>
 
             <!-- 下半部分：Live on Multimarket -->
             <div class="live-section">
               <div class="live-header">
-                <h3 class="live-title">Live on Multimarket</h3>
-                <button class="follow-btn">follow on X</button>
+                <h3 class="live-title">{{ $t('breaking.live.title') }}</h3>
+                <button class="follow-btn">{{ $t('breaking.live.followBtn') }}</button>
               </div>
               <div class="breaking-news-list">
                 <div v-for="(news, index) in breakingNews" :key="index" class="breaking-news-item">
-                  <div class="news-label">突发新闻</div>
+                  <div class="news-label">{{ $t('breaking.live.breakingNews') }}</div>
                   <div class="news-time">{{ news.time }}</div>
                   <div class="news-content">{{ news.content }}</div>
                 </div>
               </div>
               <div class="ad-image-bottom">
-                <img src="https://picsum.photos/seed/chart/400/300" alt="图表广告" />
+                <img src="https://picsum.photos/seed/chart/400/300" :alt="$t('breaking.chartAd')" />
               </div>
-              <button class="view-all-btn" @click="handleViewAll">查看全部</button>
+              <button class="view-all-btn" @click="handleViewAll">{{ $t('breaking.live.viewAll') }}</button>
             </div>
           </div>
         </div>
@@ -106,20 +106,22 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import NavBar2 from '@/components/navBar2.vue'
 import BindEmail from '@/components/BindEmail.vue'
 import { TopRight, BottomRight } from '@element-plus/icons-vue'
 
 const router = useRouter()
+const { t } = useI18n()
 
 // Tab导航
-const tabs = ref([
-  { label: '全部', value: 'all' },
-  { label: '政治', value: 'politics' },
-  { label: '加密货币', value: 'crypto' },
-  { label: '金融', value: 'finance' }
+const tabs = computed(() => [
+  { label: t('breaking.tabs.all'), value: 'all' },
+  { label: t('breaking.tabs.politics'), value: 'politics' },
+  { label: t('breaking.tabs.crypto'), value: 'crypto' },
+  { label: t('breaking.tabs.finance'), value: 'finance' }
 ])
 
 const activeTab = ref('all')

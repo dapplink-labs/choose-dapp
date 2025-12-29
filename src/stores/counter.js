@@ -1,6 +1,8 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
+
+// 定义一个名为 'counter' 的 Pinia store
 export const useCounterStore = defineStore('counter', () => {
   const count = ref(0)
   const  visible=  ref(false)

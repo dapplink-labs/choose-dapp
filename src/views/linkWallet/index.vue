@@ -10,22 +10,17 @@
       <div class="logo-box">
         <img :src="logoUrl" alt="CHOOSME Logo" class="logo-img" />
       </div>
-      <h1 class="welcome-title">欢迎来到 CHOOSEME</h1>
+      <h1 class="welcome-title">{{ $t('linkWallet.welcome') }}</h1>
       <div class="subtitle-row">
         <span class="subtitle-line"></span>
-        <span class="welcome-subtitle">请选择登录方式</span>
+        <span class="welcome-subtitle">{{ $t('linkWallet.selectLoginMethod') }}</span>
         <span class="subtitle-line"></span>
       </div>
     </div>
 
     <!-- 钱包列表 -->
     <div class="wallet-list">
-      <div
-        v-for="wallet in wallets"
-        :key="wallet.id"
-        class="wallet-card"
-        @click="handleConnect(wallet)"
-      >
+      <div v-for="wallet in wallets" :key="wallet.id" class="wallet-card" @click="handleConnect(wallet)">
         <div class="wallet-info">
           <div class="wallet-icon-box">
             <img :src="wallet.icon" :alt="wallet.name" class="wallet-icon" />
@@ -33,7 +28,7 @@
           <span class="wallet-name">{{ wallet.name }}</span>
         </div>
         <button class="connect-btn" type="button">
-          链接
+          {{ $t('linkWallet.connect') }}
         </button>
       </div>
     </div>
@@ -41,8 +36,10 @@
 </template>
 
 <script setup>
+import { useI18n } from 'vue-i18n'
 import { wallets, useLinkWallet } from './linkWallet'
 
+const { t } = useI18n()
 const { logoUrl, isConnectingFromPage, handleConnect, handleClose } = useLinkWallet()
 </script>
 
@@ -141,7 +138,7 @@ const { logoUrl, isConnectingFromPage, handleConnect, handleClose } = useLinkWal
   align-items: center;
   justify-content: space-between;
   padding: 14px 18px;
-  background-color: var(--bg-card, #ffffff);
+  background-color: var(--bg-page-h5, #ffffff);
   border-radius: 16px;
   box-sizing: border-box;
   cursor: pointer;
@@ -183,8 +180,8 @@ const { logoUrl, isConnectingFromPage, handleConnect, handleClose } = useLinkWal
   padding: 0 18px;
   border-radius: 999px;
   border: none;
-  background-color: #c1272e;
-  color: #ffffff;
+  background-color: var(--text-color, #fff);
+  color: var(--bg-color, #ffffff);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;

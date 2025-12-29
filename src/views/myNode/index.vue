@@ -2,172 +2,242 @@
     <div class="myNode">
 
 
-        <div class="banner1" style="height: 150px;margin: 0  -10px;">
-            <div class="header">
-                <div class="goback" @click="goBack">
-                    <el-icon class="goback-icon">
-                        <ArrowLeftBold />
-                    </el-icon>
+        <div class="banner1">
+            <div class="cps-card-header">
+                <div class="back-btn" @click="goBack">
+                    <svg t="1766051544466" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="6246" width="32" height="32">
+                        <path d="M723.2 1024l-512-512L716.8 0l70.4 70.4L345.6 512l441.6 448-64 64z" p-id="6247"
+                            fill="currentColor"></path>
+                    </svg>
                 </div>
-
-                <div class="title">我的节点</div>
-
-                <div class="right">
-                    <button class="theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
-                        <el-icon class="theme-icon">
-                            <Sunny v-if="isDark" />
-                            <Moon v-else />
-                        </el-icon>
-                    </button>
+                <div class="open-btn" @click="handleOpenMore">
+                    <svg t="1766051224777" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="4731" width="32" height="32">
+                        <path
+                            d="M842.724 571.473c0-22.93 18.588-41.518 41.518-41.518s41.518 18.587 41.518 41.518v271.251c0 45.86-37.177 83.036-83.036 83.036H182.126c-45.86 0-83.036-37.177-83.036-83.036V182.126c0-45.86 37.176-83.036 83.036-83.036h271.251c22.93 0 41.518 18.588 41.518 41.518s-18.588 41.518-41.518 41.518H182.126v660.598h660.598V571.473z m2.865-332.009L562.576 521.869c-16.45 16.414-43.119 16.414-59.57 0-16.448-16.414-16.448-43.027 0-59.441l283.95-283.339H646.05c-22.138 0-40.084-17.907-40.084-40 0-22.09 17.946-39.998 40.084-39.998h203.56c42.056-0.001 76.149 34.019 76.149 75.985v203.122c0 22.092-17.947 40-40.086 40s-40.085-17.908-40.085-40V239.464z"
+                            fill="currentColor" p-id="4732">
+                        </path>
+                    </svg>
                 </div>
             </div>
-            <h3>集群节点</h3>
+            <h1 class="page-title">{{ $t('myNode.title') }}</h1>
         </div>
-        <div class="banner">
-
-            <img src="../../assets/images/myNode/1.png" alt="">
-        </div>
+        <div class="cps-bg"></div>
 
         <div class="income">
-            <h3>我的收益</h3>
-
             <div class="box">
                 <div class="item">
-                    <b>CMT收益</b>
+                    <b>{{ $t('myNode.choIncome') }}</b>
                     <p>200,000</p>
                 </div>
                 <div class="item">
-                    <b>子币收益</b>
-                    <p>188,000</p>
+                    <b>{{ $t('myNode.subCoinIncome') }}</b>
+                    <p>200,000</p>
                 </div>
             </div>
 
-            <h3>待领取收益</h3>
-            <ul>
-                <li>
-                    <span>节点收益：100 CMT</span>
-                    <button>claim</button>
-                </li>
-                <li>
-                    <span>全网手续费买卖收益：100.00 CMT</span>
-                    <button>claim</button>
-                </li>
-                <li>
-                    <span>子币手续费收益：100 CBN</span>
-                    <button>claim</button>
-                </li>
-                <li>
-                    <span>二级市场盈利收益：1000 CMT</span>
-                    <button>claim</button>
-                </li>
-                <li>
-                    <span>直推收益：1000 CMT</span>
-                    <button>claim</button>
-                </li>
-                <li>
-                    <span>网体收益：1000 CMT</span>
-                    <button>claim</button>
-                </li>
-            </ul>
+            <div class="earn-prompt">
+                <div class="earn-icon">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                </div>
+                <div class="earn-text">
+                    {{ $t('myNode.earnPrompt') }} <span class="earn-amount">+1000000CHO</span>
+                </div>
+            </div>
+
+            <h3>{{ $t('myNode.pendingIncome') }}</h3>
+            <div class="pending-income-grid">
+                <div class="income-item">
+                    <div class="income-label">{{ $t('myNode.nodeIncome') }}(CHO)</div>
+                    <div class="income-value">200,000</div>
+                </div>
+                <div class="income-item">
+                    <div class="income-label">{{ $t('myNode.networkFeeIncome') }}(CHO)</div>
+                    <div class="income-value">180,000</div>
+                </div>
+                <div class="income-item">
+                    <div class="income-label">{{ $t('myNode.subCoinFeeIncome') }}(CHO)</div>
+                    <div class="income-value">1,200,000</div>
+                </div>
+                <div class="income-item">
+                    <div class="income-label">{{ $t('myNode.secondaryMarketIncome') }}(CHO)</div>
+                    <div class="income-value">12,000</div>
+                </div>
+                <div class="income-item">
+                    <div class="income-label">{{ $t('myNode.directReferralIncome') }}(CHO)</div>
+                    <div class="income-value">1,200,000</div>
+                </div>
+                <div class="income-item">
+                    <div class="income-label">{{ $t('myNode.networkIncome') }}(CHO)</div>
+                    <div class="income-value">12,000</div>
+                </div>
+            </div>
+
+            <!-- 一键领取按钮 -->
+            <button class="claim-all-btn">{{ $t('myNode.claimAll') }}</button>
 
         </div>
 
+        <!-- 我的团队模块 -->
+        <div class="my-team">
 
-        <div class="content">
-            <div class="tab">
-                <div v-for="(item, index) in tabArr" :class="item.index == active ? 'active' : 'item'"
-                    @click="tab(item.index)">{{ item.name }}</div>
-            </div>
-            <div class="myLevel">
-                <div>
-                    <span>我的上级：</span>
-                    <b>289KS8283268</b>
+            <div class="team-content">
+                <div class="team-tabs">
+                    <div :class="['tab-btn', { active: activeTab === 'direct' }]" @click="activeTab = 'direct'">
+                        {{ $t('myNode.directAddress') }}
+                    </div>
+                    <div :class="['tab-btn', { active: activeTab === 'team' }]" @click="activeTab = 'team'">
+                        {{ $t('myNode.teamAddress') }}
+                    </div>
                 </div>
 
-                <div>
-                    <span>邀请总人数：</span>
-                    <b>3</b>
+                <div class="team-header">
+                    <span class="invite-count"><span>{{ $t('myNode.inviteAddressCount') }}</span> {{ inviteCount
+                        }}</span>
+                    <div class="search-icon" @click="handleSearch">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.35-4.35" />
+                        </svg>
+                    </div>
                 </div>
 
+                <!-- 层级树状图占位 -->
+                <div class="team-tree-placeholder">
+                    <TeamTree />
+                </div>
+
+                <div class="team-list">
+                    <div v-for="item in currentList" :key="item.address" class="team-item">
+                        <div class="team-avatar">
+                            <div class="avatar-content">
+                                <img :src="item.avatar || avatarImg" alt="avatar" class="avatar-img" />
+                            </div>
+                        </div>
+                        <div class="team-info-content">
+                            <div class="team-info-row">
+                                <div class="team-left-info">
+                                    <div class="team-address-row">
+                                        <span class="team-address">{{ item.address }}</span>
+                                        <span v-if="item.nodeTag" class="team-node-tag">{{ item.nodeTag }}</span>
+                                    </div>
+                                    <!-- 直推地址列表：时间在地址下面 -->
+                                    <div v-if="activeTab === 'direct'" class="team-time-direct">
+                                        <span class="team-time">{{ item.activationTime }}</span>
+                                    </div>
+                                </div>
+                                <div class="team-right-info">
+                                    <span class="team-reward">+ {{ item.reward || '32,567' }} CHO</span>
+                                </div>
+                            </div>
+                            <!-- 团队地址列表：显示Upline和时间 -->
+                            <div v-if="activeTab === 'team'" class="team-upline-row">
+                                <div class="team-upline-left">
+                                    <span class="team-upline-label">Upline:</span>
+                                    <span class="team-upline-address">{{ item.upline || item.address }}</span>
+                                </div>
+                                <span class="team-time">{{ item.activationTime }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="tree">
-                <graph />
-            </div>
-
-            <div class="tableContent">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>间推用户</th>
-                            <th>上级</th>
-                            <th>质押类型</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>87152721AH17</td>
-                            <td>921GS91GHSd</td>
-                            <td>T1</td>
-                        </tr>
-                        <tr>
-                            <td>87152721AH17</td>
-                            <td>921GS91GHSd</td>
-                            <td>T1</td>
-                        </tr>
-                        <tr>
-                            <td>87152721AH17</td>
-                            <td>921GS91GHSd</td>
-                            <td>T1</td>
-                        </tr>
-                        <tr>
-                            <td>87152721AH17</td>
-                            <td>921GS91GHSd</td>
-                            <td>T1</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </div>
 
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed, onUnmounted } from "vue"
-import graph from "../../components/graph.vue"
-import { ArrowLeftBold, Sunny, Moon } from '@element-plus/icons-vue'
-import { useThemeStore } from '@/stores/theme'
+import { ref, onMounted, computed } from "vue"
 import { useRouter } from 'vue-router'
+import { useThemeStore } from '@/stores/theme'
+import { useI18n } from 'vue-i18n'
+import avatarImg from '@/assets/icon/avatar.png'
+import TeamTree from "@/components/TeamTree.vue"
+
 
 const router = useRouter()
 const themeStore = useThemeStore()
-const isDark = computed(() => themeStore.isDark)
-
-const toggleTheme = () => {
-    themeStore.toggleTheme()
-}
+const { t } = useI18n()
 
 const goBack = () => {
     router.back()
 }
 
-const tabArr = ref([
+const handleOpenMore = () => {
+    // 预留「了解更多」跳转逻辑
+    console.log('前往了解更多')
+}
+
+// 我的团队相关数据
+const activeTab = ref('direct')
+
+// 直推地址列表
+const directList = ref([
     {
-        name: "直推",
-        index: 0
+        address: '0xb574...4c7d',
+        activationTime: '2025-09-01 10:23',
+        nodeType: t('myNode.nodeTypes.distributed'),
+        nodeTag: 'T1',
+        reward: '32,567',
+        avatar: avatarImg,
+        upline: '0xb574...4c7d'
     },
     {
-        name: "网体",
-        index: 1
+        address: '0xb574...4c7d',
+        activationTime: '2025-09-01 10:23',
+        nodeType: t('myNode.nodeTypes.distributed'),
+        nodeTag: 'T1',
+        reward: '32,567',
+        avatar: avatarImg,
+        upline: '0xb574...4c7d'
     }
 ])
 
-function tab(index) {
-    active.value = index
-}
+// 团队地址列表
+const teamList = ref([
+    {
+        address: '0xa123...5f6g',
+        activationTime: '2025-09-02 14:30',
+        nodeType: t('myNode.nodeTypes.cluster'),
+        nodeTag: 'T2',
+        reward: '45,890',
+        avatar: avatarImg,
+        upline: '0xb574...4c7d'
+    },
+    {
+        address: '0xc789...1a2b',
+        activationTime: '2025-09-03 09:15',
+        nodeType: t('myNode.nodeTypes.distributed'),
+        nodeTag: 'T1',
+        reward: '28,123',
+        avatar: avatarImg,
+        upline: '0xa123...5f6g'
+    }
+])
 
-const active = ref(1)
+// 根据当前tab显示对应的列表
+const currentList = computed(() => {
+    return activeTab.value === 'direct' ? directList.value : teamList.value
+})
+
+// 根据当前tab显示对应的邀请地址数
+const inviteCount = computed(() => {
+    return activeTab.value === 'direct' ? directList.value.length : teamList.value.length
+})
+
+const handleSearch = () => {
+    // 搜索功能
+    console.log('搜索团队')
+}
 
 // 初始化主题
 onMounted(() => {
@@ -176,350 +246,534 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+/* 暗色主题下使用深色背景图 */
+.theme-dark .cps-bg {
+    background-image: url("@/assets/icon/cpsBgDark.png") !important;
+}
+
 .myNode {
     min-height: 100vh;
     padding: 20px 10px 0 10px;
-    background-color: var(--bg-page, #FCFCFC);
     color: var(--text-color, #1a1a1a);
     transition: background-color 0.3s ease, color 0.3s ease;
 
+    .cps-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: url("@/assets/icon/cpsBg.png") no-repeat;
+        background-size: 100% 100%;
+        pointer-events: none;
+        width: 100%;
+        min-height: 230px;
+        z-index: 1;
+    }
+
     .banner1 {
-        background: url("../../assets/images/banner1.png");
-        background-size: cover;
-        background-repeat: no-repeat;
+        background: transparent;
         flex-direction: column;
         display: flex;
-        height: 100%;
-        /* 或 height: 100vh */
+        height: auto;
         justify-content: space-between;
-
-        h3 {
-            padding: 0 10px;
-            margin-bottom: 20px;
-        }
     }
 
-    .header {
-        position: relative;
-        height: 22px;
+    .cps-card-header {
         display: flex;
-        margin-bottom: 35px;
-        align-items: center;
-        padding: 0 10px;
         justify-content: space-between;
-
-        .goback {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: transform 0.2s ease;
-
-            &:hover {
-                transform: translateX(-2px);
-            }
-
-            &:active {
-                transform: translateX(-4px);
-            }
-
-            .goback-icon {
-                color: var(--text-color, #000000);
-                font-size: 20px;
-                transition: color 0.3s ease;
-            }
-        }
-
-        .title {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            font-weight: 600;
-            font-size: 16px;
-            color: var(--text-color, #000000);
-            transition: color 0.3s ease;
-        }
-
-        .right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .theme-toggle-btn {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-light, #F5F5F5);
-            border: 1px solid var(--border-color, #E0E0E0);
-            border-radius: 8px;
-            color: var(--text-color, #000000);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-
-            &:hover {
-                background-color: var(--bg-card, #ffffff);
-                border-color: var(--text-color, #000000);
-                transform: scale(1.05);
-            }
-
-            &:active {
-                transform: scale(0.95);
-            }
-
-            .theme-icon {
-                font-size: 18px;
-                transition: transform 0.3s ease, color 0.3s ease;
-                color: var(--text-color, #000000);
-            }
-
-            &:hover .theme-icon {
-                transform: rotate(15deg);
-            }
-        }
+        align-items: center;
+        margin-bottom: 27px;
+        z-index: 999;
     }
 
-    .banner {
-        margin-bottom: 40px;
+    .back-btn,
+    .open-btn {
+        width: 24px;
+        height: 24px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        cursor: pointer;
+        color: var(--text-color, #1a1a1a);
+        transition: all 0.3s ease;
 
-        h3 {
-            font-weight: bold;
-            font-size: 20px;
-            color: var(--text-color, #000000);
-            margin-bottom: 20px;
-            transition: color 0.3s ease;
+        &:hover {
+            opacity: 0.8;
         }
 
-        img {
+        .icon {
             width: 100%;
-            border-radius: 8px;
-            transition: opacity 0.3s ease;
+            height: 100%;
         }
     }
+
+    .back-btn {
+        width: 18px;
+        height: 18px;
+    }
+
+    .page-title {
+        font-family: Noto Sans SC, Noto Sans SC;
+        font-weight: bold;
+        font-size: 28px;
+        color: var(--text-color, #1a1a1a);
+        margin-bottom: 22px;
+        transition: color 0.3s ease;
+    }
+
 
     .income {
         margin-bottom: 38px;
-
-        h3 {
-            font-size: 20px;
-            color: var(--text-color, #000000);
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
+        position: relative;
+        z-index: 999;
 
         .box {
-            margin-top: 14px;
             display: flex;
             justify-content: space-between;
             gap: 18px;
-            margin-bottom: 40px;
+            margin-bottom: 26px;
 
             .item {
-                height: 80px;
-                background: var(--bg-light, #F4F4F4);
                 flex: 1;
-                border-radius: 8px;
                 display: flex;
                 flex-direction: column;
-                align-items: center;
-                justify-content: center;
                 transition: background-color 0.3s ease, transform 0.2s ease;
 
-                &:hover {
-                    transform: translateY(-2px);
-                }
-
                 b {
+                    font-family: PingFang SC, PingFang SC;
                     font-weight: 400;
-                    font-size: 12px;
-                    color: var(--text-dark-gray, #999999);
-                    line-height: 22px;
-                    transition: color 0.3s ease;
+                    font-size: 14px;
+                    color: var(--text-color-tabBtn, #999999);
+                    margin-bottom: 8px;
                 }
 
                 p {
+                    font-family: DIN, DIN;
                     font-weight: bold;
                     font-size: 24px;
-                    color: #25A750;
-                    line-height: 20px;
+                    color: var(--text-color, #1a1a1a);
+                    transition: color 0.3s ease;
                 }
             }
         }
 
-        ul {
-            margin-top: 13px;
-            list-style: none;
+        .earn-prompt {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-light, #F5F5F5);
+            border-radius: 999px;
+            margin-bottom: 32px;
+            transition: all 0.3s ease;
 
-            li {
-                height: 60px;
-                align-items: center;
-                justify-content: space-between;
-                padding: 0 10px;
+            .earn-icon {
+                width: 24px;
+                height: 24px;
                 display: flex;
-                border-radius: 8px;
-                border: 1px solid var(--border-color, #F3F3F3);
-                margin-bottom: 10px;
-                background: var(--bg-card, #ffffff);
+                align-items: center;
+                justify-content: center;
+                background: var(--text-color-p, #BBFF2E);
+                border-radius: 4px;
+                color: #000000;
+                flex-shrink: 0;
+            }
+
+            .earn-text {
+                font-size: 14px;
+                color: var(--text-color, #1a1a1a);
+                flex: 1;
+                transition: color 0.3s ease;
+
+                .earn-amount {
+                    color: var(--text-color-p, #BBFF2E);
+                    font-weight: 600;
+                }
+            }
+        }
+
+        h3 {
+            font-family: PingFang SC, PingFang SC;
+            font-weight: 600;
+            font-size: 20px;
+            color: var(--text-color, #1a1a1a);
+            margin-bottom: 24px;
+            transition: color 0.3s ease;
+        }
+
+        .pending-income-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 13px;
+
+            .income-item {
+                display: flex;
+                flex-direction: column;
                 transition: all 0.3s ease;
 
-                &:hover {
-                    border-color: var(--text-color, #000000);
-                    transform: translateX(4px);
-                }
-
-                span {
+                .income-label {
+                    font-family: PingFang SC, PingFang SC;
                     font-weight: 400;
-                    font-size: 14px;
-                    color: var(--text-color, #000000);
-                    transition: color 0.3s ease;
+                    font-size: 13px;
+                    color: #999999;
+                    margin-bottom: 6px;
+                    min-height: 33px;
                 }
 
-                button {
-                    width: 64px;
-                    height: 28px;
-                    background: #C1272E;
-                    border-radius: 24px;
-                    outline: none;
-                    border: 1px solid #C1272E;
-                    font-weight: 400;
-                    font-size: 14px;
-                    color: #FFFFFF;
-                    cursor: pointer;
-                    transition: all 0.2s ease;
-
-                    &:hover {
-                        background: #a01f25;
-                        transform: scale(1.05);
-                    }
-
-                    &:active {
-                        transform: scale(0.95);
-                    }
+                .income-value {
+                    font-family: DIN, DIN;
+                    font-weight: bold;
+                    font-size: 18px;
+                    color: var(--text-color, #ffffff);
                 }
+            }
+        }
+
+        .claim-all-btn {
+            width: 100%;
+            height: 56px;
+            background: var(--text-color-p, #BBFF2E);
+            border-radius: 999px;
+            border: none;
+            outline: none;
+            font-weight: 600;
+            font-size: 16px;
+            color: #000000;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background: #A8E626;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(187, 255, 46, 0.3);
+            }
+
+            &:active {
+                transform: translateY(0);
             }
         }
     }
 
-    .content {
-        .tab {
-            display: flex;
-            gap: 32px;
-            border-bottom: 1px solid var(--border-color, #F3F3F3);
-            margin-bottom: 20px;
-            overflow-x: auto;
-            white-space: nowrap;
-            transition: border-color 0.3s ease;
+    .my-team {
+        margin-top: 40px;
+        margin-bottom: 38px;
+        position: relative;
+        z-index: 999;
 
-            .item {
-                flex-shrink: 0;
-                font-weight: 400;
-                font-size: 16px;
-                width: 32px;
-                color: var(--text-gray, #909090);
-                padding-bottom: 15px;
-                border-bottom: 2px solid transparent;
-                cursor: pointer;
-                transition: all 0.3s ease;
-
-                &:hover {
-                    color: var(--text-color, #000000);
-                }
-            }
-
-            .active {
-                flex-shrink: 0;
-                font-weight: 400;
-                font-size: 16px;
-                color: var(--text-color, #000);
-                width: 32px;
-                padding-bottom: 15px;
-                border-bottom: 2px solid var(--text-color, #000);
-                transition: all 0.3s ease;
-            }
-        }
-
-        .myLevel {
+        .team-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 50px;
             margin-bottom: 16px;
-            background: var(--bg-light, #F4F4F4);
-            border-radius: 8px;
-            padding: 0 10px;
-            font-weight: 600;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
 
-            span {
-                color: var(--text-gray, #909090);
+            .invite-count {
+                font-family: PingFang SC, PingFang SC;
+                font-weight: 400;
+                font-size: 14px;
+                color: var(--text-color, #1a1a1a);
                 transition: color 0.3s ease;
+
+                span {
+                    font-family: PingFang SC, PingFang SC;
+                    font-weight: 400;
+                    font-size: 14px;
+                    color: var(--text-color-tabBtn, #999999);
+                }
             }
 
-            b {
-                color: var(--text-color, #000);
-                transition: color 0.3s ease;
-            }
-        }
-
-        .tree {
-            height: 354px;
-            border-radius: 8px;
-            overflow: hidden;
-            background: var(--bg-card, #000);
-            transition: background-color 0.3s ease;
-        }
-
-        .tableContent {
-            table {
-                width: 100%;
-                border: 1px solid var(--border-color, #F3F3F3);
-                background: var(--bg-card, #ffffff);
-                border-radius: 8px;
-                overflow: hidden;
+            .search-icon {
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                color: #999999;
                 transition: all 0.3s ease;
 
-                thead {
-                    tr {
-                        th {
-                            font-weight: 400;
-                            font-size: 14px;
-                            color: var(--text-gray, #909090);
-                            height: 50px;
-                            border-bottom: 1px solid var(--border-color, #F3F3F3);
-                            background: var(--bg-light, #F5F5F5);
-                            transition: all 0.3s ease;
+                &:hover {
+                    opacity: 0.7;
+                }
+
+                svg {
+                    width: 100%;
+                    height: 100%;
+                }
+            }
+        }
+
+        .team-tree-placeholder {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color-tabBtn, #999999);
+            font-size: 12px;
+        }
+
+        .team-content {
+            width: 100%;
+        }
+
+        .team-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+
+            .tab-btn {
+                height: 36px;
+                font-family: PingFang SC, PingFang SC;
+                font-weight: 600;
+                font-size: 20px;
+                color: #909090;
+
+                &.active {
+                    color: #000000;
+                }
+            }
+        }
+
+        .team-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            border: 1px solid #F3F3F3;
+
+
+            .team-item {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px;
+                border-radius: 12px;
+
+                .team-avatar {
+                    position: relative;
+                    width: 48px;
+                    height: 48px;
+                    flex-shrink: 0;
+
+                    .avatar-content {
+                        position: relative;
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 50%;
+                        overflow: hidden;
+                        border: 2px solid var(--text-color-p, #BBFF2E);
+
+                        .avatar-img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                            image-rendering: pixelated;
                         }
                     }
                 }
 
-                tbody {
-                    tr {
-                        transition: background-color 0.2s ease;
+                .team-info-content {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
 
-                        &:hover {
-                            background-color: var(--bg-light, #F5F5F5);
+                    .team-info-row {
+                        display: flex;
+                        align-items: flex-start;
+                        justify-content: space-between;
+
+                        .team-left-info {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 4px;
+                            flex: 1;
+
+                            .team-address-row {
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+
+                                .team-address {
+                                    font-family: PingFang SC, PingFang SC;
+                                    font-weight: 400;
+                                    font-size: 14px;
+                                    color: var(--text-color, #1a1a1a);
+                                    transition: color 0.3s ease;
+                                }
+
+                                .team-node-tag {
+                                    display: inline-block;
+                                    padding: 2px 8px;
+                                    background: rgba(234, 171, 74, 0.1);
+                                    color: #EAAB4A;
+                                    border-radius: 4px;
+                                    font-family: PingFang SC, PingFang SC;
+                                    font-weight: 500;
+                                    font-size: 12px;
+                                    line-height: 1.2;
+                                }
+                            }
+
+                            .team-time-direct {
+                                .team-time {
+                                    font-family: PingFang SC, PingFang SC;
+                                    font-weight: 400;
+                                    font-size: 12px;
+                                    color: #999999;
+                                }
+                            }
                         }
 
-                        td {
-                            height: 60px;
+                        .team-right-info {
+                            display: flex;
+                            align-items: center;
+
+                            .team-reward {
+                                font-family: PingFang SC, PingFang SC;
+                                font-weight: 500;
+                                font-size: 14px;
+                                color: #2EBE69;
+                            }
+                        }
+                    }
+
+
+                    .team-upline-row {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+
+                        .team-upline-left {
+                            display: flex;
+                            align-items: center;
+                            gap: 4px;
+
+                            .team-upline-label {
+                                font-family: PingFang SC, PingFang SC;
+                                font-weight: 400;
+                                font-size: 12px;
+                                color: #999999;
+                            }
+
+                            .team-upline-address {
+                                font-family: PingFang SC, PingFang SC;
+                                font-weight: 400;
+                                font-size: 12px;
+                                color: #999999;
+                            }
+                        }
+
+                        .team-time {
+                            font-family: PingFang SC, PingFang SC;
                             font-weight: 400;
-                            font-size: 14px;
-                            color: var(--text-color, #000000);
-                            border-right: 1px solid var(--border-color, #F3F3F3);
-                            border-bottom: 1px solid var(--border-color, #F3F3F3);
-                            transition: all 0.3s ease;
+                            font-size: 12px;
+                            color: #999999;
                         }
                     }
                 }
             }
         }
     }
+}
 
+/* 暗色主题特定样式 */
+.theme-dark .myNode {
+    .earn-prompt {
+        .earn-text {
+            color: #F4F4F4 !important;
+        }
+    }
 
+    .pending-income-grid {
+        .income-item {
 
+            .income-label {
+                color: #999999 !important;
+            }
 
+            .income-value {
+                color: #ffffff !important;
+            }
+        }
+    }
+
+    .my-team {
+
+        .team-header {
+            .invite-count {
+                color: #FFFFFF !important;
+            }
+
+            .search-icon {
+                color: #999999 !important;
+            }
+        }
+
+        .team-tabs .tab-btn {
+            color: #999999 !important;
+
+            &.active {
+                color: #FFFFFF !important;
+            }
+        }
+
+        .team-tree-placeholder {
+            background: rgba(255, 255, 255, 0.05) !important;
+            color: #999999 !important;
+        }
+
+        .team-list  {
+            background: #121212 !important;
+            border: none;
+            padding: 23px 0;
+        }
+
+        .team-item {
+
+            .team-info-content {
+                .team-info-row {
+                    .team-left-info {
+                        .team-address-row {
+                            .team-address {
+                                color: #FFFFFF !important;
+                            }
+                        }
+
+                        .team-time-direct {
+                            .team-time {
+                                color: #999999 !important;
+                            }
+                        }
+                    }
+
+                    .team-right-info {
+                        .team-reward {
+                            color: #2EBE69 !important;
+                        }
+                    }
+                }
+
+                .team-upline-row {
+                    .team-upline-left {
+                        .team-upline-label,
+                        .team-upline-address {
+                            color: #999999 !important;
+                        }
+                    }
+
+                    .team-time {
+                        color: #999999 !important;
+                    }
+                }
+            }
+        }
+    }
 }
 </style>

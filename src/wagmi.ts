@@ -4,11 +4,11 @@ import { defineChain } from 'viem'
 
 // ✅ 1. 定义各链
 const cpChain = defineChain({
-  id: 86606,
+  id: 86606,// CPChain 测试网 Chain ID
   name: 'CPChain Testnet',
-  nativeCurrency: { name: 'CPChain', symbol: 'CP', decimals: 18 },
-  rpcUrls: { default: { http: ['https://rpc-testnet.cpchain.com'] } },
-  blockExplorers: {
+  nativeCurrency: { name: 'CPChain', symbol: 'CP', decimals: 18 },// 本链的原生代币信息，name 是代币名称，symbol 是代币符号，decimals 是小数位数
+  rpcUrls: { default: { http: ['https://rpc-testnet.cpchain.com'] } },// RPC URL 列表，用于与区块链网络进行通信
+  blockExplorers: {// 区块浏览器信息，包含名称和 URL
     default: {
       name: 'CP Explorer',
       url: 'https://explorer-testnet.cpchain.com',
@@ -46,14 +46,16 @@ const optimism = defineChain({
 })
 
 // ✅ 2. 构建 wagmi config
+// createConfig 用于创建 wagmi 的配置对象
 export const config = createConfig({
-  chains: [cpChain, sepolia, optimism],
+  chains: [cpChain, sepolia, optimism],// 配置支持的区块链网络
   connectors: [
     injected(), // ✅ 添加 injected 连接器支持 MetaMask 等浏览器钱包
-    walletConnect({
-      projectId: 'f87cf4373910e1766c873dc5df019573',
+    walletConnect({// WalletConnect 连接器与injected 连接器类似，允许用户通过 WalletConnect 协议连接他们的移动钱包或其他支持 WalletConnect 的钱包。
+      projectId: 'f87cf4373910e1766c873dc5df019573',// ✅ 替换为你的 WalletConnect 项目 ID
     }),
   ],
+  // ✅ 使用本地存储保存连接状态，key 为 'vite-vue'
   storage: createStorage({ storage: localStorage, key: 'vite-vue' }),
   transports: {
     [cpChain.id]: http(cpChain.rpcUrls.default.http[0]),

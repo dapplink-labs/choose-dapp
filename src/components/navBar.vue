@@ -429,7 +429,7 @@ watch(address, async (newAddress) => {
 
 }, { immediate: true }) // 立即执行一次
 
-
+// 获取 CP 余额的函数
 async function getBalanceCp(newAddress) {
   try {
     const raw = await provider.getBalance(newAddress)
@@ -442,6 +442,7 @@ async function getBalanceCp(newAddress) {
 console.log(connectors);
 // 存储当前滚动位置
 const scrollY = ref(0);
+// 当前函数用于等待 TokenPocket 插件注入
 function waitForTPProvider(timeout = 5000) {
   return new Promise((resolve, reject) => {
     const start = Date.now();
@@ -458,6 +459,8 @@ function waitForTPProvider(timeout = 5000) {
     }, 100);
   });
 }
+
+// 连接钱包函数
 async function wallconnects(id, chainId) {
   // const connector = injected(); // ✅
   // await connect({ connector, chainId })
@@ -519,6 +522,7 @@ watchEffect(() => {
 onMounted(() => {
   window.addEventListener("scroll", handleScroll);
 });
+// 复制到剪贴板
 async function copyToClipboard(text) {
   copyText(text, undefined, (error, event) => {
     if (error) {
@@ -539,6 +543,9 @@ async function copyToClipboard(text) {
 onBeforeUnmount(() => {
   window.removeEventListener("scroll", handleScroll);
 });
+// 菜单选择事件处理函数
+// index: 选中的菜单项索引
+// indexPath: 选中菜单项的完整路径数组
 const handleSelect = (index, indexPath) => {
   console.log(index, indexPath);
   activeIndex.value = index;

@@ -13,7 +13,7 @@
             <!-- 标题和事件详情 -->
             <div class="event-header">
               <div class="event-title-section">
-                <img :src="detailData.avatar" alt="头像" class="event-avatar" />
+                <img :src="detailData.avatar" :alt="$t('detail.avatar')" class="event-avatar" />
                 <h1 class="event-title">{{ detailData.title }}</h1>
               </div>
               <div class="event-info">
@@ -31,9 +31,9 @@
                 </div>
               </div>
               <div class="prediction-status">
-                <p class="status-label">预测</p>
+                <p class="status-label">{{ $t('detail.prediction') }}</p>
                 <span class="status-date">{{ detailData.predictionDate }}</span>
-                <span class="status-days">({{ detailData.daysLeft }}天后关闭)</span>
+                <span class="status-days">({{ detailData.daysLeft }}{{ $t('detail.daysClose') }})</span>
               </div>
             </div>
 
@@ -108,11 +108,11 @@
                 <div class="order-book-tabs">
                   <button class="order-tab-btn" :class="{ active: activeOrderTab === 'orderbook' }"
                     @click="activeOrderTab = 'orderbook'">
-                    订单簿
+                    {{ $t('detail.orderBook') }}
                   </button>
                   <button class="order-tab-btn" :class="{ active: activeOrderTab === 'graph' }"
                     @click="activeOrderTab = 'graph'">
-                    图形
+                    {{ $t('detail.graph') }}
                   </button>
                 </div>
 
@@ -123,10 +123,10 @@
                     <div class="panel-table-wrapper">
                       <!-- 表头 -->
                       <div class="table-header">
-                        <div class="table-header-cell volume-header">交易量</div>
-                        <div class="table-header-cell price-header">价格</div>
-                        <div class="table-header-cell shares-header">股</div>
-                        <div class="table-header-cell total-header">全部</div>
+                        <div class="table-header-cell volume-header">{{ $t('detail.volume') }}</div>
+                        <div class="table-header-cell price-header">{{ $t('detail.price') }}</div>
+                        <div class="table-header-cell shares-header">{{ $t('detail.shares') }}</div>
+                        <div class="table-header-cell total-header">{{ $t('detail.all') }}</div>
                       </div>
                       <!-- 数据行 -->
                       <div v-for="(order, index) in sellOrders" :key="index" class="table-row">
@@ -148,8 +148,8 @@
                     <div class="panel-table-wrapper">
                       <!-- 表头 -->
                       <div class="table-header">
-                        <div class="table-header-cell volume-header">最后:${{ lastPrice }}</div>
-                        <div class="table-header-cell price-header" style="width: 31.5%;">价差: $1</div>
+                        <div class="table-header-cell volume-header">{{ $t('detail.last') }}:${{ lastPrice }}</div>
+                        <div class="table-header-cell price-header" style="width: 31.5%;">{{ $t('detail.spread') }}: $1</div>
                       </div>
                       <!-- 数据行 -->
                       <div v-for="(order, index) in buyOrders" :key="index" class="table-row">
@@ -194,10 +194,10 @@
 
               <!-- 规则模块 -->
               <div class="rules-section">
-                <h3 class="rules-title">规则</h3>
+                <h3 class="rules-title">{{ $t('detail.rules') }}</h3>
                 <p class="rules-text">{{ rulesText }}</p>
                 <button class="view-more-btn" @click="toggleRulesExpanded">
-                  <span>查看更多</span>
+                  <span>{{ $t('detail.viewMore') }}</span>
                   <el-icon class="info-icon chevron-icon" :class="{ expanded: rulesExpanded }">
                     <ArrowDownBold />
                   </el-icon>
@@ -217,10 +217,10 @@
             <!-- 买入/卖出标签页 -->
             <div class="panel-tabs">
               <button class="tab-btn" :class="{ active: activeTab === 'buy' }" @click="activeTab = 'buy'">
-                买入
+                {{ $t('detail.buy') }}
               </button>
               <button class="tab-btn" :class="{ active: activeTab === 'sell' }" @click="activeTab = 'sell'">
-                卖出
+                {{ $t('detail.sell') }}
               </button>
             </div>
 
@@ -238,8 +238,8 @@
 
             <!-- 金额输入 -->
             <div class="amount-section">
-              <div class="amount-label">金额</div>
-              <div class="balance-info">余额:${{ balance }}</div>
+              <div class="amount-label">{{ $t('detail.amount') }}</div>
+              <div class="balance-info">{{ $t('detail.balance') }}:${{ balance }}</div>
               <div class="amount-input-wrapper">
                 <input type="text" class="amount-input" v-model="amount" placeholder="$0" />
               </div>
@@ -253,8 +253,8 @@
 
             <!-- 赢取金额显示 -->
             <div class="winning-section">
-              <div class="winning-label">赢取金额</div>
-              <div class="average-price">平均价格 ${{ averagePrice }}</div>
+              <div class="winning-label">{{ $t('detail.winningAmount') }}</div>
+              <div class="average-price">{{ $t('detail.averagePrice') }} ${{ averagePrice }}</div>
               <div class="winning-amount">${{ winningAmount }}</div>
             </div>
 
@@ -272,12 +272,14 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import NavBar2 from '@/components/navBar2.vue'
 import LineChartDetail from '@/components/LineChartDetail.vue'
 import { Trophy, Clock, ArrowDownBold } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 
 
 // 详情数据
@@ -302,13 +304,13 @@ const chartOptions = ref([
 const selectedOption = ref(chartOptions.value[2]) // 默认选中第三个
 
 // 时间范围选项
-const timeRanges = ref([
+const timeRanges = computed(() => [
   { label: '1H', value: '1H' },
   { label: '6H', value: '6H' },
-  { label: '1D', value: '1D' },
-  { label: '1W', value: '1W' },
-  { label: '1M', value: '1M' },
-  { label: 'ALL', value: 'ALL' }
+  { label: t('detail.timeRanges.1D'), value: '1D' },
+  { label: t('detail.timeRanges.1W'), value: '1W' },
+  { label: t('detail.timeRanges.1M'), value: '1M' },
+  { label: t('detail.timeRanges.ALL'), value: 'ALL' }
 ])
 
 const selectedTimeRange = ref('1W')

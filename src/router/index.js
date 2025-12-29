@@ -14,7 +14,8 @@ import myNode from "../views/myNode/index.vue"
 import myIncome from "../views/myIncome/index.vue"
 import LPVault from "../views/LPVault/index.vue"
 import dashboard from "../views/dashboard/index.vue"
-import myPromotions from "../views/myPromotions/index.vue"
+import detailH5 from "../views/detailH5/index.vue"
+import purchaseNodeRecord from "../views/purchaseNodeRecord/index.vue"
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -42,6 +43,15 @@ const router = createRouter({
       path: '/detail',
       name: 'detail',
       component: detail,
+    },
+    {
+      path: '/detail-h5',
+      name: 'detailH5',
+      component: detailH5,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
     },
     {
       path: '/breaking',
@@ -114,18 +124,18 @@ const router = createRouter({
       }
     },
     {
-      path: '/dashboard',
-      name: 'dashboard',
-      component: dashboard,
+      path: '/purchase-node-record',
+      name: 'purchaseNodeRecord',
+      component: purchaseNodeRecord,
       meta: {
         hideHeader: true,
         hideFooterNav: true
       }
     },
     {
-      path: '/my-promotions',
-      name: 'myPromotions',
-      component: myPromotions,
+      path: '/dashboard',
+      name: 'dashboard',
+      component: dashboard,
       meta: {
         hideHeader: true,
         hideFooterNav: true

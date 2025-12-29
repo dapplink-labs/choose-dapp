@@ -6,15 +6,15 @@
       <div class="cps-card">
         <div class="cps-card-header">
           <div class="back-btn" @click="handleBack">
-            <svg t="1766051544466" class="icon" viewBox="0 0 1024 1024" version="1.1"
-              xmlns="http://www.w3.org/2000/svg" p-id="6246" width="32" height="32">
+            <svg t="1766051544466" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+              p-id="6246" width="32" height="32">
               <path d="M723.2 1024l-512-512L716.8 0l70.4 70.4L345.6 512l441.6 448-64 64z" p-id="6247"
                 fill="currentColor"></path>
             </svg>
           </div>
           <div class="open-btn" @click="handleOpenMore">
-            <svg t="1766051224777" class="icon" viewBox="0 0 1024 1024" version="1.1"
-              xmlns="http://www.w3.org/2000/svg" p-id="4731" width="32" height="32">
+            <svg t="1766051224777" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+              p-id="4731" width="32" height="32">
               <path
                 d="M842.724 571.473c0-22.93 18.588-41.518 41.518-41.518s41.518 18.587 41.518 41.518v271.251c0 45.86-37.177 83.036-83.036 83.036H182.126c-45.86 0-83.036-37.177-83.036-83.036V182.126c0-45.86 37.176-83.036 83.036-83.036h271.251c22.93 0 41.518 18.588 41.518 41.518s-18.588 41.518-41.518 41.518H182.126v660.598h660.598V571.473z m2.865-332.009L562.576 521.869c-16.45 16.414-43.119 16.414-59.57 0-16.448-16.414-16.448-43.027 0-59.441l283.95-283.339H646.05c-22.138 0-40.084-17.907-40.084-40 0-22.09 17.946-39.998 40.084-39.998h203.56c42.056-0.001 76.149 34.019 76.149 75.985v203.122c0 22.092-17.947 40-40.086 40s-40.085-17.908-40.085-40V239.464z"
                 fill="currentColor" p-id="4732">
@@ -23,22 +23,32 @@
           </div>
         </div>
 
-        <h1 class="cps-title">算力服务商</h1>
+        <h1 class="cps-title">{{ t('computingPower.title') }}</h1>
 
         <p class="cps-desc">
-          1、分布式节点算力服务商 500U，享受数据节点收益、交易全网手续费买卖 0.5% 收益，子币手续费 3%。二级市场分润 10%
-          收益，分布式算力节点推分布式算力节点。
-          <a href="javascript:void(0)" class="cps-link" @click="handleOpenMore">了解更多</a>
+          {{ t('computingPower.desc') }}
+          <a href="javascript:void(0)" class="cps-link" @click="handleOpenMore">{{ t('computingPower.learnMore') }}</a>
         </p>
+
+        <!-- 激活提示模块 -->
+        <div class="activation-banner">
+          <div class="activation-avatar">
+            <img :src="activationAvatar" alt="avatar" />
+          </div>
+          <div class="activation-text">
+            {{ activationMsg }}
+          </div>
+        </div>
 
         <!-- 购买节点标题区域 -->
         <div class="node-header">
           <div class="node-title-wrap">
-            <h2 class="node-section-title">购买节点</h2>
+            <h2 class="node-section-title">{{ t('computingPower.buyNode') }}</h2>
           </div>
           <div class="my-node-btn" @click="handleMyNodes">
-            我的节点 <svg t="1766063981785" class="icon-next" viewBox="0 0 1024 1024" version="1.1"
-              xmlns="http://www.w3.org/2000/svg" p-id="1589" width="12" height="12">
+            {{ t('computingPower.myNodes') }}
+            <svg t="1766063981785" class="icon-next" viewBox="0 0 1024 1024" version="1.1"
+              xmlns="http://www.w3.org/2000/svg" p-id="1589" width="18" height="18">
               <path
                 d="M340.688 830.24l11.312 11.328a16 16 0 0 0 22.624 0L685.76 530.448a16 16 0 0 0 0-22.64L374.624 196.688a16 16 0 0 0-22.624 0l-11.312 11.312a16 16 0 0 0 0 22.624l288.496 288.496-288.496 288.512a16 16 0 0 0 0 22.624z"
                 fill="currentColor" p-id="1590"></path>
@@ -46,109 +56,116 @@
           </div>
         </div>
 
-        <!-- 购买节点模块 -->
-        <div class="node-card">
-          <div class="node-tabs">
-            <div class="node-tab" :class="{ active: activeNodeTab === 'distributed' }"
-              @click="activeNodeTab = 'distributed'">
-              分布节点
+        <!-- 购买节点模块：卡片列表 -->
+        <div class="node-card-list">
+          <div v-for="node in displayNodes" :key="node.type" class="node-card-item">
+            <div class="node-item-header">
+              <div class="node-item-icon">
+                <img :src="node.icon" :alt="node.title" />
+                <span v-if="node.badge" class="node-badge">
+                  {{ node.badge }}
+                </span>
+              </div>
+              <div class="node-item-main">
+                <div class="node-item-title">{{ node.title }}</div>
+                <div class="node-item-price">
+                  <span class="label">{{ t('computingPower.priceLabel') }}</span>
+                  <span class="value">
+                    <img class="coin" :src="TIcon" alt="T" />{{ node.price }}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div class="node-tab" :class="{ active: activeNodeTab === 'cluster' }" @click="activeNodeTab = 'cluster'">
-              集群节点
-            </div>
-          </div>
 
-          <div class="node-content">
-            <div class="node-image-wrap">
-              <img :src="currentNodeImg" alt="节点插图" class="node-image" />
+            <div class="node-item-desc">
+              <p>{{ node.descText }}</p>
             </div>
 
-            <ul class="benefit-list">
-              <li v-for="(item, idx) in benefits" :key="idx" class="benefit-item">
-                <span class="check-icon"></span>
-                <span class="text">{{ item }}</span>
-              </li>
-            </ul>
-
-            <div class="price-row">
-              <span class="price-label">价格：</span>
-              <span class="price-value">500USDT</span>
-            </div>
-          </div>
-
-          <div class="buy-btn" @click="handleBuy">
-            购买
+            <button class="node-item-btn" @click="handleBuy(node.type)">
+              {{ t('computingPower.activateBtn') }}
+            </button>
           </div>
         </div>
 
-        <!-- 节点购买记录模块 -->
-        <div class="record-section">
-          <div class="record-header">
-            <h2 class="record-title">节点购买记录</h2>
-            <div class="record-more-btn" @click="handleMoreRecords">
-              查看更多 <svg t="1766063981785" class="icon-next" viewBox="0 0 1024 1024" version="1.1"
-                xmlns="http://www.w3.org/2000/svg" p-id="1589" width="12" height="12">
-                <path
-                  d="M340.688 830.24l11.312 11.328a16 16 0 0 0 22.624 0L685.76 530.448a16 16 0 0 0 0-22.64L374.624 196.688a16 16 0 0 0-22.624 0l-11.312 11.312a16 16 0 0 0 0 22.624l288.496 288.496-288.496 288.512a16 16 0 0 0 0 22.624z"
-                  fill="currentColor" p-id="1590"></path>
-              </svg>
-            </div>
-          </div>
-
-          <div class="record-card">
-            <div class="record-table">
-              <div class="record-row record-row--head">
-                <div class="cell time">操作时间</div>
-                <div class="cell type">产品类型</div>
-                <div class="cell amount">消耗USDT</div>
-              </div>
-              <div v-for="(row, index) in records" :key="index" class="record-row">
-                <div class="cell time">{{ row.time }}</div>
-                <div class="cell type">{{ row.type }}</div>
-                <div class="cell amount">{{ row.amount }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
 
-    <PurchaseNode
-      v-model="showPurchaseNode"
-      :title="purchaseTitle"
-      @buy="handleConfirmBuy"
-    />
+    <PurchaseNode v-model="showPurchaseNode" :title="purchaseTitle" @buy="handleConfirmBuy" />
   </div>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import cpsBg from '@/assets/icon/cpsBg.png'
 import distributedNodeImg from '@/assets/icon/DistributedNode.png'
-import clusterNodeImg from '@/assets/icon/ClusterNode.png'
+import distributedNodeImgDark from '@/assets/icon/DistributedNodeDark.png'
+import clusterNodeImgDark from '@/assets/icon/ClusterNode.png'
+import clusterNodeImg from '@/assets/icon/11.png'
+import TIcon from '@/assets/icon/TIcon.png'
 import PurchaseNode from '@/components/PurchaseNode.vue'
+import { useThemeStore } from '@/stores/theme'
 
 const router = useRouter()
+const { t, locale } = useI18n()
+const { isDark } = useThemeStore()
 
-// 节点 TAB 状态（目前仅展示 UI，逻辑可后续扩展）
+// 激活提示头像（复用集群节点插图）
+const activationAvatar = clusterNodeImg
+
+// 节点 TAB 状态（用于弹窗标题）
 const activeNodeTab = ref('distributed')
 
-const benefits = [
-  '享受数据节点收益',
-  '交易全网手续费买卖 0.5% 收益',
-  '子币手续费 3%',
-  '二级市场盈利 10% 收益',
-  '分布式算力节点推分布式算力节点'
-]
+// 节点卡片数据（从服务端获取，空时用默认兜底）
+const nodeProducts = ref([])
 
-const records = [
-  { time: '2025-09-01 09:08:36', type: '分布节点', amount: 500 },
-  { time: '2025-09-01 09:08:36', type: '分布节点', amount: 500 },
-  { time: '2025-09-01 09:08:36', type: '分布节点', amount: 500 },
-  { time: '2025-09-01 09:08:36', type: '分布节点', amount: 500 }
-]
+const fallbackNodes = computed(() => [
+  {
+    type: 'distributed',
+    icon: isDark.value ? distributedNodeImgDark : distributedNodeImg,
+    title: t('computingPower.tabs.distributed'),
+    price: '500',
+    badge: '',
+    fee: 0.5,
+    subFee: 3,
+    marketShare: 10,
+    descText: t('computingPower.products.distributedDescTemplate', {
+      fee: 0.5,
+      subFee: 3,
+      marketShare: 10
+    })
+  },
+  {
+    type: 'cluster',
+    icon: isDark.value ? clusterNodeImgDark : clusterNodeImg,
+    title: t('computingPower.tabs.cluster'),
+    price: '10000',
+    badge: '',
+    fee: 0.5,
+    subFee: 2,
+    marketShare: 5,
+    descText: t('computingPower.products.clusterDescTemplate', {
+      fee: 0.5,
+      subFee: 2,
+      marketShare: 5
+    })
+  }
+])
+
+const displayNodes = computed(() =>
+  nodeProducts.value.length ? nodeProducts.value : fallbackNodes.value
+)
+
+// 激活提示文案
+const activationAddress = ref('0xb574...4c7d')
+const activationMsg = computed(() =>
+  t('computingPower.activationMsg', {
+    address: activationAddress.value,
+    nodeType: t('computingPower.tabs.cluster')
+  })
+)
 
 const handleBack = () => {
   router.back()
@@ -167,10 +184,13 @@ const handleMyNodes = () => {
 const showPurchaseNode = ref(false)
 
 const purchaseTitle = computed(() =>
-  activeNodeTab.value === 'distributed' ? '分布节点-500 USDT' : '集群节点-10000 USDT'
+  activeNodeTab.value === 'distributed'
+    ? t('computingPower.purchaseTitle.distributed')
+    : t('computingPower.purchaseTitle.cluster')
 )
 
-const handleBuy = () => {
+const handleBuy = (type) => {
+  activeNodeTab.value = type
   showPurchaseNode.value = true
 }
 
@@ -179,11 +199,60 @@ const handleConfirmBuy = () => {
   showPurchaseNode.value = false
 }
 
-const handleMoreRecords = () => {
-  console.log('查看更多节点购买记录')
+// 拉取节点数据（示例，替换为真实接口）
+const fetchNodeProducts = async () => {
+  try {
+    const res = await fetch('/api/node-products')
+    if (!res.ok) throw new Error('fetch node products failed')
+    const data = await res.json()
+    // 期望服务端字段：type/icon/title/price/badge/fee/subFee/marketShare/descText(optional)
+    nodeProducts.value = Array.isArray(data)
+      ? data.map(item => {
+        const type = item.type || 'distributed'
+        const fee = item.fee ?? (type === 'distributed' ? 0.5 : 0.5)
+        const subFee = item.subFee ?? (type === 'distributed' ? 3 : 2)
+        const marketShare = item.marketShare ?? (type === 'distributed' ? 10 : 5)
+
+        const base = {
+          type,
+          icon: item.icon || (type === 'distributed' ? distributedNodeImg : clusterNodeImg),
+          title: item.title || (type === 'distributed'
+            ? t('computingPower.tabs.distributed')
+            : t('computingPower.tabs.cluster')),
+          price: item.price || (type === 'distributed' ? '500' : '10000'),
+          badge: item.badge || '',
+          fee,
+          subFee,
+          marketShare
+        }
+
+        // 如果后端直接给了已拼好的多语言描述，就直接用；否则用本地 i18n 模板和动态数值生成
+        if (item.descText) {
+          return {
+            ...base,
+            descText: item.descText
+          }
+        }
+
+        const templateKey = type === 'distributed'
+          ? 'computingPower.products.distributedDescTemplate'
+          : 'computingPower.products.clusterDescTemplate'
+
+        return {
+          ...base,
+          descText: t(templateKey, { fee, subFee, marketShare })
+        }
+      })
+      : []
+  } catch (err) {
+    console.warn('node products fetch failed, use fallback', err)
+    nodeProducts.value = []
+  }
 }
 
-// 当前展示的节点插图，随 Tab 切换
+onMounted(fetchNodeProducts)
+
+// 保留当前选中节点图（弹窗可能复用）
 const currentNodeImg = computed(() =>
   activeNodeTab.value === 'distributed' ? distributedNodeImg : clusterNodeImg
 )
@@ -193,7 +262,7 @@ const currentNodeImg = computed(() =>
 .cps-page {
   width: 100%;
   position: relative;
-  background-color: var(--bg-page-h5, #FFFFFF);
+  background-color: var(--bg-dashboard, #FFFFFF);
   min-height: 100vh;
 }
 
@@ -207,6 +276,11 @@ const currentNodeImg = computed(() =>
   width: 100%;
   min-height: 230px;
   z-index: 1;
+}
+
+/* 暗色主题下使用深色背景图 */
+.theme-dark .cps-bg {
+  background-image: url("@/assets/icon/cpsBgDark.png");
 }
 
 .cps-content {
@@ -226,19 +300,148 @@ const currentNodeImg = computed(() =>
 
 }
 
-.node-content {
-  width: 100%;
-  border: 1px solid var(--border-color, #E0E0E0);
+// 节点列表卡片
+.node-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.node-card-item {
+  background: var(--bg-card, #ffffff);
+  border-radius: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.node-item-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.node-item-icon {
+  position: relative;
+  width: 72px;
+  height: 72px;
   border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
 
+  img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+  }
+}
+
+.node-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #fff;
+  color: #000;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.node-item-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.node-item-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-color, #000000);
+}
+
+.node-item-price {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #9ca3af;
+
+  .label {
+    color: #9ca3af;
+  }
+
+  .value {
+    font-family: PingFang SC, PingFang SC;
+    font-weight: 600;
+    font-size: 16px;
+    color: #2EBE69;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .coin {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    object-fit: contain;
+  }
+}
+
+.node-item-desc {
+  line-height: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  p {
+    font-family: PingFang SC, PingFang SC;
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--text-dark-gray, #909090);
+    line-height: 20px;
+    text-align: left;
+  }
+}
+
+.node-item-btn {
+  margin-top: 4px;
+  height: 44px;
+  border-radius: 22px;
+  border: none;
+  background: #2B6C18;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 16px rgba(43, 108, 24, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
 }
 
 .cps-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 29px;
+  margin-bottom: 30px;
 }
 
 .back-btn,
@@ -260,26 +463,73 @@ const currentNodeImg = computed(() =>
 }
 
 .cps-title {
-  margin: 0 0 16px;
-  font-size: 22px;
-  font-weight: 700;
+  margin: 0 0 10px;
+  font-family: Noto Sans SC, Noto Sans SC;
+  font-weight: bold;
+  font-size: 28px;
+  color: #FFFFFF;
   color: var(--text-color, #111111);
 }
 
 .cps-desc {
-  line-height: 1.7;
   margin: 0;
   font-family: PingFang SC, PingFang SC;
   font-weight: 400;
-  font-size: 12px;
-  color: var(--text-dark-gray, #909090);
+  font-size: 14px;
+  line-height: 20px;
   text-align: left;
+  color: var(--text-color-F4, #F4F4F4);
+  padding-right: 25%;
+  box-sizing: border-box;
 }
 
 .cps-link {
   font-size: 12px;
-  color: var(--text-dark-gray, #909090);
+  color: var(--text-color-F4, #F4F4F4);
   text-decoration: underline;
+}
+
+// 激活提示模块样式
+.activation-banner {
+  margin: 12px 0 16px;
+  padding: 10px 14px;
+  width: 100%;
+  box-sizing: border-box;
+  background: #F4F4F4;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #111111;
+}
+
+.activation-avatar {
+  width: 36px;
+  height: 36px;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #2F2F2F;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.activation-text {
+  font-size: 13px;
+  line-height: 18px;
+  color: inherit;
+}
+
+/* 关灯（暗色主题）下的激活提示背景色与文字色 */
+.theme-dark .activation-banner {
+  background: #2F2F2F;
+  color: #F4F4F4;
 }
 
 .node-header {
@@ -292,20 +542,29 @@ const currentNodeImg = computed(() =>
 
 .node-section-title {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  font-family: Noto Sans SC, Noto Sans SC;
+  font-weight: bold;
+  font-size: 20px;
+  line-height: 16px;
+  text-align: left;
   color: var(--text-color, #000000);
 }
 
 .my-node-btn {
   border: none;
   background: transparent;
-  font-size: 13px;
-  color: var(--text-dark-gray, #909090);
+  color: var(--text-color, #FFF);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 2px;
+
+  font-family: PingFang SC, PingFang SC;
+  font-weight: 400;
+  font-size: 16px;
+  text-align: right;
+  font-style: normal;
+  text-transform: none;
 }
 
 .node-card {
@@ -443,94 +702,8 @@ const currentNodeImg = computed(() =>
   text-align: center;
 }
 
-.record-section {
-  margin-top: 32px;
-}
-
-.record-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.record-title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-color, #000000);
-}
-
-.record-more-btn {
-  border: none;
-  background: transparent;
-  font-size: 13px;
-  color: var(--text-dark-gray, #909090);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.record-card {
-  background-color: var(--bg-card, #ffffff);
-  border-radius: 12px;
-  border: 1px solid var(--border-color, #E0E0E0);
-  overflow: hidden;
-}
-
-.record-table {
-  width: 100%;
-}
-
-.record-row {
-  display: flex;
-  align-items: center;
-  font-size: 13px;
-  color: var(--text-color, #333333);
-}
-
-.cell {
-  font-family: PingFang SC, PingFang SC;
-  font-weight: 400;
-  font-size: 14px;
-  color: var(--text-color, #000000);
-}
-
-.record-row--head>.cell {
-  font-weight: 500;
-  font-family: PingFang SC, PingFang SC;
-  font-weight: 400;
-  font-size: 14px;
-  color: #909090;
-}
-
-.record-row:not(.record-row--head) {
-  border-top: 1px solid var(--border-color, #E0E0E0);
-}
-
-.cell {
-  padding: 10px 0;
-  box-sizing: border-box;
-  text-align: center;
-}
-
-.cell.time {
-  flex: 1.2;
-}
-
-.cell.type {
-  flex: 0.8;
-  border-left: 1px solid var(--border-color, #E0E0E0);
-  border-right: 1px solid var(--border-color, #E0E0E0);
-}
-
-.record-row--head>.cell.type {
-  border: none;
-}
-
-.cell.amount {
-  flex: 0.8;
-  text-align: center;
+.theme-dark .node-item-btn {
+  background: #ffffff !important;
+  color: #111111 !important;
 }
 </style>

@@ -16,8 +16,8 @@
       <!-- 功能暂不开放覆盖层 -->
       <div class="coming-soon-overlay">
         <div class="coming-soon-content">
-          <img src="@/assets/icon/11.png" alt="暂不开放" class="coming-soon-icon" />
-          <p class="coming-soon-text">预测功能即将上线</p>
+          <img src="@/assets/icon/11.png" :alt="$t('home.comingSoonAlt') || '暂不开放'" class="coming-soon-icon" />
+          <p class="coming-soon-text">{{ $t('home.comingSoon') || '预测功能即将上线' }}</p>
         </div>
       </div>
       <div class="content-wrapper">
@@ -29,26 +29,27 @@
               <el-icon class="search-icon">
                 <Search />
               </el-icon>
-              <input type="text" placeholder="搜索" class="search-input" v-model="searchQuery" @input="handleSearch" />
+              <input type="text" :placeholder="$t('home.searchPlaceholder') || '搜索'" class="search-input"
+                v-model="searchQuery" @input="handleSearch" />
             </div>
 
             <div class="action-buttons">
-              <button class="action-btn" @click="handleFilter">
+              <div class="action-btn" @click="handleFilter">
                 <svg t="1765525668660" class="icon" viewBox="0 0 1228 1024" version="1.1"
                   xmlns="http://www.w3.org/2000/svg" p-id="16362" width="20" height="20">
                   <path
                     d="M819.038649 0a204.759662 204.759662 0 0 1 198.309733 153.569747h185.614634a25.594958 25.594958 0 0 1 25.594958 25.594958v51.189915a25.594958 25.594958 0 0 1-25.594958 25.594958l-185.614634 0.10238a204.759662 204.759662 0 0 1-396.619466 0L25.594958 255.949578A25.594958 25.594958 0 0 1 0 230.35462v-51.189915a25.594958 25.594958 0 0 1 25.594958-25.594958h595.133958A204.759662 204.759662 0 0 1 819.038649 0z m0 102.379831a102.379831 102.379831 0 1 0 0 204.759663 102.379831 102.379831 0 0 0 0-204.759663zM409.519325 614.278987a204.759662 204.759662 0 0 1 198.309733 153.569747h595.133958a25.594958 25.594958 0 0 1 25.594958 25.594958v51.189915a25.594958 25.594958 0 0 1-25.594958 25.594958l-595.133958 0.10238a204.759662 204.759662 0 0 1-396.619466 0L25.594958 870.228565A25.594958 25.594958 0 0 1 0 844.633607v-51.189915a25.594958 25.594958 0 0 1 25.594958-25.594958h185.614634A204.759662 204.759662 0 0 1 409.519325 614.278987z m0 102.379831a102.379831 102.379831 0 1 0 0 204.759663 102.379831 102.379831 0 0 0 0-204.759663z"
                     p-id="16363" fill="currentColor"></path>
                 </svg>
-              </button>
-              <button class="action-btn" @click="handleViewToggle">
+              </div>
+              <div class="action-btn" @click="handleViewToggle">
                 <svg t="1765591111184" class="icon" viewBox="0 0 1024 1024" version="1.1"
                   xmlns="http://www.w3.org/2000/svg" p-id="5484" width="32" height="32">
                   <path
                     d="M389.461333 85.333333l253.354667 0.021334c5.397333 0.042667 10.602667 0.128 15.616 0.256l14.506667 0.490666 13.482666 0.789334c43.306667 3.072 71.104 10.965333 99.733334 26.282666a197.738667 197.738667 0 0 1 82.005333 82.005334c15.317333 28.629333 23.210667 56.426667 26.282667 99.733333l0.789333 13.482667 0.490667 14.506666 0.149333 7.658667 0.128 16.213333v501.525334a85.333333 85.333333 0 0 1-123.498667 76.330666L518.186667 797.44l-3.2-1.557333-2.965334-1.322667-2.986666 1.322667-257.514667 128.725333A85.333333 85.333333 0 0 1 128 848.298667l0.021333-509.781334c0.042667-5.397333 0.128-10.602667 0.256-15.616l0.490667-14.506666 0.789333-13.482667c3.072-43.306667 10.965333-71.104 26.282667-99.733333a197.738667 197.738667 0 0 1 82.005333-82.005334c28.629333-15.317333 56.426667-23.210667 99.733334-26.282666l13.482666-0.789334 14.506667-0.490666 7.658667-0.149334 16.213333-0.128z m252.16 85.354667H382.378667l-13.184 0.170667-6.122667 0.149333-11.413333 0.426667-10.325334 0.64c-4.906667 0.384-9.493333 0.832-13.76 1.365333l-8.149333 1.173333c-11.712 1.92-21.12 4.650667-29.866667 8.32l-5.76 2.602667c-1.92 0.917333-3.797333 1.877333-5.674666 2.88a112.426667 112.426667 0 0 0-47.018667 47.018667 145.664 145.664 0 0 0-2.88 5.674666l-2.602667 5.76c-3.669333 8.746667-6.4 18.154667-8.32 29.866667l-1.173333 8.149333c-0.533333 4.266667-0.981333 8.832-1.344 13.76l-0.64 10.325334a514.133333 514.133333 0 0 0-0.256 5.546666l-0.341333 11.989334-0.170667 13.184L213.333333 848.277333l256.469334-128.170666c10.965333-5.312 18.112-7.850667 26.88-9.536a80.213333 80.213333 0 0 1 30.634666 0c9.856 1.898667 17.664 4.885333 31.189334 11.648L810.666667 848.298667l-0.021334-508.586667-0.170666-13.226667a709.973333 709.973333 0 0 0-0.149334-6.101333l-0.426666-11.413333-0.64-10.325334c-0.384-4.906667-0.832-9.493333-1.365334-13.76l-1.173333-8.149333a129.984 129.984 0 0 0-8.32-29.866667l-2.602667-5.76a145.664 145.664 0 0 0-2.88-5.674666 112.426667 112.426667 0 0 0-47.018666-47.018667 145.664 145.664 0 0 0-5.674667-2.88l-5.76-2.602667c-8.746667-3.669333-18.154667-6.4-29.866667-8.32l-8.149333-1.173333c-4.266667-0.533333-8.832-0.981333-13.76-1.344l-10.325333-0.64a514.133333 514.133333 0 0 0-5.546667-0.256l-11.989333-0.341333L641.642667 170.666667zM576 298.666667a42.666667 42.666667 0 0 1 3.2 85.226666L576 384h-128a42.666667 42.666667 0 0 1-3.2-85.226667L448 298.666667h128z"
                     fill="currentColor" p-id="5485"></path>
                 </svg>
-              </button>
+              </div>
             </div>
 
             <div class="nav-divider">|</div>
@@ -66,7 +67,7 @@
           <div class="left-vertical-list">
             <div class="list-item large-item" v-for="(item, index) in leftList" :key="'left-' + index">
               <div class="item-header">
-                <img :src="item.avatar" alt="用户头像" class="user-avatar">
+                <img :src="item.avatar" :alt="$t('home.userAvatar')" class="user-avatar">
                 <div class="item-meta">
                   <div class="item-title" @click="navigateToEarnings()">{{ item.title }}</div>
                 </div>
@@ -75,14 +76,14 @@
                     <!-- 背景半圆 -->
                     <path class="semicircle-background" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke-width="8" />
                     <!-- 进度半圆 -->
-                    <path class="semicircle-progress" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#FF4D4F"
+                    <path class="semicircle-progress" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#E44096"
                       stroke-width="8" stroke-linecap="round" :stroke-dasharray="125.6"
                       :stroke-dashoffset="(125.6 * (100 - parseInt(item.percentage))) / 100" />
                     <!-- 百分比文本 -->
                     <text class="semicircle-percentage" x="52" y="50" text-anchor="middle" dy="0">{{ item.percentage
-                    }}</text>
+                      }}</text>
                   </svg>
-                  <div class="percentage-label">机会</div>
+                  <div class="percentage-label">{{ $t('home.opportunity') }}</div>
                 </div>
               </div>
               <div class="item-actions">
@@ -107,7 +108,7 @@
               <div class="list-item small-item" v-for="(item, itemIndex) in row"
                 :key="'right-' + rowIndex + '-' + itemIndex">
                 <div class="item-header">
-                  <img :src="item.avatar" alt="用户头像" class="user-avatar">
+                  <img :src="item.avatar" :alt="$t('home.userAvatar')" class="user-avatar">
                   <div class="item-meta">
                     <div class="item-title">{{ item.title }}</div>
                   </div>
@@ -152,10 +153,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import NavBar2 from '@/components/navBar2.vue'
 import { Search } from '@element-plus/icons-vue'
 import router from '@/router'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 // 禁止页面滚动
 onMounted(() => {
@@ -170,15 +174,15 @@ onUnmounted(() => {
 const searchQuery = ref('')
 
 // 筛选标签数据
-const filterTags = [
-  { value: 'all', label: '全部' },
-  { value: 'premium', label: '王牌' },
-  { value: 'ukraine', label: '乌克兰' },
-  { value: 'afghanistan', label: '爱泼斯坦' },
-  { value: 'trump', label: '特朗普' },
-  { value: 'fed', label: '美联储' },
-  { value: 'token', label: '代币销售' }
-]
+const filterTags = computed(() => [
+  { value: 'all', label: t('home.filterTags.all') },
+  { value: 'premium', label: t('home.filterTags.premium') },
+  { value: 'ukraine', label: t('home.filterTags.ukraine') },
+  { value: 'afghanistan', label: t('home.filterTags.afghanistan') },
+  { value: 'trump', label: t('home.filterTags.trump') },
+  { value: 'fed', label: t('home.filterTags.fed') },
+  { value: 'token', label: t('home.filterTags.token') }
+])
 
 // 当前激活的标签
 const activeTag = ref('all')
@@ -280,10 +284,21 @@ const navigateToEarnings = () => {
   router.push('/earnings')
 }
 
+// 检测是否为移动端
+const checkIsMobile = () => {
+  if (typeof window !== 'undefined') {
+    return window.innerWidth <= 768
+  }
+  return false
+}
+
 // 跳转到详情页面
 const navigateToDetail = (item, choice) => {
+  const isMobile = checkIsMobile()
+  const detailPath = isMobile ? '/detail-h5' : '/detail'
+
   router.push({
-    path: '/detail',
+    path: detailPath,
     query: {
       choice,
       id: item.id || item.title
@@ -305,10 +320,10 @@ const toggleFavorite = (item) => {
 
 <style scoped lang="scss">
 // 公共样式变量（使用CSS变量以支持主题切换）
-$yes-color: #25A750;
-$no-color: #CA4064;
-$yes-bg-light: rgba(37, 167, 80, 0.2);
-$no-bg-light: rgba(202, 64, 100, 0.2);
+$yes-color: #BCFF33;
+$no-color: #E23891;
+$yes-bg-light: rgba(188, 255, 51, 0.2);
+$no-bg-light: rgba(226, 56, 145, 0.2);
 
 // 公共按钮样式 mixin
 @mixin yes-no-button($color, $bg-light) {
@@ -436,7 +451,6 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
             cursor: pointer;
             transition: all 0.2s;
             border: none;
-            background: var(--bg-page, #FCFCFC);
             color: var(--text-color, #000000);
 
             .icon {
@@ -448,10 +462,6 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
               path {
                 fill: currentColor;
               }
-            }
-
-            &:hover {
-              background: var(--bg-light, #F5F5F5);
             }
           }
         }
@@ -641,17 +651,16 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
       .semicircle-percentage {
         font-size: 30px;
         font-weight: 600;
+        // 跟随主题：亮色黑字，暗色白字
         fill: var(--text-color, #333);
         transition: fill 0.3s ease;
 
         @media (max-width: 768px) {
           font-size: 24px;
-          fill: #FF4D4F; // 移动端使用红色
         }
 
         @media (max-width: 480px) {
           font-size: 20px;
-          fill: #FF4D4F; // 移动端使用红色
         }
       }
 
@@ -968,22 +977,13 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
             flex-shrink: 0;
 
             .action-btn {
-              width: 44px;
-              height: 44px;
               padding: 0;
               display: flex;
               align-items: center;
               justify-content: center;
-              background: #ffffff;
-              border: 1px solid var(--border-color, #e0e0e0);
-              border-radius: 8px;
               cursor: pointer;
               transition: all 0.2s;
               flex-shrink: 0;
-
-              &:hover {
-                background: var(--bg-light, #F5F5F5);
-              }
 
               .icon {
                 width: 20px;
@@ -1223,8 +1223,8 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
                       white-space: nowrap;
 
                       &.yes-btn {
-                        background: rgba(37, 167, 80, 0.2);
-                        color: #25A750;
+                        background: rgba(188, 255, 51, 0.2);
+                        color: var(--text-color-p, #BBFF2E);
 
                         &:hover {
                           background: rgba(37, 167, 80, 0.3);
@@ -1237,8 +1237,8 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
                       }
 
                       &.no-btn {
-                        background: rgba(202, 64, 100, 0.2);
-                        color: #CA4064;
+                        background: rgba(226, 56, 145, 0.2);
+                        color: #E44096;
 
                         &:hover {
                           background: rgba(202, 64, 100, 0.3);
@@ -1293,7 +1293,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
 @media (max-width: 480px) {
   .coming-soon-overlay {
-    display: flex !important;
+    // display: flex !important;
   }
 
   .home-page {
@@ -1306,7 +1306,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         margin-bottom: 12px;
 
         .filter-container {
-          gap: 8px;
+          gap: 22px;
 
           .search-box {
             padding: 8px 10px;
@@ -1327,19 +1327,14 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
           }
 
           .action-buttons {
-            gap: 6px;
+            gap: 16px;
 
             .action-btn {
-              width: 40px;
-              height: 40px;
               padding: 0;
-              border-radius: 6px;
-              background: var(--bg-card, #F5F5F5);
-              border: 1px solid var(--border-color, #e0e0e0);
 
               .icon {
-                width: 18px;
-                height: 18px;
+                width: 24px;
+                height: 24px;
               }
             }
           }
@@ -1649,7 +1644,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
             .item-header {
-              margin-bottom: 14px;
+              margin-bottom: 33px;
               align-items: center;
               gap: 10px;
 
@@ -1800,8 +1795,8 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 }
 
 .coming-soon-icon {
-  width: 48px;
-  height: 30px;
+  width: 72px;
+  height: 72px;
 }
 
 .coming-soon-text {

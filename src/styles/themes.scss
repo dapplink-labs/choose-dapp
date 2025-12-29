@@ -11,12 +11,12 @@
   --border-color: #E0E0E0;
   --text-gray  : #666;
   --text-gray-2  : #5A5F74;
-  --text-dark-gray: #999;
+  --text-dark-gray: #909090;
   --check-icon-bg: #000000;
   --el-bg-color: #121212;
   --color:#fff;
   --el-menu-border-color:none;
-  --el-menu-text-color:#fff;
+  --el-menu-text-color:#000;
   --el-menu-bg-color:#151517;
   --el-menu-active-color:#00CE7A;
   --el-border-color-light:none;
@@ -24,6 +24,8 @@
   --bg-current-user:#E8F5E9;
   --bg-current-user-border:#C8E6C9;
   --bg-dashboard:#FFFFFF;
+  --text-color-F4: #444444;
+  --text-color-p: #2EBE69;
 }
 
 /* 暗黑主题 */
@@ -32,13 +34,13 @@
   --text-color : #f2f2f2;
   --text-color-tabBtn : #999999;
   --bg-page    : #141414;
-  --bg-page-h5 : #141414;
+  --bg-page-h5 : #000000;
   --bg-card    : #1e1e1e;
   --bg-light   : #2a2a2a;
-  --border-color: #3a3a3a;
+  --border-color: #23262F;
   --text-gray  : #a0a0a0;
   --text-gray-2  : #5A5F74;
-  --text-dark-gray: #808080;
+  --text-dark-gray: #909090;
   --check-icon-bg: #C1272E;
   --el-bg-color: #121212;
   --color:#fff;
@@ -51,6 +53,8 @@
   --bg-current-user:rgba(17, 95, 198, 0.3);
   --bg-current-user-border:rgba(17, 95, 198, 0.6);
   --bg-dashboard:#000000;
+  --text-color-F4: #F4F4F4;
+  --text-color-p: #BBFF2E;
 }
 
 /* 全局背景色应用 */

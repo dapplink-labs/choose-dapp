@@ -11,8 +11,8 @@
           <div class="left-section">
             <div class="tab-list">
               <div class="tab-item">
-                <div :class="['tab-label', { active: activeTab === 0 }]" @click="handleTabChange(0)">总体准确率</div>
-                <div :class="['tab-label', { active: activeTab === 1 }]" @click="handleTabChange(1)">预期值与实际值</div>
+                <div :class="['tab-label', { active: activeTab === 0 }]" @click="handleTabChange(0)">{{ $t('accuracy.overallAccuracy') }}</div>
+                <div :class="['tab-label', { active: activeTab === 1 }]" @click="handleTabChange(1)">{{ $t('accuracy.expectedVsActual') }}</div>
               </div>
             </div>
           </div>
@@ -23,21 +23,21 @@
             <!-- 主体内容区域 -->
             <div class="main-content-area">
               <!-- 主标题 -->
-              <h1 class="main-title">Multimarket 的准确性如何?</h1>
+              <h1 class="main-title">{{ $t('accuracy.title') }}</h1>
 
               <!-- 准确率指标 -->
               <div class="accuracy-metrics">
                 <div class="metric-item">
                   <div class="metric-value primary">{{ metrics.fourHour }}%</div>
-                  <div class="metric-label">4小时准确率</div>
+                  <div class="metric-label">{{ $t('accuracy.accuracy4Hours') }}</div>
                 </div>
                 <div class="metric-item">
                   <div class="metric-value secondary">{{ metrics.oneMonth }}%</div>
-                  <div class="metric-label">1个月的准确率</div>
+                  <div class="metric-label">{{ $t('accuracy.accuracy1Month') }}</div>
                 </div>
                 <div class="metric-item">
                   <div class="metric-value secondary">{{ metrics.brillScore }}</div>
-                  <div class="metric-label">布里尔评分</div>
+                  <div class="metric-label">{{ $t('accuracy.brierScore') }}</div>
                 </div>
               </div>
 
@@ -61,9 +61,12 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import NavBar2 from '@/components/navBar2.vue'
 import LineChartAccuracy from '@/components/LineChartAccuracy.vue'
 import LineChartAccuracyTow from '@/components/LineChartAccuracyTow.vue'
+
+const { t } = useI18n()
 
 
 // 当前选中的Tab

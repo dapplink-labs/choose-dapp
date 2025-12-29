@@ -9,7 +9,7 @@
         <!-- 左侧主排行榜区域 -->
         <div class="left-leaderboard">
           <!-- 标题 -->
-          <h1 class="page-title">排行榜</h1>
+          <h1 class="page-title">{{ $t('leaderboard.title') }}</h1>
 
           <!-- 时间筛选和类别筛选 -->
           <div class="time-category-section">
@@ -21,9 +21,9 @@
             </div>
             <div class="category-dropdown">
               <select v-model="selectedCategory" class="category-select">
-                <option value="all">所有类别</option>
-                <option value="category1">类别1</option>
-                <option value="category2">类别2</option>
+                <option value="all">{{ $t('leaderboard.allCategories') }}</option>
+                <option value="category1">{{ $t('leaderboard.category1') }}</option>
+                <option value="category2">{{ $t('leaderboard.category2') }}</option>
               </select>
             </div>
           </div>
@@ -35,12 +35,12 @@
                 <el-icon class="search-icon">
                   <Search />
                 </el-icon>
-                <input type="text" placeholder="按名称搜索" class="search-input" v-model="searchQuery"
+                <input type="text" :placeholder="$t('leaderboard.searchByName')" class="search-input" v-model="searchQuery"
                   @input="handleSearch" />
               </div>
             </div>
-            <div class="header-profit">利润/亏损</div>
-            <div class="header-quantity">数量</div>
+            <div class="header-profit">{{ $t('leaderboard.profitLoss') }}</div>
+            <div class="header-quantity">{{ $t('leaderboard.quantity') }}</div>
           </div>
 
           <!-- 排行榜列表 -->
@@ -49,18 +49,18 @@
               :class="{ 'current-user': user.isCurrentUser }">
               <div class="item-user">
                 <span class="item-rank">{{ user.rank || '--' }}</span>
-                <img :src="user.avatar" alt="用户头像" class="user-avatar" />
+                <img :src="user.avatar" :alt="$t('leaderboard.userAvatar')" class="user-avatar" />
                 <span class="user-name">{{ user.name }}</span>
               </div>
               <div class="item-profit">
-                <span class="profit-label">利润/亏损:</span>
+                <span class="profit-label">{{ $t('leaderboard.profitLoss') }}:</span>
                 <span v-if="user.profit !== null" :class="{ positive: user.profit > 0 }">
                   {{ user.profit > 0 ? '+' : '' }}${{ formatNumber(user.profit) }}
                 </span>
                 <span v-else>--</span>
               </div>
               <div class="item-quantity">
-                <span class="quantity-label">数量:</span>
+                <span class="quantity-label">{{ $t('leaderboard.quantity') }}:</span>
                 <span v-if="user.quantity !== null">${{ formatNumber(user.quantity) }}</span>
                 <span v-else>--</span>
               </div>
@@ -77,13 +77,13 @@
                 d="M864.10445369 802.99470279c-102.19894784 88.52652487-565.95981085 39.48007197-565.95981084 39.4800731s-153.64778439-11.74476117-153.31691748-103.08879587c0.23427869-64.55405909 87.97165454-69.47391147 99.4924123-123.95604196 8.21825081-38.86149405 8.48130048-146.03372658 40.77477092-238.12786289 28.91492466-82.45993927 145.97001899-181.76328477 220.03291591-193.44433835 86.3132069-13.61488099 195.93303609 99.85821582 231.18787129 179.81301646 18.61282702 42.21126883 26.03781803 196.51256775 30.93300906 234.35679858 5.52815502 42.75586389 86.53104583 87.91411143 105.35965582 120.15826033 17.45170887 29.88492003 21.17550649 59.09988579-8.50390698 84.8088906zM595.18127104 915.53479566c0 39.63420331-32.13111865 71.76532195-71.76532195 71.76532196s-71.76326713-32.13111865-71.76326714-71.76532196 32.12906382-30.98849621 71.76326714-30.98849735 71.76532195-8.64570595 71.76532195 30.98849735zM579.68599495 127.64523293c0 28.31484245-25.19318073 24.60953941-56.27004586 24.60953941s-56.27004587 3.70530304-56.27004587-24.60953941c0-28.31278763 25.19318073-51.26593536 56.27004587-51.26593536s56.27004587 22.95109291 56.27004586 51.26593536zM299.34480725 254.6859429c-29.00740323 33.92725561-44.67119445 66.87629539-49.72051683 62.56268971-5.04726755-4.31566051 2.44143104-44.26018019 31.44472348-78.18743467 29.00534727-33.92725561 67.11262891-46.43856043 72.15784164-42.12290105 5.04932238 4.31360569-24.87669987 23.81833557-53.88204829 57.74764601zM724.81343261 255.75869326c-22.64899698-38.46280875-48.71353003-63.99302315-42.99219741-67.36540331 5.72133262-3.36827051 41.05837113 16.70366094 63.70942293 55.16441487 22.64899698 38.46280875 22.08796103 78.56762425 16.36662841 81.93589475-5.72133262 3.37032533-14.43280099-31.27209757-37.08385393-69.73490631z"
                 p-id="7841" fill="#909090"></path>
             </svg>
-            <h2 class="wins-title">本月最大胜利</h2>
+            <h2 class="wins-title">{{ $t('leaderboard.thisMonthBiggestWin') }}</h2>
           </div>
           <div class="wins-list">
             <div v-for="(user, index) in monthlyWinsData" :key="user.id" class="wins-item">
               <div class="wins-rank">{{ user.rank }}</div>
               <div class="wins-user">
-                <img :src="user.avatar" alt="用户头像" class="wins-avatar" />
+                <img :src="user.avatar" :alt="$t('leaderboard.userAvatar')" class="wins-avatar" />
                 <div class="wins-user-info">
                   <span class="wins-name">{{ user.name }}</span>
                   <div class="wins-amount">
@@ -102,18 +102,21 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import NavBar2 from '@/components/navBar2.vue'
 import { Search } from '@element-plus/icons-vue'
 
+const { t } = useI18n()
+
 
 // 时间筛选
-const timeFilters = [
-  { value: 'today', label: '今天' },
-  { value: 'weekly', label: '每周' },
-  { value: 'monthly', label: '月度' },
-  { value: 'all', label: '全部' }
-]
+const timeFilters = computed(() => [
+  { value: 'today', label: 'Today' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'all', label: 'All' }
+])
 const activeTimeFilter = ref('today')
 
 // 搜索

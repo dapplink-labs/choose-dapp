@@ -9,7 +9,7 @@
                         <ArrowLeft />
                     </el-icon>
                 </div>
-                <h1 class="page-title">仪表盘</h1>
+                <h1 class="page-title">{{ $t('dashboard.title') }}</h1>
             </div>
         </div>
 
@@ -29,29 +29,31 @@
             <CMTCurrentPrice v-if="activeTab === 0" />
             <!-- CMT质押组件 -->
             <CMTPledge v-if="activeTab === 1" />
-            <!-- LP金库组件 -->
+            <!-- 市场收益组件 -->
             <LPVault v-if="activeTab === 2" />
-            <computepowerpool  v-if="activeTab === 3"/>
-
-            <MarketReturns v-if="activeTab === 4"></MarketReturns>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import CMTCurrentPrice from '@/components/CMTCurrentPrice.vue'
 import CMTPledge from '@/components/CMTPledge.vue'
 import LPVault from '@/components/LPVault.vue'
-import  computepowerpool  from '@/components/computepowerpool.vue'
-import   MarketReturns  from  '@/components/MarketReturns.vue'
+
+const { t } = useI18n()
 const router = useRouter()
 const tabNavRef = ref(null)
 const activeTab = ref(0)
 
-const tabs = ['CMT现价', 'CMT质押', 'LP金库', '算力池', '市场']
+const tabs = computed(() => [
+  t('dashboard.tabs.currentPrice'),
+  t('dashboard.tabs.pledge'),
+  t('dashboard.tabs.marketReturns')
+])
 
 // 返回上一页
 const goBack = () => {
@@ -166,6 +168,8 @@ onMounted(() => {
     overflow: hidden;
     position: relative;
     z-index: 1;
+    border-bottom: 1px solid var(--border-color, #E0E0E0);
+    transition: border-color 0.3s ease;
 }
 
 .tab-nav {
@@ -207,5 +211,67 @@ onMounted(() => {
     min-height: calc(100vh - 140px);
     position: relative;
     z-index: 1;
+}
+
+// 暗色主题适配
+:deep(.theme-dark) {
+    .dashboard-page {
+        background-color: var(--bg-dashboard, #000000);
+        color: var(--text-color, #f2f2f2);
+    }
+
+    .header {
+        .page-title {
+            color: var(--text-color, #f2f2f2);
+        }
+
+        .goback-icon {
+            color: var(--text-color, #f2f2f2);
+        }
+    }
+
+    .tab-nav-container {
+        border-bottom-color: var(--border-color, #23262F);
+    }
+
+    .tab-item {
+        color: var(--text-gray, #a0a0a0);
+
+        &.active {
+            color: var(--text-color, #f2f2f2);
+            border-bottom-color: var(--text-color, #f2f2f2);
+        }
+    }
+}
+
+// 浅色主题适配
+:deep(.theme-light) {
+    .dashboard-page {
+        background-color: var(--bg-dashboard, #FFFFFF);
+        color: var(--text-color, #1a1a1a);
+    }
+
+    .header {
+        .page-title {
+            color: var(--text-color, #1a1a1a);
+        }
+
+        .goback-icon {
+            color: var(--text-color, #1a1a1a);
+        }
+    }
+
+    .tab-nav-container {
+        border-bottom-color: var(--border-color, #E0E0E0);
+    }
+
+    .tab-item {
+        color: var(--text-gray, #666);
+
+        &.active {
+            color: var(--text-color, #1a1a1a);
+            border-bottom-color: var(--text-color, #1a1a1a);
+        }
+    }
 }
 </style>

@@ -8,13 +8,13 @@
         <div class="top-section">
           <div class="user-info-card">
             <div class="user-header">
-              <img src="https://picsum.photos/seed/user1/80/80" alt="用户头像" class="user-avatar">
+              <img src="https://picsum.photos/seed/user1/80/80" :alt="$t('earnings.userAvatar')" class="user-avatar">
               <div class="user-meta">
                 <div class="user-name">埃隆马斯克</div>
                 <div class="user-stats">
-                  <span class="join-date">2025-11-1 加入</span>
+                  <span class="join-date">2025-11-1 {{ $t('earnings.joined') }}</span>
                   <span class="divider">·</span>
-                  <span class="follower-count">10 浏览人数</span>
+                  <span class="follower-count">10 {{ $t('earnings.views') }}</span>
                 </div>
               </div>
             </div>
@@ -22,15 +22,15 @@
             <div class="user-stats-grid">
               <div class="stat-item">
                 <div class="stat-value">$188.88</div>
-                <div class="stat-label">中奖总金额</div>
+                <div class="stat-label">{{ $t('earnings.totalWinnings') }}</div>
               </div>
               <div class="stat-item">
                 <div class="stat-value">$12.96</div>
-                <div class="stat-label">最大奖金额</div>
+                <div class="stat-label">{{ $t('earnings.maxWinning') }}</div>
               </div>
               <div class="stat-item">
                 <div class="stat-value">18</div>
-                <div class="stat-label">预测事件</div>
+                <div class="stat-label">{{ $t('earnings.predictionEvents') }}</div>
               </div>
             </div>
           </div>
@@ -38,7 +38,7 @@
           <div class="chart-card">
             <div class="chart-header">
               <div class="chart-left-section">
-                <div class="chart-title">盈亏金额</div>
+                <div class="chart-title">{{ $t('earnings.profitLoss') }}</div>
                 <div class="profit-amount">
                   <div class="amount-value">$188.88</div>
                   <div class="time-period">{{ timePeriodText }}</div>
@@ -79,7 +79,7 @@
                 <el-icon class="search-icon">
                   <Search />
                 </el-icon>
-                <input type="text" :placeholder="activeTab === 'positions' ? '搜索仓位事件' : '搜索交易活动'" v-model="searchQuery"
+                <input type="text" :placeholder="activeTab === 'positions' ? $t('earnings.searchPositions') : $t('earnings.searchActivities')" v-model="searchQuery"
                   class="search-input" />
               </div>
             </div>
@@ -89,17 +89,17 @@
             <template v-if="activeTab === 'positions'">
               <template v-if="selectedFilter === 'online'">
                 <div class="online-list-header">
-                  <div class="online-title">市场</div>
-                  <div class="online-col">平均值</div>
-                  <div class="online-col">现价</div>
-                  <div class="online-col">价值</div>
+                  <div class="online-title">{{ $t('earnings.market') }}</div>
+                  <div class="online-col">{{ $t('earnings.average') }}</div>
+                  <div class="online-col">{{ $t('earnings.currentPrice') }}</div>
+                  <div class="online-col">{{ $t('earnings.value') }}</div>
                   <div class="online-col"></div>
                 </div>
 
                 <div class="online-list">
                   <div class="online-item" v-for="item in onlineListData" :key="item.id">
                     <div class="online-item-left">
-                      <img :src="item.avatar" alt="用户头像" class="item-avatar" />
+                      <img :src="item.avatar" :alt="$t('earnings.userAvatar')" class="item-avatar" />
                       <div class="item-info">
                         <div class="item-description">{{ item.description }}</div>
                         <div class="item-bet-info">
@@ -128,10 +128,10 @@
 
               <template v-else>
                 <div class="list-header-row">
-                  <div class="header-result">结果</div>
-                  <div class="header-market">市场</div>
-                  <div class="header-bet-amount">总投注额</div>
-                  <div class="header-winning">赢得奖金</div>
+                  <div class="header-result">{{ $t('earnings.result') }}</div>
+                  <div class="header-market">{{ $t('earnings.market') }}</div>
+                  <div class="header-bet-amount">{{ $t('earnings.totalBet') }}</div>
+                  <div class="header-winning">{{ $t('earnings.winningPrize') }}</div>
                   <div class="header-icon"></div>
                 </div>
 
@@ -217,9 +217,12 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import NavBar2 from '@/components/navBar2.vue'
 import LineChartEarnings from '@/components/LineChartEarnings.vue'
 import { Search } from '@element-plus/icons-vue'
+
+const { t } = useI18n()
 
 // 定义不同时间周期的模拟数据（包含日期和收益）
 const chartData = ref({

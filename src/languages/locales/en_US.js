@@ -315,7 +315,375 @@ export default {
   },
   home: {
     welcome: "Welcome to Multimarket",
-    description: "Explore the latest market trends, news and information"
+    description: "Explore the latest market trends, news and information",
+    comingSoon: "Prediction feature coming soon",
+    comingSoonAlt: "Not available",
+    searchPlaceholder: "Search",
+    userAvatar: "User Avatar",
+    opportunity: "Chance",
+    filterTags: {
+      all: "All",
+      premium: "Premium",
+      ukraine: "Ukraine",
+      afghanistan: "Epstein",
+      trump: "Trump",
+      fed: "Federal Reserve",
+      token: "Token Sale"
+    }
+  },
+  footerNav: {
+    home: "Home",
+    search: "Search",
+    breaking: "Breaking",
+    more: "More"
+  },
+  userInfo: {
+    close: "Close",
+    userAvatar: "User Avatar",
+    settings: "Settings",
+    disconnect: "Disconnect",
+    ecosystem: "Ecosystem",
+    others: "Others",
+    nodeStaking: "Node Staking",
+    stakingPool: "Staking Pool",
+    lpVault: "LP Vault",
+    onChainData: "On-chain Data",
+    predictionMarket: "Prediction Market",
+    assets: "Assets",
+    eventPool: "Event Pool",
+    audit: "Audit",
+    developerDocs: "Developer Docs",
+    alpha: "Alpha",
+    developerContributions: "Developer Contributions",
+    tokenomics: "Tokenomics",
+    launchpad: "Launchpad",
+    smartMoney: "Smart Money",
+    bugBounty: "Bug Bounty",
+    github: "GitHub",
+    technicalSupport: "Technical Support",
+    support: "Support",
+    officialVerification: "Official Verification",
+    productFeedback: "Product Feedback",
+    apiManagement: "Api Management",
+    helpCenter: "Help Center",
+    customerSupport: "Customer Support",
+    selfService: "Self Service",
+    dashboard: "Dashboard",
+    createMarket: "Create Prediction Market",
+    fundManagement: "Fund Management",
+    reward: "Reward",
+    accuracy: "Accuracy",
+    leaderboard: "Leaderboard",
+    terms: "Terms of Use",
+    doc: "Documentation",
+    walletAddressCopied: "Wallet address copied to clipboard",
+    copyFailed: "Copy failed, please copy manually",
+    disconnectWallet: "Disconnect Wallet"
+  },
+  settings: {
+    title: "Settings",
+    email: "Email",
+    emailPlaceholder: "Please enter email address",
+    emailHelper: "Used to receive important updates from multimarket",
+    username: "Username",
+    usernamePlaceholder: "Please enter username",
+    twitter: "Twitter",
+    bindTwitter: "Bind",
+    save: "Save"
+  },
+  breaking: {
+    ad: "Advertisement",
+    avatar: "Avatar",
+    chartAd: "Chart Advertisement",
+    tabs: {
+      all: "All",
+      politics: "Politics",
+      crypto: "Cryptocurrency",
+      finance: "Finance"
+    },
+    subscription: {
+      title: "Get Daily Updates",
+      description: "We'll send you an email every day with the latest updates from multimarket.",
+      emailPlaceholder: "Please enter your email address",
+      submit: "Get Updates"
+    },
+    live: {
+      title: "Live on Multimarket",
+      followBtn: "follow on X",
+      breakingNews: "Breaking News",
+      viewAll: "View All"
+    }
+  },
+  detail: {
+    avatar: "Avatar",
+    prediction: "Prediction",
+    daysClose: "days to close",
+    orderBook: "Order Book",
+    graph: "Graph",
+    volume: "Volume",
+    price: "Price",
+    shares: "Shares",
+    all: "All",
+    last: "Last",
+    spread: "Spread",
+    rules: "Rules",
+    viewMore: "View More",
+    buy: "Buy",
+    sell: "Sell",
+    amount: "Amount",
+    balance: "Balance",
+    winningAmount: "Winning Amount",
+    averagePrice: "Average Price",
+    maximumLeverage: "Maximum leverage",
+    maximumReturn: "Maximum return",
+    popularity: "popularity",
+    whatDoYouPredict: "What Do You Predict?",
+    outcome: "OUTCOME",
+    chance: "% CHANCE",
+    buyYes: "Buy Yes",
+    buyNo: "Buy No",
+    comments: "Comments",
+    holds: "Holds",
+    activity: "Activity",
+    yesHolders: "Yes holders",
+    noHolders: "No holders",
+    bought: "Bought",
+    timeRanges: {
+      "1D": "1D",
+      "1W": "1W",
+      "1M": "1M",
+      "ALL": "ALL"
+    }
+  },
+  payment: {
+    cashUsed: "Cash Used",
+    maxTradeSize: "Max trade size:",
+    usableBonusAmount: "Usable Bonus Amount:",
+    leverage: "Leverage",
+    maxAvailableLeverage: "Max Available leverage",
+    predictionOutcome: "50+ bps decrease",
+    leveragedSize: "Leveraged Size",
+    cashUsedLabel: "Cash used",
+    projectedPnl: "Projected PnL(ROI)",
+    tradedProbability: "Your traded probability",
+    marketImpact: "Market Impact",
+    continue: "Continue"
+  },
+  earnings: {
+    userAvatar: "User Avatar",
+    totalWinnings: "Total Winnings",
+    maxWinning: "Max Winning",
+    predictionEvents: "Prediction Events",
+    profitLoss: "Profit/Loss",
+    searchPositions: "Search position events",
+    searchActivities: "Search trading activities",
+    market: "Market",
+    average: "Average",
+    currentPrice: "Current Price",
+    value: "Value",
+    result: "Result",
+    totalBet: "Total Bet",
+    winningPrize: "Winning Prize",
+    joined: "Joined",
+    views: "Views"
+  },
+  leaderboard: {
+    title: "Leaderboard",
+    allCategories: "All Categories",
+    category1: "Category 1",
+    category2: "Category 2",
+    searchByName: "Search by name",
+    profitLoss: "Profit/Loss",
+    quantity: "Quantity",
+    userAvatar: "User Avatar",
+    thisMonthBiggestWin: "This Month's Biggest Win"
+  },
+  accuracy: {
+    overallAccuracy: "Overall Accuracy",
+    expectedVsActual: "Expected vs Actual",
+    title: "How accurate is Multimarket?",
+    accuracy4Hours: "4-Hour Accuracy",
+    accuracy1Month: "1-Month Accuracy",
+    brierScore: "Brier Score",
+    accuracyBeforeResolution: "Accuracy Before Resolution",
+    expectedVsActualChart: "Expected vs Actual Chart"
+  },
+  linkWallet: {
+    welcome: "Welcome to CHOOSEME",
+    selectLoginMethod: "Please select login method",
+    connect: "Connect"
+  },
+  computingPower: {
+    title: "Computing Provider",
+    desc: "This section outlines the incentive distribution, node rewards, and network participation rules. ",
+    learnMore: "Learn more",
+    buyNode: "Acquire Nodes",
+    myNodes: "My Nodes",
+    tabs: {
+      distributed: "Distributed Node",
+      cluster: "Cluster Node"
+    },
+    nodeImageAlt: "Node illustration",
+    priceLabel: "Price:",
+    buyBtn: "Buy",
+    record: {
+      title: "Node Purchase Records",
+      more: "View more",
+      time: "Time",
+      type: "Product Type",
+      amount: "USDT Spent",
+      types: {
+        distributed: "Distributed Node",
+        cluster: "Cluster Node"
+      }
+    },
+    benefits: {
+      item1: "Enjoy data node income",
+      item2: "0.5% revenue from total network trading fees",
+      item3: "3% fee on sub-tokens",
+      item4: "10% profit share from secondary market",
+      item5: "Distributed hashrate nodes recommend distributed hashrate nodes"
+    },
+    purchaseTitle: {
+      distributed: "Distributed Node - 500 USDT",
+      cluster: "Cluster Node - 10000 USDT"
+    },
+    activationMsg: "Address {address} has successfully activated a {nodeType}",
+    activateBtn: "Activate Node",
+    products: {
+      distributedDescTemplate: "{fee}% revenue share from network trading fees, {subFee}% sub-token transaction fee rewards, up to {marketShare}% profit sharing from secondary market activities, participation in distributed computing node expansion.",
+      clusterDescTemplate: "{fee}% share of global transaction fees, {subFee}% sub-token fee rewards, {marketShare}% profit sharing from secondary market performance, with eligibility for ecosystem-level node promotion and governance participation."
+    }
+  },
+  lpVault: {
+    title: "LP Vault",
+    desc: "This section outlines the reward rules, reward rules, reward rules, reward rules, reward rules, reward rules",
+    learnMore: "Learn more",
+    nodeStaking: "Node Staking",
+    myLPIncome: "My LP Income",
+    activationPrice: "Activation Price:",
+    dailyEarnings: "Daily Earnings",
+    cycleDays: "Cycle Days",
+    totalEarnings: "Total Earnings",
+    activateComputingPower: "Activate Computing Power",
+    activationMsg: "Address {address} has activated LP Vault",
+    nodeTypes: {
+      T1: "Information Node",
+      T2: "Data Node",
+      T3: "Certification Node",
+      T4: "Consensus Node",
+      T5: "Super Node",
+      T6: "Genesis Node"
+    },
+    days: " days"
+  },
+  myNode: {
+    title: "Cluster Node",
+    choIncome: "CHO Income",
+    subCoinIncome: "Sub-coin Income",
+    earnPrompt: "Address ç Earn Income",
+    pendingIncome: "Pending Income",
+    nodeIncome: "Node Income",
+    networkFeeIncome: "Network Trading Fee Income",
+    subCoinFeeIncome: "Sub-coin Fee Income",
+    secondaryMarketIncome: "Secondary Market Profit Income",
+    directReferralIncome: "Direct Referral Income",
+    networkIncome: "Network Income",
+    claimAll: "Claim All Income",
+    claim: "Claim",
+    myTeam: "My Team",
+    inviteAddressCount: "Total Invited Addresses",
+    directAddress: "Direct Referrals",
+    teamAddress: "Team",
+    activated: "Activated",
+    nodeTypes: {
+      distributed: "Distributed Node",
+      cluster: "Cluster Node"
+    }
+  },
+  myIncome: {
+    title: "My Income",
+    myIncomeCMT: "My Income",
+    computingPowerIncomeCMT: "Computing Rewards",
+    networkIncomeCMT: "Network Rewards",
+    earnPrompt: "Address {address} earned income",
+    pendingIncome: "Pending Income",
+    staticIncomeCHO: "Static Income (CHO)",
+    directReferralIncomeCHO: "Direct Referral Income (CHO)",
+    teamIncomeCHO: "Team Income (CHO)",
+    genesisNodeIncomeCHO: "Genesis Node 5% Income (CHO)",
+    claimAll: "Claim All Income",
+    myTeam: "My Team",
+    mySuperior: "My Superior",
+    totalInvites: "Total Invites"
+  },
+  dashboard: {
+    title: "Dashboard",
+    tabs: {
+      currentPrice: "CMT Price",
+      pledge: "CMT Pledge",
+      marketReturns: "Market Returns"
+    }
+  },
+  cmtCurrentPrice: {
+    latestPrice: "Latest Price",
+    high24h: "24H High",
+    low24h: "24H Low",
+    volume24hCMT: "24H Vol CMT",
+    volume24hUSDT: "24H Vol USDT",
+    timePeriods: {
+      "5m": "5m",
+      "1h": "1h",
+      "4h": "4h",
+      "1d": "1d"
+    },
+    tooltip: {
+      open: "Open",
+      close: "Close",
+      low: "Low",
+      high: "High",
+      volume: "Volume"
+    }
+  },
+  cmtPledge: {
+    pledgeTotal: "Pledged Total Amount",
+    lpPledgeDestroy: "LP Staking Destruction (USDT)",
+    timePeriods: {
+      "7d": "7d",
+      "30d": "30d",
+      "90d": "90d",
+      "1y": "1y",
+      "all": "All"
+    }
+  },
+  marketReturns: {
+    secondaryMarketProfit: "Secondary Market Profit Amount",
+    userProfit: "User Profit Amount",
+    destroyedCMT: "Number of CMT Destroyed",
+    myProfit: "My Profit Amount",
+    profit24hCHO: "24h Profit (CHO)",
+    profit24hUSDT: "24h Profit (USDT)",
+    fomoProfit: "FOMO Profit Amount",
+    fomoVolume24hCMT: "24h FOMO Volume (CMT)",
+    fomoVolume24hUSDT: "24h FOMO Volume (USDT)",
+    latestMarketValue: "Latest Market Value",
+    volume24hCMT: "24h Volume (CMT)",
+    volume24hUSDT: "24h Volume (USDT)"
+  },
+  purchaseNodeRecord: {
+    title: "Node Purchase Record",
+    informationNode: "Information Node",
+    price: "Price"
+  },
+  tabNode: {
+    purchaseTime: "Purchase Time"
+  },
+  myNodes: {
+    title: "My Nodes"
+  },
+  collectEarnings: {
+    title: "Claim Method",
+    tip: "* You can claim all node rewards, or choose to claim rewards from a single node",
+    confirm: "Confirm"
   }
-  
 };

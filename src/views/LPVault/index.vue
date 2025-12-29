@@ -1,246 +1,95 @@
 <template>
     <div class="LPVault">
-        
-        <div class="banner1" style="height: 200px;margin: 0  -10px;">
-            <div class="header">
-            <div class="goback" @click="goBack">
-                <el-icon class="goback-icon">
-                    <ArrowLeft />
-                </el-icon>
+
+        <div class="banner1" style="margin: 0  -10px;">
+            <div class="cps-card-header">
+                <div class="back-btn" @click="handleBack">
+                    <svg t="1766051544466" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="6246" width="32" height="32">
+                        <path d="M723.2 1024l-512-512L716.8 0l70.4 70.4L345.6 512l441.6 448-64 64z" p-id="6247"
+                            fill="currentColor"></path>
+                    </svg>
+                </div>
+                <div class="open-btn" @click="handleOpenMore">
+                    <svg t="1766051224777" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                        xmlns="http://www.w3.org/2000/svg" p-id="4731" width="32" height="32">
+                        <path
+                            d="M842.724 571.473c0-22.93 18.588-41.518 41.518-41.518s41.518 18.587 41.518 41.518v271.251c0 45.86-37.177 83.036-83.036 83.036H182.126c-45.86 0-83.036-37.177-83.036-83.036V182.126c0-45.86 37.176-83.036 83.036-83.036h271.251c22.93 0 41.518 18.588 41.518 41.518s-18.588 41.518-41.518 41.518H182.126v660.598h660.598V571.473z m2.865-332.009L562.576 521.869c-16.45 16.414-43.119 16.414-59.57 0-16.448-16.414-16.448-43.027 0-59.441l283.95-283.339H646.05c-22.138 0-40.084-17.907-40.084-40 0-22.09 17.946-39.998 40.084-39.998h203.56c42.056-0.001 76.149 34.019 76.149 75.985v203.122c0 22.092-17.947 40-40.086 40s-40.085-17.908-40.085-40V239.464z"
+                            fill="currentColor" p-id="4732">
+                        </path>
+                    </svg>
+                </div>
             </div>
 
-            <div class="right">
-                <button class="theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
-                    <el-icon class="theme-icon">
-                        <Sunny v-if="isDark" />
-                        <Moon v-else />
-                    </el-icon>
-                </button>
-                <img src="@/assets/images/share.svg" alt="" class="share-icon">
+            <div class="intro">
+                <h1>{{ $t('lpVault.title') }}</h1>
+                <p>{{ $t('lpVault.desc') }},
+                    <a href="javascript:void(0)" @click="handleOpenMore">{{ $t('lpVault.learnMore') }}</a>。
+                </p>
             </div>
         </div>
 
-        <div class="intro">
-            <h1>LP金库</h1>
-            <p>全球⾸创⼀套链上循环进场，循环组LP底池，循环销毁、循环出局、循环应⽤上永动机。每个投资档位按照组LP→销毁底池的循环模式，合约⾃动执⾏
-                <a href="">了解更多</a>。
-            </p>
+        <!-- 激活提示模块 -->
+        <div class="activation-banner">
+            <div class="activation-avatar">
+                <img :src="activationAvatar" alt="avatar" />
+            </div>
+            <div class="activation-text">
+                {{ activationMsg }}
+            </div>
         </div>
-        </div>
+
         <h3>
-            <span>质押</span>
-            <b @click="handleOpenMyIncome">我的LP收益
+            <span>{{ $t('lpVault.nodeStaking') }}</span>
+            <b @click="handleOpenMyIncome">{{ $t('lpVault.myLPIncome') }}
                 <el-icon class="arrow-icon">
                     <ArrowRightBold />
                 </el-icon>
             </b>
         </h3>
 
-        <div class="details">
-            <div class="tab hide-scroll">
-                <div v-for="(item, index) in tabArr" :class="item.index == active ? 'active' : 'item'"
-                    @click="tab(item.index)">{{ item.name }}</div>
-            </div>
-
-            <div class="card">
-                <div class="imgContiner">
-                    <img src="@/assets/images/linghua1.png" alt="">
-                </div>
-
-                <div v-if="active == 0">
-
-                    <ul>
-                        <li>
-                            <span>激活金额：</span>
-                            <b>200USDT</b>
-                        </li>
-                        <li>
-                            <span>周期天数：</span>
-                            <b>2天</b>
-                        </li>
-                        <li>
-                            <span>日化收益：</span>
-                            <b>0.5%-1%</b>
-                        </li>
-                        <li>
-                            <span>总收益：</span>
-                            <b>1%周期</b>
-                        </li>
-                    </ul>
-
-                    <div class="pline">
-                        <p>1.第1天:组LP(50U+50U等值代币)</p>
-                        <p>2.第2天:移除流动性，销毁底池(价值100U的代币)</p>
-                        <p>注:此时完成⼀次“进-销”循环，获得静态收益.</p>
-
+        <!-- 节点卡片列表 -->
+        <div class="node-card-list">
+            <div v-for="node in nodeList" :key="node.type" class="node-card-item">
+                <div class="node-item-header">
+                    <div class="node-item-icon">
+                        <img :src="node.icon" :alt="node.name" />
                     </div>
-                </div>
-                <div v-if="active == 1">
-
-                    <ul>
-                        <li>
-                            <span>激活金额：</span>
-                            <b>600USDT</b>
-                        </li>
-                        <li>
-                            <span>周期天数：</span>
-                            <b>3天</b>
-                        </li>
-                        <li>
-                            <span>日化收益：</span>
-                            <b>0.6%-1.1%</b>
-                        </li>
-                        <li>
-                            <span>总收益：</span>
-                            <b>1%周期</b>
-                        </li>
-                    </ul>
-
-                    <div class="pline">
-                        <p>1.第1天:组LP(100U+100U等值代币)</p>
-                        <p>2.第2天:销毁底池(价值200U的代币)</p>
-                        <p>3.第3天:组LP(100U+100U等值代币)</p>
-
+                    <div class="node-item-main">
+                        <div class="node-item-title-wrapper">
+                            <span class="node-item-name">{{ node.name }}</span>
+                            <span class="node-item-type-badge">{{ node.type }}</span>
+                        </div>
+                        <div class="node-item-price">
+                            <span class="label">{{ $t('lpVault.activationPrice') }}</span>
+                            <span class="value">
+                                <img class="coin" :src="TIcon" alt="T" />{{ node.price }}
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <div v-if="active == 2">
-
-                    <ul>
-                        <li>
-                            <span>激活金额：</span>
-                            <b>1200USDT</b>
-                        </li>
-                        <li>
-                            <span>周期天数：</span>
-                            <b>4天</b>
-                        </li>
-                        <li>
-                            <span>日化收益：</span>
-                            <b>0.7%-1.2%</b>
-                        </li>
-                        <li>
-                            <span>总收益：</span>
-                            <b>1%周期</b>
-                        </li>
-                    </ul>
-
-                    <div class="pline">
-                        <p>1.第1天:组LP(150U+150U等值代币)</p>
-                        <p>2.第2天:销毁底池(价值300U的代币)</p>
-                        <p>3.第3天:组LP(150U+150U等值代币)</p>
-                        <p>4.第4天:销毁底池(价值300U的代币)</p>
-
+                <div class="node-item-metrics">
+                    <div class="metric-item">
+                        <span class="metric-label">{{ $t('lpVault.dailyEarnings') }}</span>
+                        <span class="metric-value daily-earnings">{{ node.dailyEarnings }}</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">{{ $t('lpVault.cycleDays') }}</span>
+                        <span class="metric-value">{{ node.cycleDays }}</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">{{ $t('lpVault.totalEarnings') }}</span>
+                        <span class="metric-value total-earnings">
+                            <img class="total-icon" src="@/assets/icon/LP1.png" alt="" />
+                            {{ node.totalEarnings }}
+                        </span>
                     </div>
                 </div>
 
-                <div v-if="active == 3">
-
-                    <ul>
-                        <li>
-                            <span>激活金额：</span>
-                            <b>2500USDT</b>
-                        </li>
-                        <li>
-                            <span>周期天数：</span>
-                            <b>5天</b>
-                        </li>
-                        <li>
-                            <span>日化收益：</span>
-                            <b>0.8%-1.3%</b>
-                        </li>
-                        <li>
-                            <span>总收益：</span>
-                            <b>1%周期</b>
-                        </li>
-                    </ul>
-
-                    <div class="pline">
-                        <p>1.第1天:组LP:250U+250U等值代币)</p>
-                        <p>2.第2天:销毁底池(价值500U的代币)</p>
-                        <p>3.第3天:组LP(250U+250U等值代币)</p>
-                        <p>4.第4天:销毁底池(价值500U的代币)</p>
-                        <p>5.第5天：组LP（250U+250U组LP）</p>
-
-                    </div>
-                </div>
-
-                <div v-if="active == 4">
-
-                    <ul>
-                        <li>
-                            <span>激活金额：</span>
-                            <b>6000USDT</b>
-                        </li>
-                        <li>
-                            <span>周期天数：</span>
-                            <b>6天</b>
-                        </li>
-                        <li>
-                            <span>日化收益：</span>
-                            <b>0.9%-1.4%</b>
-                        </li>
-                        <li>
-                            <span>总收益：</span>
-                            <b>1%周期</b>
-                        </li>
-                    </ul>
-
-                    <div class="pline">
-                        <p>1.第1天:组LP(500U+500U等值代币)</p>
-                        <p>2.第2天:销毁底池(价值1000U的代币)</p>
-                        <p>3.第3天:组LP(500U+500U等值代币)</p>
-                        <p>4.第4天:销毁底池(价值1000U的代币)</p>
-                        <p>5.第5天：组LP（500U+500U组LP）</p>
-                        <p>6.第6天：销毁底池（1000U等值代币</p>
-                    </div>
-                </div>
-
-                <div v-if="active == 5">
-
-                    <ul>
-                        <li>
-                            <span>激活金额：</span>
-                            <b>14000USDT</b>
-                        </li>
-                        <li>
-                            <span>周期天数：</span>
-                            <b>7天</b>
-                        </li>
-                        <li>
-                            <span>日化收益：</span>
-                            <b>1%-1.5%</b>
-                        </li>
-                        <li>
-                            <span>总收益：</span>
-                            <b>1%周期</b>
-                        </li>
-                    </ul>
-
-                    <div class="pline">
-                        <p>1.第1天:组LP(1000U+1000U等值代币)</p>
-                        <p>2.第2天:销毁底池(价值2000U的代币)</p>
-                        <p>3.第3天:组LP(1000U+1000U等值代币)</p>
-                        <p>4.第4天:销毁底池(价值2000U的代币)</p>
-                        <p>5.第5天：组LP（500U+500U组LP）</p>
-                        <p>6.第6天：销毁底池（1000U等值代币）</p>
-                        <p>7.第7天：组LP（1000U+1000U）</p>
-                    </div>
-                </div>
-                <button>
-                    激活算力
+                <button class="node-item-btn" @click="handleActivate(node.type)">
+                    {{ $t('lpVault.activateComputingPower') }}
                 </button>
-                <div class="wallect">
-                    <div class="item">
-                        <img src="@/assets/images/Subtract.png" alt="">
-                        <span><b>钱包余额：</b>200000 USDT</span>
-                    </div>
-
-                    <div class="item">
-                        <img src="@/assets/images/Subtract1.png" alt="">
-                        <span><b>LP质押：</b>200 USDT</span>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -248,62 +97,105 @@
 
 <script setup>
 import { ref, onMounted, watch, computed, onUnmounted } from "vue"
-import { ArrowLeft, ArrowRightBold, Sunny, Moon } from '@element-plus/icons-vue'
-import { useThemeStore } from '@/stores/theme'
+import { ArrowRightBold } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import clusterNodeImg from '@/assets/icon/ClusterNode.png'
+import DistributedNode from '@/assets/icon/DistributedNode.png'
+import DistributedNodeDark from '@/assets/icon/DistributedNodeDark.png'
+import TIcon from '@/assets/icon/TIcon.png'
 
 const router = useRouter()
-const themeStore = useThemeStore()
-const isDark = computed(() => themeStore.isDark)
+const { t } = useI18n()
 
-const toggleTheme = () => {
-    themeStore.toggleTheme()
+// 激活提示头像（复用集群节点插图）
+const activationAvatar = clusterNodeImg
+
+// 激活提示文案
+const activationAddress = ref('0xb574...4c7d')
+const activationMsg = computed(() => {
+    return t('lpVault.activationMsg', { address: activationAddress.value })
+})
+
+const handleBack = () => {
+    router.back()
 }
 
-const goBack = () => {
-    router.back()
+const handleOpenMore = () => {
+    // 预留「了解更多」跳转逻辑
+    console.log('前往了解更多')
 }
 
 const handleOpenMyIncome = () => {
     router.push('/myIncome')
 }
 
-const tabArr = ref([
+// 节点列表数据
+const nodeList = computed(() => [
     {
-        name: "T1信息节点",
-        index: 0
+        type: 'T1',
+        name: t('lpVault.nodeTypes.T1'),
+        icon: DistributedNode,
+        price: '200',
+        dailyEarnings: '0.5%-1%',
+        cycleDays: `2${t('lpVault.days')}`,
+        totalEarnings: '3000000'
     },
     {
-        name: "T2信息节点",
-        index: 1
+        type: 'T2',
+        name: t('lpVault.nodeTypes.T2'),
+        icon: DistributedNode,
+        price: '600',
+        dailyEarnings: '0.6%-1.1%',
+        cycleDays: `3${t('lpVault.days')}`,
+        totalEarnings: '3000000'
     },
     {
-        name: "T3验证节点",
-        index: 2
+        type: 'T3',
+        name: t('lpVault.nodeTypes.T3'),
+        icon: DistributedNode,
+        price: '1200',
+        dailyEarnings: '0.7%-1.2%',
+        cycleDays: `4${t('lpVault.days')}`,
+        totalEarnings: '3000000'
     },
     {
-        name: "T4共识节点",
-        index: 3
+        type: 'T4',
+        name: t('lpVault.nodeTypes.T4'),
+        icon: DistributedNode,
+        price: '2500',
+        dailyEarnings: '0.8%-1.3%',
+        cycleDays: `5${t('lpVault.days')}`,
+        totalEarnings: '3000000'
     },
     {
-        name: "T5超级节点",
-        index: 4
+        type: 'T5',
+        name: t('lpVault.nodeTypes.T5'),
+        icon: DistributedNode,
+        price: '6000',
+        dailyEarnings: '0.9%-1.4%',
+        cycleDays: `6${t('lpVault.days')}`,
+        totalEarnings: '3000000'
     },
     {
-        name: "T6创世节点",
-        index: 5
+        type: 'T6',
+        name: t('lpVault.nodeTypes.T6'),
+        icon: DistributedNode,
+        price: '14000',
+        dailyEarnings: '1%-1.5%',
+        cycleDays: `7${t('lpVault.days')}`,
+        totalEarnings: '3000000'
     }
 ])
 
-function tab(index) {
-    active.value = index
+// 处理激活节点
+const handleActivate = (type) => {
+    console.log('激活节点:', type)
+    // TODO: 实现激活逻辑
 }
-
-const active = ref(0)
 
 // 初始化主题
 onMounted(() => {
-    themeStore.applyTheme()
 })
 </script>
 
@@ -314,7 +206,8 @@ onMounted(() => {
     background-color: var(--bg-page, #FCFCFC);
     color: var(--text-color, #1a1a1a);
     transition: background-color 0.3s ease, color 0.3s ease;
-.banner1 {
+
+    .banner1 {
         background: url("../../assets/images/banner3.png");
         background-size: cover;
         background-repeat: no-repeat;
@@ -329,6 +222,7 @@ onMounted(() => {
             margin-bottom: 20px;
         }
     }
+
     .hide-scroll {
         overflow: auto;
         scrollbar-width: none;
@@ -376,104 +270,68 @@ onMounted(() => {
         }
     }
 
-    .header {
-        position: relative;
-        height: 22px;
+    .cps-card-header {
         display: flex;
-        margin-bottom: 13px;
-        align-items: center;
         justify-content: space-between;
- padding: 0  10px;
-        .goback {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            transition: transform 0.2s ease;
+        align-items: center;
+        margin-bottom: 60px;
+        padding: 0 10px;
+    }
 
-            &:hover {
-                transform: translateX(-2px);
-            }
+    .back-btn,
+    .open-btn {
+        width: 24px;
+        height: 24px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        cursor: pointer;
+        color: var(--text-color, #000000);
+        background: transparent;
+        transition: color 0.3s ease;
+    }
 
-            &:active {
-                transform: translateX(-4px);
-            }
+    .back-btn {
+        width: 18px;
+        height: 18px;
+    }
 
-            .goback-icon {
-                color: var(--text-color, #000000);
-                font-size: 20px;
-                transition: color 0.3s ease;
-            }
-        }
-
-        .right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .theme-toggle-btn {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--bg-light, #F5F5F5);
-            border: 1px solid var(--border-color, #E0E0E0);
-            border-radius: 8px;
-            color: var(--text-color, #000000);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            flex-shrink: 0;
-
-            &:hover {
-                background-color: var(--bg-card, #ffffff);
-                border-color: var(--text-color, #000000);
-                transform: scale(1.05);
-            }
-
-            &:active {
-                transform: scale(0.95);
-            }
-
-            .theme-icon {
-                font-size: 18px;
-                transition: transform 0.3s ease, color 0.3s ease;
-                color: var(--text-color, #000000);
-            }
-
-            &:hover .theme-icon {
-                transform: rotate(15deg);
-            }
-        }
-
-        .share-icon {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-
-            &:hover {
-                transform: scale(1.1);
-                opacity: 0.8;
-            }
-        }
+    .back-btn .icon,
+    .open-btn .icon {
+        width: 100%;
+        height: 100%;
     }
 
     .intro {
-        padding: 0  10px;
+        padding: 0 10px;
+
         h1 {
+            font-family: Noto Sans SC, Noto Sans SC;
             font-weight: bold;
             font-size: 28px;
             color: var(--text-color, #000000);
             transition: color 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        p {
+            display: block;
+            width: 100%;
+            padding-right: 25%;
+            box-sizing: border-box;
         }
 
         p,
         a {
+            font-family: PingFang SC, PingFang SC;
             font-weight: 400;
-            font-size: 12px;
+            font-size: 14px;
+            color: #383838;
+            line-height: 20px;
+            text-align: left;
             color: var(--text-gray, #909090);
-            line-height: 18px;
             transition: color 0.3s ease;
         }
 
@@ -487,11 +345,238 @@ onMounted(() => {
         }
     }
 
+    .activation-banner {
+        width: 100%;
+        box-sizing: border-box;
+        margin: 32px 0 16px;
+        padding: 10px 14px;
+        /* 开灯（亮色主题）默认背景色 */
+        background: #F4F4F4;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #111111;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .activation-avatar {
+        width: 36px;
+        height: 36px;
+        aspect-ratio: 1 / 1;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background: #2F2F2F;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+    }
+
+    .activation-text {
+        font-size: 13px;
+        line-height: 18px;
+        color: var(--text-color, #000000);
+    }
+
+    /* 节点卡片列表样式 */
+    .node-card-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .node-card-item {
+        background: #F6F6F6;
+        border-radius: 16px;
+        padding: 16px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+    }
+
+    .node-item-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .node-item-icon {
+        position: relative;
+        width: 72px;
+        height: 72px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: visible;
+        flex-shrink: 0;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    }
+
+    .node-item-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .node-item-title-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 4px;
+    }
+
+    .node-item-name {
+        font-family: PingFang SC, PingFang SC;
+        font-weight: 400;
+        font-size: 18px;
+        line-height: 1.5;
+        color: #666666;
+        transition: color 0.3s ease;
+    }
+
+    .node-item-type-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1px 10px;
+        background: #E6E6E6;
+        border-radius: 6px;
+        font-family: DingTalk JinBuTi, DingTalk JinBuTi;
+        font-weight: 500;
+        font-size: 13px;
+        color: #000000;
+        font-style: italic;
+    }
+
+    /* 暗色主题下的标签样式 */
+    :deep(.theme-dark) .node-item-type-badge {
+        background: #2F2F2F;
+        color: #FFFFFF;
+    }
+
+    .node-item-price {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: #9ca3af;
+
+        .label {
+            color: #9ca3af;
+        }
+
+        .value {
+            font-family: PingFang SC, PingFang SC;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-color, #000000);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .coin {
+            width: 18px;
+            height: 18px;
+            display: inline-block;
+            object-fit: contain;
+        }
+    }
+
+    .node-item-metrics {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 0;
+        margin: 8px 0;
+    }
+
+    .metric-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .metric-label {
+        font-family: PingFang SC, PingFang SC;
+        font-weight: 400;
+        font-size: 14px;
+        color: #909090;
+        line-height: 20px;
+        text-align: left;
+        font-style: normal;
+        text-transform: none;
+        border-bottom: 1px dashed #909090;
+    }
+
+    .metric-value {
+        font-family: PingFang SC, PingFang SC;
+        font-weight: 600;
+        color: var(--text-color, #000000);
+        transition: color 0.3s ease;
+
+        &.daily-earnings {
+            color: #2EBE69;
+        }
+
+        &.total-earnings {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-color, #000000);
+        }
+    }
+
+    .total-icon {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+    }
+
+    .node-item-btn {
+        margin-top: 8px;
+        height: 44px;
+        border-radius: 22px;
+        border: none;
+        background: #2B6C18;
+        color: #ffffff;
+        font-family: PingFang SC, PingFang SC;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(46, 190, 105, 0.3);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+
     h3 {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin: 43px 0 24px 0;
+        margin: 22px 0 24px 0;
 
         span {
             font-weight: bold;
@@ -527,148 +612,25 @@ onMounted(() => {
         }
     }
 
-    .details {
-       
-        border: 1px solid var(--border-color, #F3F3F3);
-        border-radius: 8px;
-        padding: 13px 15px;
-        background: var(--bg-card, #ffffff);
-        transition: all 0.3s ease;
+}
 
-        .card {
-            border-radius: 12px;
-            min-height: 222px;
-           
-            background: var(--bg-card, #ffffff);
-            transition: all 0.3s ease;
-            padding-bottom: 20px;
-
-            .imgContiner {
-                height: 160px;
-                border-radius: 8px;
-                overflow: hidden;
-
-                img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    object-position: center;
-                    transition: transform 0.3s ease;
-
-                    &:hover {
-                        transform: scale(1.02);
-                    }
-                }
-            }
-
-            ul {
-                list-style: none;
-                border: 1px solid var(--border-color, #F5F5F5);
-                border-radius: 0 0  8px 8px;
-                // background: #2E2E2E;
-                background: var(--bg-card, #ffffff);
-                li {
-                    height: 60px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    border-bottom: 1px solid var(--border-color, #F3F3F3);
-                    padding: 0 16px;
-                    transition: background-color 0.2s ease;
-
-                    &:hover {
-                        background-color: var(--bg-light, #F5F5F5);
-                    }
-
-                    span {
-                        font-weight: 400;
-                        font-size: 14px;
-                        color: var(--text-color, #000000);
-                        transition: color 0.3s ease;
-                    }
-
-                    b {
-                        font-weight: 400;
-                        font-size: 14px;
-                        color: var(--text-color, #000000);
-                        transition: color 0.3s ease;
-                    }
-                }
-
-                li:last-child {
-                    border-bottom: none;
-                }
-            }
-
-            .pline {
-                margin: 15px 0 28px 0;
-                padding: 0 10px;
-
-                p {
-                    font-weight: 400;
-                    font-size: 12px;
-                    color: var(--text-gray, #909090);
-                    line-height: 24px;
-                    transition: color 0.3s ease;
-                }
-            }
-
-            button {
-                width: 100%;
-                height: 48px;
-                background: #C1272E;
-                border-radius: 8px;
-                border: none;
-                outline: none;
-                font-weight: 500;
-                font-size: 16px;
-                color: #FFFFFF;
-                cursor: pointer;
-                transition: all 0.2s ease;
-
-                &:hover {
-                    background: #a01f25;
-                    transform: translateY(-2px);
-                    box-shadow: 0 4px 12px rgba(193, 39, 46, 0.3);
-                }
-
-                &:active {
-                    transform: translateY(0);
-                }
-            }
-
-            .wallect {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                margin-top: 17px;
-                padding: 0 10px;
-
-                .item {
-                    font-weight: 400;
-                    font-size: 12px;
-                    color: var(--text-color, #000);
-                    display: flex;
-                    align-items: center;
-                    transition: color 0.3s ease;
-
-                    img {
-                        margin-right: 10px;
-                        transition: transform 0.2s ease;
-                    }
-
-                    &:hover img {
-                        transform: scale(1.1);
-                    }
-
-                    b {
-                        color: var(--text-gray, #909090);
-                        font-weight: 400;
-                        transition: color 0.3s ease;
-                    }
-                }
-            }
-        }
+.theme-dark {
+    .activation-banner {
+        background: #2F2F2F !important;
+    }
+    .node-card-item{
+        background: #1D1D1D !important;
+    }
+    .node-item-name{
+        color: #FFFFFF !important;
+    }
+    .node-item-type-badge{
+        background: rgba(234, 171, 74, 0.1) !important;
+        color: #EAAB4A !important;
+    }
+    .node-item-btn{
+        background: var(--text-color-p, #BBFF2E) !important;
+        color: #000000 !important;
     }
 }
 </style>

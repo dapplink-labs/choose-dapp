@@ -59,7 +59,6 @@ const navItems = [
   { key: 'trends', label: '趋势', path: '/' }, // 使用自定义 SVG
   { key: 'breaking', label: '突发', path: '/breaking' }, // 使用自定义 SVG
   { key: 'news', label: '新闻', path: '/news' }, // 使用自定义 SVG
-  { key: 'politics', label: '政治', path: '/politics' },
   { key: 'sports', label: '体育', path: '/sports' },
   { key: 'finance', label: '金融', path: '/finance' },
   { key: 'crypto', label: '加密货币', path: '/crypto' }
@@ -74,7 +73,6 @@ const routeToNavKey = {
   '/detail': '',
   '/accuracy': '',
   '/news': 'news',
-  '/politics': 'politics',
   '/sports': 'sports',
   '/finance': 'finance',
   '/crypto': 'crypto'
@@ -402,23 +400,23 @@ const handleNavClick = (key) => {
 
         &.active {
           .nav-icon {
-            color: #C1272E; // 激活状态图标使用红色
+            color: var(--text-color, #000000);
 
             svg {
-              fill: #C1272E;
+              fill: var(--text-color, #000000);
 
               path {
-                fill: #C1272E;
+                fill: var(--text-color, #000000);
               }
             }
 
             &.trends-icon,
             &.breaking-icon,
             &.news-icon {
-              fill: #C1272E;
+              fill: var(--text-color, #000000);
 
               path {
-                fill: #C1272E;
+                fill: var(--text-color, #000000);
               }
             }
           }
@@ -426,7 +424,7 @@ const handleNavClick = (key) => {
           .nav-text {
             font-size: 14px;
             font-weight: 600;
-            color: #C1272E; // 激活状态文字使用红色
+            color: var(--text-color, #000000);
           }
         }
       }
@@ -508,23 +506,23 @@ const handleNavClick = (key) => {
 
         &.active {
           .nav-icon {
-            color: #C1272E;
+            color: var(--text-color, #000000);
 
             svg {
-              fill: #C1272E;
+              fill: var(--text-color, #000000);
 
               path {
-                fill: #C1272E;
+                fill: var(--text-color, #000000);
               }
             }
 
             &.trends-icon,
             &.breaking-icon,
             &.news-icon {
-              fill: #C1272E;
+              fill: var(--text-color, #000000);
 
               path {
-                fill: #C1272E;
+                fill: var(--text-color, #000000);
               }
             }
           }
@@ -532,7 +530,7 @@ const handleNavClick = (key) => {
           .nav-text {
             font-size: 14px;
             font-weight: 600;
-            color: #C1272E;
+            color: var(--text-color, #000000);
           }
         }
       }
@@ -615,23 +613,23 @@ const handleNavClick = (key) => {
 
         &.active {
           .nav-icon {
-            color: #C1272E;
+            color: var(--text-color, #000000);
 
             svg {
-              fill: #C1272E;
+              fill: var(--text-color, #000000);
 
               path {
-                fill: #C1272E;
+                fill: var(--text-color, #000000);
               }
             }
 
             &.trends-icon,
             &.breaking-icon,
             &.news-icon {
-              fill: #C1272E;
+              fill: var(--text-color, #000000);
 
               path {
-                fill: #C1272E;
+                fill: var(--text-color, #000000);
               }
             }
           }
@@ -639,7 +637,7 @@ const handleNavClick = (key) => {
           .nav-text {
             font-size: 14px;
             font-weight: 600;
-            color: #C1272E;
+            color: var(--text-color, #000000);
           }
         }
       }

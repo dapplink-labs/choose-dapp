@@ -23,6 +23,19 @@
 
 
       <div class="right-section">
+        <!-- 语言切换下拉菜单 -->
+        <el-dropdown class="language-dropdown" @command="handleLanguageChange" trigger="click">
+          <button class="language-toggle-btn" :title="$t('navbar.language.en') || 'Language'">
+            <img src="@/assets/language.png" alt="language" class="language-icon" />
+          </button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="zh-cn">{{ $t('navbar.language.cn') || '中文' }}</el-dropdown-item>
+              <el-dropdown-item command="en-us">{{ $t('navbar.language.en') || 'English' }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+
         <!-- 关灯按钮 -->
         <button class="theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
           <el-icon class="theme-icon">
@@ -65,23 +78,41 @@
         </div>
       </div>
 
-      <div class="h5-finance-section" v-if="isConnected">
-        <span class="finance-label">{{ $t('header.portfolio') || '投资组合' }}: </span>
-        <span class="finance-amount">${{ portfolioAmount }}</span>
-      </div>
-
       <div class="h5-user-section">
+        <!-- 语言切换下拉菜单 -->
+        <el-dropdown class="h5-language-dropdown" @command="handleLanguageChange" trigger="click">
+          <button class="h5-language-toggle-btn" :title="$t('navbar.language.en') || 'Language'">
+            <!-- <img :src="isDark ? languageIcon : languageIconDark" alt="language" class="language-icon" /> -->
+            <svg t="1766829818391" class="h5-language-toggle-btn" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+              p-id="1552" width="32" height="32">
+              <path
+                d="M512 42.666667c259.2 0 469.333333 210.133333 469.333333 469.333333s-210.133333 469.333333-469.333333 469.333333S42.666667 771.2 42.666667 512 252.8 42.666667 512 42.666667z m0 85.333333a384 384 0 1 0 0 768 384 384 0 0 0 0-768z"
+                :fill="isDark ? '#FFFFFF' : '#515151'" p-id="1553"></path>
+              <path
+                d="M512 42.666667c142.208 140.074667 213.333333 296.533333 213.333333 469.333333s-71.125333 329.258667-213.333333 469.333333c-142.208-140.074667-213.333333-296.533333-213.333333-469.333333s71.125333-329.258667 213.333333-469.333333z m0 126.464l-10.325333 13.056C422.570667 284.544 384 393.813333 384 512s38.570667 227.456 117.674667 329.813333l10.325333 13.013334 10.325333-13.013334c75.648-97.92 114.261333-202.197333 117.461334-314.453333L640 512c0-118.144-38.570667-227.456-117.674667-329.813333L512 169.130667z"
+                :fill="isDark ? '#FFFFFF' : '#515151'" p-id="1554"></path>
+              <path d="M85.333333 469.333333h853.333334v85.333334H85.333333z" :fill="isDark ? '#FFFFFF' : '#515151'" p-id="1555"></path>
+            </svg>
+          </button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="zh-cn">{{ $t('navbar.language.cn') || '中文' }}</el-dropdown-item>
+              <el-dropdown-item command="en-us">{{ $t('navbar.language.en') || 'English' }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+
         <!-- 主题切换按钮 -->
-        <button class="h5-theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
+        <div class="h5-theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
           <el-icon class="theme-icon" :class="{ 'icon-light': !isDark, 'icon-dark': isDark }">
             <Sunny v-if="!isDark" />
             <Moon v-else />
           </el-icon>
-        </button>
+        </div>
 
         <!-- 未连接钱包时显示"连接钱包"按钮（跳转到 LinkWallet 页面） -->
         <button v-if="!isConnected" class="h5-connect-wallet-btn" @click="goLinkWallet">
-          连接钱包
+          {{ $t('link.titel') || '链接钱包' }}
         </button>
 
         <!-- 已连接钱包显示头像 -->
@@ -100,7 +131,7 @@
           </el-icon>
           <div class="headerlogo">
             <img :src="logoUrl" alt="logo">
-              <h4>连接钱包</h4>
+              <h4>{{ $t('link.titel') || '链接钱包' }}</h4>
           </div>
           <ul class="scroll-area">
             <li v-for="connector in wallets" :key="connector.id" @click="wallconnects(connector.id, chainId)">
@@ -135,15 +166,19 @@ import { injected, useAccount, useChainId, useConnect, useDisconnect } from '@wa
 import { copyText } from 'vue3-clipboard'
 import { useThemeStore } from '@/stores/theme'
 import { useCounterStore } from '@/stores/counter'
+import { useI18n } from 'vue-i18n'
 import img from "../assets/wallconnect.svg";
 import router from "@/router";
 import logoLight from "@/assets/logo.png";
 import logoDark from "@/assets/logo-Dark.png";
+import languageIcon from "@/assets/language.png";
+import languageIconDark from "@/assets/languageDark.png";
 
 
 const { disconnect } = useDisconnect();
 const counterStore = useCounterStore()
 const chainId = useChainId();
+const { locale, t } = useI18n();
 
 const props = defineProps({
   portfolioAmount: {
@@ -252,6 +287,12 @@ const wallets = [
 
 const toggleTheme = () => {
   themeStore.toggleTheme()
+}
+
+// 语言切换处理
+const handleLanguageChange = (command) => {
+  locale.value = command
+  document.documentElement.setAttribute("data-lang", locale.value)
 }
 
 // 短地址显示
@@ -411,30 +452,35 @@ onBeforeUnmount(() => {
       }
     }
 
-    .h5-finance-section {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      white-space: nowrap;
-
-      .finance-label {
-        color: var(--text-color, #fff);
-        margin-right: 4px;
-      }
-
-      .finance-amount {
-        color: #10b981;
-        font-weight: 500;
-      }
-    }
-
     .h5-user-section {
       display: flex;
       align-items: center;
       gap: 8px;
       flex-shrink: 0;
+
+      .h5-language-dropdown {
+        .h5-language-toggle-btn {
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: transparent;
+          border: 1px solid #3a3a3a;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s;
+          padding: 0;
+          flex-shrink: 0;
+
+
+          .language-icon {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+          }
+        }
+      }
 
       .h5-theme-toggle-btn {
         width: 32px;
@@ -442,18 +488,10 @@ onBeforeUnmount(() => {
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: transparent;
         border: 1px solid #3a3a3a;
-        border-radius: 8px;
         color: #ffffff;
-        cursor: pointer;
         transition: all 0.2s;
         flex-shrink: 0;
-
-        &:hover {
-          background-color: rgba(255, 255, 255, 0.1);
-          border-color: #5a5a5a;
-        }
 
         &:active {
           transform: scale(0.95);
@@ -500,9 +538,6 @@ onBeforeUnmount(() => {
         border-radius: 50%;
         transition: background-color 0.2s;
 
-        &:hover {
-          background-color: rgba(255, 255, 255, 0.1);
-        }
 
         img {
           width: 32px;
@@ -510,7 +545,6 @@ onBeforeUnmount(() => {
           display: block;
           border-radius: 50%;
           object-fit: cover;
-          border: 2px solid #3a3a3a;
         }
       }
     }
@@ -589,6 +623,34 @@ onBeforeUnmount(() => {
     align-items: center;
     gap: 16px;
     flex-shrink: 0;
+  }
+
+  // 语言切换按钮
+  .language-dropdown {
+    .language-toggle-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: transparent;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 0;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-color: #5a5a5a;
+      }
+
+      .language-icon {
+        width: 18px;
+        height: 18px;
+        object-fit: contain;
+      }
+    }
   }
 
   // 主题切换按钮
@@ -918,7 +980,7 @@ onBeforeUnmount(() => {
 
 @media (max-width: 480px) {
   .multimarket-header {
-    background-color: var(--bg-color,#fff);
+    background-color: var(--bg-page-h5, #fff);
   }
 
   .popup {
@@ -1007,6 +1069,18 @@ onBeforeUnmount(() => {
       display: none;
     }
 
+    .language-dropdown {
+      .language-toggle-btn {
+        width: 34px;
+        height: 34px;
+
+        .language-icon {
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+
     .theme-toggle-btn {
       width: 34px;
       height: 34px;
@@ -1059,12 +1133,21 @@ onBeforeUnmount(() => {
         }
       }
 
-      .h5-finance-section {
-        font-size: 13px;
-      }
-
       .h5-user-section {
         gap: 8px;
+
+        .h5-language-dropdown {
+          .h5-language-toggle-btn {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+
+            .language-icon {
+              width: 15px;
+              height: 15px;
+            }
+          }
+        }
 
         .h5-theme-toggle-btn {
           width: 32px;
@@ -1128,12 +1211,20 @@ onBeforeUnmount(() => {
         }
       }
 
-      .h5-finance-section {
-        font-size: 12px;
-      }
-
       .h5-user-section {
         gap: 6px;
+
+        .h5-language-dropdown {
+          .h5-language-toggle-btn {
+            width: 30px;
+            height: 30px;
+
+            .language-icon {
+              width: 14px;
+              height: 14px;
+            }
+          }
+        }
 
         .h5-theme-toggle-btn {
           width: 30px;
@@ -1180,20 +1271,29 @@ onBeforeUnmount(() => {
         }
       }
 
-      .h5-finance-section {
-        font-size: 11px;
-      }
-
       .h5-user-section {
         gap: 4px;
 
+        .h5-language-dropdown {
+          .h5-language-toggle-btn {
+            width: 20px;
+            height: 22px;
+            border: none;
+
+            .language-icon {
+              width: 100%;
+              height: 100%;
+            }
+          }
+        }
+
         .h5-theme-toggle-btn {
-          width: 28px;
-          height: 28px;
-          min-width: 28px;
+          width: 20px;
+          height: 20px;
+          border: none;
 
           .theme-icon {
-            font-size: 13px;
+            font-size: 20px;
           }
         }
 

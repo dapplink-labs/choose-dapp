@@ -2,7 +2,7 @@
   <div class="settings-page">
 
     <div class="card">
-      <h1 class="page-title">个人设置</h1>
+      <h1 class="page-title">{{ $t('settings.title') }}</h1>
 
       <div class="avatar-section">
         <div class="avatar-wrapper">
@@ -14,28 +14,28 @@
       </div>
 
       <div class="form-section">
-        <label class="field-label">邮箱</label>
+        <label class="field-label">{{ $t('settings.email') }}</label>
         <div class="input-group">
-          <input class="text-input" type="email" placeholder="请输入邮箱地址" />
-          <div class="helper-text">用来接收multimarket重要更新信息</div>
+          <input class="text-input" type="email" :placeholder="$t('settings.emailPlaceholder')" />
+          <div class="helper-text">{{ $t('settings.emailHelper') }}</div>
         </div>
 
-        <label class="field-label">用户名</label>
+        <label class="field-label">{{ $t('settings.username') }}</label>
         <div class="input-group">
-          <input class="text-input" type="text" placeholder="请输入用户名" />
+          <input class="text-input" type="text" :placeholder="$t('settings.usernamePlaceholder')" />
         </div>
 
-        <label class="field-label">Twitter</label>
+        <label class="field-label">{{ $t('settings.twitter') }}</label>
         <div class="input-group">
           <button class="link-btn">
-            去绑定
+            {{ $t('settings.bindTwitter') }}
             <span class="arrow">→</span>
           </button>
         </div>
       </div>
 
       <div class="actions">
-        <button class="save-btn">保存编辑</button>
+        <button class="save-btn">{{ $t('settings.save') }}</button>
       </div>
     </div>
   </div>
@@ -44,7 +44,10 @@
 <script setup>
 import { computed } from "vue"
 import { useAccount } from "@wagmi/vue"
+import { useI18n } from 'vue-i18n'
+
 const { address, status } = useAccount();
+const { t } = useI18n()
 
 const props = defineProps({
   portfolioAmount: {
