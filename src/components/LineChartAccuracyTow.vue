@@ -3,7 +3,7 @@
     <div class="chart-header">
       <div class="header-left">
         <h2 class="chart-title">预期值与实际值</h2>
-        <p class="chart-description">显示了 Multimarket 赔率在最终确定之前不同时间点的准确度</p>
+        <p class="chart-description">显示了 ChooseMe 赔率在最终确定之前不同时间点的准确度</p>
       </div>
     </div>
 

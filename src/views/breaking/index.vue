@@ -77,7 +77,7 @@
               </div>
             </div>
 
-            <!-- 下半部分：Live on Multimarket -->
+            <!-- 下半部分：Live on ChooseMe -->
             <div class="live-section">
               <div class="live-header">
                 <h3 class="live-title">{{ $t('breaking.live.title') }}</h3>
@@ -601,7 +601,7 @@ onMounted(() => {
           }
         }
 
-        // Live on Multimarket
+        // Live on ChooseMe
         .live-section {
           background: var(--bg-card, #ffffff);
           border-radius: 12px;

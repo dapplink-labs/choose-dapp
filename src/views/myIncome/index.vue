@@ -1,42 +1,12 @@
 <template>
     <div class="myIncome">
 
-
+        <BackHeaderNav 
+            :show-record-btn="true" 
+            :show-open-btn="true"
+        />
 
         <div class="banner1">
-            <div class="cps-card-header">
-                <div class="back-btn" @click="goBack">
-                    <svg t="1766051544466" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                        xmlns="http://www.w3.org/2000/svg" p-id="6246" width="32" height="32">
-                        <path d="M723.2 1024l-512-512L716.8 0l70.4 70.4L345.6 512l441.6 448-64 64z" p-id="6247"
-                            fill="currentColor"></path>
-                    </svg>
-                </div>
-                <div class="header-right">
-                    <div class="record-btn" @click="goToPurchaseRecord">
-                        <svg t="1766816881858" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                            xmlns="http://www.w3.org/2000/svg" p-id="23535" id="mx_n_1766816881860" width="32"
-                            height="32">
-                            <path
-                                d="M823.765 200.765l-79.529-79.529A192 192 0 0 0 608.471 65H304c-106.039 0-192 85.961-192 192v512c0 106.038 85.961 192 192 192h384c106.039 0 192-85.962 192-192V336.528a192 192 0 0 0-56.235-135.763z m-56.569 56.568c9.261 9.262 16.611 20.033 22.071 31.667H720c-35.347 0-64-28.654-64-64v-69.268c11.634 5.46 22.405 12.811 31.666 22.071l79.53 79.53zM688 881H304c-61.855 0-112-50.145-112-112V257c0-61.856 50.145-112 112-112h272v96c0 70.692 57.308 128 128 128h96v400c0 61.855-50.145 112-112 112z"
-                                fill="currentColor" p-id="23536"></path>
-                            <path
-                                d="M616 465H376c-22.092 0-40 17.908-40 40s17.908 40 40 40h240c22.092 0 40-17.908 40-40s-17.908-40-40-40zM536 641H376c-22.092 0-40 17.908-40 40s17.908 40 40 40h160c22.092 0 40-17.908 40-40s-17.908-40-40-40z"
-                                fill="currentColor" p-id="23537"></path>
-                        </svg>
-                    </div>
-                    <div class="open-btn" @click="handleOpenMore">
-                        <svg t="1766051224777" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                            xmlns="http://www.w3.org/2000/svg" p-id="4731" width="32" height="32">
-                            <path
-                                d="M842.724 571.473c0-22.93 18.588-41.518 41.518-41.518s41.518 18.587 41.518 41.518v271.251c0 45.86-37.177 83.036-83.036 83.036H182.126c-45.86 0-83.036-37.177-83.036-83.036V182.126c0-45.86 37.176-83.036 83.036-83.036h271.251c22.93 0 41.518 18.588 41.518 41.518s-18.588 41.518-41.518 41.518H182.126v660.598h660.598V571.473z m2.865-332.009L562.576 521.869c-16.45 16.414-43.119 16.414-59.57 0-16.448-16.414-16.448-43.027 0-59.441l283.95-283.339H646.05c-22.138 0-40.084-17.907-40.084-40 0-22.09 17.946-39.998 40.084-39.998h203.56c42.056-0.001 76.149 34.019 76.149 75.985v203.122c0 22.092-17.947 40-40.086 40s-40.085-17.908-40.085-40V239.464z"
-                                fill="currentColor" p-id="4732">
-                            </path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-
             <div class="intro">
                 <div class="intro-header">
                     <h1 class="intro-title">Super Node</h1>
@@ -143,7 +113,7 @@
 
                 <div class="team-header">
                     <span class="invite-count"><span>{{ $t('myNode.inviteAddressCount') }}</span> {{ inviteCount
-                    }}</span>
+                        }}</span>
                     <div class="search-icon" @click="handleSearch">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
                             stroke-width="2">
@@ -214,6 +184,7 @@ import avatarImg from '@/assets/icon/avatar.png'
 import TabNode from '@/components/TabNode.vue'
 import CollectEarnings from '@/components/CollectEarnings.vue'
 import TeamTree from '@/components/TeamTree.vue'
+import BackHeaderNav from '@/components/BackHeaderNav.vue'
 
 const router = useRouter()
 const themeStore = useThemeStore()
@@ -281,18 +252,7 @@ const handleSearch = () => {
     console.log('搜索团队')
 }
 
-const goBack = () => {
-    router.back()
-}
 
-const goToPurchaseRecord = () => {
-    router.push('/purchase-node-record')
-}
-
-const handleOpenMore = () => {
-    // 预留「了解更多」跳转逻辑
-    console.log('前往了解更多')
-}
 
 // 我的节点弹窗控制
 const showNodesModal = ref(false)
@@ -367,6 +327,25 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+.theme-light {
+    .progress-fill {
+        background-color: #2B6C18 !important;
+    }
+
+    .progress-indicator {
+        background-color: #2B6C18 !important;
+        border: 2px solid #FFFFFF !important;
+    }
+
+    .claim-all-btn {
+        background-color: #2B6C18 !important;
+    }
+
+    .avatar-content {
+        border: 2px solid #2B6C18 !important;
+    }
+}
+
 .theme-dark {
     .myIncome {
         .earn-prompt {
@@ -381,19 +360,20 @@ onMounted(() => {
 
 .myIncome {
     min-height: 100vh;
-    padding: 20px 10px 0 10px;
-    background-color: var(--bg-page, #FCFCFC);
+    padding: 100px 10px 0 10px;
+    background-color: var(--bg-page-h5, #FCFCFC);
     color: var(--text-color, #1a1a1a);
     transition: background-color 0.3s ease, color 0.3s ease;
+    box-sizing: border-box;
 
     &::after {
         background: url("../../assets/images/banner1.png");
         background-size: cover;
         background-repeat: no-repeat;
         content: '';
-        position: fixed;
-        top: -30px;
-        right: -10px;
+        position: absolute;
+        top: 0;
+        right: 0;
         width: 100%;
         height: 230px;
         z-index: 1;
@@ -410,60 +390,6 @@ onMounted(() => {
 
     }
 
-    .cps-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-
-        .back-btn {
-            width: 18px;
-            height: 18px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .record-btn {
-            width: 24px;
-            height: 24px;
-        }
-    }
-
-    .back-btn,
-    .record-btn,
-    .open-btn {
-        width: 24px;
-        height: 24px;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        cursor: pointer;
-        color: var(--text-color, #FFFFFF);
-        background: transparent;
-        transition: color 0.3s ease;
-
-        .icon {
-            width: 100%;
-            height: 100%;
-        }
-    }
-
-    .back-btn {
-        width: 18px;
-        height: 18px;
-    }
-
-    .back-btn .icon,
-    .open-btn .icon {
-        width: 100%;
-        height: 100%;
-    }
 
     .intro {
         position: relative;
@@ -566,7 +492,7 @@ onMounted(() => {
             .progress-bar {
                 position: relative;
                 width: 100%;
-                height: 20px;
+                height: 12px;
                 background-color: #e0e0e0;
                 border-radius: 10px;
                 overflow: visible;
@@ -577,7 +503,7 @@ onMounted(() => {
                 top: 0;
                 left: 0;
                 height: 100%;
-                background-color: var(--text-color-p, #BBFF2E);
+                background-color: var(--text-color-y, #BBFF2E);
                 border-radius: 10px;
                 transition: width 0.3s ease;
             }
@@ -586,9 +512,9 @@ onMounted(() => {
                 position: absolute;
                 top: 50%;
                 transform: translate(-50%, -50%);
-                width: 48px;
-                height: 28px;
-                background-color: var(--text-color-p, #BBFF2E);
+                height: 18px;
+                padding: 0 5px;
+                background-color: var(--text-color-y, #BBFF2E);
                 border-radius: 999px;
                 display: flex;
                 align-items: center;
@@ -598,8 +524,7 @@ onMounted(() => {
 
                 .indicator-text {
                     font-size: 12px;
-                    font-weight: 600;
-                    color: #000000;
+                    color: var(--bg-page-h5, #FFFFFF);
                 }
             }
 
@@ -633,7 +558,6 @@ onMounted(() => {
                 color: var(--text-dark-gray, #999999);
                 margin-bottom: 8px;
                 font-weight: 400;
-                min-height: 38px;
             }
 
             .earnings-value {
@@ -646,7 +570,7 @@ onMounted(() => {
         .claim-all-btn {
             width: 100%;
             height: 48px;
-            background: var(--text-color-p, #BBFF2E);
+            background: var(--text-color-y, #BBFF2E);
             border-radius: 999px;
             border: none;
             outline: none;
@@ -675,7 +599,7 @@ onMounted(() => {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: var(--text-color-p, #BBFF2E);
+                background: var(--text-color-y, #BBFF2E);
                 border-radius: 4px;
                 color: #000000;
                 flex-shrink: 0;
@@ -687,7 +611,7 @@ onMounted(() => {
                 flex: 1;
 
                 .earn-amount {
-                    color: var(--text-color-p, #BBFF2E);
+                    color: var(--text-color-y, #BBFF2E);
                     font-weight: 600;
                 }
             }
@@ -836,13 +760,15 @@ onMounted(() => {
                         height: 100%;
                         border-radius: 50%;
                         overflow: hidden;
-                        border: 2px solid var(--text-color-p, #BBFF2E);
+                        border: 2px solid var(--text-color-y, #BBFF2E);
 
                         .avatar-img {
                             width: 100%;
                             height: 100%;
                             object-fit: cover;
+                            border: 1px solid var(--bg-page-h5, #FFFFFF);
                             image-rendering: pixelated;
+                            box-sizing: border-box;
                         }
                     }
                 }

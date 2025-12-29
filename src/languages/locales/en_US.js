@@ -1,6 +1,6 @@
 export default {
   link: {
-    titel: "Connect a Wallet",
+    titel: "Connect Wallet",
     exit: "Disconnect"
   },
   bridge: {
@@ -294,7 +294,7 @@ export default {
     
   },
   header: {
-    searchPlaceholder: "Search multimarket",
+    searchPlaceholder: "Search ChooseMe",
     portfolio: "Portfolio",
     cash: "Cash",
     deposit: "Deposit",
@@ -314,7 +314,7 @@ export default {
     }
   },
   home: {
-    welcome: "Welcome to Multimarket",
+    welcome: "Welcome to ChooseMe",
     description: "Explore the latest market trends, news and information",
     comingSoon: "Prediction feature coming soon",
     comingSoonAlt: "Not available",
@@ -384,7 +384,7 @@ export default {
     title: "Settings",
     email: "Email",
     emailPlaceholder: "Please enter email address",
-    emailHelper: "Used to receive important updates from multimarket",
+    emailHelper: "Used to receive important updates from ChooseMe",
     username: "Username",
     usernamePlaceholder: "Please enter username",
     twitter: "Twitter",
@@ -403,12 +403,12 @@ export default {
     },
     subscription: {
       title: "Get Daily Updates",
-      description: "We'll send you an email every day with the latest updates from multimarket.",
+      description: "We'll send you an email every day with the latest updates from ChooseMe.",
       emailPlaceholder: "Please enter your email address",
       submit: "Get Updates"
     },
     live: {
-      title: "Live on Multimarket",
+      title: "Live on ChooseMe",
       followBtn: "follow on X",
       breakingNews: "Breaking News",
       viewAll: "View All"
@@ -501,7 +501,7 @@ export default {
   accuracy: {
     overallAccuracy: "Overall Accuracy",
     expectedVsActual: "Expected vs Actual",
-    title: "How accurate is Multimarket?",
+    title: "How accurate is ChooseMe?",
     accuracy4Hours: "4-Hour Accuracy",
     accuracy1Month: "1-Month Accuracy",
     brierScore: "Brier Score",
@@ -608,10 +608,10 @@ export default {
     networkIncomeCMT: "Network Rewards",
     earnPrompt: "Address {address} earned income",
     pendingIncome: "Pending Income",
-    staticIncomeCHO: "Static Income (CHO)",
-    directReferralIncomeCHO: "Direct Referral Income (CHO)",
-    teamIncomeCHO: "Team Income (CHO)",
-    genesisNodeIncomeCHO: "Genesis Node 5% Income (CHO)",
+    staticIncomeCHO: "Static Income",
+    directReferralIncomeCHO: "Direct Referral Income",
+    teamIncomeCHO: "Team Income",
+    genesisNodeIncomeCHO: "Genesis Node 5% Income",
     claimAll: "Claim All Income",
     myTeam: "My Team",
     mySuperior: "My Superior",
@@ -680,6 +680,14 @@ export default {
   },
   myNodes: {
     title: "My Nodes"
+  },
+  purchaseNode: {
+    estimatedTradeProfit: "Estimated Trading Profit:",
+    subCoinFeeProfit: "Sub-coin Fee Profit:",
+    secondaryProfit: "Secondary Market Profit:",
+    tipText: "* Total profit ≥ 3x triggers claim",
+    buyBtn: "Purchase",
+    walletBalance: "Wallet Balance:"
   },
   collectEarnings: {
     title: "Claim Method",

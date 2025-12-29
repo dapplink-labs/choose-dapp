@@ -4,24 +4,11 @@
 
     <div class="cps-content">
       <div class="cps-card">
-        <div class="cps-card-header">
-          <div class="back-btn" @click="handleBack">
-            <svg t="1766051544466" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-              p-id="6246" width="32" height="32">
-              <path d="M723.2 1024l-512-512L716.8 0l70.4 70.4L345.6 512l441.6 448-64 64z" p-id="6247"
-                fill="currentColor"></path>
-            </svg>
-          </div>
-          <div class="open-btn" @click="handleOpenMore">
-            <svg t="1766051224777" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-              p-id="4731" width="32" height="32">
-              <path
-                d="M842.724 571.473c0-22.93 18.588-41.518 41.518-41.518s41.518 18.587 41.518 41.518v271.251c0 45.86-37.177 83.036-83.036 83.036H182.126c-45.86 0-83.036-37.177-83.036-83.036V182.126c0-45.86 37.176-83.036 83.036-83.036h271.251c22.93 0 41.518 18.588 41.518 41.518s-18.588 41.518-41.518 41.518H182.126v660.598h660.598V571.473z m2.865-332.009L562.576 521.869c-16.45 16.414-43.119 16.414-59.57 0-16.448-16.414-16.448-43.027 0-59.441l283.95-283.339H646.05c-22.138 0-40.084-17.907-40.084-40 0-22.09 17.946-39.998 40.084-39.998h203.56c42.056-0.001 76.149 34.019 76.149 75.985v203.122c0 22.092-17.947 40-40.086 40s-40.085-17.908-40.085-40V239.464z"
-                fill="currentColor" p-id="4732">
-              </path>
-            </svg>
-          </div>
-        </div>
+        <BackHeaderNav 
+          :show-open-btn="true"
+          :use-default-open-action="false"
+          @open-click="handleOpenMore"
+        />
 
         <h1 class="cps-title">{{ t('computingPower.title') }}</h1>
 
@@ -36,7 +23,10 @@
             <img :src="activationAvatar" alt="avatar" />
           </div>
           <div class="activation-text">
-            {{ activationMsg }}
+            <template v-for="(part, index) in activationMsgParts" :key="index">
+              <strong v-if="part.isAddress">{{ part.text }}</strong>
+              <span v-else>{{ part.text }}</span>
+            </template>
           </div>
         </div>
 
@@ -106,6 +96,7 @@ import clusterNodeImgDark from '@/assets/icon/ClusterNode.png'
 import clusterNodeImg from '@/assets/icon/11.png'
 import TIcon from '@/assets/icon/TIcon.png'
 import PurchaseNode from '@/components/PurchaseNode.vue'
+import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import { useThemeStore } from '@/stores/theme'
 
 const router = useRouter()
@@ -167,9 +158,36 @@ const activationMsg = computed(() =>
   })
 )
 
-const handleBack = () => {
-  router.back()
-}
+// 将激活消息拆分成部分，以便地址部分可以加粗
+const activationMsgParts = computed(() => {
+  const msg = activationMsg.value
+  const address = activationAddress.value
+  const parts = []
+  
+  // 查找地址在消息中的位置
+  const addressIndex = msg.indexOf(address)
+  
+  if (addressIndex === -1) {
+    // 如果找不到地址，直接返回整个消息
+    return [{ text: msg, isAddress: false }]
+  }
+  
+  // 地址前的文本
+  if (addressIndex > 0) {
+    parts.push({ text: msg.substring(0, addressIndex), isAddress: false })
+  }
+  
+  // 地址部分
+  parts.push({ text: address, isAddress: true })
+  
+  // 地址后的文本
+  const afterIndex = addressIndex + address.length
+  if (afterIndex < msg.length) {
+    parts.push({ text: msg.substring(afterIndex), isAddress: false })
+  }
+  
+  return parts
+})
 
 const handleOpenMore = () => {
   // 预留「了解更多」跳转逻辑
@@ -262,12 +280,12 @@ const currentNodeImg = computed(() =>
 .cps-page {
   width: 100%;
   position: relative;
-  background-color: var(--bg-dashboard, #FFFFFF);
+  background-color: var(--bg-page-h5, #FFFFFF);
   min-height: 100vh;
 }
 
 .cps-bg {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   background: url("@/assets/icon/cpsBg.png") no-repeat;
@@ -296,7 +314,7 @@ const currentNodeImg = computed(() =>
 .cps-card {
   width: 100%;
   box-sizing: border-box;
-
+  padding-top: 60px; // 为 fixed 的 BackHeaderNav 预留空间
 
 }
 
@@ -435,31 +453,6 @@ const currentNodeImg = computed(() =>
     transform: translateY(0);
     box-shadow: none;
   }
-}
-
-.cps-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.back-btn,
-.open-btn {
-  width: 24px;
-  height: 24px;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  cursor: pointer;
-  color: var(--text-color, #000000);
-}
-
-.back-btn {
-  width: 18px;
-  height: 18px;
 }
 
 .cps-title {
@@ -684,22 +677,6 @@ const currentNodeImg = computed(() =>
   color: #DE9800;
   margin-left: 6px;
   vertical-align: middle;
-}
-
-.buy-btn {
-  display: block;
-  width: calc(100% - 32px);
-  margin: 20px auto 23px;
-  height: 48px;
-  line-height: 48px;
-  border-radius: 8px;
-  border: none;
-  background-color: #c1272e;
-  font-family: PingFang SC, PingFang SC;
-  font-weight: 500;
-  font-size: 16px;
-  color: #FFFFFF;
-  text-align: center;
 }
 
 .theme-dark .node-item-btn {

@@ -1,25 +1,12 @@
 <template>
     <div class="LPVault">
 
+        <!-- 通用返回头部导航 -->
+        <BackHeaderNav
+            :show-open-btn="true"
+        />
+
         <div class="banner1" style="margin: 0  -10px;">
-            <div class="cps-card-header">
-                <div class="back-btn" @click="handleBack">
-                    <svg t="1766051544466" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                        xmlns="http://www.w3.org/2000/svg" p-id="6246" width="32" height="32">
-                        <path d="M723.2 1024l-512-512L716.8 0l70.4 70.4L345.6 512l441.6 448-64 64z" p-id="6247"
-                            fill="currentColor"></path>
-                    </svg>
-                </div>
-                <div class="open-btn" @click="handleOpenMore">
-                    <svg t="1766051224777" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                        xmlns="http://www.w3.org/2000/svg" p-id="4731" width="32" height="32">
-                        <path
-                            d="M842.724 571.473c0-22.93 18.588-41.518 41.518-41.518s41.518 18.587 41.518 41.518v271.251c0 45.86-37.177 83.036-83.036 83.036H182.126c-45.86 0-83.036-37.177-83.036-83.036V182.126c0-45.86 37.176-83.036 83.036-83.036h271.251c22.93 0 41.518 18.588 41.518 41.518s-18.588 41.518-41.518 41.518H182.126v660.598h660.598V571.473z m2.865-332.009L562.576 521.869c-16.45 16.414-43.119 16.414-59.57 0-16.448-16.414-16.448-43.027 0-59.441l283.95-283.339H646.05c-22.138 0-40.084-17.907-40.084-40 0-22.09 17.946-39.998 40.084-39.998h203.56c42.056-0.001 76.149 34.019 76.149 75.985v203.122c0 22.092-17.947 40-40.086 40s-40.085-17.908-40.085-40V239.464z"
-                            fill="currentColor" p-id="4732">
-                        </path>
-                    </svg>
-                </div>
-            </div>
 
             <div class="intro">
                 <h1>{{ $t('lpVault.title') }}</h1>
@@ -104,6 +91,7 @@ import clusterNodeImg from '@/assets/icon/ClusterNode.png'
 import DistributedNode from '@/assets/icon/DistributedNode.png'
 import DistributedNodeDark from '@/assets/icon/DistributedNodeDark.png'
 import TIcon from '@/assets/icon/TIcon.png'
+import BackHeaderNav from '@/components/BackHeaderNav.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -116,10 +104,6 @@ const activationAddress = ref('0xb574...4c7d')
 const activationMsg = computed(() => {
     return t('lpVault.activationMsg', { address: activationAddress.value })
 })
-
-const handleBack = () => {
-    router.back()
-}
 
 const handleOpenMore = () => {
     // 预留「了解更多」跳转逻辑
@@ -202,19 +186,26 @@ onMounted(() => {
 <style scoped lang="scss">
 .LPVault {
     min-height: 100vh;
-    padding: 20px 10px 60px 10px;
-    background-color: var(--bg-page, #FCFCFC);
+    padding: 100px 10px 60px 10px;
+    background-color: var(--bg-page-h5, #FCFCFC);
     color: var(--text-color, #1a1a1a);
     transition: background-color 0.3s ease, color 0.3s ease;
 
-    .banner1 {
+    &::after {
         background: url("../../assets/images/banner3.png");
         background-size: cover;
         background-repeat: no-repeat;
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 230px;
+    }
+    .banner1 {
         flex-direction: column;
         display: flex;
         height: 100%;
-        /* 或 height: 100vh */
         justify-content: space-between;
 
         h3 {
@@ -268,34 +259,6 @@ onMounted(() => {
             border-bottom: 2px solid var(--text-color, #000);
             transition: all 0.3s ease;
         }
-    }
-
-    .cps-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 60px;
-        padding: 0 10px;
-    }
-
-    .back-btn,
-    .open-btn {
-        width: 24px;
-        height: 24px;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        cursor: pointer;
-        color: var(--text-color, #000000);
-        background: transparent;
-        transition: color 0.3s ease;
-    }
-
-    .back-btn {
-        width: 18px;
-        height: 18px;
     }
 
     .back-btn .icon,
@@ -629,7 +592,7 @@ onMounted(() => {
         color: #EAAB4A !important;
     }
     .node-item-btn{
-        background: var(--text-color-p, #BBFF2E) !important;
+        background: var(--text-color-y, #BBFF2E) !important;
         color: #000000 !important;
     }
 }

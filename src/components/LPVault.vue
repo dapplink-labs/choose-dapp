@@ -467,7 +467,7 @@ onUnmounted(() => {
         font-family: DIN, DIN;
         font-weight: bold;
         font-size: 28px;
-        color: var(--text-color-p, #BBFF2E);
+        color: var(--text-color-y, #BBFF2E);
         line-height: 48px;
     }
 
@@ -529,7 +529,7 @@ onUnmounted(() => {
         font-family: DIN, DIN;
         font-weight: bold;
         font-size: 28px;
-        color: var(--text-color-p, #BBFF2E);
+        color: var(--text-color-y, #BBFF2E);
         line-height: 48px;
     }
 
@@ -638,7 +638,7 @@ onUnmounted(() => {
         }
 
         .profit-main-value {
-            color: var(--text-color-p, #BBFF2E);
+            color: var(--text-color-y, #BBFF2E);
         }
 
         .profit-24h {
@@ -659,7 +659,7 @@ onUnmounted(() => {
         }
 
         .section-main-value {
-            color: var(--text-color-p, #BBFF2E);
+            color: var(--text-color-y, #BBFF2E);
         }
 
         .market-metrics {

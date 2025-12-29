@@ -48,10 +48,6 @@ const router = createRouter({
       path: '/detail-h5',
       name: 'detailH5',
       component: detailH5,
-      meta: {
-        hideHeader: true,
-        hideFooterNav: true
-      }
     },
     {
       path: '/breaking',

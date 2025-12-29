@@ -120,7 +120,7 @@ const handleNavClick = (item) => {
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--bg-card, #ffffff);
+  background-color: var(--bg-page-h5, #ffffff);
   border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
   z-index: 1000;
   padding: 0;
@@ -131,7 +131,7 @@ const handleNavClick = (item) => {
     display: flex;
     align-items: center;
     justify-content: space-around;
-    height: 60px;
+    height: 56px;
     max-width: 100%;
     padding: 0;
     box-sizing: border-box;
@@ -145,21 +145,21 @@ const handleNavClick = (item) => {
     flex: 1;
     cursor: pointer;
     transition: all 0.2s;
-    padding: 4px 8px;
-    min-height: 60px;
+    padding: 4px 6px;
+    min-height: 56px;
     box-sizing: border-box;
 
     .nav-icon {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       color: #999999;
       transition: color 0.2s;
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       flex-shrink: 0;
     }
 
     .nav-text {
-      font-size: 12px;
+      font-size: 11px;
       color: #999999;
       transition: color 0.2s;
       font-weight: 400;
@@ -197,40 +197,10 @@ const handleNavClick = (item) => {
   }
 }
 
-// 仅在移动端显示
+// 仅在移动端显示，PC端隐藏
 @media (min-width: 769px) {
   .footer-nav {
     display: none;
-  }
-}
-
-// 移动端优化
-@media (max-width: 768px) {
-  .footer-nav {
-    display: block;
-  }
-}
-
-@media (max-width: 480px) {
-  .footer-nav {
-    .nav-container {
-      height: 56px;
-    }
-
-    .nav-item {
-      min-height: 56px;
-      padding: 4px 6px;
-
-      .nav-icon {
-        width: 22px;
-        height: 22px;
-        margin-bottom: 3px;
-      }
-
-      .nav-text {
-        font-size: 11px;
-      }
-    }
   }
 }
 </style>

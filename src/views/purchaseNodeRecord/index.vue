@@ -1,17 +1,6 @@
 <template>
     <div class="purchase-node-record">
-        <div class="banner1">
-            <div class="cps-card-header">
-                <div class="back-btn" @click="goBack">
-                    <svg t="1766051544466" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                        xmlns="http://www.w3.org/2000/svg" p-id="6246" width="32" height="32">
-                        <path d="M723.2 1024l-512-512L716.8 0l70.4 70.4L345.6 512l441.6 448-64 64z" p-id="6247"
-                            fill="currentColor"></path>
-                    </svg>
-                </div>
-                <h1 class="page-title">{{ $t('purchaseNodeRecord.title') }}</h1>
-            </div>
-        </div>
+        <BackHeaderNav :title="$t('purchaseNodeRecord.title')" />
 
         <div class="record-list">
             <div v-for="(item, index) in recordList" :key="index" class="record-item">
@@ -41,14 +30,10 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import BackHeaderNav from '@/components/BackHeaderNav.vue'
 
 const router = useRouter()
 const { t } = useI18n()
-
-const goBack = () => {
-    console.log(router)
-    router.back()
-}
 
 // 示例数据
 const recordList = ref([
@@ -92,62 +77,14 @@ const recordList = ref([
 
 <style scoped lang="scss">
 .purchase-node-record {
-    padding: 20px 10px 0 10px;
-    background-color: var(--bg-page, #FCFCFC);
+    padding: 50px 10px 0 10px;
+    background-color: var(--bg-page-h5, #FFFFFF);
     color: var(--text-color, #1a1a1a);
     transition: background-color 0.3s ease, color 0.3s ease;
     position: relative;
     z-index: 999;
-
-    .banner1 {
-        position: relative;
-        z-index: 999;
-        margin-bottom: 24px;
-
-        .cps-card-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 33px;
-            position: relative;
-
-            .back-btn {
-                width: 20px;
-                border: none;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 16px;
-                cursor: pointer;
-                color: var(--text-color, #FFFFFF);
-                background: transparent;
-                transition: color 0.3s ease;
-                flex-shrink: 0;
-                position: relative;
-                z-index: 10;
-
-                .icon {
-                    width: 100%;
-                    height: 100%;
-                }
-            }
-
-            .page-title {
-                font-family: PingFang SC, PingFang SC;
-                font-weight: 600;
-                font-size: 20px;
-                color: var(--text-color, #FFFFFF);
-                text-align: center;
-                margin: 0;
-                transition: color 0.3s ease;
-                flex: 1;
-                position: absolute;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 100%;
-                pointer-events: none;
-            }
-        }
-    }
+    min-height: 100vh;
+    box-sizing: border-box;
 
     .record-list {
         display: flex;
@@ -214,7 +151,7 @@ const recordList = ref([
                     font-family: PingFang SC, PingFang SC;
                     font-weight: 500;
                     font-size: 14px;
-                    color: var(--text-color-p, #2EBE69);
+                    color: var(--text-color-y, #2EBE69);
                 }
 
                 .record-time {
@@ -232,13 +169,6 @@ const recordList = ref([
 .theme-dark {
     .purchase-node-record {
         background-color: #000000;
-
-        .banner1 {
-
-            .page-title {
-                color: #FFFFFF !important;
-            }
-        }
 
         .record-list {
             .record-item {

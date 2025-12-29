@@ -297,13 +297,8 @@ const handleContinue = () => {
     transition: all 0.3s ease;
 
     &.active {
-        background: var(--primary-color, #25A750);
-        border-color: var(--primary-color, #25A750);
-        color: #FFFFFF;
-    }
-
-    &:hover {
-        border-color: var(--primary-color, #25A750);
+        background: var(--bg-opposite, #FFFFFF);
+        color: var(--bg-page, #000000);
     }
 }
 
@@ -330,7 +325,7 @@ const handleContinue = () => {
     top: 0;
     bottom: 0;
     width: 2px;
-    background: var(--text-color-p, #BBFF2E);
+    background: var(--text-color-y, #BBFF2E);
 }
 
 .prediction-content {
@@ -345,7 +340,7 @@ const handleContinue = () => {
     font-family: PingFang SC, PingFang SC;
     font-weight: 600;
     font-size: 14px;
-    color: var(--text-color-p, #BBFF2E);
+    color: var(--text-color-y, #BBFF2E);
 }
 
 .prediction-percentage {
@@ -410,7 +405,7 @@ const handleContinue = () => {
     transition: color 0.3s ease;
 
     &.positive {
-        color: var(--text-color-p, #BBFF2E);
+        color: var(--text-color-y, #BBFF2E);
     }
 }
 

@@ -2,25 +2,13 @@
     <div class="myNode">
 
 
+        <BackHeaderNav 
+            :show-open-btn="true"
+            :use-default-open-action="false"
+            @open-click="handleOpenMore"
+        />
+
         <div class="banner1">
-            <div class="cps-card-header">
-                <div class="back-btn" @click="goBack">
-                    <svg t="1766051544466" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                        xmlns="http://www.w3.org/2000/svg" p-id="6246" width="32" height="32">
-                        <path d="M723.2 1024l-512-512L716.8 0l70.4 70.4L345.6 512l441.6 448-64 64z" p-id="6247"
-                            fill="currentColor"></path>
-                    </svg>
-                </div>
-                <div class="open-btn" @click="handleOpenMore">
-                    <svg t="1766051224777" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                        xmlns="http://www.w3.org/2000/svg" p-id="4731" width="32" height="32">
-                        <path
-                            d="M842.724 571.473c0-22.93 18.588-41.518 41.518-41.518s41.518 18.587 41.518 41.518v271.251c0 45.86-37.177 83.036-83.036 83.036H182.126c-45.86 0-83.036-37.177-83.036-83.036V182.126c0-45.86 37.176-83.036 83.036-83.036h271.251c22.93 0 41.518 18.588 41.518 41.518s-18.588 41.518-41.518 41.518H182.126v660.598h660.598V571.473z m2.865-332.009L562.576 521.869c-16.45 16.414-43.119 16.414-59.57 0-16.448-16.414-16.448-43.027 0-59.441l283.95-283.339H646.05c-22.138 0-40.084-17.907-40.084-40 0-22.09 17.946-39.998 40.084-39.998h203.56c42.056-0.001 76.149 34.019 76.149 75.985v203.122c0 22.092-17.947 40-40.086 40s-40.085-17.908-40.085-40V239.464z"
-                            fill="currentColor" p-id="4732">
-                        </path>
-                    </svg>
-                </div>
-            </div>
             <h1 class="page-title">{{ $t('myNode.title') }}</h1>
         </div>
         <div class="cps-bg"></div>
@@ -162,15 +150,12 @@ import { useThemeStore } from '@/stores/theme'
 import { useI18n } from 'vue-i18n'
 import avatarImg from '@/assets/icon/avatar.png'
 import TeamTree from "@/components/TeamTree.vue"
+import BackHeaderNav from '@/components/BackHeaderNav.vue'
 
 
 const router = useRouter()
 const themeStore = useThemeStore()
 const { t } = useI18n()
-
-const goBack = () => {
-    router.back()
-}
 
 const handleOpenMore = () => {
     // 预留「了解更多」跳转逻辑
@@ -246,6 +231,14 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+.theme-light {
+    .claim-all-btn{
+        background-color: #2B6C18 !important;
+    }
+    .avatar-content{
+        border: 2px solid #2B6C18 !important;
+    }
+}
 /* 暗色主题下使用深色背景图 */
 .theme-dark .cps-bg {
     background-image: url("@/assets/icon/cpsBgDark.png") !important;
@@ -255,10 +248,11 @@ onMounted(() => {
     min-height: 100vh;
     padding: 20px 10px 0 10px;
     color: var(--text-color, #1a1a1a);
+    background-color: var(--bg-page-h5, #FFFFFF);
     transition: background-color 0.3s ease, color 0.3s ease;
 
     .cps-bg {
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
         background: url("@/assets/icon/cpsBg.png") no-repeat;
@@ -275,42 +269,7 @@ onMounted(() => {
         display: flex;
         height: auto;
         justify-content: space-between;
-    }
-
-    .cps-card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 27px;
-        z-index: 999;
-    }
-
-    .back-btn,
-    .open-btn {
-        width: 24px;
-        height: 24px;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 16px;
-        cursor: pointer;
-        color: var(--text-color, #1a1a1a);
-        transition: all 0.3s ease;
-
-        &:hover {
-            opacity: 0.8;
-        }
-
-        .icon {
-            width: 100%;
-            height: 100%;
-        }
-    }
-
-    .back-btn {
-        width: 18px;
-        height: 18px;
+        padding-top: 60px; // 为 fixed 的 BackHeaderNav 预留空间
     }
 
     .page-title {
@@ -374,7 +333,7 @@ onMounted(() => {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: var(--text-color-p, #BBFF2E);
+                background: var(--text-color-y, #BBFF2E);
                 border-radius: 4px;
                 color: #000000;
                 flex-shrink: 0;
@@ -387,7 +346,7 @@ onMounted(() => {
                 transition: color 0.3s ease;
 
                 .earn-amount {
-                    color: var(--text-color-p, #BBFF2E);
+                    color: var(--text-color-y, #BBFF2E);
                     font-weight: 600;
                 }
             }
@@ -434,26 +393,15 @@ onMounted(() => {
         .claim-all-btn {
             width: 100%;
             height: 56px;
-            background: var(--text-color-p, #BBFF2E);
+            background: var(--text-color-y, #BBFF2E);
             border-radius: 999px;
             border: none;
             outline: none;
             font-weight: 600;
             font-size: 16px;
-            color: #000000;
-            cursor: pointer;
+            color: var(--bg-page-h5, #FFFFFF);
             margin-top: 20px;
             transition: all 0.3s ease;
-
-            &:hover {
-                background: #A8E626;
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(187, 255, 46, 0.3);
-            }
-
-            &:active {
-                transform: translateY(0);
-            }
         }
     }
 
@@ -567,13 +515,15 @@ onMounted(() => {
                         height: 100%;
                         border-radius: 50%;
                         overflow: hidden;
-                        border: 2px solid var(--text-color-p, #BBFF2E);
+                        border: 2px solid var(--text-color-y, #BBFF2E);
 
                         .avatar-img {
                             width: 100%;
                             height: 100%;
                             object-fit: cover;
+                            border:1px solid var(--bg-page-h5, #FFFFFF);
                             image-rendering: pixelated;
+                            box-sizing: border-box;
                         }
                     }
                 }

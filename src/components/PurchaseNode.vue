@@ -15,26 +15,26 @@
 
       <div class="info-card">
         <div class="info-row">
-          <span class="info-label">预计买卖交易收益约：</span>
+          <span class="info-label">{{ $t('purchaseNode.estimatedTradeProfit') }}</span>
           <span class="info-value">{{ tradeProfit }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">子币手续费收益约：</span>
+          <span class="info-label">{{ $t('purchaseNode.subCoinFeeProfit') }}</span>
           <span class="info-value">{{ feeProfit }}</span>
         </div>
         <div class="info-row">
-          <span class="info-label">二级盈利收益约：</span>
+          <span class="info-label">{{ $t('purchaseNode.secondaryProfit') }}</span>
           <span class="info-value">{{ secondaryProfit }}</span>
         </div>
       </div>
 
-      <p class="tip-text">* 总收益≥3倍触发claim</p>
+      <p class="tip-text">{{ $t('purchaseNode.tipText') }}</p>
 
-      <button class="buy-btn" @click="handleBuy">去购买</button>
+      <button class="buy-btn" @click="handleBuy">{{ $t('purchaseNode.buyBtn') }}</button>
 
       <div class="wallet-row">
         <img :src="walletIcon" alt="wallet" class="wallet-icon" />
-        <span class="wallet-label">钱包余额：</span>
+        <span class="wallet-label">{{ $t('purchaseNode.walletBalance') }}</span>
         <span class="wallet-value">{{ walletBalance }}</span>
       </div>
     </div>
@@ -43,7 +43,10 @@
 
 <script setup>
 import { defineProps, defineEmits } from 'vue'
+import { useI18n } from 'vue-i18n'
 import walletIcon from '@/assets/icon/10.png'
+
+const { t } = useI18n()
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -152,7 +155,7 @@ const handleBuy = () => {
 .tip-text {
   margin: 0 0 16px;
   font-size: 13px;
-  color: #C1272E;
+  color: var(--text-dark-gray, #999999);
 }
 
 .buy-btn {
@@ -160,10 +163,10 @@ const handleBuy = () => {
   height: 48px;
   border: none;
   border-radius: 8px;
-  background-color: #C1272E;
+  background-color: var(--bg-opposite, #000000);
   font-size: 16px;
   font-weight: 500;
-  color: #ffffff;
+  color: var(--bg-page-h5, #ffffff);
   cursor: pointer;
   margin-bottom: 16px;
 }
@@ -171,7 +174,7 @@ const handleBuy = () => {
 .wallet-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .wallet-icon {

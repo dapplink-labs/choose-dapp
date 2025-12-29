@@ -550,15 +550,19 @@ const handleSelect = (index, indexPath) => {
   console.log(index, indexPath);
   activeIndex.value = index;
   if (index == "6-3") {
-    locale.value = "en-us"; // 切
+    locale.value = "en-us"; // 切换为英文
     document.documentElement.setAttribute("data-lang", locale.value);
+    // 保存语言选择到 localStorage
+    localStorage.setItem('app-locale', locale.value);
     setTimeout(() => {
       menuRef.value && menuRef.value.close && menuRef.value.close("6");
     }, 100);
   }
   if (index == "6-1") {
-    locale.value = "zh-cn"; // 切
+    locale.value = "zh-cn"; // 切换为中文
     document.documentElement.setAttribute("data-lang", locale.value);
+    // 保存语言选择到 localStorage
+    localStorage.setItem('app-locale', locale.value);
     setTimeout(() => {
       menuRef.value && menuRef.value.close && menuRef.value.close("6");
     }, 100);

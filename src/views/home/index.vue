@@ -320,10 +320,10 @@ const toggleFavorite = (item) => {
 
 <style scoped lang="scss">
 // 公共样式变量（使用CSS变量以支持主题切换）
-$yes-color: #BCFF33;
-$no-color: #E23891;
-$yes-bg-light: rgba(188, 255, 51, 0.2);
-$no-bg-light: rgba(226, 56, 145, 0.2);
+$yes-color: #25A750;
+$no-color: #CA4064;
+$yes-bg-light: rgba(37, 167, 80, 0.2);
+$no-bg-light: rgba(202, 64, 100, 0.2);
 
 // 公共按钮样式 mixin
 @mixin yes-no-button($color, $bg-light) {
@@ -1288,207 +1288,70 @@ $no-bg-light: rgba(226, 56, 145, 0.2);
         }
       }
     }
-  }
-}
 
-@media (max-width: 480px) {
-  .coming-soon-overlay {
-    // display: flex !important;
-  }
+    // 480px 及以下屏幕的样式覆盖
+    @media (max-width: 480px) {
+      padding-top: 60px;
 
-  .home-page {
-    padding-top: 60px;
+      .main-content {
+        padding: 12px 12px 32px;
 
-    .main-content {
-      padding: 12px 12px 32px;
+        .filter-section {
+          margin-bottom: 12px;
 
-      .filter-section {
-        margin-bottom: 12px;
+          .filter-container {
+            gap: 22px;
 
-        .filter-container {
-          gap: 22px;
+            .search-box {
+              padding: 8px 10px;
+              border-radius: 6px;
+              height: 40px;
+              border-radius: 8px 8px 8px 8px;
+              border: 1px solid var(--border-color, #e0e0e0);
+              background-color: var(--bg-page-h5, #F5F5F5);
 
-          .search-box {
-            padding: 8px 10px;
-            border-radius: 6px;
-            height: 40px;
-            border-radius: 8px 8px 8px 8px;
-            border: 1px solid var(--border-color, #e0e0e0);
-            background-color: var(--bg-page-h5, #F5F5F5);
-
-            .search-icon {
-              font-size: 14px;
-              margin-right: 6px;
-            }
-
-            .search-input {
-              font-size: 13px;
-            }
-          }
-
-          .action-buttons {
-            gap: 16px;
-
-            .action-btn {
-              padding: 0;
-
-              .icon {
-                width: 24px;
-                height: 24px;
-              }
-            }
-          }
-
-          .filter-tags {
-            gap: 6px;
-
-            .filter-tag {
-              padding: 5px 10px;
-              font-size: 12px;
-              min-height: 30px; // 触摸友好的最小高度
-            }
-          }
-        }
-      }
-
-      .main-list-section {
-        gap: 10px;
-
-        .left-vertical-list {
-          gap: 12px;
-
-          .list-item {
-            padding: 14px;
-            border-radius: 12px;
-            background: var(--bg-card, #ffffff);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-
-            .item-header {
-              margin-bottom: 14px;
-              align-items: center;
-              gap: 10px;
-
-              .user-avatar {
-                width: 44px;
-                height: 44px;
-                border-radius: 8px;
-                object-fit: cover;
-                flex-shrink: 0;
+              .search-icon {
+                font-size: 14px;
+                margin-right: 6px;
               }
 
-              .item-meta {
-                padding-left: 0;
-                flex: 1;
-                min-width: 0;
-
-                .item-title {
-                  font-size: 13px;
-                  line-height: 1.5;
-                  color: var(--text-color, #333);
-                  font-weight: 500;
-                }
-              }
-
-              .percentage-semicircle {
-                flex-shrink: 0;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 4px;
-
-                .semicircle-chart {
-                  width: 55px;
-                  height: 28px;
-                }
-
-                .percentage-label {
-                  font-size: 9px;
-                  color: var(--text-dark-gray, #999);
-                  margin-top: 0;
-                }
+              .search-input {
+                font-size: 13px;
               }
             }
 
-            .item-actions {
-              gap: 10px;
-              margin-bottom: 12px;
+            .action-buttons {
+              gap: 16px;
 
               .action-btn {
-                flex: 1;
-                padding: 10px 14px;
-                font-size: 13px;
-                font-weight: 600;
-                min-height: 40px;
-                border-radius: 8px;
-                border: none;
-                cursor: pointer;
-                transition: all 0.2s;
+                padding: 0;
 
-                &.yes-btn {
-                  background: rgba(37, 167, 80, 0.2);
-                  color: #4CAF50;
-
-                  &:hover {
-                    background: #C8E6C9;
-                  }
-
-                  &.active {
-                    background: #4CAF50;
-                    color: #ffffff;
-                  }
-                }
-
-                &.no-btn {
-                  background: rgba(202, 64, 100, 0.2);
-                  color: #E91E63;
-
-                  &:hover {
-                    background: #F8BBD0;
-                  }
-
-                  &.active {
-                    background: #E91E63;
-                    color: #ffffff;
-                  }
+                .icon {
+                  width: 24px;
+                  height: 24px;
                 }
               }
             }
 
-            .item-amount {
-              font-size: 11px;
-              color: var(--text-dark-gray, #999);
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
+            .filter-tags {
+              gap: 6px;
 
-              .icon-sc {
-                width: 16px;
-                height: 16px;
-                cursor: pointer;
-                transition: all 0.2s;
-
-                &:hover {
-                  transform: scale(1.1);
-                }
-
-                &.active {
-                  fill: #CA4064;
-                }
+              .filter-tag {
+                padding: 5px 10px;
+                font-size: 12px;
+                min-height: 30px; // 触摸友好的最小高度
               }
             }
           }
         }
 
-        .right-horizontal-list {
-          gap: 12px;
+        .main-list-section {
+          gap: 10px;
 
-          .horizontal-row {
-            flex-direction: column;
+          .left-vertical-list {
             gap: 12px;
 
             .list-item {
-              flex: 0 0 100%;
-              width: 100%;
               padding: 14px;
               border-radius: 12px;
               background: var(--bg-card, #ffffff);
@@ -1519,86 +1382,82 @@ $no-bg-light: rgba(226, 56, 145, 0.2);
                     font-weight: 500;
                   }
                 }
+
+                .percentage-semicircle {
+                  flex-shrink: 0;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: 4px;
+
+                  .semicircle-chart {
+                    width: 55px;
+                    height: 28px;
+                  }
+
+                  .percentage-label {
+                    font-size: 9px;
+                    color: var(--text-dark-gray, #999);
+                    margin-top: 0;
+                  }
+                }
               }
 
-              .item-options {
+              // 当存在 .item-options 时，.item-header 需要更大的 margin-bottom
+              &:has(.item-options) .item-header {
+                margin-bottom: 33px;
+              }
+
+              .item-actions {
+                gap: 10px;
                 margin-bottom: 12px;
 
-                .option-item {
-                  margin-bottom: 6px;
-                  display: flex;
-                  flex-direction: row;
-                  align-items: center;
-                  justify-content: space-between;
-                  gap: 12px;
+                .action-btn {
+                  flex: 1;
+                  padding: 10px 14px;
+                  font-size: 13px;
+                  font-weight: 600;
+                  min-height: 40px;
+                  border-radius: 8px;
+                  border: none;
+                  cursor: pointer;
+                  transition: all 0.2s;
 
-                  &:last-child {
-                    margin-bottom: 0;
-                  }
+                  &.yes-btn {
+                    background: rgba(37, 167, 80, 0.2);
+                    color: #4CAF50;
 
-                  .option-text {
-                    flex: 1;
-                    font-size: 12px;
-                    color: var(--text-color, #333);
-                    margin-right: auto;
-                    display: flex;
-                    align-items: center;
-
-                    span:first-child {
-                      flex: 1;
+                    &:hover {
+                      background: #C8E6C9;
                     }
 
-                    span:last-child {
-                      display: none; // 移动端隐藏百分比
+                    &.active {
+                      background: #4CAF50;
+                      color: #ffffff;
                     }
                   }
 
-                  .option-buttons {
-                    display: flex;
-                    gap: 8px;
-                    flex-shrink: 0;
+                  &.no-btn {
+                    background: rgba(202, 64, 100, 0.2);
+                    color: #E91E63;
 
-                    .option-btn {
-                      padding: 6px 16px;
-                      font-size: 12px;
-                      font-weight: 600;
-                      min-height: 32px;
-                      border-radius: 6px;
-                      border: none;
-                      cursor: pointer;
-                      transition: all 0.2s;
-                      white-space: nowrap;
+                    &:hover {
+                      background: #F8BBD0;
+                    }
 
-                      &.yes-btn {
-                        background: rgba(37, 167, 80, 0.2);
-                        color: #25A750;
-
-                        &:hover {
-                          background: rgba(37, 167, 80, 0.3);
-                        }
-
-                        &.active {
-                          background: #25A750;
-                          color: #ffffff;
-                        }
-                      }
-
-                      &.no-btn {
-                        background: rgba(202, 64, 100, 0.2);
-                        color: #CA4064;
-
-                        &:hover {
-                          background: rgba(202, 64, 100, 0.3);
-                        }
-
-                        &.active {
-                          background: #CA4064;
-                          color: #ffffff;
-                        }
-                      }
+                    &.active {
+                      background: #E91E63;
+                      color: #ffffff;
                     }
                   }
                 }
+              }
+
+              // 当存在 .item-options 时，.item-actions 的样式需要调整
+              &:has(.item-options) .item-actions .action-btn {
+                padding: 8px 10px;
+                font-size: 12px;
+                min-height: 38px; // 触摸友好的最小高度
               }
 
               .item-amount {
@@ -1607,13 +1466,6 @@ $no-bg-light: rgba(226, 56, 145, 0.2);
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                margin-top: 8px;
-
-                span:first-child {
-                  &::before {
-                    content: '交易额: ';
-                  }
-                }
 
                 .icon-sc {
                   width: 16px;
@@ -1630,131 +1482,219 @@ $no-bg-light: rgba(226, 56, 145, 0.2);
                   }
                 }
               }
+
+              // 当存在 .item-options 时，.item-amount 的样式需要调整
+              &:has(.item-options) .item-amount {
+                font-size: 10px;
+                margin-top: 8px;
+
+                span:first-child {
+                  &::before {
+                    content: '交易额: ';
+                  }
+                }
+
+                .icon-sc {
+                  width: 12px;
+                  height: 12px;
+                }
+              }
+
+              .item-options {
+                margin-bottom: 8px;
+
+                .option-item {
+                  margin-bottom: 8px;
+                  display: flex;
+                  flex-direction: row;
+                  align-items: center;
+                  justify-content: space-between;
+                  gap: 10px;
+
+                  .option-text {
+                    flex: 1;
+                    font-size: 11px;
+                    margin-bottom: 0;
+                    margin-right: auto;
+                    display: flex;
+                    align-items: center;
+
+                    span:first-child {
+                      flex: 1;
+                    }
+
+                    span:last-child {
+                      display: none; // 移动端隐藏百分比
+                    }
+                  }
+
+                  .option-buttons {
+                    display: flex;
+                    gap: 6px;
+                    flex-shrink: 0;
+
+                    .option-btn {
+                      padding: 5px 10px;
+                      font-size: 11px;
+                      min-height: 30px;
+                      border-radius: 6px;
+                      white-space: nowrap;
+                    }
+                  }
+                }
+              }
             }
           }
-        }
 
-        .left-vertical-list {
-          gap: 12px;
+          .right-horizontal-list {
+            gap: 12px;
 
-          .list-item {
-            padding: 14px;
-            border-radius: 12px;
-            background: var(--bg-card, #ffffff);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            .horizontal-row {
+              flex-direction: column;
+              gap: 12px;
 
-            .item-header {
-              margin-bottom: 33px;
-              align-items: center;
-              gap: 10px;
+              .list-item {
+                flex: 0 0 100%;
+                width: 100%;
+                padding: 14px;
+                border-radius: 12px;
+                background: var(--bg-card, #ffffff);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
-              .user-avatar {
-                width: 44px;
-                height: 44px;
-                border-radius: 8px;
-                object-fit: cover;
-                flex-shrink: 0;
-              }
+                .item-header {
+                  margin-bottom: 14px;
+                  align-items: center;
+                  gap: 10px;
 
-              .item-meta {
-                padding-left: 0;
-                flex: 1;
-                min-width: 0;
+                  .user-avatar {
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 8px;
+                    object-fit: cover;
+                    flex-shrink: 0;
+                  }
 
-                .item-title {
-                  font-size: 13px;
-                  line-height: 1.5;
-                  color: var(--text-color, #333);
-                  font-weight: 500;
-                }
-              }
+                  .item-meta {
+                    padding-left: 0;
+                    flex: 1;
+                    min-width: 0;
 
-              .percentage-semicircle {
-                flex-shrink: 0;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 4px;
-
-                .semicircle-chart {
-                  width: 55px;
-                  height: 28px;
+                    .item-title {
+                      font-size: 13px;
+                      line-height: 1.5;
+                      color: var(--text-color, #333);
+                      font-weight: 500;
+                    }
+                  }
                 }
 
-                .percentage-label {
-                  font-size: 9px;
-                  color: var(--text-dark-gray, #999);
-                  margin-top: 0;
+                .item-options {
+                  margin-bottom: 12px;
+
+                  .option-item {
+                    margin-bottom: 6px;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+
+                    &:last-child {
+                      margin-bottom: 0;
+                    }
+
+                    .option-text {
+                      flex: 1;
+                      font-size: 12px;
+                      color: var(--text-color, #333);
+                      margin-right: auto;
+                      display: flex;
+                      align-items: center;
+
+                      span:first-child {
+                        flex: 1;
+                      }
+
+                      span:last-child {
+                        display: none; // 移动端隐藏百分比
+                      }
+                    }
+
+                    .option-buttons {
+                      display: flex;
+                      gap: 8px;
+                      flex-shrink: 0;
+
+                      .option-btn {
+                        padding: 6px 16px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        min-height: 32px;
+                        border-radius: 6px;
+                        border: none;
+                        cursor: pointer;
+                        transition: all 0.2s;
+                        white-space: nowrap;
+
+                        &.yes-btn {
+                          background: rgba(37, 167, 80, 0.2);
+                          color: #25A750;
+
+                          &:hover {
+                            background: rgba(37, 167, 80, 0.3);
+                          }
+
+                          &.active {
+                            background: #25A750;
+                            color: #ffffff;
+                          }
+                        }
+
+                        &.no-btn {
+                          background: rgba(202, 64, 100, 0.2);
+                          color: #CA4064;
+
+                          &:hover {
+                            background: rgba(202, 64, 100, 0.3);
+                          }
+
+                          &.active {
+                            background: #CA4064;
+                            color: #ffffff;
+                          }
+                        }
+                      }
+                    }
+                  }
                 }
-              }
-            }
 
-            .item-actions {
-              gap: 10px;
-              margin-bottom: 12px;
-
-              .action-btn {
-                padding: 8px 10px;
-                font-size: 12px;
-                min-height: 38px; // 触摸友好的最小高度
-              }
-            }
-
-            .item-amount {
-              font-size: 10px;
-              margin-top: 8px;
-
-              span:first-child {
-                &::before {
-                  content: '交易额: ';
-                }
-              }
-
-              .icon-sc {
-                width: 12px;
-                height: 12px;
-              }
-            }
-
-            .item-options {
-              margin-bottom: 8px;
-
-              .option-item {
-                margin-bottom: 8px;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-                gap: 10px;
-
-                .option-text {
-                  flex: 1;
+                .item-amount {
                   font-size: 11px;
-                  margin-bottom: 0;
-                  margin-right: auto;
+                  color: var(--text-dark-gray, #999);
                   display: flex;
                   align-items: center;
+                  justify-content: space-between;
+                  margin-top: 8px;
 
                   span:first-child {
-                    flex: 1;
+                    &::before {
+                      content: '交易额: ';
+                    }
                   }
 
-                  span:last-child {
-                    display: none; // 移动端隐藏百分比
-                  }
-                }
+                  .icon-sc {
+                    width: 16px;
+                    height: 16px;
+                    cursor: pointer;
+                    transition: all 0.2s;
 
-                .option-buttons {
-                  display: flex;
-                  gap: 6px;
-                  flex-shrink: 0;
+                    &:hover {
+                      transform: scale(1.1);
+                    }
 
-                  .option-btn {
-                    padding: 5px 10px;
-                    font-size: 11px;
-                    min-height: 30px;
-                    border-radius: 6px;
-                    white-space: nowrap;
+                    &.active {
+                      fill: #CA4064;
+                    }
                   }
                 }
               }

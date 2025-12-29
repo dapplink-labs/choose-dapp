@@ -1,5 +1,6 @@
 <template>
     <div class="detail-h5-page">
+        <NavBar2 />
         <!-- 主要内容 -->
         <div class="content">
             <!-- 事件标题和基本信息 -->
@@ -48,11 +49,11 @@
 
                 <!-- 时间范围选择器 -->
                 <div class="time-range-selector">
-                    <button v-for="range in timeRanges" :key="range.value" class="time-range-btn"
+                    <div v-for="range in timeRanges" :key="range.value" class="time-range-btn"
                         :class="{ active: selectedTimeRange === range.value }"
                         @click="handleTimeRangeChange(range.value)">
                         {{ range.label }}
-                    </button>
+                    </div>
                 </div>
 
                 <!-- 图表图例 -->
@@ -231,6 +232,7 @@ import { useI18n } from 'vue-i18n'
 import { Trophy, Clock } from '@element-plus/icons-vue'
 import LineChartDetail from '@/components/LineChartDetail.vue'
 import Payment from '@/components/Payment.vue'
+import NavBar2 from '@/components/NavBar2.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -305,7 +307,6 @@ const outcomes = ref([
         selected: null
     }
 ])
-
 
 // 规则相关
 const rulesText = ref('The FED interest rates are defined in this market by the upper bound of the target federal funds range. The decisions on the target')
@@ -634,8 +635,6 @@ const closePayment = () => {
     selectedOutcomeType.value = null
 }
 
-
-
 const formatNumber = (num) => {
     if (num >= 1000000) {
         return (num / 1000000).toFixed(2) + 'M'
@@ -650,8 +649,8 @@ const formatNumber = (num) => {
 <style scoped lang="scss">
 .detail-h5-page {
     min-height: 100vh;
-    background-color: var(--bg-page, #FFFFFF);
-    padding-top: 16px;
+    background-color: var(--bg-page-h5, #FFFFFF);
+    padding-top: 52px;
     padding-bottom: 24px;
     transition: background-color 0.3s ease;
 }
@@ -795,10 +794,7 @@ const formatNumber = (num) => {
             border-radius: 16px;
             color: var(--text-dark-gray, #999999);
             font-size: 12px;
-            cursor: pointer;
-            white-space: nowrap;
             transition: all 0.3s ease;
-            background: var(--bg-page, #000000);
 
             &.active {
                 color: var(--text-color, #000000);
@@ -931,7 +927,7 @@ const formatNumber = (num) => {
 
                 .outcome-btn {
                     flex: 1;
-                    padding: 8px 12px;
+                    padding: 10px 26px;
                     border: none;
                     border-radius: 6px;
                     font-size: 12px;
@@ -941,13 +937,13 @@ const formatNumber = (num) => {
                     white-space: nowrap;
 
                     &.yes-btn {
-                        background: #1a5d2e;
-                        color: #4ade80;
+                        background: rgba(188, 255, 51, 0.2);
+                        color: var(--text-color-y, #2EBE69);
                     }
 
                     &.no-btn {
-                        background: #7c2d5f;
-                        color: #f472b6;
+                        background: rgba(226, 56, 145, 0.2);
+                        color: var(--text-color-n, #E44096);
                     }
                 }
             }
@@ -1071,7 +1067,7 @@ const formatNumber = (num) => {
 
                         &.tag-green {
                             background-color: rgba(187, 255, 46, 0.2);
-                            color: var(--text-color-p, #BBFF2E);
+                            color: var(--text-color-y, #BBFF2E);
                         }
 
                         &.tag-pink {
@@ -1234,7 +1230,7 @@ const formatNumber = (num) => {
                         font-weight: 600;
 
                         &.bps-green {
-                            color: var(--text-color-p, #BBFF2E);
+                            color: var(--text-color-y, #BBFF2E);
                         }
 
                         &.bps-pink {
@@ -1262,49 +1258,50 @@ const formatNumber = (num) => {
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    z-index: 9999;
+    z-index: 1001;
     display: flex;
     align-items: flex-end;
     justify-content: center;
-}
 
-.payment-modal {
-    width: 100%;
-    max-height: 70vh;
-    background-color: var(--bg-page, #000000);
-    border-radius: 20px 20px 0 0;
-    overflow-y: auto;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-}
+    .payment-modal {
+        width: 100%;
+        max-height: 80vh;
+        background-color: var(--bg-page, #000000);
+        border-radius: 20px 20px 0 0;
+        overflow-y: auto;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        position: relative;
+        display: flex;
+        z-index: 1002;
+        flex-direction: column;
+    }
 
-.payment-header {
-    width: 100%;
-    height: 20px;
-    position: sticky;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 9999;
-    background-color: var(--bg-page, #000000);
-    flex-shrink: 0;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    .payment-header {
+        width: 100%;
+        height: 20px;
+        position: sticky;
+        top: -1px;
+        left: 0;
+        right: 0;
+        background-color: var(--bg-page, #000000);
+        flex-shrink: 0;
+        padding-top: 10px;
+        padding-bottom: 10px;
 
-    &::before {
-        content: '';
-        position: absolute;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 30px;
-        height: 3px;
-        background: #383838;
-        border-radius: 2px;
+        &::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 3px;
+            background: #383838;
+            border-radius: 2px;
+        }
     }
 }
+
 
 
 // 弹窗动画

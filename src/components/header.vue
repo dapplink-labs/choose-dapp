@@ -1,12 +1,12 @@
 <template>
-  <div class="multimarket-header">
+  <div class="ChooseMe-header">
 
     <!-- PC端 -->
     <div class="header-container">
 
       <div class="logo-section">
         <div class="logo" @click="handleLogoClick">
-          <img src="@/assets/logo-Dark.png" alt="multimarket" class="logo-img" />
+          <img src="@/assets/logo-Dark.png" alt="ChooseMe" class="logo-img" />
         </div>
       </div>
 
@@ -16,7 +16,7 @@
           <el-icon class="search-icon">
             <Search />
           </el-icon>
-          <input type="text" class="search-input" :placeholder="$t('header.searchPlaceholder') || '搜索multimarket'"
+          <input type="text" class="search-input" :placeholder="$t('header.searchPlaceholder') || '搜索ChooseMe'"
             v-model="searchValue" @keyup.enter="handleSearch" />
         </div>
       </div>
@@ -74,7 +74,7 @@
     <div class="header-h5">
       <div class="h5-logo-section">
         <div class="logo" @click="handleLogoClick">
-          <img :src="logoUrl" alt="multimarket" class="logo-img" />
+          <img :src="logoUrl" alt="ChooseMe" class="logo-img" />
         </div>
       </div>
 
@@ -83,15 +83,16 @@
         <el-dropdown class="h5-language-dropdown" @command="handleLanguageChange" trigger="click">
           <button class="h5-language-toggle-btn" :title="$t('navbar.language.en') || 'Language'">
             <!-- <img :src="isDark ? languageIcon : languageIconDark" alt="language" class="language-icon" /> -->
-            <svg t="1766829818391" class="h5-language-toggle-btn" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
-              p-id="1552" width="32" height="32">
+            <svg t="1766829818391" class="h5-language-toggle-btn" viewBox="0 0 1024 1024" version="1.1"
+              xmlns="http://www.w3.org/2000/svg" p-id="1552" width="32" height="32">
               <path
                 d="M512 42.666667c259.2 0 469.333333 210.133333 469.333333 469.333333s-210.133333 469.333333-469.333333 469.333333S42.666667 771.2 42.666667 512 252.8 42.666667 512 42.666667z m0 85.333333a384 384 0 1 0 0 768 384 384 0 0 0 0-768z"
                 :fill="isDark ? '#FFFFFF' : '#515151'" p-id="1553"></path>
               <path
                 d="M512 42.666667c142.208 140.074667 213.333333 296.533333 213.333333 469.333333s-71.125333 329.258667-213.333333 469.333333c-142.208-140.074667-213.333333-296.533333-213.333333-469.333333s71.125333-329.258667 213.333333-469.333333z m0 126.464l-10.325333 13.056C422.570667 284.544 384 393.813333 384 512s38.570667 227.456 117.674667 329.813333l10.325333 13.013334 10.325333-13.013334c75.648-97.92 114.261333-202.197333 117.461334-314.453333L640 512c0-118.144-38.570667-227.456-117.674667-329.813333L512 169.130667z"
                 :fill="isDark ? '#FFFFFF' : '#515151'" p-id="1554"></path>
-              <path d="M85.333333 469.333333h853.333334v85.333334H85.333333z" :fill="isDark ? '#FFFFFF' : '#515151'" p-id="1555"></path>
+              <path d="M85.333333 469.333333h853.333334v85.333334H85.333333z" :fill="isDark ? '#FFFFFF' : '#515151'"
+                p-id="1555"></path>
             </svg>
           </button>
           <template #dropdown>
@@ -293,6 +294,8 @@ const toggleTheme = () => {
 const handleLanguageChange = (command) => {
   locale.value = command
   document.documentElement.setAttribute("data-lang", locale.value)
+  // 保存语言选择到 localStorage
+  localStorage.setItem('app-locale', command)
 }
 
 // 短地址显示
@@ -396,7 +399,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
-.multimarket-header {
+.ChooseMe-header {
   position: fixed;
   top: 0;
   left: 0;
@@ -455,7 +458,7 @@ onBeforeUnmount(() => {
     .h5-user-section {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 15px;
       flex-shrink: 0;
 
       .h5-language-dropdown {
@@ -510,25 +513,6 @@ onBeforeUnmount(() => {
           &.icon-dark {
             color: #FFFFFF;
           }
-        }
-      }
-
-      .h5-connect-wallet-btn {
-        height: 32px;
-        padding: 0 12px;
-        border: none;
-        background: #C1272E;
-        color: #ffffff;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        white-space: nowrap;
-        line-height: 1;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.08);
         }
       }
 
@@ -931,109 +915,11 @@ onBeforeUnmount(() => {
   }
 }
 
-// 弹窗移动端适配
-@media (max-width: 768px) {
-  .popup {
-    .content1 {
-      width: 85%;
-      padding: 20px;
-
-      h4 {
-        font-size: 18px;
-        margin-bottom: 20px;
-      }
-
-      :deep(.el-icon) {
-        right: 16px;
-        top: 16px;
-        font-size: 18px;
-      }
-
-      .headerlogo {
-        img {
-          max-width: 160px;
-          margin-bottom: 12px;
-        }
-      }
-
-      .scroll-area {
-        padding: 0 12px;
-        max-height: 300px;
-
-        li {
-          height: 56px;
-          padding: 0 12px;
-          margin-bottom: 8px;
-
-          img {
-            width: 28px;
-          }
-
-          span {
-            font-size: 14px;
-          }
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .multimarket-header {
-    background-color: var(--bg-page-h5, #fff);
-  }
-
-  .popup {
-    .content1 {
-      width: 90%;
-      padding: 16px;
-      border-radius: 12px;
-
-      h4 {
-        font-size: 16px;
-        margin-bottom: 16px;
-      }
-
-      :deep(.el-icon) {
-        right: 12px;
-        top: 12px;
-        font-size: 16px;
-      }
-
-      .headerlogo {
-        img {
-          max-width: 140px;
-          margin-bottom: 10px;
-        }
-      }
-
-      .scroll-area {
-        padding: 0 8px;
-        max-height: 280px;
-
-        li {
-          height: 52px;
-          padding: 0 10px;
-          margin-bottom: 6px;
-          border-radius: 12px;
-
-          img {
-            width: 24px;
-          }
-
-          span {
-            font-size: 13px;
-          }
-        }
-      }
-    }
-  }
-}
 
 
 // 响应式设计
 @media (max-width: 1280px) {
-  .multimarket-header {
+  .ChooseMe-header {
     padding: 0 4%;
 
     .header-container {
@@ -1047,7 +933,7 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width: 1024px) {
-  .multimarket-header {
+  .ChooseMe-header {
     padding: 0 3%;
 
     .header-container {
@@ -1111,10 +997,12 @@ onBeforeUnmount(() => {
   }
 }
 
-@media (max-width: 768px) {
-  .multimarket-header {
-    padding: 0 16px;
-    height: 56px;
+// 480px 及以下屏幕的样式（合并了 768px 的样式）
+@media (max-width: 480px) {
+  .ChooseMe-header {
+    padding: 0 10px;
+    height: 52px;
+    background-color: var(--bg-page-h5, #fff);
 
     // PC端头部在移动端隐藏
     .header-container {
@@ -1124,143 +1012,6 @@ onBeforeUnmount(() => {
     // 移动端头部显示
     .header-h5 {
       display: flex;
-
-      .h5-logo-section {
-        .logo {
-          .logo-img {
-            height: 28px;
-          }
-        }
-      }
-
-      .h5-user-section {
-        gap: 8px;
-
-        .h5-language-dropdown {
-          .h5-language-toggle-btn {
-            width: 32px;
-            height: 32px;
-            min-width: 32px;
-
-            .language-icon {
-              width: 15px;
-              height: 15px;
-            }
-          }
-        }
-
-        .h5-theme-toggle-btn {
-          width: 32px;
-          height: 32px;
-          min-width: 32px;
-
-          .theme-icon {
-            font-size: 15px;
-          }
-        }
-
-        .h5-connect-wallet-btn {
-          height: 32px;
-          padding: 0 12px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          border: 1px solid #C1272E !important;
-          background: #C1272E !important;
-          color: #ffffff !important;
-          font-size: 12px;
-          min-width: 70px;
-          opacity: 1;
-          visibility: visible;
-        }
-
-        .h5-user-avatar {
-          img {
-            width: 30px;
-            height: 30px;
-          }
-        }
-      }
-    }
-
-    .user-menu {
-      right: 16px;
-      min-width: 140px;
-
-      .menu-item {
-        padding: 10px 14px;
-        font-size: 13px;
-      }
-    }
-  }
-}
-
-@media (max-width: 640px) {
-  .multimarket-header {
-    padding: 0 12px;
-    height: 56px;
-
-    .header-h5 {
-      gap: 8px;
-
-      .h5-logo-section {
-        .logo {
-          .logo-img {
-            height: 24px;
-          }
-        }
-      }
-
-      .h5-user-section {
-        gap: 6px;
-
-        .h5-language-dropdown {
-          .h5-language-toggle-btn {
-            width: 30px;
-            height: 30px;
-
-            .language-icon {
-              width: 14px;
-              height: 14px;
-            }
-          }
-        }
-
-        .h5-theme-toggle-btn {
-          width: 30px;
-          height: 30px;
-
-          .theme-icon {
-            font-size: 14px;
-          }
-        }
-
-        .h5-connect-wallet-btn {
-          padding: 0 10px;
-          font-size: 11px;
-          min-width: 60px;
-          border: 1px solid #C1272E !important;
-          background: #C1272E !important;
-          color: #ffffff !important;
-        }
-
-        .h5-user-avatar {
-          img {
-            width: 28px;
-            height: 28px;
-          }
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .multimarket-header {
-    padding: 0 10px;
-    height: 52px;
-
-    .header-h5 {
       gap: 6px;
 
       .h5-logo-section {
@@ -1272,13 +1023,14 @@ onBeforeUnmount(() => {
       }
 
       .h5-user-section {
-        gap: 4px;
+        gap: 15px;
 
         .h5-language-dropdown {
           .h5-language-toggle-btn {
             width: 20px;
             height: 22px;
             border: none;
+            min-width: 20px;
 
             .language-icon {
               width: 100%;
@@ -1291,6 +1043,7 @@ onBeforeUnmount(() => {
           width: 20px;
           height: 20px;
           border: none;
+          min-width: 20px;
 
           .theme-icon {
             font-size: 20px;
@@ -1300,8 +1053,17 @@ onBeforeUnmount(() => {
         .h5-connect-wallet-btn {
           height: 30px;
           padding: 0 8px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: none;
+          border-radius: 8px;
+          background: var(--bg-opposite, #000000);
+          color: var(--bg-page-h5, #ffffff);
           font-size: 11px;
           min-width: 55px;
+          opacity: 1;
+          visibility: visible;
         }
 
         .h5-user-avatar {
@@ -1320,6 +1082,53 @@ onBeforeUnmount(() => {
       .menu-item {
         padding: 8px 12px;
         font-size: 12px;
+      }
+    }
+  }
+
+  // 弹窗样式
+  .popup {
+    .content1 {
+      width: 90%;
+      padding: 16px;
+      border-radius: 12px;
+
+      h4 {
+        font-size: 16px;
+        margin-bottom: 16px;
+      }
+
+      :deep(.el-icon) {
+        right: 12px;
+        top: 12px;
+        font-size: 16px;
+      }
+
+      .headerlogo {
+        img {
+          max-width: 140px;
+          margin-bottom: 10px;
+        }
+      }
+
+      .scroll-area {
+        padding: 0 8px;
+        max-height: 280px;
+
+        li {
+          height: 52px;
+          padding: 0 10px;
+          margin-bottom: 6px;
+          border-radius: 12px;
+
+          img {
+            width: 24px;
+          }
+
+          span {
+            font-size: 13px;
+          }
+        }
       }
     }
   }

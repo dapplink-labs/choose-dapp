@@ -2,7 +2,7 @@
   <div class="line-chart-accuracy">
     <div class="chart-header">
       <h2 class="chart-title">分辨率之前的准确性</h2>
-      <p class="chart-description">Multimarket 的预测结果与所有概率范围内的实际结果都非常吻合</p>
+      <p class="chart-description">ChooseMe 的预测结果与所有概率范围内的实际结果都非常吻合</p>
     </div>
     <div class="chart-container">
       <canvas ref="chartCanvas" class="chart-canvas"></canvas>

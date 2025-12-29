@@ -306,7 +306,7 @@ export default {
     sure: "确定"
   },
   header: {
-    searchPlaceholder: "搜索multimarket",
+    searchPlaceholder: "搜索ChooseMe",
     portfolio: "投资组合",
     cash: "现金",
     deposit: "存入",
@@ -326,7 +326,7 @@ export default {
     }
   },
   home: {
-    welcome: "欢迎来到 Multimarket",
+    welcome: "欢迎来到 ChooseMe",
     description: "探索最新的市场趋势、新闻和资讯",
     comingSoon: "预测功能即将上线",
     comingSoonAlt: "暂不开放",
@@ -397,7 +397,7 @@ export default {
     title: "个人设置",
     email: "邮箱",
     emailPlaceholder: "请输入邮箱地址",
-    emailHelper: "用来接收multimarket重要更新信息",
+    emailHelper: "用来接收ChooseMe重要更新信息",
     username: "用户名",
     usernamePlaceholder: "请输入用户名",
     twitter: "Twitter",
@@ -416,12 +416,12 @@ export default {
     },
     subscription: {
       title: "获取每日更新",
-      description: "我们会每天向您发送电子邮件,告知您 multimarket 的最新动态。",
+      description: "我们会每天向您发送电子邮件,告知您 ChooseMe 的最新动态。",
       emailPlaceholder: "请输入您的电子邮箱地址",
       submit: "获取更新"
     },
     live: {
-      title: "Live on Multimarket",
+      title: "Live on ChooseMe",
       followBtn: "follow on X",
       breakingNews: "突发新闻",
       viewAll: "查看全部"
@@ -514,7 +514,7 @@ export default {
   accuracy: {
     overallAccuracy: "总体准确率",
     expectedVsActual: "预期值与实际值",
-    title: "Multimarket 的准确性如何?",
+    title: "ChooseMe 的准确性如何?",
     accuracy4Hours: "4小时准确率",
     accuracy1Month: "1个月的准确率",
     brierScore: "布里尔评分",
@@ -687,6 +687,14 @@ export default {
     title: "节点购买记录",
     informationNode: "信息节点",
     price: "价格"
+  },
+  purchaseNode: {
+    estimatedTradeProfit: "预计买卖交易收益约：",
+    subCoinFeeProfit: "子币手续费收益约：",
+    secondaryProfit: "二级盈利收益约：",
+    tipText: "* 总收益≥3倍触发claim",
+    buyBtn: "去购买",
+    walletBalance: "钱包余额："
   },
   tabNode: {
     purchaseTime: "购买时间"
