@@ -35,7 +35,7 @@
       </div>
 
       <div class="actions">
-        <button class="save-btn">{{ $t('settings.save') }}</button>
+        <button class="save-btn">{{ $t('settings.saveText') }}</button>
       </div>
     </div>
   </div>

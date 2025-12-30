@@ -80,7 +80,7 @@
         </div>
 
         <!-- Continue Button -->
-        <button class="continue-btn" @click="handleContinue">{{ t('payment.continue') }}</button>
+        <button class="continue-btn" @click="handleContinue">{{ t('common.continue') }}</button>
     </div>
 </template>
 

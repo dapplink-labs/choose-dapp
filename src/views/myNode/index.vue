@@ -42,27 +42,27 @@
             <h3>{{ $t('myNode.pendingIncome') }}</h3>
             <div class="pending-income-grid">
                 <div class="income-item">
-                    <div class="income-label">{{ $t('myNode.nodeIncome') }}(CHO)</div>
+                    <div class="income-label">{{ $t('myNode.nodeIncome') }}</div>
                     <div class="income-value">200,000</div>
                 </div>
                 <div class="income-item">
-                    <div class="income-label">{{ $t('myNode.networkFeeIncome') }}(CHO)</div>
+                    <div class="income-label">{{ $t('myNode.networkFeeIncome') }}</div>
                     <div class="income-value">180,000</div>
                 </div>
                 <div class="income-item">
-                    <div class="income-label">{{ $t('myNode.subCoinFeeIncome') }}(CHO)</div>
+                    <div class="income-label">{{ $t('myNode.subCoinFeeIncome') }}</div>
                     <div class="income-value">1,200,000</div>
                 </div>
                 <div class="income-item">
-                    <div class="income-label">{{ $t('myNode.secondaryMarketIncome') }}(CHO)</div>
+                    <div class="income-label">{{ $t('myNode.secondaryMarketIncome') }}</div>
                     <div class="income-value">12,000</div>
                 </div>
                 <div class="income-item">
-                    <div class="income-label">{{ $t('myNode.directReferralIncome') }}(CHO)</div>
+                    <div class="income-label">{{ $t('myNode.directReferralIncome') }}</div>
                     <div class="income-value">1,200,000</div>
                 </div>
                 <div class="income-item">
-                    <div class="income-label">{{ $t('myNode.networkIncome') }}(CHO)</div>
+                    <div class="income-label">{{ $t('myNode.networkIncome') }}</div>
                     <div class="income-value">12,000</div>
                 </div>
             </div>
@@ -375,10 +375,9 @@ onMounted(() => {
                 .income-label {
                     font-family: PingFang SC, PingFang SC;
                     font-weight: 400;
-                    font-size: 13px;
+                    font-size: 11px;
                     color: #999999;
                     margin-bottom: 6px;
-                    min-height: 33px;
                 }
 
                 .income-value {

@@ -18,12 +18,15 @@
                     <img src="@/assets/language.png" alt="" style="height: 20px" />
                   </template>
 
-                  <el-menu-item index="6-3">{{
-                    $t("navbar.language.en")
-                  }}</el-menu-item>
-                  <el-menu-item index="6-1">{{
-                    $t("navbar.language.cn")
-                  }}</el-menu-item>
+                  <el-menu-item index="6-3">
+                    {{ $t("navbar.language.en") }}
+                  </el-menu-item>
+                  <el-menu-item index="6-1">
+                    {{ $t("navbar.language.cn") }}
+                  </el-menu-item>
+                  <el-menu-item index="6-4">
+                    {{ $t("navbar.language.Korean") }}
+                  </el-menu-item>
                 </el-sub-menu>
                 <!--  @click="showConnet = true" -->
                 <button class="conentc-btn" v-if="status != 'connected'" @click="islogin()">
@@ -36,18 +39,28 @@
             </div>
 
             <div class="menu1">
-              <el-menu :default-active="activeIndex" class="el-menu-demo2" ref="menuRef" mode="horizontal"
-                @select="handleSelect" style="background: transparent" :ellipsis="false">
+              <el-menu
+                :default-active="activeIndex"
+                class="el-menu-demo2"
+                ref="menuRef"
+                mode="horizontal"
+                @select="handleSelect"
+                style="background: transparent"
+                :ellipsis="false"
+              >
                 <el-sub-menu index="6">
                   <template #title>
                     <img src="@/assets/language.png" alt="" style="width: 20px" />
                   </template>
-                  <el-menu-item index="6-3">{{
-                    $t("navbar.language.en")
-                  }}</el-menu-item>
-                  <el-menu-item index="6-1">{{
-                    $t("navbar.language.cn")
-                  }}</el-menu-item>
+                  <el-menu-item index="6-3">
+                    {{ $t("navbar.language.en") }}
+                  </el-menu-item>
+                  <el-menu-item index="6-1">
+                    {{ $t("navbar.language.cn") }}
+                  </el-menu-item>
+                  <el-menu-item index="6-4">
+                    {{ $t("navbar.language.Korean") }}
+                  </el-menu-item>
                 </el-sub-menu>
               </el-menu>
               <button v-if="status != 'connected'" @click="islogin()">
@@ -550,23 +563,36 @@ const handleSelect = (index, indexPath) => {
   console.log(index, indexPath);
   activeIndex.value = index;
   if (index == "6-3") {
-    locale.value = "en-us"; // 切换为英文
+    locale.value = "en-us"; // 英文
     document.documentElement.setAttribute("data-lang", locale.value);
-    // 保存语言选择到 localStorage
-    localStorage.setItem('app-locale', locale.value);
+    localStorage.setItem("app-locale", locale.value);
     setTimeout(() => {
       menuRef.value && menuRef.value.close && menuRef.value.close("6");
     }, 100);
+    return;
   }
+
   if (index == "6-1") {
-    locale.value = "zh-cn"; // 切换为中文
+    locale.value = "zh-cn"; // 中文
     document.documentElement.setAttribute("data-lang", locale.value);
-    // 保存语言选择到 localStorage
-    localStorage.setItem('app-locale', locale.value);
+    localStorage.setItem("app-locale", locale.value);
     setTimeout(() => {
       menuRef.value && menuRef.value.close && menuRef.value.close("6");
     }, 100);
-  } else if (index != "6-1" && index != "6-3") {
+    return;
+  }
+
+  if (index == "6-4") {
+    locale.value = "ko-kr"; // 韩语
+    document.documentElement.setAttribute("data-lang", locale.value);
+    localStorage.setItem("app-locale", locale.value);
+    setTimeout(() => {
+      menuRef.value && menuRef.value.close && menuRef.value.close("6");
+    }, 100);
+    return;
+  }
+
+  if (index != "6-1" && index != "6-3" && index != "6-4") {
     const obj = menuList.value.find((item) => item.index === indexPath[0]);
     if (obj && obj.itemList) {
       const item = obj.itemList.find((item) => item.index === indexPath[1]);

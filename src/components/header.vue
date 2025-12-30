@@ -30,8 +30,15 @@
           </button>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="zh-cn">{{ $t('navbar.language.cn') || '中文' }}</el-dropdown-item>
-              <el-dropdown-item command="en-us">{{ $t('navbar.language.en') || 'English' }}</el-dropdown-item>
+              <el-dropdown-item command="zh-cn">
+                {{ $t('navbar.language.cn') || '中文' }}
+              </el-dropdown-item>
+              <el-dropdown-item command="en-us">
+                {{ $t('navbar.language.en') || 'English' }}
+              </el-dropdown-item>
+              <el-dropdown-item command="ko-kr">
+                {{ $t('navbar.language.Korean') || '한국어' }}
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -97,8 +104,15 @@
           </button>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="zh-cn">{{ $t('navbar.language.cn') || '中文' }}</el-dropdown-item>
-              <el-dropdown-item command="en-us">{{ $t('navbar.language.en') || 'English' }}</el-dropdown-item>
+              <el-dropdown-item command="zh-cn">
+                {{ $t('navbar.language.cn') || '中文' }}
+              </el-dropdown-item>
+              <el-dropdown-item command="en-us">
+                {{ $t('navbar.language.en') || 'English' }}
+              </el-dropdown-item>
+              <el-dropdown-item command="ko-kr">
+                {{ $t('navbar.language.Korean') || '한국어' }}
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -150,7 +164,7 @@
           {{ $t('header.profile') || '个人资料' }}
         </div> -->
         <div class="menu-item" @click="handleSettings">
-          {{ $t('header.settings') || '个人设置' }}
+          {{ $t('header.settingsTitle') || '个人设置' }}
         </div>
         <div class="menu-item" @click="handleLogout">
           {{ $t('header.logout') || '退出登录' }}
@@ -1083,8 +1097,8 @@ onBeforeUnmount(() => {
         padding: 8px 12px;
         font-size: 12px;
       }
+      }
     }
-  }
 
   // 弹窗样式
   .popup {
@@ -1096,7 +1110,7 @@ onBeforeUnmount(() => {
       h4 {
         font-size: 16px;
         margin-bottom: 16px;
-      }
+          }
 
       :deep(.el-icon) {
         right: 12px;
@@ -1108,11 +1122,11 @@ onBeforeUnmount(() => {
         img {
           max-width: 140px;
           margin-bottom: 10px;
-        }
-      }
+            }
+          }
 
       .scroll-area {
-        padding: 0 8px;
+            padding: 0 8px;
         max-height: 280px;
 
         li {
@@ -1121,7 +1135,7 @@ onBeforeUnmount(() => {
           margin-bottom: 6px;
           border-radius: 12px;
 
-          img {
+            img {
             width: 24px;
           }
 

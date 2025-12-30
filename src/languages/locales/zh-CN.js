@@ -4,6 +4,16 @@ export default {
     titel: "链接钱包",
     exit: "断开链接"
   },
+  bindEmail: {
+    title: "绑定邮箱",
+    placeholder: "请输入邮箱地址",
+    sendCode: "发送验证码"
+  },
+  invite: {
+    title: "欢迎来到CHOOSEME",
+    placeholder: "请输入邀请码",
+    tip: "* 填写邀请码有机会可以获得更多收益奖励"
+  },
   bridge: {
     placeholderAmount: "至少 0.1",
     transferTime: "3~10分钟",
@@ -41,35 +51,24 @@ export default {
     waitingForConfirmation: "等待确认",
     record: {
       title: "跨链记录",
-      name1: "时间",
       coin: "代币",
       send: "发出方",
-      total: "金额",
       receive: "接收方",
       sourcehash: "源链哈希",
       tosourcehash: "目标链哈希",
       fee: "手续费",
       state: {
         name: "状态",
-        error: "失败",
-        success: "成功",
-        opt: "操作",
-        ped: "待办"
+        opt: "操作"
       },
       opt: "查看"
-
     },
-    search: "搜索",
     sureTitle: "确认信息",
-    from: "从",
-    to: "到",
     Crosschain: "跨链",
     get: "获得",
     cross: "通过",
     crossName: "原生跨链",
-    time: "转账时间",
-    fee: "费用",
-    continues: "继续"
+    time: "转账时间"
   },
   notice: {
     title: "功能开发中",
@@ -128,7 +127,7 @@ export default {
       }
     },
     language: {
-      cn: "中文",
+      cn: "简体中文",
       chFan: "繁体",
       en: "英文",
       Vietnamese: "越南语",
@@ -273,7 +272,38 @@ export default {
   },
 
   common: {
+    // 按钮和操作
+    skip: "跳过",
+    confirm: "确定",
+    continue: "继续",
+    search: "搜索",
     more: "查看更多",
+    viewMore: "查看更多",
+    viewAll: "查看全部",
+    buy: "购买",
+    sell: "出售",
+    close: "关闭",
+    save: "保存",
+    // 状态和标签
+    userAvatar: "用户头像",
+    settings: "设置",
+    balance: "余额",
+    price: "价格",
+    time: "时间",
+    amount: "金额",
+    all: "全部",
+    success: "成功",
+    failed: "失败",
+    error: "失败",
+    pending: "待办",
+    processing: "处理中...",
+    // 其他常用词
+    title: "标题",
+    type: "类型",
+    status: "状态",
+    total: "总计",
+    from: "从",
+    to: "到"
   },
   leftMenus: {
     "/": "首页",
@@ -290,9 +320,6 @@ export default {
   },
   swap: {
     title: "随时随地，轻松兑换",
-    sell: "出售",
-    buy: "购买",
-    balance: "余额",
     rateWarn: "滑点后最小可得",
     rate: "当前汇率",
     nofund: "余额不足",
@@ -302,8 +329,7 @@ export default {
     basicons: "常用币种",
     searchicons: "搜索币种",
     doswaps: "兑换",
-    prohibitReasons: "输入金额过大，超过池子可兑换额度",
-    sure: "确定"
+    prohibitReasons: "输入金额过大，超过池子可兑换额度"
   },
   header: {
     searchPlaceholder: "搜索ChooseMe",
@@ -311,30 +337,32 @@ export default {
     cash: "现金",
     deposit: "存入",
     profile: "个人资料",
-    settings: "个人设置",
+    settingsTitle: "个人设置",
     logout: "退出登录"
   },
   navbar2: {
     nav: {
       trends: "趋势",
-      breaking: "突发",
-      news: "新闻",
-      politics: "政治",
+      breaking: "热点",
+      news: "最新",
+      esports: "电子竞技",
       sports: "体育",
-      finance: "金融",
-      crypto: "加密货币"
+      finance: "经济",
+      crypto: "加密货币",
+      company: "公司",
+      popularCulture: "流行文化",
+      technology: "技术",
+      ai: "人工智能"
     }
   },
   home: {
     welcome: "欢迎来到 ChooseMe",
     description: "探索最新的市场趋势、新闻和资讯",
-    comingSoon: "预测功能即将上线",
+    comingSoon: "预测市场即将开放",
     comingSoonAlt: "暂不开放",
     searchPlaceholder: "搜索",
-    userAvatar: "用户头像",
     opportunity: "机会",
     filterTags: {
-      all: "全部",
       premium: "王牌",
       ukraine: "乌克兰",
       afghanistan: "爱泼斯坦",
@@ -345,19 +373,14 @@ export default {
   },
   footerNav: {
     home: "首页",
-    search: "搜索",
-    breaking: "突发",
-    more: "更多"
+    breaking: "突发"
   },
   userInfo: {
-    close: "关闭",
-    userAvatar: "用户头像",
-    settings: "设置",
-    disconnect: "断开链接",
+    disconnect: "断开钱包",
     ecosystem: "生态系统",
     others: "其他",
-    nodeStaking: "节点质押",
-    stakingPool: "质押池",
+    chooseMe: "ChooseMe",
+    stakingPool: "算力池",
     lpVault: "LP 金库",
     onChainData: "链上数据",
     predictionMarket: "预测市场",
@@ -369,16 +392,16 @@ export default {
     developerContributions: "开发者贡献",
     tokenomics: "代币经济",
     launchpad: "启动平台",
-    smartMoney: "聪明资金",
+    smartMoney: "聪明钱",
     bugBounty: "漏洞赏金",
     github: "GitHub",
     technicalSupport: "技术支持",
     support: "支持",
-    officialVerification: "官方认证",
+    officialVerification: "官方验证",
     productFeedback: "产品反馈",
-    apiManagement: "API 管理",
-    helpCenter: "帮助中心",
-    customerSupport: "客服支持",
+    apiManagement: "API 文档",
+    helpCenter: "使用文档",
+    customerSupport: "客服服务",
     selfService: "自助服务",
     disconnectWallet: "断开钱包",
     dashboard: "数据看板",
@@ -386,12 +409,11 @@ export default {
     fundManagement: "资金管理",
     reward: "奖励",
     accuracy: "准确度",
-    leaderboard: "领先看板",
+    leaderboard: "排行榜",
     terms: "使用条款",
     doc: "文档",
     walletAddressCopied: "钱包地址已复制到剪贴板",
-    copyFailed: "复制失败，请手动复制",
-    disconnectWallet: "断开钱包"
+    copyFailed: "复制失败，请手动复制"
   },
   settings: {
     title: "个人设置",
@@ -400,16 +422,15 @@ export default {
     emailHelper: "用来接收ChooseMe重要更新信息",
     username: "用户名",
     usernamePlaceholder: "请输入用户名",
-    twitter: "Twitter",
-    bindTwitter: "去绑定",
-    save: "保存编辑"
+    twitter: "推特",
+    bindTwitter: "绑定",
+    saveText: "保存"
   },
   breaking: {
     ad: "广告",
     avatar: "头像",
     chartAd: "图表广告",
     tabs: {
-      all: "全部",
       politics: "政治",
       crypto: "加密货币",
       finance: "金融"
@@ -423,8 +444,7 @@ export default {
     live: {
       title: "Live on ChooseMe",
       followBtn: "follow on X",
-      breakingNews: "突发新闻",
-      viewAll: "查看全部"
+      breakingNews: "突发新闻"
     }
   },
   detail: {
@@ -434,17 +454,12 @@ export default {
     orderBook: "订单簿",
     graph: "图形",
     volume: "交易量",
-    price: "价格",
     shares: "股",
-    all: "全部",
     last: "最后",
     spread: "价差",
     rules: "规则",
-    viewMore: "查看更多",
-    buy: "买入",
-    sell: "卖出",
-    amount: "金额",
-    balance: "余额",
+    buyText: "买入",
+    sellText: "卖出",
     winningAmount: "赢取金额",
     averagePrice: "平均价格",
     maximumLeverage: "最大杠杆",
@@ -464,8 +479,7 @@ export default {
     timeRanges: {
       "1D": "1天",
       "1W": "1周",
-      "1M": "1个月",
-      "ALL": "全部"
+      "1M": "1个月"
     }
   },
   payment: {
@@ -479,11 +493,9 @@ export default {
     cashUsedLabel: "已用现金",
     projectedPnl: "预估盈亏（ROI）",
     tradedProbability: "你的成交概率",
-    marketImpact: "市场冲击",
-    continue: "继续"
+    marketImpact: "市场冲击"
   },
   earnings: {
-    userAvatar: "用户头像",
     totalWinnings: "中奖总金额",
     maxWinning: "最大奖金额",
     predictionEvents: "预测事件",
@@ -508,7 +520,6 @@ export default {
     searchByName: "按名称搜索",
     profitLoss: "利润/亏损",
     quantity: "数量",
-    userAvatar: "用户头像",
     thisMonthBiggestWin: "本月最大胜利"
   },
   accuracy: {
@@ -523,14 +534,14 @@ export default {
   },
   linkWallet: {
     welcome: "欢迎来到 CHOOSEME",
-    selectLoginMethod: "请选择登录方式",
+    selectLoginMethod: "请选择一个钱包",
     connect: "链接"
   },
   computingPower: {
     title: "算力服务商",
-    desc: "1、分布式节点算力服务商 500U，享受数据节点收益、交易全网手续费买卖 0.5% 收益，子币手续费 3%。二级市场分润 10% 收益，分布式算力节点推分布式算力节点。",
+    desc: "成为算力服务商，享受数据节点收益，交易手续费收益，子币手续费收益，二级市场收益，推动更多的节点加入获取更多收益。",
     learnMore: "了解更多",
-    buyNode: "购买节点",
+    buyNode: "激活节点",
     myNodes: "我的节点",
     tabs: {
       distributed: "分布节点",
@@ -541,10 +552,9 @@ export default {
     buyBtn: "购买",
     record: {
       title: "节点激活记录",
-      more: "查看更多",
-      time: "操作时间",
-      type: "产品类型",
-      amount: "消耗USDT",
+      timeLabel: "操作时间",
+      typeLabel: "产品类型",
+      amountLabel: "消耗USDT",
       types: {
         distributed: "分布节点",
         cluster: "集群节点"
@@ -561,29 +571,29 @@ export default {
       distributed: "分布节点-500 USDT",
       cluster: "集群节点-10000 USDT"
     },
-    activationMsg: "地址 {address} 已成功激活 {nodeType}",
+    activationMsg: "地址 {address} 已成功激活[ {nodeType} ]",
     activateBtn: "激活节点",
     products: {
       distributedDescTemplate: "享受数据节点收益，交易全网手续费买卖 {fee}% 收益，子币手续费 {subFee}% 。二级市场分润 {marketShare}% 收益，分布式算力节点推分布式算力节点。",
-      clusterDescTemplate: "享受数据节点收益，全网交易手续费 {fee}% 分润，子币手续费 {subFee}% 分润，二级市场业绩 {marketShare}% 分润，享受生态级节点推广与治理参与。"
+      clusterDescTemplate: "享受数据节点收益，交易全网手续费 {fee}% 分润，子币手续费 {subFee}% 分润，二级市场业绩 {marketShare}% 分润，享受生态级节点推广与治理参与。"
     }
   },
   lpVault: {
     title: "LP金库",
-    desc: "这里是奖励规则，这里是奖励规则，这里是奖励规则，这里是奖励规则，这里是奖励规则，这里是奖励规则",
+    desc: "全球首创一套链上循环进场，循环组LP底池，循环销毁、循环出局、循环应用上永动机。每个投资档位按照组LP→销毁底池的循环模式，合约自动执行。",
     learnMore: "了解更多",
-    nodeStaking: "节点质押",
-    myLPIncome: "我的LP收益",
+    nodeStaking: "激活节点",
+    myLPIncome: "我的收益",
     activationPrice: "激活价格:",
     dailyEarnings: "日化收益",
     cycleDays: "周期天数",
     totalEarnings: "总收益",
-    activateComputingPower: "激活算力",
-    activationMsg: "地址 {address} 已激活 LP 金库",
+    activateComputingPower: "激活节点",
+    activationMsg: "地址 {address} 已激活[ {nodeType} ]",
     nodeTypes: {
       T1: "信息节点",
       T2: "数据节点",
-      T3: "认证节点",
+      T3: "验证节点",
       T4: "共识节点",
       T5: "超级节点",
       T6: "创世节点"
@@ -594,15 +604,15 @@ export default {
     title: "集群节点",
     choIncome: "CHO收益",
     subCoinIncome: "子币收益",
-    earnPrompt: "地址 ç 赚取收益",
+    earnPrompt: "地址 {address} Earn Income",
     pendingIncome: "待领取收益",
     nodeIncome: "节点收益",
     networkFeeIncome: "全网手续费买卖收益",
     subCoinFeeIncome: "子币手续费收益",
     secondaryMarketIncome: "二级市场盈利收益",
     directReferralIncome: "直推收益",
-    networkIncome: "网体收益",
-    claimAll: "一键领取收益",
+    networkIncome: "团队收益",
+    claimAll: "领取所有收益",
     claim: "Claim",
     myTeam: "我的团队",
     inviteAddressCount: "邀请地址数",
@@ -624,17 +634,33 @@ export default {
     staticIncomeCHO: "静态收益(CHO)",
     directReferralIncomeCHO: "直推收益(CHO)",
     teamIncomeCHO: "团队收益(CHO)",
-    genesisNodeIncomeCHO: "创世节点5%收益(CHO)",
-    claimAll: "一键领取收益",
+    genesisNodeIncomeCHO: "创世节点收益(CHO)",
+    superNodeIncomeCHO: "超级节点收益(CHO)",
+    claimAll: "领取收益",
     myTeam: "我的团队",
     mySuperior: "我的上级",
-    totalInvites: "邀请总人数"
+    totalInvites: "邀请总人数",
+    superNode: "超级节点",
+    purchaseTime: "激活时间",
+    upline: "上线",
+    nodeNames: {
+      infoNode: "信息节点",
+      dataNode: "数据节点",
+      validationNode: "认证节点",
+      consensusNode: "共识节点"
+    },
+    earningsOptions: {
+      allNodeRewards: "所有节点收益",
+      dataNode: "数据节点",
+      validationNode: "认证节点"
+    }
   },
   dashboard: {
     title: "仪表盘",
     tabs: {
-      currentPrice: "CMT现价",
-      pledge: "CMT质押",
+      currentPrice: "CHO现价",
+      pledge: "LP金库",
+      computingPool: "算力池",
       marketReturns: "市场收益"
     }
   },
@@ -669,6 +695,19 @@ export default {
       "all": "全部"
     }
   },
+  computingPool: {
+    pledgeTotal: "质押总额",
+    composition: "算力池构成",
+    distributedNodeTotal: "分布节点总额",
+    clusterNodeTotal: "集群节点总额",
+    timePeriods: {
+      "7d": "7日",
+      "30d": "30日",
+      "90d": "90日",
+      "1y": "1年",
+      "all": "全部"
+    }
+  },
   marketReturns: {
     secondaryMarketProfit: "二级市场盈利金额",
     userProfit: "用户盈利金额",
@@ -685,8 +724,7 @@ export default {
   },
   purchaseNodeRecord: {
     title: "节点购买记录",
-    informationNode: "信息节点",
-    price: "价格"
+    informationNode: "信息节点"
   },
   purchaseNode: {
     estimatedTradeProfit: "预计买卖交易收益约：",
@@ -703,9 +741,8 @@ export default {
     title: "我的节点"
   },
   collectEarnings: {
-    title: "Claim Method",
-    allNodeRewards: "All Node Rewards",
-    tip: "* You can claim all node rewards, or choose to claim rewards from a single node",
-    confirm: "Confirm"
+    title: "领取方式",
+    allNodeRewards: "所有节点收益",
+    tip: "* 您可以领取所有节点收益，或选择领取单个节点的收益"
   }
 };

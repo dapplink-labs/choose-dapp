@@ -93,7 +93,7 @@
               <div class="ad-image-bottom">
                 <img src="https://picsum.photos/seed/chart/400/300" :alt="$t('breaking.chartAd')" />
               </div>
-              <button class="view-all-btn" @click="handleViewAll">{{ $t('breaking.live.viewAll') }}</button>
+              <button class="view-all-btn" @click="handleViewAll">{{ $t('common.viewAll') }}</button>
             </div>
           </div>
         </div>
@@ -118,7 +118,7 @@ const { t } = useI18n()
 
 // Tab导航
 const tabs = computed(() => [
-  { label: t('breaking.tabs.all'), value: 'all' },
+  { label: t('common.all'), value: 'all' },
   { label: t('breaking.tabs.politics'), value: 'politics' },
   { label: t('breaking.tabs.crypto'), value: 'crypto' },
   { label: t('breaking.tabs.finance'), value: 'finance' }

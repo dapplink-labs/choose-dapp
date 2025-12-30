@@ -49,5 +49,24 @@
         "ethContract":"0x478210a1678046a0C6af45D159176e75B1BACA91",
         "bridgeContract": "0x558A58D22d5fE5832A2E11Eb0f89552a8C85190f"
         
+    },
+    {
+        "name": "BSC Mainnet",
+        "chainId": 56,
+        "img": "bnb.png",
+        "rpcUrl": "https://bsc-dataseed.binance.org",
+        "explorerUrl": "https://bscscan.com",
+        "currency": "BNB",
+        "nativeTokenContract": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        "usdtContract": "0xc0f27fd2ad4A59e9767f93497c5c74d92F0B4b36",
+        "cpContract": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        "ethContract": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        "bridgeContract": "0x0000000000000000000000000000000000000000",
+        "usdtTokenAddress": "0xc0f27fd2ad4A59e9767f93497c5c74d92F0B4b36",
+        "proxyChooseMeToken": "0x57AC59999A9c37ffe4Da331D10ffdb6E2CB33164",
+        "proxyStakingManager": "0x5B920144774909329983f80A30217eF5660e8BC8",
+        "proxyNodeManager": "0x1453bc76CbbDbC2aAe94Cc8E669e1A52a3136526",
+        "proxyDaoRewardManager": "0x97807b490Bb554a910f542693105d65742DaaAc9",
+        "proxyFomoTreasureManager": "0x5DF3CeAF62ae4226f6C5D9Bd5395328Ad815A71e"
     }
 ]

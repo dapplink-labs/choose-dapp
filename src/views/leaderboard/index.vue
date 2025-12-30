@@ -49,7 +49,7 @@
               :class="{ 'current-user': user.isCurrentUser }">
               <div class="item-user">
                 <span class="item-rank">{{ user.rank || '--' }}</span>
-                <img :src="user.avatar" :alt="$t('leaderboard.userAvatar')" class="user-avatar" />
+                <img :src="user.avatar" :alt="$t('common.userAvatar')" class="user-avatar" />
                 <span class="user-name">{{ user.name }}</span>
               </div>
               <div class="item-profit">

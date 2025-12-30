@@ -10,7 +10,7 @@
                         <span v-if="item.nodeTag" class="node-tag">{{ item.nodeTag }}</span>
                     </div>
                     <div class="node-price">
-                        {{ $t('purchaseNodeRecord.price') }}: {{ item.price }}
+                        {{ $t('common.price') }}: {{ item.price }}
                     </div>
                 </div>
                 <div class="record-right">

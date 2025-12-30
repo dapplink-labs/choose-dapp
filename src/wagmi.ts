@@ -45,10 +45,24 @@ const optimism = defineChain({
   testnet: true,
 })
 
+const bsc = defineChain({
+  id: 56,
+  name: 'BNB Smart Chain',
+  nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+  rpcUrls: { default: { http: ['https://bsc-dataseed.binance.org'] } },
+  blockExplorers: {
+    default: {
+      name: 'BscScan',
+      url: 'https://bscscan.com',
+    },
+  },
+  testnet: false,
+})
+
 // ✅ 2. 构建 wagmi config
 // createConfig 用于创建 wagmi 的配置对象
 export const config = createConfig({
-  chains: [cpChain, sepolia, optimism],// 配置支持的区块链网络
+  chains: [cpChain, sepolia, optimism, bsc],// 配置支持的区块链网络
   connectors: [
     injected(), // ✅ 添加 injected 连接器支持 MetaMask 等浏览器钱包
     walletConnect({// WalletConnect 连接器与injected 连接器类似，允许用户通过 WalletConnect 协议连接他们的移动钱包或其他支持 WalletConnect 的钱包。
@@ -60,7 +74,8 @@ export const config = createConfig({
   transports: {
     [cpChain.id]: http(cpChain.rpcUrls.default.http[0]),
     [sepolia.id]: http(sepolia.rpcUrls.default.http[0]),
-    [optimism.id]: http(optimism.rpcUrls.default.http[0])
+    [optimism.id]: http(optimism.rpcUrls.default.http[0]),
+    [bsc.id]: http(bsc.rpcUrls.default.http[0])
   },
 })
 

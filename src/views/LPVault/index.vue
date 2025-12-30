@@ -102,7 +102,7 @@ const activationAvatar = clusterNodeImg
 // 激活提示文案
 const activationAddress = ref('0xb574...4c7d')
 const activationMsg = computed(() => {
-    return t('lpVault.activationMsg', { address: activationAddress.value })
+    return t('lpVault.activationMsg', { address: activationAddress.value, nodeType: t('lpVault.nodeTypes.T1') })
 })
 
 const handleOpenMore = () => {

@@ -6,7 +6,7 @@
         <div class="card-handle"></div>
 
         <!-- 标题 -->
-        <h2 class="card-title">绑定邮箱</h2>
+        <h2 class="card-title">{{ $t('bindEmail.title') }}</h2>
 
         <!-- 表单区域 -->
         <div class="form-row">
@@ -14,20 +14,20 @@
             v-model="localEmail"
             class="email-input"
             type="email"
-            placeholder="请输入邮箱"
+            :placeholder="$t('bindEmail.placeholder')"
           />
           <button class="code-btn" type="button" @click="handleGetCode">
-            获取验证码
+            {{ $t('bindEmail.sendCode') }}
           </button>
         </div>
 
         <!-- 底部按钮 -->
         <div class="action-row">
           <button class="btn skip-btn" type="button" @click="handleSkip">
-            跳过
+            {{ $t('common.skip') }}
           </button>
           <button class="btn primary-btn" type="button" @click="handleConfirm">
-            绑定邮箱
+            {{ $t('common.continue') }}
           </button>
         </div>
       </div>
@@ -37,6 +37,9 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   modelValue: {

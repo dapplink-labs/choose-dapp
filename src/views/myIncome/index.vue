@@ -9,7 +9,7 @@
         <div class="banner1">
             <div class="intro">
                 <div class="intro-header">
-                    <h1 class="intro-title">Super Node</h1>
+                    <h1 class="intro-title">{{ $t('myIncome.superNode') }}</h1>
                     <div class="intro-tag">T 5</div>
                     <div class="intro-action-icon" @click="handleSwap">
                         <svg t="1766805327912" class="icon" viewBox="0 0 1024 1024" version="1.1"
@@ -22,7 +22,7 @@
                 </div>
                 <div class="intro-time">
                     <Clock class="time-icon" />
-                    <span class="time-text">Purchase Time: 2025-12-25 12:20:19</span>
+                    <span class="time-text">{{ $t('myIncome.purchaseTime') }}: 2025-12-25 12:20:19</span>
                 </div>
             </div>
         </div>
@@ -94,6 +94,10 @@
                     <div class="earnings-label">{{ $t('myIncome.genesisNodeIncomeCHO') }}</div>
                     <div class="earnings-value">12,000</div>
                 </div>
+                <div class="earnings-item">
+                    <div class="earnings-label">{{ $t('myIncome.superNodeIncomeCHO') }}</div>
+                    <div class="earnings-value">20,000</div>
+                </div>
             </div>
 
             <button class="claim-all-btn" @click="openCollectEarnings">{{ $t('myIncome.claimAll') }}</button>
@@ -154,7 +158,7 @@
                             <!-- 团队地址列表：显示Upline和时间 -->
                             <div v-if="activeTab === 'team'" class="team-upline-row">
                                 <div class="team-upline-left">
-                                    <span class="team-upline-label">Upline:</span>
+                                    <span class="team-upline-label">{{ $t('myIncome.upline') }}:</span>
                                     <span class="team-upline-address">{{ item.upline || item.address }}</span>
                                 </div>
                                 <span class="team-time">{{ item.activationTime }}</span>
@@ -258,24 +262,24 @@ const handleSearch = () => {
 const showNodesModal = ref(false)
 
 // 我的节点数据
-const myNodes = ref([
+const myNodes = computed(() => [
     {
-        nodeName: 'Info Node',
+        nodeName: t('myIncome.nodeNames.infoNode'),
         nodeTag: 'T1',
         purchaseTime: '2025-12-25 12:30:45'
     },
     {
-        nodeName: 'Data Node',
+        nodeName: t('myIncome.nodeNames.dataNode'),
         nodeTag: 'T2',
         purchaseTime: '2025-12-25 12:30:45'
     },
     {
-        nodeName: 'Validation Node',
+        nodeName: t('myIncome.nodeNames.validationNode'),
         nodeTag: 'T3',
         purchaseTime: '2025-12-25 12:30:45'
     },
     {
-        nodeName: 'Consensus Node',
+        nodeName: t('myIncome.nodeNames.consensusNode'),
         nodeTag: 'T4',
         purchaseTime: '2025-12-25 12:30:45'
     }
@@ -290,19 +294,19 @@ const handleSwap = () => {
 const showCollectEarningsModal = ref(false)
 
 // 领取收益选项数据
-const earningsOptions = ref([
+const earningsOptions = computed(() => [
     {
-        name: 'All Node Rewards',
+        name: t('myIncome.earningsOptions.allNodeRewards'),
         tag: '',
         amount: '100,0000'
     },
     {
-        name: 'Data Node',
+        name: t('myIncome.earningsOptions.dataNode'),
         tag: 'T2',
         amount: '80,000'
     },
     {
-        name: 'Validation Node',
+        name: t('myIncome.earningsOptions.validationNode'),
         tag: 'T3',
         amount: '200,000'
     }
@@ -554,7 +558,7 @@ onMounted(() => {
             border-radius: 8px;
 
             .earnings-label {
-                font-size: 14px;
+                font-size: 11px;
                 color: var(--text-dark-gray, #999999);
                 margin-bottom: 8px;
                 font-weight: 400;

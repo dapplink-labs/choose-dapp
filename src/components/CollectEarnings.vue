@@ -25,7 +25,7 @@
 
                 <!-- 确认按钮 -->
                 <button class="confirm-btn" @click="handleConfirm">
-                    {{ $t('collectEarnings.confirm') }}
+                    {{ $t('common.confirm') }}
                 </button>
             </div>
         </div>

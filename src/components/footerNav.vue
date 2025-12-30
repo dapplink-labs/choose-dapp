@@ -57,9 +57,9 @@ const { t } = useI18n()
 // 导航项配置
 const navItems = computed(() => [
   { key: 'home', label: t('footerNav.home') || '首页', path: '/' },
-  { key: 'search', label: t('footerNav.search') || '搜索', path: '/breaking' },
+  { key: 'search', label: t('common.search') || '搜索', path: '/breaking' },
   { key: 'breaking', label: t('footerNav.breaking') || '突发', path: '/breaking' },
-  { key: 'more', label: t('footerNav.more') || '更多', path: '/user-info' }
+  { key: 'more', label: t('common.more') || '更多', path: '/user-info' }
 ])
 
 // 当前激活的导航项

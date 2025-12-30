@@ -124,9 +124,9 @@
                       <!-- 表头 -->
                       <div class="table-header">
                         <div class="table-header-cell volume-header">{{ $t('detail.volume') }}</div>
-                        <div class="table-header-cell price-header">{{ $t('detail.price') }}</div>
+                        <div class="table-header-cell price-header">{{ $t('common.price') }}</div>
                         <div class="table-header-cell shares-header">{{ $t('detail.shares') }}</div>
-                        <div class="table-header-cell total-header">{{ $t('detail.all') }}</div>
+                        <div class="table-header-cell total-header">{{ $t('common.all') }}</div>
                       </div>
                       <!-- 数据行 -->
                       <div v-for="(order, index) in sellOrders" :key="index" class="table-row">
@@ -197,7 +197,7 @@
                 <h3 class="rules-title">{{ $t('detail.rules') }}</h3>
                 <p class="rules-text">{{ rulesText }}</p>
                 <button class="view-more-btn" @click="toggleRulesExpanded">
-                  <span>{{ $t('detail.viewMore') }}</span>
+                  <span>{{ $t('common.viewMore') }}</span>
                   <el-icon class="info-icon chevron-icon" :class="{ expanded: rulesExpanded }">
                     <ArrowDownBold />
                   </el-icon>
@@ -217,10 +217,10 @@
             <!-- 买入/卖出标签页 -->
             <div class="panel-tabs">
               <button class="tab-btn" :class="{ active: activeTab === 'buy' }" @click="activeTab = 'buy'">
-                {{ $t('detail.buy') }}
+                {{ $t('common.buy') }}
               </button>
               <button class="tab-btn" :class="{ active: activeTab === 'sell' }" @click="activeTab = 'sell'">
-                {{ $t('detail.sell') }}
+                {{ $t('common.sell') }}
               </button>
             </div>
 
@@ -238,8 +238,8 @@
 
             <!-- 金额输入 -->
             <div class="amount-section">
-              <div class="amount-label">{{ $t('detail.amount') }}</div>
-              <div class="balance-info">{{ $t('detail.balance') }}:${{ balance }}</div>
+              <div class="amount-label">{{ $t('common.amount') }}</div>
+              <div class="balance-info">{{ $t('common.balance') }}:${{ balance }}</div>
               <div class="amount-input-wrapper">
                 <input type="text" class="amount-input" v-model="amount" placeholder="$0" />
               </div>
@@ -310,7 +310,7 @@ const timeRanges = computed(() => [
   { label: t('detail.timeRanges.1D'), value: '1D' },
   { label: t('detail.timeRanges.1W'), value: '1W' },
   { label: t('detail.timeRanges.1M'), value: '1M' },
-  { label: t('detail.timeRanges.ALL'), value: 'ALL' }
+  { label: t('common.all'), value: 'ALL' }
 ])
 
 const selectedTimeRange = ref('1W')

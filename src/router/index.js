@@ -28,6 +28,10 @@ const router = createRouter({
       path: '/bridge',
       name: 'bridge',
       component: bridge,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
     },
     {
       path: '/earnings',

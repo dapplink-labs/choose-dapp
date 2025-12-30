@@ -232,7 +232,7 @@ import { useI18n } from 'vue-i18n'
 import { Trophy, Clock } from '@element-plus/icons-vue'
 import LineChartDetail from '@/components/LineChartDetail.vue'
 import Payment from '@/components/Payment.vue'
-import NavBar2 from '@/components/NavBar2.vue'
+import NavBar2 from '@/components/navBar2.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -264,7 +264,7 @@ const timeRanges = computed(() => [
     { label: t('detail.timeRanges.1D') || '1D', value: '1D' },
     { label: t('detail.timeRanges.1W') || '1W', value: '1W' },
     { label: t('detail.timeRanges.1M') || '1M', value: '1M' },
-    { label: t('detail.timeRanges.ALL') || 'ALL', value: 'ALL' }
+    { label: t('common.all') || 'ALL', value: 'ALL' }
 ])
 
 const selectedTimeRange = ref('1W')

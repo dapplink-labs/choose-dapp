@@ -3,6 +3,16 @@ export default {
     titel: "Connect Wallet",
     exit: "Disconnect"
   },
+  bindEmail: {
+    title: "Bind Email",
+    placeholder: "Email address",
+    sendCode: "Send Code"
+  },
+  invite: {
+    title: "Welcome to CHOOSEME",
+    placeholder: "Iinvite code",
+    tip: "* By filling out the invitation code, there is a chance to receive more profit rewards"
+  },
   bridge: {
     placeholderAmount: "at least 0.1",
     transferTime: "3~10mins",
@@ -40,34 +50,25 @@ export default {
     waitingForConfirmation: "Waiting for confirmation",
     record: {
       title: "Cross-chain records",
-      name1: "Time",
       coin: "Token",
       send: "Sender",
-      total:"Amount",
       receive: "Receiver",
       sourcehash: "Source chain hash",
       tosourcehash: "Target chain hash",
       fee:"Txn Fee",
       state: {
         name: "Status",
-        error: "Failed",
-        success: "Successful",
-        opt: "Action",
-        ped:"pending"
+        opt: "Action"
       },
       opt: "Check"
     },
-    search: "Search",
     sureTitle: "Confirm information",
-    from: "From",
-    to: "To",
     Crosschain: "Cross-chain",
     get: "Receive",
     cross: "Via",
     crossName: "Native cross-chain",
     time: "Transfer time",
-    fee: "Fee",
-    continues: "Continue"
+    fee: "Fee"
   },
   notice:{
     title: 'Feature Under Development',
@@ -260,7 +261,38 @@ export default {
     }
   },
   common: {
-    more: "Look More",
+    // Buttons and actions
+    skip: "Skip",
+    confirm: "OK",
+    continue: "Continue",
+    search: "Search",
+    more: "More",
+    viewMore: "View More",
+    viewAll: "View All",
+    buy: "Buy",
+    sell: "Sell",
+    close: "Close",
+    save: "Save",
+    // Status and labels
+    userAvatar: "User Avatar",
+    settings: "Settings",
+    balance: "Balance",
+    price: "Price",
+    time: "Time",
+    amount: "Amount",
+    all: "All",
+    success: "Successful",
+    failed: "Failed",
+    error: "Failed",
+    pending: "Pending",
+    processing: "Processing...",
+    // Other common words
+    title: "Title",
+    type: "Type",
+    status: "Status",
+    total: "Total",
+    from: "From",
+    to: "To"
   },
   leftMenus: {
     "/": "Home",
@@ -277,9 +309,6 @@ export default {
   },
   swap: {
     title: "Swap on  CP Chain",
-    sell: "Sell",
-    buy: "Buy",
-    balance: "Balance",
     rateWarn: "Minimum received after slippage",
     rate: "Current rate",
     nofund: "Insufficient balance",
@@ -289,9 +318,7 @@ export default {
     basicons: "Popular tokens",
     searchicons: "Search tokens",
     doswaps: "Swap",
-    prohibitReasons: "Amount too large, exceeds pool liquidity",
-    sure: "Confirm"
-    
+    prohibitReasons: "Amount too large, exceeds pool liquidity"
   },
   header: {
     searchPlaceholder: "Search ChooseMe",
@@ -299,30 +326,32 @@ export default {
     cash: "Cash",
     deposit: "Deposit",
     profile: "Profile",
-    settings: "Settings",
+    settingsTitle: "Settings",
     logout: "Logout"
   },
   navbar2: {
     nav: {
-      trends: "Trends",
+      trends: "Trending",
       breaking: "Breaking",
-      news: "News",
-      politics: "Politics",
+      news: "New",
+      esports: "Esports",
       sports: "Sports",
-      finance: "Finance",
-      crypto: "Cryptocurrency"
+      finance: "Economy",
+      crypto: "Crypto",
+      company: "Companies",
+      popularCulture: "Pop Cultrue",
+      technology: "Tech",
+      ai: "AI"
     }
   },
   home: {
     welcome: "Welcome to ChooseMe",
     description: "Explore the latest market trends, news and information",
-    comingSoon: "Prediction feature coming soon",
+    comingSoon: "Prediction market coming soon.",
     comingSoonAlt: "Not available",
     searchPlaceholder: "Search",
-    userAvatar: "User Avatar",
     opportunity: "Chance",
     filterTags: {
-      all: "All",
       premium: "Premium",
       ukraine: "Ukraine",
       afghanistan: "Epstein",
@@ -333,15 +362,10 @@ export default {
   },
   footerNav: {
     home: "Home",
-    search: "Search",
-    breaking: "Breaking",
-    more: "More"
+    breaking: "Breaking"
   },
   userInfo: {
-    close: "Close",
-    userAvatar: "User Avatar",
-    settings: "Settings",
-    disconnect: "Disconnect",
+    disconnect: "Disconnect Wallet",
     ecosystem: "Ecosystem",
     others: "Others",
     nodeStaking: "Node Staking",
@@ -363,10 +387,10 @@ export default {
     technicalSupport: "Technical Support",
     support: "Support",
     officialVerification: "Official Verification",
-    productFeedback: "Product Feedback",
-    apiManagement: "Api Management",
-    helpCenter: "Help Center",
-    customerSupport: "Customer Support",
+    productFeedback: "Feedback",
+    apiManagement: "API Docs",
+    helpCenter: "Documentation",
+    customerSupport: "Customer Service",
     selfService: "Self Service",
     dashboard: "Dashboard",
     createMarket: "Create Prediction Market",
@@ -389,14 +413,13 @@ export default {
     usernamePlaceholder: "Please enter username",
     twitter: "Twitter",
     bindTwitter: "Bind",
-    save: "Save"
+    saveText: "Save"
   },
   breaking: {
     ad: "Advertisement",
     avatar: "Avatar",
     chartAd: "Chart Advertisement",
     tabs: {
-      all: "All",
       politics: "Politics",
       crypto: "Cryptocurrency",
       finance: "Finance"
@@ -410,8 +433,7 @@ export default {
     live: {
       title: "Live on ChooseMe",
       followBtn: "follow on X",
-      breakingNews: "Breaking News",
-      viewAll: "View All"
+      breakingNews: "Breaking News"
     }
   },
   detail: {
@@ -421,17 +443,12 @@ export default {
     orderBook: "Order Book",
     graph: "Graph",
     volume: "Volume",
-    price: "Price",
     shares: "Shares",
-    all: "All",
     last: "Last",
     spread: "Spread",
     rules: "Rules",
-    viewMore: "View More",
-    buy: "Buy",
-    sell: "Sell",
-    amount: "Amount",
-    balance: "Balance",
+    buyText: "Buy",
+    sellText: "Sell",
     winningAmount: "Winning Amount",
     averagePrice: "Average Price",
     maximumLeverage: "Maximum leverage",
@@ -451,8 +468,7 @@ export default {
     timeRanges: {
       "1D": "1D",
       "1W": "1W",
-      "1M": "1M",
-      "ALL": "ALL"
+      "1M": "1M"
     }
   },
   payment: {
@@ -466,11 +482,9 @@ export default {
     cashUsedLabel: "Cash used",
     projectedPnl: "Projected PnL(ROI)",
     tradedProbability: "Your traded probability",
-    marketImpact: "Market Impact",
-    continue: "Continue"
+    marketImpact: "Market Impact"
   },
   earnings: {
-    userAvatar: "User Avatar",
     totalWinnings: "Total Winnings",
     maxWinning: "Max Winning",
     predictionEvents: "Prediction Events",
@@ -495,7 +509,6 @@ export default {
     searchByName: "Search by name",
     profitLoss: "Profit/Loss",
     quantity: "Quantity",
-    userAvatar: "User Avatar",
     thisMonthBiggestWin: "This Month's Biggest Win"
   },
   accuracy: {
@@ -515,7 +528,7 @@ export default {
   },
   computingPower: {
     title: "Computing Provider",
-    desc: "This section outlines the incentive distribution, node rewards, and network participation rules. ",
+    desc: "Become a computing provider, enjoy node revenue, transaction fee revenue, sub-coin fee revenue, and secondary market revenue, and promote more nodes to join and obtain more revenue. Learn more ",
     learnMore: "Learn more",
     buyNode: "Acquire Nodes",
     myNodes: "My Nodes",
@@ -528,27 +541,26 @@ export default {
     buyBtn: "Buy",
     record: {
       title: "Node Purchase Records",
-      more: "View more",
-      time: "Time",
-      type: "Product Type",
-      amount: "USDT Spent",
+      timeLabel: "Time",
+      typeLabel: "Product Type",
+      amountLabel: "USDT Spent",
       types: {
         distributed: "Distributed Node",
         cluster: "Cluster Node"
       }
     },
     benefits: {
-      item1: "Enjoy data node income",
-      item2: "0.5% revenue from total network trading fees",
-      item3: "3% fee on sub-tokens",
-      item4: "10% profit share from secondary market",
-      item5: "Distributed hashrate nodes recommend distributed hashrate nodes"
+      item1: "Enjoy the benefits of data nodes",
+      item2: "Earning 0.5% from trading fees across the entire network ",
+      item3: "Sub-coin transaction fee: 3% ",
+      item4: "Secondary market profit of 10% return ",
+      item5: "Distributed computing power nodes promote distributed computing power nodes"
     },
     purchaseTitle: {
       distributed: "Distributed Node - 500 USDT",
       cluster: "Cluster Node - 10000 USDT"
     },
-    activationMsg: "Address {address} has successfully activated a {nodeType}",
+    activationMsg: "Address {address} successfully activated a {nodeType}",
     activateBtn: "Activate Node",
     products: {
       distributedDescTemplate: "{fee}% revenue share from network trading fees, {subFee}% sub-token transaction fee rewards, up to {marketShare}% profit sharing from secondary market activities, participation in distributed computing node expansion.",
@@ -557,20 +569,20 @@ export default {
   },
   lpVault: {
     title: "LP Vault",
-    desc: "This section outlines the reward rules, reward rules, reward rules, reward rules, reward rules, reward rules",
+    desc: "The world's first set of on chain cyclic entry, cyclic LP bottom pool, cyclic destruction, cyclic elimination, and cyclic application on perpetual motion machines. Each investment level follows a cyclic pattern of group LP → destruction of the bottom pool, and the contract is automatically executed. ",
     learnMore: "Learn more",
-    nodeStaking: "Node Staking",
-    myLPIncome: "My LP Income",
+    nodeStaking: "Activate Node",
+    myLPIncome: "My Profit",
     activationPrice: "Activation Price:",
-    dailyEarnings: "Daily Earnings",
+    dailyEarnings: "Rate of daily return",
     cycleDays: "Cycle Days",
-    totalEarnings: "Total Earnings",
-    activateComputingPower: "Activate Computing Power",
-    activationMsg: "Address {address} has activated LP Vault",
+    totalEarnings: "Total Profits",
+    activateComputingPower: "Activate Node",
+    activationMsg: "Address {address} has activated [ {nodeType} ]",
     nodeTypes: {
       T1: "Information Node",
       T2: "Data Node",
-      T3: "Certification Node",
+      T3: "Validation Node",
       T4: "Consensus Node",
       T5: "Super Node",
       T6: "Genesis Node"
@@ -579,21 +591,21 @@ export default {
   },
   myNode: {
     title: "Cluster Node",
-    choIncome: "CHO Income",
-    subCoinIncome: "Sub-coin Income",
-    earnPrompt: "Address ç Earn Income",
-    pendingIncome: "Pending Income",
-    nodeIncome: "Node Income",
-    networkFeeIncome: "Network Trading Fee Income",
-    subCoinFeeIncome: "Sub-coin Fee Income",
-    secondaryMarketIncome: "Secondary Market Profit Income",
-    directReferralIncome: "Direct Referral Income",
-    networkIncome: "Network Income",
-    claimAll: "Claim All Income",
+    choIncome: "CHO profit",
+    subCoinIncome: "Sub-coin profit",
+    earnPrompt: "Address {address} Earn Income",
+    pendingIncome: "Pending profit",
+    nodeIncome: "Node Profit",
+    networkFeeIncome: "Network Trading Fee Profit",
+    subCoinFeeIncome: "Sub-coin Fee Profit",
+    secondaryMarketIncome: "Secondary Market Profit",
+    directReferralIncome: "Direct Referal Profit",
+    networkIncome: "Network Profit",
+    claimAll: "Claim All Profit",
     claim: "Claim",
     myTeam: "My Team",
-    inviteAddressCount: "Total Invited Addresses",
-    directAddress: "Direct Referrals",
+    inviteAddressCount: "Invite Address Count",
+    directAddress: "Direct Promotion Node",
     teamAddress: "Team",
     activated: "Activated",
     nodeTypes: {
@@ -602,26 +614,42 @@ export default {
     }
   },
   myIncome: {
-    title: "My Income",
-    myIncomeCMT: "My Income",
-    computingPowerIncomeCMT: "Computing Rewards",
-    networkIncomeCMT: "Network Rewards",
-    earnPrompt: "Address {address} earned income",
-    pendingIncome: "Pending Income",
-    staticIncomeCHO: "Static Income",
-    directReferralIncomeCHO: "Direct Referral Income",
-    teamIncomeCHO: "Team Income",
-    genesisNodeIncomeCHO: "Genesis Node 5% Income",
-    claimAll: "Claim All Income",
+    title: "My Profit",
+    myIncomeCMT: "My Profit",
+    computingPowerIncomeCMT: "Computing Profit",
+    networkIncomeCMT: "Network Profit",
+    earnPrompt: "Address {address} earned",
+    pendingIncome: "Pending Profit",
+    staticIncomeCHO: "Static Profit",
+    directReferralIncomeCHO: "Direct Referral Profit",
+    teamIncomeCHO: "Team Profit",
+    genesisNodeIncomeCHO: "Genesis Node Revenue",
+    superNodeIncomeCHO: "Super Node Revenue",
+    claimAll: "Claim All Profit",
     myTeam: "My Team",
     mySuperior: "My Superior",
-    totalInvites: "Total Invites"
+    totalInvites: "Total Invites",
+    superNode: "Super Node",
+    purchaseTime: "Activation Time",
+    upline: "Upline",
+    nodeNames: {
+      infoNode: "Info Node",
+      dataNode: "Data Node",
+      validationNode: "Validation Node",
+      consensusNode: "Consensus Node"
+    },
+    earningsOptions: {
+      allNodeRewards: "All Node Rewards",
+      dataNode: "Data Node",
+      validationNode: "Validation Node"
+    }
   },
   dashboard: {
     title: "Dashboard",
     tabs: {
       currentPrice: "CMT Price",
-      pledge: "CMT Pledge",
+      pledge: "LP Vault",
+      computingPool: "Computing Pool",
       marketReturns: "Market Returns"
     }
   },
@@ -656,6 +684,19 @@ export default {
       "all": "All"
     }
   },
+  computingPool: {
+    pledgeTotal: "Total Staked Amount",
+    composition: "Computing Power Pool Composition",
+    distributedNodeTotal: "Distributed Node Total Amount",
+    clusterNodeTotal: "Cluster Node Total Amount",
+    timePeriods: {
+      "7d": "7d",
+      "30d": "30d",
+      "90d": "90d",
+      "1y": "1y",
+      "all": "All"
+    }
+  },
   marketReturns: {
     secondaryMarketProfit: "Secondary Market Profit Amount",
     userProfit: "User Profit Amount",
@@ -672,8 +713,7 @@ export default {
   },
   purchaseNodeRecord: {
     title: "Node Purchase Record",
-    informationNode: "Information Node",
-    price: "Price"
+    informationNode: "Information Node"
   },
   tabNode: {
     purchaseTime: "Purchase Time"
@@ -691,7 +731,7 @@ export default {
   },
   collectEarnings: {
     title: "Claim Method",
-    tip: "* You can claim all node rewards, or choose to claim rewards from a single node",
-    confirm: "Confirm"
+    allNodeRewards: "All Node Rewards",
+    tip: "* You can claim all node rewards, or choose to claim rewards from a single node"
   }
 };

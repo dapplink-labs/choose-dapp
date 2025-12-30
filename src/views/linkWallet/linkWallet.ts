@@ -23,7 +23,6 @@ type AnyConnector = {
   type?: string
 }
 
-// 直接复用 navBar 中的钱包列表
 export const wallets: WalletItem[] = [
   {
     name: 'MetaMask',

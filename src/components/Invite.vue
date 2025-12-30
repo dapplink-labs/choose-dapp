@@ -6,7 +6,7 @@
         <div class="card-handle"></div>
 
         <!-- 标题 -->
-        <h2 class="card-title">欢迎来到ChooseMe~</h2>
+        <h2 class="card-title">{{ $t('invite.title') }}</h2>
 
         <!-- 邀请码输入 -->
         <div class="form-row">
@@ -14,18 +14,18 @@
             v-model="localCode"
             class="code-input"
             type="text"
-            placeholder="填写邀请码"
+            :placeholder="$t('invite.placeholder')"
           />
         </div>
-        <p class="tip-text">* 填写邀请码有机会可以获得更多收益奖励</p>
+        <p class="tip-text">{{ $t('invite.tip') }}</p>
 
         <!-- 底部按钮 -->
         <div class="action-row">
           <button class="btn skip-btn" type="button" @click="handleSkip">
-            跳过
+            {{ $t('common.skip') }}
           </button>
           <button class="btn primary-btn" type="button" @click="handleConfirm">
-            确定
+            {{ $t('common.confirm') }}
           </button>
         </div>
       </div>
@@ -35,6 +35,9 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   modelValue: {

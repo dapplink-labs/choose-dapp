@@ -8,7 +8,7 @@
         <div class="top-section">
           <div class="user-info-card">
             <div class="user-header">
-              <img src="https://picsum.photos/seed/user1/80/80" :alt="$t('earnings.userAvatar')" class="user-avatar">
+              <img src="https://picsum.photos/seed/user1/80/80" :alt="$t('common.userAvatar')" class="user-avatar">
               <div class="user-meta">
                 <div class="user-name">埃隆马斯克</div>
                 <div class="user-stats">
@@ -99,7 +99,7 @@
                 <div class="online-list">
                   <div class="online-item" v-for="item in onlineListData" :key="item.id">
                     <div class="online-item-left">
-                      <img :src="item.avatar" :alt="$t('earnings.userAvatar')" class="item-avatar" />
+                      <img :src="item.avatar" :alt="$t('common.userAvatar')" class="item-avatar" />
                       <div class="item-info">
                         <div class="item-description">{{ item.description }}</div>
                         <div class="item-bet-info">

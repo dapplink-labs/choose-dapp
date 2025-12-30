@@ -29,8 +29,10 @@
             <CMTCurrentPrice v-if="activeTab === 0" />
             <!-- CMT质押组件 -->
             <CMTPledge v-if="activeTab === 1" />
+            <!-- 算力池组件 -->
+            <ComputingPool v-if="activeTab === 2" />
             <!-- 市场收益组件 -->
-            <LPVault v-if="activeTab === 2" />
+            <LPVault v-if="activeTab === 3" />
         </div>
     </div>
 </template>
@@ -42,6 +44,7 @@ import { useI18n } from 'vue-i18n'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import CMTCurrentPrice from '@/components/CMTCurrentPrice.vue'
 import CMTPledge from '@/components/CMTPledge.vue'
+import ComputingPool from '@/components/ComputingPool.vue'
 import LPVault from '@/components/LPVault.vue'
 
 const { t } = useI18n()
@@ -52,6 +55,7 @@ const activeTab = ref(0)
 const tabs = computed(() => [
   t('dashboard.tabs.currentPrice'),
   t('dashboard.tabs.pledge'),
+  t('dashboard.tabs.computingPool'),
   t('dashboard.tabs.marketReturns')
 ])
 

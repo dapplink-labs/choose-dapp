@@ -3,7 +3,7 @@
     <!-- 用户信息卡片 -->
     <div class="user-card">
       <div class="user-info">
-        <img :src="userAvatar" :alt="$t('userInfo.userAvatar')" class="avatar" />
+        <img :src="userAvatar" :alt="$t('common.userAvatar')" class="avatar" />
         <div class="user-details">
           <div class="username">{{ username }}</div>
           <div class="wallet-address" @click="copyWalletAddress">
@@ -12,49 +12,62 @@
         </div>
       </div>
       <div class="action-icons">
-        <img :src="isDark ? settingIconDark : settingIcon" :alt="$t('userInfo.settings')" class="icon-img"
+        <img :src="isDark ? settingIconDark : settingIcon" :alt="$t('common.settings')" class="icon-img"
           @click="handleSettings" />
-        <img :src="isDark ? closeIconDark : closeIcon" :alt="$t('userInfo.close')" class="icon-img"
+        <img :src="isDark ? closeIconDark : closeIcon" :alt="$t('common.close')" class="icon-img"
           @click="handleClose" />
       </div>
     </div>
 
     <!-- Ecosystem 标题 -->
-    <div class="ecosystem-title">{{ $t('userInfo.ecosystem') }}</div>
+    <div class="section-title">{{ $t('userInfo.ecosystem') }}</div>
 
     <!-- Ecosystem 网格布局 -->
-    <div class="ecosystem-grid">
-      <div v-for="item in ecosystemItems" :key="item.key" class="ecosystem-item" @click="handleMenuClick(item)">
-        <div class="ecosystem-icon-wrapper">
-          <img :src="item.icon" :alt="item.label" class="ecosystem-icon" />
+    <div class="section-grid">
+      <div v-for="item in ecosystemItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
+        <div class="section-icon-wrapper">
+          <img :src="item.icon" :alt="item.label" class="section-icon" />
         </div>
-        <div class="ecosystem-label">{{ item.label }}</div>
+        <div class="section-label">{{ item.label }}</div>
       </div>
     </div>
 
-    <!-- Others 标题 -->
-    <div class="others-title">{{ $t('userInfo.others') }}</div>
+    <!-- Choose Me 标题 -->
+    <div class="section-title">{{ $t('userInfo.chooseMe') }}</div>
 
-    <!-- Others 网格布局 -->
-    <div class="others-grid">
-      <div v-for="item in othersItems" :key="item.key" class="others-item" @click="handleMenuClick(item)">
-        <div class="others-icon-wrapper">
-          <img :src="item.icon" :alt="item.label" class="others-icon" />
+    <!-- Choose Me 网格布局 -->
+    <div class="section-grid">
+      <div v-for="item in chooseMeItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
+        <div class="section-icon-wrapper">
+          <img :src="item.icon" :alt="item.label" class="section-icon" />
         </div>
-        <div class="others-label">{{ item.label }}</div>
+        <div class="section-label">{{ item.label }}</div>
       </div>
     </div>
 
     <!-- Support 标题 -->
-    <div class="support-title">{{ $t('userInfo.support') }}</div>
+    <div class="section-title section-title-with-margin">{{ $t('userInfo.support') }}</div>
 
     <!-- Support 网格布局 -->
-    <div class="support-grid">
-      <div v-for="item in supportItems" :key="item.key" class="support-item" @click="handleMenuClick(item)">
-        <div class="support-icon-wrapper">
-          <img :src="item.icon" :alt="item.label" class="support-icon" />
+    <div class="section-grid">
+      <div v-for="item in supportItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
+        <div class="section-icon-wrapper">
+          <img :src="item.icon" :alt="item.label" class="section-icon" />
         </div>
-        <div class="support-label">{{ item.label }}</div>
+        <div class="section-label">{{ item.label }}</div>
+      </div>
+    </div>
+
+    <!-- Others 标题 -->
+    <div class="section-title">{{ $t('userInfo.others') }}</div>
+
+    <!-- Others 网格布局 -->
+    <div class="section-grid">
+      <div v-for="item in othersItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
+        <div class="section-icon-wrapper">
+          <img :src="item.icon" :alt="item.label" class="section-icon" />
+        </div>
+        <div class="section-label">{{ item.label }}</div>
       </div>
     </div>
 
@@ -79,7 +92,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useAccount, useDisconnect } from '@wagmi/vue'
 import { useThemeStore } from '@/stores/theme'
 import { useI18n } from 'vue-i18n'
@@ -162,16 +175,10 @@ const friend5Dark = getIcon('TwitterDark')
 const friend6Dark = getIcon('YouTubeDark')
 
 const router = useRouter()
-const route = useRoute()
 const { address } = useAccount()
 const { disconnect } = useDisconnect()
 const themeStore = useThemeStore()
 const isDark = computed(() => themeStore.isDark)
-
-// 判断是否来自底部导航的"更多"页面
-const isFromFooter = computed(() => {
-  return route.query.from === 'footer' || route.meta?.fromFooter
-})
 
 // Invite组件控制
 const showInvite = ref(false)
@@ -218,148 +225,7 @@ const copyWalletAddress = async () => {
   }
 }
 
-
-// 第一张图的菜单配置（8个菜单项，无友链）
-const baseMenuItems1 = computed(() => [
-  {
-    key: 'computing-power-services',
-    label: t('userInfo.nodeStaking'),
-    icon: icon1,
-    iconDark: icon1Dark,
-    path: '/computing-power-services'
-  },
-  {
-    key: 'LPVault',
-    label: t('userInfo.lpVault'),
-    icon: icon2,
-    iconDark: icon2Dark,
-    path: '/LPVault'
-  },
-  {
-    key: 'dashboard',
-    label: t('userInfo.dashboard'),
-    icon: icon3,
-    iconDark: icon3Dark,
-    path: '/dashboard'
-  },
-  {
-    key: 'create',
-    label: t('userInfo.createMarket'),
-    icon: icon4,
-    iconDark: icon4Dark,
-    path: '/create'
-  },
-  {
-    key: 'fund',
-    label: t('userInfo.fundManagement'),
-    icon: icon5,
-    iconDark: icon5Dark,
-    path: '/'
-  },
-  {
-    key: 'accuracy',
-    label: t('userInfo.accuracy'),
-    icon: icon6,
-    iconDark: icon6Dark,
-    path: '/accuracy'
-  },
-  {
-    key: 'leaderboard',
-    label: t('userInfo.leaderboard'),
-    icon: icon7,
-    iconDark: icon7Dark,
-    path: '/leaderboard'
-  },
-  {
-    key: 'terms',
-    label: t('userInfo.terms'),
-    icon: icon8,
-    iconDark: icon8Dark,
-    path: '/terms'
-  }
-])
-
-// 第二张图的菜单配置（9个菜单项，有友链）
-const baseMenuItems2 = computed(() => [
-  {
-    key: 'computing-power-services',
-    label: t('userInfo.nodeStaking'),
-    icon: icon1,
-    iconDark: icon1Dark,
-    path: '/computing-power-services'
-  },
-  {
-    key: 'LPVault',
-    label: t('userInfo.lpVault'),
-    icon: icon2,
-    iconDark: icon2Dark,
-    path: '/LPVault'
-  },
-  {
-    key: 'dashboard',
-    label: t('userInfo.dashboard'),
-    icon: icon3,
-    iconDark: icon3Dark,
-    path: '/dashboard'
-  },
-  {
-    key: 'create',
-    label: t('userInfo.createMarket'),
-    icon: icon4,
-    iconDark: icon4Dark,
-    path: '/create'
-  },
-  {
-    key: 'leaderboard',
-    label: t('userInfo.leaderboard'),
-    icon: icon7,
-    iconDark: icon7Dark,
-    path: '/leaderboard'
-  },
-  {
-    key: 'fund',
-    label: t('userInfo.reward'),
-    icon: icon5,
-    iconDark: icon5Dark,
-    path: '/'
-  },
-  {
-    key: 'accuracy',
-    label: t('userInfo.accuracy'),
-    icon: icon6,
-    iconDark: icon6Dark,
-    path: '/accuracy'
-  },
-  {
-    key: 'doc',
-    label: t('userInfo.doc'),
-    icon: icon9,
-    iconDark: icon9Dark,
-    path: '/doc'
-  },
-  {
-    key: 'terms',
-    label: t('userInfo.terms'),
-    icon: icon8,
-    iconDark: icon8Dark,
-    path: '/terms'
-  }
-])
-
-// 根据来源选择菜单配置
-const baseMenuItems = computed(() => {
-  return isFromFooter.value ? baseMenuItems2.value : baseMenuItems1.value
-})
-
-// 根据主题返回实际使用的菜单项（图标随主题切换）
-const menuItems = computed(() =>
-  baseMenuItems.value.map(item => ({
-    ...item,
-    icon: isDark.value ? item.iconDark : item.icon
-  }))
-)
-
-// Ecosystem 模块配置（6个模块）
+// 生态系统菜单配置
 const baseEcosystemItems = computed(() => [
   {
     key: 'computing-power-services',
@@ -390,6 +256,20 @@ const baseEcosystemItems = computed(() => [
     path: '/create'
   },
   {
+    key: 'launchpad',
+    label: t('userInfo.launchpad'),
+    icon: icon14,
+    iconDark: icon14Dark,
+    path: '/'
+  },
+  {
+    key: 'smart-money',
+    label: t('userInfo.smartMoney'),
+    icon: icon15,
+    iconDark: icon15Dark,
+    path: '/'
+  },
+  {
     key: 'fund',
     label: t('userInfo.assets'),
     icon: icon5,
@@ -412,7 +292,46 @@ const ecosystemItems = computed(() =>
   }))
 )
 
-// Others 模块配置（10个模块）
+// choose me菜单配置
+const baseChooseMeItems = computed(() => [
+  {
+    key: 'leaderboard',
+    label: t('userInfo.leaderboard'),
+    icon: icon7,
+    iconDark: icon7Dark,
+    path: '/leaderboard'
+  },
+  {
+    key: 'reward',
+    label: '奖励',
+    icon: icon9,
+    iconDark: icon9Dark,
+    path: '/reward'
+  },
+  {
+    key: 'accuracy',
+    label: '准确度',
+    icon: icon9,
+    iconDark: icon9Dark,
+    path: '/accuracy'
+  },
+  {
+    key: 'terms',
+    label: '使用条款',
+    icon: icon9,
+    iconDark: icon9Dark,
+    path: '/terms'
+  }
+])
+
+const chooseMeItems = computed(() =>
+  baseChooseMeItems.value.map(item => ({
+    ...item,
+    icon: isDark.value ? item.iconDark : item.icon
+  }))
+)
+
+// 其他菜单配置
 const baseOthersItems = computed(() => [
   {
     key: 'audit',
@@ -450,20 +369,6 @@ const baseOthersItems = computed(() => [
     path: '/'
   },
   {
-    key: 'launchpad',
-    label: t('userInfo.launchpad'),
-    icon: icon14,
-    iconDark: icon14Dark,
-    path: '/'
-  },
-  {
-    key: 'smart-money',
-    label: t('userInfo.smartMoney'),
-    icon: icon15,
-    iconDark: icon15Dark,
-    path: '/'
-  },
-  {
     key: 'bug-bounty',
     label: t('userInfo.bugBounty'),
     icon: icon16,
@@ -493,7 +398,7 @@ const othersItems = computed(() =>
   }))
 )
 
-// Support 模块配置（6个模块）
+// 支持菜单配置
 const baseSupportItems = computed(() => [
   {
     key: 'official-verification',
@@ -696,15 +601,21 @@ onMounted(() => {
     }
   }
 
-  .ecosystem-title {
+  // 统一的标题样式
+  .section-title {
     font-size: 16px;
     font-weight: 600;
     color: var(--text-color, #1a1a1a);
     margin-bottom: 24px;
     transition: color 0.3s ease;
+
+    &.section-title-with-margin {
+      margin-top: 32px;
+    }
   }
 
-  .ecosystem-grid {
+  // 统一的网格布局样式
+  .section-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 40px 0px;
@@ -712,7 +623,8 @@ onMounted(() => {
     border-bottom: 1px solid var(--border-color, #F3F3F3);
     margin-bottom: 32px;
 
-    .ecosystem-item {
+    // 统一的网格项样式
+    .section-item {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -723,7 +635,8 @@ onMounted(() => {
         transform: scale(0.95);
       }
 
-      .ecosystem-icon-wrapper {
+      // 统一的图标包装器样式
+      .section-icon-wrapper {
         width: 24px;
         height: 24px;
         display: flex;
@@ -731,123 +644,16 @@ onMounted(() => {
         justify-content: center;
         margin-bottom: 8px;
 
-        .ecosystem-icon {
+        // 统一的图标样式
+        .section-icon {
           width: 100%;
           height: 100%;
           object-fit: contain;
         }
       }
 
-      .ecosystem-label {
-        font-size: 11px;
-        color: var(--text-color, #1a1a1a);
-        text-align: center;
-        line-height: 1.4;
-        transition: color 0.3s ease;
-      }
-    }
-  }
-
-  .others-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-color, #1a1a1a);
-    margin-bottom: 24px;
-    transition: color 0.3s ease;
-  }
-
-  .others-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 40px 0px;
-    padding-bottom: 36px;
-    border-bottom: 1px solid var(--border-color, #F3F3F3);
-    margin-bottom: 32px;
-
-    .others-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      transition: transform 0.2s;
-
-      &:active {
-        transform: scale(0.95);
-      }
-
-      .others-icon-wrapper {
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 8px;
-
-        .others-icon {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-      }
-
-      .others-label {
-        font-size: 11px;
-        color: var(--text-color, #1a1a1a);
-        text-align: center;
-        line-height: 1.4;
-        transition: color 0.3s ease;
-      }
-    }
-  }
-
-  .support-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-color, #1a1a1a);
-    margin-bottom: 24px;
-    margin-top: 32px;
-    transition: color 0.3s ease;
-  }
-
-  .support-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 40px 0px;
-    padding-bottom: 36px;
-    border-bottom: 1px solid var(--border-color, #F3F3F3);
-    margin-bottom: 32px;
-
-    &:last-child {
-      gap: 40px 10px;
-    }
-
-    .support-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      transition: transform 0.2s;
-
-      &:active {
-        transform: scale(0.95);
-      }
-
-      .support-icon-wrapper {
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 8px;
-
-        .support-icon {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-      }
-
-      .support-label {
+      // 统一的标签样式
+      .section-label {
         font-size: 11px;
         color: var(--text-color, #1a1a1a);
         text-align: center;

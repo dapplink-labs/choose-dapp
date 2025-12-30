@@ -57,25 +57,23 @@ const emit = defineEmits(['nav-click'])
 // 导航项配置
 const navItems = [
   { key: 'trends', label: '趋势', path: '/' }, // 使用自定义 SVG
-  { key: 'breaking', label: '突发', path: '/breaking' }, // 使用自定义 SVG
-  { key: 'news', label: '新闻', path: '/news' }, // 使用自定义 SVG
-  { key: 'sports', label: '体育', path: '/sports' },
-  { key: 'finance', label: '金融', path: '/finance' },
-  { key: 'crypto', label: '加密货币', path: '/crypto' }
+  { key: 'breaking', label: '热点', path: '/breaking' }, // 使用自定义 SVG
+  { key: 'news', label: '最新', path: '/news' }, // 使用自定义 SVG
+  { key: 'esports', label: '电子竞技', path: null },
+  { key: 'sports', label: '体育', path: null }, 
+  { key: 'finance', label: '经济', path: null }, 
+  { key: 'crypto', label: '加密货币', path: null },
+  { key: 'company', label: '公司', path: null },
+  { key: 'popularCulture', label: '流行文化', path: null },
+  { key: 'technology', label: '技术', path: null },
+  { key: 'ai', label: '人工智能', path: null } 
 ]
 
 // 路由到导航key的映射
 const routeToNavKey = {
   '/': 'trends',
   '/breaking': 'breaking',
-  '/earnings': '',
-  '/leaderboard': '',
-  '/detail': '',
-  '/accuracy': '',
   '/news': 'news',
-  '/sports': 'sports',
-  '/finance': 'finance',
-  '/crypto': 'crypto'
 }
 
 // 当前激活的导航项
@@ -105,9 +103,9 @@ const handleNavClick = (key) => {
   activeNav.value = key
   emit('nav-click', key)
 
-  // 路由跳转
+  // 路由跳转：path 为 null 时是筛选按钮，不跳转；path 不为 null 则跳转
   const navItem = navItems.find(item => item.key === key)
-  if (navItem && navItem.path) {
+  if (navItem && navItem.path !== null) {
     router.push(navItem.path)
   }
 }

@@ -1,6 +1,7 @@
 <template>
   <div class="bridge">
 
+    <NavBar />
     <div class="swap-container" v-if="bridgeStep === 1">
       <h1>
         {{ $t('bridge.title') }}
@@ -161,7 +162,7 @@
       <!-- 底部按钮 222-->
       <button class="modal-btn" :disabled="isProcessing" @click="bridgeMethod">
         <img src="@/assets/images/bridge/loading.svg" v-if="isProcessing" alt="">
-        <span v-else>{{ $t('bridge.continues') }}</span>
+        <span v-else>{{ $t('bridge.continue') }}</span>
       </button>
     </div>
 
@@ -174,7 +175,7 @@
           <span class="close-btn" @click="handleClose">✕</span>
         </div>
         <div class="search-box">
-          <input v-model="search" type="text" :placeholder="$t('bridge.search')" @input="fliterChain()" />
+          <input v-model="search" type="text" :placeholder="$t('common.search')" @input="fliterChain()" />
         </div>
 
         <div class="chain-list">
@@ -198,7 +199,7 @@
           <span class="close-btn" @click="showModal2 = false">✕</span>
         </div>
         <div class="search-box">
-          <input v-model="search2" type="text" :placeholder="$t('bridge.search')" @input="fliterCoin()" />
+          <input v-model="search2" type="text" :placeholder="$t('common.search')" @input="fliterCoin()" />
         </div>
 
         <div class="chain-list">
@@ -222,7 +223,7 @@
             <tr>
               <th>{{ $t('bridge.record.sourcehash') }}</th>
               <th>{{ $t('bridge.record.tosourcehash') }}</th>
-              <th>{{ $t('bridge.record.name1') }}</th>
+              <th>{{ $t('common.time') }}</th>
               <th>{{ $t('bridge.record.coin') }}</th>
               <th>{{ $t('bridge.record.fee') }}</th>
               <th>{{ $t('bridge.record.total') }}</th>
@@ -249,8 +250,8 @@
               <td>{{ shortAddress(row.to_address) }}</td>
               <td>
                 <span :class="['status', row.status === 1 ? 'success' : 'fail']">
-                  {{ row.status === 1 ? $t('bridge.record.state.success') :
-                    $t('bridge.record.state.ped') }}
+                  {{ row.status === 1 ? $t('common.success') :
+                    $t('common.pending') }}
                 </span>
               </td>
             </tr>
@@ -294,13 +295,13 @@
             <div class="item">
               <b class="statues">{{ $t('bridge.record.state.name') }}</b>
               <span :class="['status', row.status === 1 ? 'success' : 'fail']">
-                {{ row.status === 1 ? $t('bridge.record.state.success') :
+                {{ row.status === 1 ? $t('common.success') :
                   $t('bridge.record.state.ped') }}
               </span>
             </div>
 
             <div class="item">
-              <b class="time">{{ $t('bridge.record.name1') }}</b>
+              <b class="time">{{ $t('common.time') }}</b>
               <span class="see">
                 {{ formatTimestamp(row.msg_sent_timestamp) }}
               </span>
@@ -337,6 +338,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 import { useCounterStore } from '@/stores/counter'
 import { storeToRefs } from 'pinia'
+import NavBar from '../../components/navBar.vue';
 
 // 拿到 store
 const counterStore = useCounterStore()
