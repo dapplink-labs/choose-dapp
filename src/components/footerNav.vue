@@ -59,7 +59,7 @@ const navItems = computed(() => [
   { key: 'home', label: t('footerNav.home') || '首页', path: '/' },
   { key: 'search', label: t('common.search') || '搜索', path: '/breaking' },
   { key: 'breaking', label: t('footerNav.breaking') || '突发', path: '/breaking' },
-  { key: 'more', label: t('common.more') || '更多', path: '/user-info' }
+  { key: 'more', label: t('common.more') || '更多', path: '/personal-center' }
 ])
 
 // 当前激活的导航项
@@ -70,7 +70,7 @@ const routeToNavKey = {
   '/': 'home',
   '/breaking': 'breaking',
   '/settings': 'more',
-  '/user-info': 'more',
+  '/personal-center': 'more',
   '/earnings': 'home',
   '/leaderboard': 'home',
   '/detail': 'home',

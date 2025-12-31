@@ -2,12 +2,13 @@ import { createI18n } from 'vue-i18n'
 import zhCN from './locales/zh-CN'
 import enUS from './locales/en_US'
 import koKR from './locales/ko_KR'
+import jaJP from './locales/ja_JP'
 
 // 从 localStorage 读取保存的语言，如果没有则使用默认值
 const getSavedLocale = () => {
   const savedLocale = localStorage.getItem('app-locale')
   // 验证保存的语言是否有效
-  if (savedLocale === 'zh-cn' || savedLocale === 'en-us' || savedLocale === 'ko-kr') {
+  if (savedLocale === 'zh-cn' || savedLocale === 'en-us' || savedLocale === 'ko-kr' || savedLocale === 'ja-jp') {
     return savedLocale
   }
   return 'en-us' // 默认语言
@@ -21,7 +22,8 @@ const i18n = createI18n({
   messages: {
     'zh-cn': zhCN,
     'en-us': enUS,
-    'ko-kr': koKR
+    'ko-kr': koKR,
+    'ja-jp': jaJP
   }
 })
 

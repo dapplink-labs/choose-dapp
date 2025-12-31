@@ -39,6 +39,9 @@
               <el-dropdown-item command="ko-kr">
                 {{ $t('navbar.language.Korean') || '한국어' }}
               </el-dropdown-item>
+              <el-dropdown-item command="ja-jp">
+                {{ $t('navbar.language.Japanese') || '日本語' }}
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -112,6 +115,9 @@
               </el-dropdown-item>
               <el-dropdown-item command="ko-kr">
                 {{ $t('navbar.language.Korean') || '한국어' }}
+              </el-dropdown-item>
+              <el-dropdown-item command="ja-jp">
+                {{ $t('navbar.language.Japanese') || '日本語' }}
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -372,7 +378,7 @@ const toggleUserMenu = () => {
 }
 
 const handleUserInfo = () => {
-  router.push('/user-info')
+  router.push('/personal-center')
   closeUserMenu()
 }
 

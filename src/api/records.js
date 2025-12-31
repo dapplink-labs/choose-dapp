@@ -12,7 +12,6 @@ export function getBridgeRecords(page,pageSize,order,address) {
             pageSize: pageSize,
             order: order,
             address: address
-
         }
     })
 }

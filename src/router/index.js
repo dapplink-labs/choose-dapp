@@ -7,7 +7,7 @@ import detail from "../views/detail/index.vue"
 import breaking from "../views/breaking/index.vue"
 import accuracy from "../views/accuracy/index.vue"
 import settings from "../views/settings/index.vue"
-import userInformationListH5 from "../views/userInformationListH5/index.vue"
+import personalCenter from "../views/personalCenter/index.vue"
 import linkWallet from "../views/linkWallet/index.vue"
 import computingPowerServices from "../views/computingPowerServices/index.vue"
 import myNode from "../views/myNode/index.vue"
@@ -87,9 +87,9 @@ const router = createRouter({
       }
     },
     {
-      path: '/user-info',
-      name: 'userInformationListH5',
-      component: userInformationListH5,
+      path: '/personal-center',
+      name: 'personalCenter',
+      component: personalCenter,
       meta: {
         hideHeader: true,
         hideFooterNav: true

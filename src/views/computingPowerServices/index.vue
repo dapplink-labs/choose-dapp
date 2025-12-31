@@ -4,11 +4,7 @@
 
     <div class="cps-content">
       <div class="cps-card">
-        <BackHeaderNav 
-          :show-open-btn="true"
-          :use-default-open-action="false"
-          @open-click="handleOpenMore"
-        />
+        <BackHeaderNav :show-open-btn="true" :use-default-open-action="false" @open-click="handleOpenMore" />
 
         <h1 class="cps-title">{{ t('computingPower.title') }}</h1>
 
@@ -101,7 +97,7 @@ import { useThemeStore } from '@/stores/theme'
 import { useAccount, useChainId } from '@wagmi/vue'
 import { writeContract, waitForTransactionReceipt, readContract, switchChain, getPublicClient } from '@wagmi/core'
 import { config } from '@/wagmi.ts'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElLoading } from 'element-plus'
 import erc20ABI from '@/assets/abi/erc20ABI'
 
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
@@ -177,29 +173,29 @@ const activationMsgParts = computed(() => {
   const msg = activationMsg.value
   const address = activationAddress.value
   const parts = []
-  
+
   // 查找地址在消息中的位置
   const addressIndex = msg.indexOf(address)
-  
+
   if (addressIndex === -1) {
     // 如果找不到地址，直接返回整个消息
     return [{ text: msg, isAddress: false }]
   }
-  
+
   // 地址前的文本
   if (addressIndex > 0) {
     parts.push({ text: msg.substring(0, addressIndex), isAddress: false })
   }
-  
+
   // 地址部分
   parts.push({ text: address, isAddress: true })
-  
+
   // 地址后的文本
   const afterIndex = addressIndex + address.length
   if (afterIndex < msg.length) {
     parts.push({ text: msg.substring(afterIndex), isAddress: false })
   }
-  
+
   return parts
 })
 
@@ -233,13 +229,19 @@ const handleConfirmBuy = async () => {
       ElMessage.error('请先连接钱包')
       return
     }
-
+    // 打开加载弹窗
+    ElLoading.service({
+      lock: true,
+      text: '加载中...',
+      background: 'rgba(0, 0, 0, 0.7)',
+      customClass: 'custom-loading'
+    })
     // 2. 检查并切换到 BSC 主网（chainId: 56）
     const BSC_CHAIN_ID = 56
     const currentChainId = Number(chainId.value)
-    
+
     console.log('当前 chainId:', chainId.value, '类型:', typeof chainId.value)
-    
+
     // 如果当前不是 BSC 主网，尝试切换
     if (currentChainId !== BSC_CHAIN_ID) {
       ElMessage({
@@ -247,19 +249,19 @@ const handleConfirmBuy = async () => {
         type: 'warning',
         duration: 3000
       })
-      
+
       try {
         await switchChain(config, { chainId: BSC_CHAIN_ID })
-        
+
         // 等待网络切换完成
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         // 验证切换是否成功
         const newChainId = Number(chainId.value)
         if (newChainId !== BSC_CHAIN_ID) {
           throw new Error('网络切换失败，请手动切换到 BSC 主网')
         }
-        
+
         ElMessage({
           message: '已成功切换到 BSC 主网',
           type: 'success',
@@ -267,12 +269,12 @@ const handleConfirmBuy = async () => {
         })
       } catch (error) {
         console.error('切换网络失败:', error)
-        
+
         // 处理用户拒绝切换的情况
-        if (error.code === 4001 || 
-            error.message?.includes('User rejected') || 
-            error.message?.includes('user rejected') ||
-            error.message?.includes('User denied')) {
+        if (error.code === 4001 ||
+          error.message?.includes('User rejected') ||
+          error.message?.includes('user rejected') ||
+          error.message?.includes('User denied')) {
           ElMessage({
             message: '用户取消了网络切换，请手动切换到 BSC 主网（chainId: 56）',
             type: 'warning',
@@ -287,7 +289,7 @@ const handleConfirmBuy = async () => {
 
     // 3. 获取 BSC 主网配置
     const currentChain = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
-    
+
     if (!currentChain) {
       console.error('未找到 BSC 主网配置')
       ElMessage.error('BSC 主网配置不存在，请联系管理员')
@@ -300,156 +302,79 @@ const handleConfirmBuy = async () => {
     const proxyNodeManager = currentChain.proxyNodeManager // 节点管理合约地址
     const proxyChooseMeToken = currentChain.proxyChooseMeToken // ERC20 代币合约地址
     const proxyStakingManager = currentChain.proxyStakingManager // 质押管理合约地址
-    
+
     console.log('proxyNodeManager:', proxyNodeManager)
     console.log('proxyChooseMeToken:', proxyChooseMeToken)
-    
-    if (!proxyNodeManager) {
-      console.error('节点管理合约地址未配置，当前链配置:', currentChain)
-      ElMessage.error(`节点管理合约地址未配置（当前链: ${currentChain.name}，chainId: ${currentChain.chainId}）`)
-      return
-    }
-    
-    if (!proxyChooseMeToken) {
-      console.error('代币合约地址未配置，当前链配置:', currentChain)
-      ElMessage.error(`代币合约地址未配置（当前链: ${currentChain.name}，chainId: ${currentChain.chainId}）`)
-      return
-    }
+
 
     // ========== 步骤 1: 读取 proxyNodeManager 合约上的 t1Staking 得到金额大小 ==========
-    ElMessage({
-      message: '正在查询节点质押金额...',
-      type: 'info',
-      duration: 2000
-    })
 
     // 确保使用正确的 chainId
-    let t1StakingAmount
-    try {
-      t1StakingAmount = await readContract(config, {
-        address: proxyStakingManager,
-        abi: nodeManagerABI,
-        functionName: 't1Staking',
-        chainId: BSC_CHAIN_ID // 显式指定 chainId，确保使用正确的 RPC
-      })
-    } catch (error) {
-      console.error('读取 t1Staking 失败:', error)
-      
-      // 处理不同类型的错误
-      if (error.message?.includes('Failed to fetch') || error.message?.includes('HTTP request failed')) {
-        ElMessage.error('网络请求失败，请检查网络连接或稍后重试。如果问题持续，可能是 BSC RPC 端点暂时不可用。')
-      } else if (error.message?.includes('reverted') || error.message?.includes('execution reverted')) {
-        // 合约执行被 revert，可能是合约地址错误、函数不存在或合约状态问题
-        ElMessage.error('合约调用失败：函数执行被回退。请检查合约地址是否正确，或联系管理员确认合约状态。')
-        console.error('合约地址:', proxyNodeManager)
-        console.error('函数名: t1Staking')
-        console.error('ChainId:', BSC_CHAIN_ID)
-      } else if (error.message?.includes('function') && error.message?.includes('not found')) {
-        ElMessage.error('合约函数不存在，请检查 ABI 配置是否正确。')
-      } else {
-        ElMessage.error(`查询质押金额失败: ${error.message || '未知错误'}`)
-      }
-      throw error
-    }
-    console.log('t1StakingAmount:', t1StakingAmount)
+    let t1StakingAmount = await readContract(config, {
+      address: proxyStakingManager,
+      abi: nodeManagerABI,
+      functionName: 't1Staking',
+      chainId: BSC_CHAIN_ID // 显式指定 chainId，确保使用正确的 RPC
+    })
+
     const amountBigInt = BigInt(t1StakingAmount.toString())
-    const amountDisplay = parseFloat(formatUnits(amountBigInt, 18))
-    
-    console.log('T1 质押金额:', amountDisplay, '代币')
-    console.log('金额 (BigInt):', amountBigInt.toString())
+    const amountDisplay = parseFloat(formatUnits(amountBigInt, 6))
+
 
 
     // ========== 步骤 2: 调用 proxyChooseMeToken 合约的 approve 方法 ==========
-    ElMessage({
-      message: '正在授权代币...',
-      type: 'info',
-      duration: 2000
-    })
 
     // 检查当前授权额度
     const currentAllowance = await readContract(config, {
       address: proxyChooseMeToken,
       abi: erc20ABI,
       functionName: 'allowance',
-      args: [address.value, proxyNodeManager],
+      args: [address.value, proxyStakingManager],
       chainId: BSC_CHAIN_ID // 显式指定 chainId
     })
 
     const allowanceBigInt = BigInt(currentAllowance.toString())
-    console.log('当前授权额度:', formatUnits(allowanceBigInt, 18))
 
     // 如果授权额度不足，执行授权
-    if (allowanceBigInt < amountBigInt) {
-      console.log('授权额度不足，执行授权...')
-      
-      const approveHash = await writeContract(config, {
-        address: proxyChooseMeToken,
-        abi: erc20ABI,
-        functionName: 'approve',
-        args: [proxyNodeManager, amountBigInt],
-        chainId: BSC_CHAIN_ID // 显式指定 chainId
-      })
+    const approveHash = await writeContract(config, {
+      address: proxyChooseMeToken,
+      abi: erc20ABI,
+      functionName: 'approve',
+      args: [proxyStakingManager, amountBigInt],
+      chainId: BSC_CHAIN_ID // 显式指定 chainId
+    })
 
-      console.log('授权交易已提交，哈希:', approveHash)
-
-      ElMessage({
-        message: '授权交易已提交，等待确认...',
-        type: 'info',
-        duration: 3000
-      })
-
-      // 等待授权交易确认
-      const approveReceipt = await waitForTransactionReceipt(config, {
-        hash: approveHash
-      })
-
-      if (approveReceipt.status !== 'success') {
-        ElMessage.error('授权失败')
-        return
-      }
-
-      ElMessage({
-        message: '授权成功！',
-        type: 'success',
-        duration: 2000
-      })
-    } else {
-      console.log('授权额度充足，跳过授权步骤')
-    }
-    // ========== 步骤 3: 调用 proxyNodeManager 的 liquidityProviderDeposit 方法 ==========
-    ElMessage({
-      message: '正在提交节点质押交易...',
-      type: 'info',
-      duration: 2000
+    // 等待授权交易确认
+    const approveReceipt = await waitForTransactionReceipt(config, {
+      hash: approveHash
     })
 
     // 邀请人地址
     const inviterAddress = '0xD837FF8cb366D1f9ebDB0659b066b709804D52bc'
 
-    // 预估质押交易 gas
-    const depositGas = await estimateContractGas(getPublicClient(config), {
+    console.log('=======================', amountBigInt)
+
+    // 预估质押交易 gas（可选，用于调试）
+    try {
+      const publicClient = getPublicClient(config, { chainId: BSC_CHAIN_ID })
+      const depositGas = await estimateContractGas(publicClient, {
+        account: address.value,
+        address: proxyStakingManager,
+        abi: nodeManagerABI,
+        functionName: 'liquidityProviderDeposit',
+        args: [inviterAddress, amountBigInt]
+      })
+      console.log('质押交易 gas:', depositGas)
+    } catch (gasError) {
+      console.warn('Gas 估算失败，将继续执行交易:', gasError)
+    }
+    // 调用 proxyNodeManager 的 liquidityProviderDeposit 方法
+    const depositHash = await writeContract(config, {
       address: proxyStakingManager,
       abi: nodeManagerABI,
       functionName: 'liquidityProviderDeposit',
       args: [inviterAddress, amountBigInt],
-      chainId: BSC_CHAIN_ID // 显式指定 chainId
-    })
-    // 调用 proxyNodeManager 的 liquidityProviderDeposit 方法
-    // 注意：根据用户需求，应该调用 proxyNodeManager，而不是 proxyStakingManager
-    const depositHash = await writeContract(config, {
-      address: proxyNodeManager, // 使用 proxyNodeManager，不是 proxyStakingManager
-      abi: nodeManagerABI,
-      functionName: 'liquidityProviderDeposit',
-      args: [inviterAddress, amountBigInt],
-      chainId: BSC_CHAIN_ID // 显式指定 chainId
-    })
-
-    console.log('质押交易已提交，哈希:', depositHash)
-
-    ElMessage({
-      message: '质押交易已提交，等待确认...',
-      type: 'info',
-      duration: 3000
+      chainId: BSC_CHAIN_ID
     })
 
     // 等待质押交易确认
@@ -464,24 +389,29 @@ const handleConfirmBuy = async () => {
         type: 'success',
         duration: 3000
       })
-      
+
       // 关闭弹窗
       showPurchaseNode.value = false
-      
+
       // 可以在这里刷新节点列表或跳转到我的节点页面
       // router.push('/myNode')
     } else {
       ElMessage.error('质押交易失败')
     }
 
+    // 关闭加载弹窗
+    ElLoading.service().close()
+
   } catch (error) {
+    // 关闭加载弹窗
+    ElLoading.service().close()
     console.error('购买节点失败:', error)
-    
+
     // 处理用户拒绝错误
-    if (error.code === 4001 || 
-        error.message?.includes('User rejected') || 
-        error.message?.includes('user rejected') ||
-        error.message?.includes('User denied')) {
+    if (error.code === 4001 ||
+      error.message?.includes('User rejected') ||
+      error.message?.includes('user rejected') ||
+      error.message?.includes('User denied')) {
       ElMessage({
         message: '用户取消了交易',
         type: 'warning',
@@ -493,7 +423,7 @@ const handleConfirmBuy = async () => {
       console.error('合约执行被 revert，错误签名:', errorSignature)
       console.error('合约地址:', error.data?.address || 'unknown')
       console.error('函数名:', error.data?.functionName || 'unknown')
-      
+
       // 根据错误签名提供更友好的提示
       if (errorSignature === '0xfb8f41b2' || error.message?.includes('0xfb8f41b2')) {
         ElMessage.error('合约执行失败：可能是余额不足、授权不足或合约状态不正确。请检查：1) 代币余额是否充足 2) 是否已正确授权 3) 邀请人地址是否正确')

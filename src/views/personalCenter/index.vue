@@ -611,8 +611,8 @@ onMounted(() => {
 
     &.section-title-with-margin {
       margin-top: 32px;
+      }
     }
-  }
 
   // 统一的网格布局样式
   .section-grid {

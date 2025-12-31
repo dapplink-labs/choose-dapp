@@ -27,6 +27,9 @@
                   <el-menu-item index="6-4">
                     {{ $t("navbar.language.Korean") }}
                   </el-menu-item>
+                  <el-menu-item index="6-5">
+                    {{ $t("navbar.language.Japanese") }}
+                  </el-menu-item>
                 </el-sub-menu>
                 <!--  @click="showConnet = true" -->
                 <button class="conentc-btn" v-if="status != 'connected'" @click="islogin()">
@@ -60,6 +63,9 @@
                   </el-menu-item>
                   <el-menu-item index="6-4">
                     {{ $t("navbar.language.Korean") }}
+                  </el-menu-item>
+                  <el-menu-item index="6-5">
+                    {{ $t("navbar.language.Japanese") }}
                   </el-menu-item>
                 </el-sub-menu>
               </el-menu>
@@ -592,7 +598,17 @@ const handleSelect = (index, indexPath) => {
     return;
   }
 
-  if (index != "6-1" && index != "6-3" && index != "6-4") {
+  if (index == "6-5") {
+    locale.value = "ja-jp"; // 日语
+    document.documentElement.setAttribute("data-lang", locale.value);
+    localStorage.setItem("app-locale", locale.value);
+    setTimeout(() => {
+      menuRef.value && menuRef.value.close && menuRef.value.close("6");
+    }, 100);
+    return;
+  }
+
+  if (index != "6-1" && index != "6-3" && index != "6-4" && index != "6-5") {
     const obj = menuList.value.find((item) => item.index === indexPath[0]);
     if (obj && obj.itemList) {
       const item = obj.itemList.find((item) => item.index === indexPath[1]);

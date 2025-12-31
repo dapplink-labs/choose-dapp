@@ -126,12 +126,12 @@ export default {
     },
     language: {
       cn: "Chinese",
-      chFan: "繁体",
+      chFan: "Chinese (Traditional)",
       en: "English",
-      Vietnamese: "越南语",
-      Turkish: "土耳其语",
-      Korean: "韩语",
-      Japanese: "日语"
+      Vietnamese: "Vietnamese",
+      Turkish: "Turkish",
+      Korean: "Korean",
+      Japanese: "Japanese"
     },
     link: "Connect",
     warining:"Multiple wallet extensions detected in your browser. Please keep only one!",
