@@ -7,14 +7,12 @@ import clusterNodeImgDark from '@/assets/icon/ClusterNode.png'
 import clusterNodeImg from '@/assets/icon/11.png'
 import { useThemeStore } from '@/stores/theme'
 import { useAccount, useChainId } from '@wagmi/vue'
-import { writeContract, waitForTransactionReceipt, readContract, switchChain } from '@wagmi/core'
+import { readContract, switchChain } from '@wagmi/core'
 import { ElMessage, ElLoading } from 'element-plus'
-import erc20ABI from '@/assets/abi/erc20ABI.json'
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
 import networks from '@/assets/json/networks.json'
-import { computedGas, checkAllowance, approveToken } from '@/views/bridge/bridgeCore.js'
-import { formatUnits, parseUnits } from 'viem'
-import { config } from '../../wagmi'
+import { checkAllowance, approveToken, writeContractOptimized, safeBigInt, getUserTokenBalance } from '@/utils/requestWEB3.js'
+import { config } from '../../wagmi.ts'
 
 export function useComputingPowerServices() {
   const router = useRouter()
@@ -33,6 +31,12 @@ export function useComputingPowerServices() {
 
   // 节点 TAB 状态（用于弹窗标题）
   const activeNodeTab = ref('distributed')
+
+  // 节点金额，单位为 wei
+  const nodePriceObj = ref({
+    DistributedNode: BigInt('500000000000000000000'),//分布式节点金额
+    ClusterNode: BigInt('1000000000000000000000'),//集群节点金额
+  })
 
   // 节点卡片数据（从服务端获取，空时用默认兜底）
   const nodeProducts = ref([])
@@ -176,315 +180,127 @@ export function useComputingPowerServices() {
     })
   }
 
-  /**
- * 检查是否为用户拒绝错误
- */
-  const isUserRejectedError = (error, message) => {
-    if (message) {
-      ElMessage({
-        message: message,
-        type: 'warning',
-        duration: 4000
-      })
+  // 获取节点价格
+  const getNodePrice = async () => {
+    const obj = {
+      DistributedNode: BigInt('500000000000000000000'), // 默认 500 USDT (18 decimals)
+      ClusterNode: BigInt('10000000000000000000000')    // 默认 10000 USDT (18 decimals)
     }
-    return (
-      error.info?.error?.code === 4001 ||
-      error.code === 4001 ||
-      error.message?.includes('User rejected') ||
-      error.message?.includes('user rejected') ||
-      error.message?.includes('User denied') ||
-      error.message?.includes('cancelled')
-    )
-  }
-
-  /**
-   * 检查 USDT 授权额度
-   */
-  const checkAllowance = async (tokenAddress, ownerAddress, spenderAddress) => {
-    try {
-      // readContract 方法用于读取区块链上的合约数据
-      // 这里调用 ERC20 合约的 allowance 方法来获取授权额度
-      const allowanceResult = await readContract(config, {
-        address: tokenAddress,
-        abi: erc20ABI,
-        functionName: 'allowance',// ERC20 标准的 allowance 方法
-        args: [ownerAddress, spenderAddress]
-      })
-      // 返回授权额度，确保是 BigInt 类型
-      return BigInt(allowanceResult || 0)
-    } catch (error) {
-      console.error('Failed to check allowance:', error)
-      return BigInt(0)
-    }
-  }
-
-  /**
- * 安全的 BigInt 转换函数
- */
-  function safeBigInt(value) {
-    // 如果当前传入的amount金额已经是bigint类型，则直接返回
-    if (typeof value === 'bigint') return value
-    // 如果当前传入的金额为字符串或者数值类型，则尝试转换为bigint类型
-    if (typeof value === 'string' || typeof value === 'number') {
-      try {
-        return BigInt(value)
-      } catch (error) {
-        throw new Error(`Invalid amount format: ${value}`)
-      }
-    }
-    throw new Error(`Unsupported amount type: ${typeof value}`)
-  }
-
-  // 确认购买节点
-  const handleConfirmBuy = async () => {
 
     try {
-      // 1. 检查钱包连接
-      if (!address.value) {
-        ElMessage.error('请先连接钱包')
-        return
-      }
-      // 打开加载弹窗
-      openLoading()
+      const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
+      if (!bscNet?.proxyNodeManager) return obj
 
-      // 2. 如果当前不是 BSC 主网，尝试切换
-      if (currentChainId !== BSC_CHAIN_ID) {
-        ElMessage({
-          message: `当前网络不是 BSC 主网，正在切换到 BSC 主网（chainId: ${BSC_CHAIN_ID}）...`,
-          type: 'warning',
-          duration: 3000
-        })
-        // 切换到 BSC 主网
-        await switchChain(config, { chainId: BSC_CHAIN_ID })
-
-        // 等待网络切换完成
-        await new Promise((resolve) => setTimeout(() => resolve(), 1000))
-
-        // 验证切换是否成功
-        const newChainId = Number(chainId.value)
-        if (newChainId !== BSC_CHAIN_ID) throw new Error('网络切换失败，请手动切换到 BSC 主网')
-
-        ElMessage({
-          message: '已成功切换到 BSC 主网',
-          type: 'success',
-          duration: 2000
-        })
-      }
-
-      // 3. 获取 BSC 主网配置
-      const currentChain = networks.find((n) => Number(n.chainId) === BSC_CHAIN_ID)
-
-      if (!currentChain) {
-        ElMessage.error('未找到 BSC 主网配置，请检查网络连接')
-        return
-      }
-
-
-      // 交易START
-      const proxyNodeManager = currentChain.proxyNodeManager // 节点管理合约地址
-      const usdtTokenAddress = currentChain.usdtTokenAddress // USDT 代币合约地址
-
-      // ========== 步骤 1: 读取 USDT 的 decimals ==========
-      let usdtDecimals = Number(18) 
-      // const decimals = await readContract(config, {
-      //   address: usdtTokenAddress,
-      //   abi: erc20ABI,
-      //   functionName: 'decimals',
-      //   chainId: BSC_CHAIN_ID
-      // })
-      // usdtDecimals = Number(decimals)
-      // console.log('USDT decimals:', usdtDecimals)
-
-      // ========== 步骤 2: 从合约读取节点价格（后续有接口后替换为接口数据） ==========
-      let nodePrice
-      // 读取节点价格
-      // const price = await readContract(config, {
-      //   address: proxyNodeManager,
-      //   abi: nodeManagerABI,
-      //   functionName: activeNodeTab.value === 'distributed' ? 'buyDistributedNode' : 'buyClusterNode',
-      //   chainId: BSC_CHAIN_ID
-      // })
-      // nodePrice = safeBigInt(price.toString())
-      // console.log('从合约读取的节点价格:', nodePrice.toString())
-
-      const fixedAmount = activeNodeTab.value === 'distributed' ? '500' : '10000'
-      nodePrice = parseUnits(fixedAmount, usdtDecimals)
-
-      const amountBigInt = nodePrice
-      console.log('最终使用的金额:', amountBigInt.toString())
-
-      // ========== 步骤 3: 读取 USDT 余额 ==========
-      const usdtBalance = await checkAllowance(usdtTokenAddress, address.value, proxyNodeManager)
-      console.log(usdtBalance)
-      ElLoading.service().close()
-      return
-
-
-      const balanceDisplay = formatUnits(usdtBalance, usdtDecimals)
-      const amountDisplay = formatUnits(amountBigInt, usdtDecimals)
-
-      console.log('========== 余额计算结果 ==========')
-      console.log('USDT 余额 (BigInt/wei):', usdtBalance.toString())
-      console.log('USDT 余额 (显示):', balanceDisplay)
-      console.log('需要金额 (BigInt/wei):', amountBigInt.toString())
-      console.log('需要金额 (显示):', amountDisplay)
-      console.log('USDT decimals:', usdtDecimals)
-      console.log('===================================')
-
-      // 如果余额为 0，给出提示
-      if (balanceBigInt === 0n) {
-        console.warn('⚠️ 警告：查询到的余额为 0')
-        console.warn('请确认：')
-        console.warn('1. 您的钱包地址是否正确:', address.value)
-        console.warn('2. 您持有的 USDT 合约地址是否为:', usdtTokenAddress)
-        console.warn('3. 您是否在 BSC 主网上（chainId: 56）')
-        console.warn('4. 标准 BSC USDT 地址为: 0x55d398326f99059fF775485246999027B3197955')
-        console.warn('   当前使用的地址为:', usdtTokenAddress)
-      }
-
-      if (balanceBigInt < amountBigInt) {
-        ElMessage.error(`USDT 余额不足！当前余额: ${balanceDisplay} USDT，需要: ${amountDisplay} USDT`)
-        return
-      }
-
-      // ========== 步骤 2: 使用 bridgeCore 中的方法检查并授权 USDT 给 proxyNodeManager ==========
-
-      // 先检查当前授权额度
-      const allowanceBigInt = await checkAllowance(
-        usdtTokenAddress,
-        address.value,
-        proxyNodeManager
-      )
-      console.log('当前授权额度:', allowanceBigInt.toString(), '需要额度:', amountBigInt.toString())
-
-      if (allowanceBigInt < amountBigInt) {
-        ElMessage({
-          message: '正在授权 USDT...',
-          type: 'info',
-          duration: 2000
-        })
-
-        try {
-          // 复用桥接模块中的授权逻辑（包含 gas 预估与错误提示）
-          await approveToken({
-            tokenAddress: usdtTokenAddress,
-            spenderAddress: proxyNodeManager,
-            amount: amountBigInt,
-            userAddress: address.value,
-            useExactApproval: true,
-            BRIDGE_MESSAGES: {
-              approvalSuccess: 'USDT 授权成功',
-              userCancelledAuth: '用户取消了授权',
-              approveTokenFailed: 'USDT 授权失败：'
-            }
-          })
-        } catch (approveError) {
-          console.error('USDT 授权失败:', approveError)
-          ElMessage.error(approveError?.message || 'USDT 授权失败，请重试')
-          return
-        }
-      } else {
-        console.log('当前授权额度已足够，无需重新授权')
-      }
-
-      // ========== 步骤 3: 使用 bridgeCore 的 gas 预估方法调用 purchaseNode 激活节点 ==========
-
-      ElMessage({
-        message: '正在激活节点...',
-        type: 'info',
-        duration: 2000
-      })
-
-      try {
-        // 先预估 purchaseNode 所需的 gas（内部会自动处理失败并给出兜底值）
-        const gasEstimate = await computedGas(
-          nodeManagerABI,
-          'purchaseNode',
-          [amountBigInt],
-          proxyNodeManager,
-          address.value
-        )
-
-        // 发起交易，带上预估 gas 与费用配置
-        const purchaseHash = await writeContract(config, {
-          address: proxyNodeManager,
+      // 这里假设合约中有查询价格的方法，或者通过购买函数的模拟调用获取
+      // 如果合约没有直接查价方法，请确保 functionName 对应正确的 view 函数
+      const [p1, p2] = await Promise.all([
+        readContract(config, {
+          address: bscNet.proxyNodeManager,
           abi: nodeManagerABI,
-          functionName: 'purchaseNode',
-          args: [amountBigInt],
-          chainId: BSC_CHAIN_ID,
-          gas: gasEstimate.gas,
-          maxFeePerGas: gasEstimate.maxFeePerGas,
-          maxPriorityFeePerGas: gasEstimate.maxPriorityFeePerGas
-        })
+          functionName: 'distributedNodePrice', // 请确认 ABI 里的查价函数名
+        }).catch(() => BigInt('500000000000000000000')),
+        readContract(config, {
+          address: bscNet.proxyNodeManager,
+          abi: nodeManagerABI,
+          functionName: 'clusterNodePrice', // 请确认 ABI 里的查价函数名
+        }).catch(() => BigInt('10000000000000000000000'))
+      ])
 
-        console.log('交易哈希:', purchaseHash)
+      obj.DistributedNode = safeBigInt(p1)
+      obj.ClusterNode = safeBigInt(p2)
+    } catch (e) {
+      console.warn('Fetch price failed, using defaults', e)
+    }
+    return obj
+  }
 
-        // 等待交易确认
-        const purchaseReceipt = await waitForTransactionReceipt(config, {
-          hash: purchaseHash
-        })
+  const handleConfirmBuy = async () => {
+    if (!address.value) {
+      ElMessage.error('请先连接钱包')
+      return
+    }
 
-        // 检查交易状态
-        if (purchaseReceipt.status === 'success') {
-          ElMessage({
-            message: '节点激活成功！',
-            type: 'success',
-            duration: 3000
-          })
+    const loading = ElLoading.service({ lock: true, text: '正在核对余额...', background: 'rgba(0, 0, 0, 0.7)' })
 
-          // 关闭弹窗
-          showPurchaseNode.value = false
-        } else {
-          ElMessage.error('节点激活交易失败')
-        }
-      } catch (purchaseError) {
-        console.error('激活节点失败:', purchaseError)
-        // 提供更详细的错误信息
-        const err = purchaseError || {}
-        if (err.message?.includes('reverted') || err.message?.includes('execution reverted')) {
-          ElMessage.error('合约执行失败。请检查：1) USDT 余额是否充足 2) 是否已正确授权 3) 节点价格是否正确')
-        } else if (err.code === 4001 || err.message?.includes('User rejected')) {
-          ElMessage({
-            message: '用户取消了交易',
-            type: 'warning',
-            duration: 2000
-          })
-        } else {
-          ElMessage.error(purchaseError?.message || '激活节点失败，请重试')
-        }
-        throw purchaseError
+    try {
+      // 1. 网络环境检查 (BSC 56)
+      if (Number(chainId.value) !== BSC_CHAIN_ID) {
+        await switchChain(config, { chainId: BSC_CHAIN_ID })
+        await new Promise(r => setTimeout(r, 1000))
       }
 
-      // 关闭加载弹窗
-      ElLoading.service().close()
+      const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
+      const { proxyNodeManager, usdtTokenAddress } = bscNet
 
-    } catch (error) {
-      // 关闭加载弹窗
-      ElLoading.service().close()
-      console.error('激活节点失败:', error)
+      // 2. 确定本次交易需要的金额
+      const priceKey = activeNodeTab.value === 'distributed' ? 'DistributedNode' : 'ClusterNode'
+      let amountBigInt = nodePriceObj.value[priceKey]
 
-      const err = error || {}
+      if (amountBigInt <= BigInt(0)) {
+        const latest = await getNodePrice()
+        amountBigInt = latest[priceKey]
+      }
 
-      // 处理用户拒绝错误
-      if (err.code === 4001 ||
-        err.message?.includes('User rejected') ||
-        err.message?.includes('user rejected') ||
-        err.message?.includes('User denied')) {
+      // ============ 余额检查 ============
+      console.log('🔍 Checking balance...')
+      const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value)
+
+      console.log('💰 Balance Report:', {
+        has: userBalance.toString(),
+        needs: amountBigInt.toString()
+      })
+
+      if (userBalance < amountBigInt) {
+        // 如果余额不足，直接报错并停止执行
         ElMessage({
-          message: '用户取消了交易',
-          type: 'warning',
-          duration: 2000
+          message: `余额不足！你需要 ${Number(amountBigInt) / 1e18} USDT。`,
+          type: 'error',
+          duration: 5000,
+          showClose: true
         })
-      } else if (err.message?.includes('reverted') || err.message?.includes('execution reverted')) {
-        // 合约执行被 revert
-        const errorSignature = err.data?.errorName || err.data?.signature || 'unknown'
-        console.error('合约执行被 revert，错误签名:', errorSignature)
-        console.error('合约地址:', err.data?.address || 'unknown')
-        console.error('函数名:', err.data?.functionName || 'unknown')
-        ElMessage.error(`合约执行失败：${err.message || '未知错误'}。请检查：1) USDT 余额是否充足 2) 是否已正确授权 3) 金额是否正确`)
-      } else {
-        ElMessage.error(err.message || '激活节点失败，请重试')
+        loading.close() // 关闭加载状态
+        return // 停止后续的授权和购买逻辑
       }
+      // ==========================================
+
+      // 3. 检查授权 (只有余额充足才会走到这一步)
+      const allowance = await checkAllowance(usdtTokenAddress, address.value, proxyNodeManager)
+      if (allowance < amountBigInt) {
+        loading.text = '正在请求 USDT 授权...'
+        await approveToken({
+          tokenAddress: usdtTokenAddress,
+          spenderAddress: proxyNodeManager,
+          amount: amountBigInt,
+          userAddress: address.value,
+          BRIDGE_MESSAGES: {
+            approvalSuccess: '授权成功',
+            userCancelledAuth: '你取消了授权',
+            approveTokenFailed: '授权失败'
+          }
+        })
+      }
+
+      // 4. 执行购买
+      loading.text = '正在支付并激活节点...'
+      await writeContractOptimized({
+        abi: nodeManagerABI,
+        address: proxyNodeManager,
+        functionName: 'purchaseNode',
+        args: [amountBigInt],
+        userAddress: address.value,
+        messages: {
+          success: '节点激活成功！',
+          failed: '支付失败',
+          rejected: '你取消了支付'
+        }
+      })
+
+      showPurchaseNode.value = false
+    } catch (error) {
+      console.error('Purchase flow failed:', error)
+      // 错误已由工具函数内的 ElMessage 处理
+    } finally {
+      loading.close()
     }
   }
 
@@ -494,7 +310,7 @@ export function useComputingPowerServices() {
     if (isFetchingNodeProducts.value) {
       return
     }
-    
+
     isFetchingNodeProducts.value = true
     try {
       const res = await fetch('/api/node-products')
@@ -557,7 +373,10 @@ export function useComputingPowerServices() {
     }
   }
 
-  onMounted(fetchNodeProducts)
+  onMounted(async () => {
+    fetchNodeProducts()
+    nodePriceObj.value = await getNodePrice()
+  })
 
   // 保留当前选中节点图（弹窗可能复用）
   const currentNodeImg = computed(() =>
