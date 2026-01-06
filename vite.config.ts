@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     host: '0.0.0.0', // 允许外部访问，通常用于 Docker 或云环境
-    port: 3000, // 配置服务器监听端口
+    port: 3001, // 配置服务器监听端口
     open: true, // 自动打开浏览器
     cors: true, // 允许跨域请求
     proxy: {
@@ -16,6 +16,23 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+      "/bsc-rpc": {
+        target: "https://bsc-dataseed.binance.org",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/bsc-rpc/, ""),
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('proxy error', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log('Sending Request to the Target:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+          });
+        },
       }
     },
   },

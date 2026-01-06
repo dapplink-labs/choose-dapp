@@ -83,6 +83,7 @@ export const useLinkWallet = () => {
   const chainId = useChainId()
   const { status } = useAccount()
   const themeStore = useThemeStore()
+  console.log(chainId)
 
   const isConnectingFromPage = ref(false)
 

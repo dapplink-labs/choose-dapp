@@ -41,29 +41,27 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue"
 import { useAccount } from "@wagmi/vue"
 import { useI18n } from 'vue-i18n'
 
-const { address, status } = useAccount();
+const { address, status } = useAccount()
 const { t } = useI18n()
 
-const props = defineProps({
-  portfolioAmount: {
-    type: [String, Number],
-    default: '4.17'
-  },
-  cashAmount: {
-    type: [String, Number],
-    default: '3.88'
-  },
-  userAvatar: {
-    type: String,
-    default: 'https://effigy.im/a/default.svg'
-  }
+interface Props {
+  portfolioAmount?: string | number
+  cashAmount?: string | number
+  userAvatar?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  portfolioAmount: '4.17',
+  cashAmount: '3.88',
+  userAvatar: 'https://effigy.im/a/default.svg'
 })
-const userAvatar = computed(() => {
+
+const userAvatar = computed<string>(() => {
   if (props.userAvatar !== 'https://effigy.im/a/default.svg') {
     return props.userAvatar
   }
