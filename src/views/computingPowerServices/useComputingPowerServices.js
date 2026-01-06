@@ -20,8 +20,6 @@ export function useComputingPowerServices() {
   const { isDark } = useThemeStore()
   const { address } = useAccount()
   const chainId = useChainId()
-  // 当前链id
-  const currentChainId = Number(chainId.value)
   // BSC 主网chainId
   const BSC_CHAIN_ID = 56
 
@@ -170,21 +168,11 @@ export function useComputingPowerServices() {
   }
 
 
-  // 打开loading弹窗
-  const openLoading = () => {
-    ElLoading.service({
-      lock: true,
-      text: '加载中...',
-      background: 'rgba(0, 0, 0, 0.7)',
-      customClass: 'custom-loading'
-    })
-  }
-
   // 获取节点价格
   const getNodePrice = async () => {
     const obj = {
-      DistributedNode: BigInt('500000000000000000000'), // 默认 500 USDT (18 decimals)
-      ClusterNode: BigInt('10000000000000000000000')    // 默认 10000 USDT (18 decimals)
+      DistributedNode: 0, // 默认 500 USDT (18 decimals)
+      ClusterNode: 0    // 默认 10000 USDT (18 decimals)
     }
 
     try {
@@ -197,13 +185,13 @@ export function useComputingPowerServices() {
         readContract(config, {
           address: bscNet.proxyNodeManager,
           abi: nodeManagerABI,
-          functionName: 'distributedNodePrice', // 请确认 ABI 里的查价函数名
-        }).catch(() => BigInt('500000000000000000000')),
+          functionName: 'buyClusterNode', // 请确认 ABI 里的查价函数名
+        }),
         readContract(config, {
           address: bscNet.proxyNodeManager,
           abi: nodeManagerABI,
-          functionName: 'clusterNodePrice', // 请确认 ABI 里的查价函数名
-        }).catch(() => BigInt('10000000000000000000000'))
+          functionName: 'buyDistributedNode', // 请确认 ABI 里的查价函数名
+        })
       ])
 
       obj.DistributedNode = safeBigInt(p1)
@@ -220,7 +208,7 @@ export function useComputingPowerServices() {
       return
     }
 
-    const loading = ElLoading.service({ lock: true, text: '正在核对余额...', background: 'rgba(0, 0, 0, 0.7)' })
+    const loading = ElLoading.service({ lock: true, text: '正在进行节点激活...', background: 'rgba(0, 0, 0, 0.7)' })
 
     try {
       // 1. 网络环境检查 (BSC 56)
@@ -245,15 +233,13 @@ export function useComputingPowerServices() {
       console.log('🔍 Checking balance...')
       const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value)
 
-      console.log('💰 Balance Report:', {
-        has: userBalance.toString(),
-        needs: amountBigInt.toString()
-      })
+      console.log('userBalance', userBalance)
+      console.log('amountBigInt', amountBigInt)
 
       if (userBalance < amountBigInt) {
         // 如果余额不足，直接报错并停止执行
         ElMessage({
-          message: `余额不足！你需要 ${Number(amountBigInt) / 1e18} USDT。`,
+          message: `余额不足！`,
           type: 'error',
           duration: 5000,
           showClose: true
@@ -265,7 +251,7 @@ export function useComputingPowerServices() {
 
       // 3. 检查授权 (只有余额充足才会走到这一步)
       const allowance = await checkAllowance(usdtTokenAddress, address.value, proxyNodeManager)
-      if (allowance < amountBigInt) {
+      if (allowance === BigInt(0) || allowance < amountBigInt) {
         loading.text = '正在请求 USDT 授权...'
         await approveToken({
           tokenAddress: usdtTokenAddress,
@@ -375,7 +361,6 @@ export function useComputingPowerServices() {
 
   onMounted(async () => {
     fetchNodeProducts()
-    nodePriceObj.value = await getNodePrice()
   })
 
   // 保留当前选中节点图（弹窗可能复用）

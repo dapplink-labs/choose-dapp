@@ -83,104 +83,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed, onUnmounted } from "vue"
 import { ArrowRightBold } from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import clusterNodeImg from '@/assets/icon/ClusterNode.png'
-import DistributedNode from '@/assets/icon/DistributedNode.png'
-import DistributedNodeDark from '@/assets/icon/DistributedNodeDark.png'
 import TIcon from '@/assets/icon/TIcon.png'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
+import { useLPVault } from './useLPVault.js'
 
-const router = useRouter()
-const { t } = useI18n()
-
-// 激活提示头像（复用集群节点插图）
-const activationAvatar = clusterNodeImg
-
-// 激活提示文案
-const activationAddress = ref('0xb574...4c7d')
-const activationMsg = computed(() => {
-    return t('lpVault.activationMsg', { address: activationAddress.value, nodeType: t('lpVault.nodeTypes.T1') })
-})
-
-const handleOpenMore = () => {
-    // 预留「了解更多」跳转逻辑
-    console.log('前往了解更多')
-}
-
-const handleOpenMyIncome = () => {
-    router.push('/myIncome')
-}
-
-// 节点列表数据
-const nodeList = computed(() => [
-    {
-        type: 'T1',
-        name: t('lpVault.nodeTypes.T1'),
-        icon: DistributedNode,
-        price: '200',
-        dailyEarnings: '0.5%-1%',
-        cycleDays: `2${t('lpVault.days')}`,
-        totalEarnings: '3000000'
-    },
-    {
-        type: 'T2',
-        name: t('lpVault.nodeTypes.T2'),
-        icon: DistributedNode,
-        price: '600',
-        dailyEarnings: '0.6%-1.1%',
-        cycleDays: `3${t('lpVault.days')}`,
-        totalEarnings: '3000000'
-    },
-    {
-        type: 'T3',
-        name: t('lpVault.nodeTypes.T3'),
-        icon: DistributedNode,
-        price: '1200',
-        dailyEarnings: '0.7%-1.2%',
-        cycleDays: `4${t('lpVault.days')}`,
-        totalEarnings: '3000000'
-    },
-    {
-        type: 'T4',
-        name: t('lpVault.nodeTypes.T4'),
-        icon: DistributedNode,
-        price: '2500',
-        dailyEarnings: '0.8%-1.3%',
-        cycleDays: `5${t('lpVault.days')}`,
-        totalEarnings: '3000000'
-    },
-    {
-        type: 'T5',
-        name: t('lpVault.nodeTypes.T5'),
-        icon: DistributedNode,
-        price: '6000',
-        dailyEarnings: '0.9%-1.4%',
-        cycleDays: `6${t('lpVault.days')}`,
-        totalEarnings: '3000000'
-    },
-    {
-        type: 'T6',
-        name: t('lpVault.nodeTypes.T6'),
-        icon: DistributedNode,
-        price: '14000',
-        dailyEarnings: '1%-1.5%',
-        cycleDays: `7${t('lpVault.days')}`,
-        totalEarnings: '3000000'
-    }
-])
-
-// 处理激活节点
-const handleActivate = (type) => {
-    console.log('激活节点:', type)
-    // TODO: 实现激活逻辑
-}
-
-// 初始化主题
-onMounted(() => {
-})
+const {
+  activationAvatar,
+  activationMsg,
+  handleOpenMore,
+  handleOpenMyIncome,
+  nodeList,
+  handleActivate
+} = useLPVault()
 </script>
 
 <style scoped lang="scss">
