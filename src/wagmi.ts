@@ -49,17 +49,12 @@ const bsc = defineChain({
   id: 56,
   name: 'BNB Smart Chain',
   nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-  rpcUrls: { 
-    default: { 
+  rpcUrls: {
+    default: {
       http: [
-        'https://bsc-dataseed1.nodereal.io',
-        'https://bsc-dataseed2.nodereal.io',
-        'https://bsc-dataseed1.defibit.io',
-        'https://bsc-dataseed2.defibit.io',
-        'https://bsc-dataseed1.binance.org',
-        'https://bsc-dataseed2.binance.org'
-      ] 
-    } 
+        'https://bsc-dataseed.binance.org'
+      ]
+    }
   },
   blockExplorers: {
     default: {
@@ -87,12 +82,7 @@ export const config = createConfig({
     [sepolia.id]: http(sepolia.rpcUrls.default.http[0]),
     [optimism.id]: http(optimism.rpcUrls.default.http[0]),
     [bsc.id]: fallback([
-      http('https://bsc-dataseed1.nodereal.io'),
-      http('https://bsc-dataseed2.nodereal.io'),
-      http('https://bsc-dataseed1.defibit.io'),
-      http('https://bsc-dataseed2.defibit.io'),
-      http('https://bsc-dataseed1.binance.org'),
-      http('https://bsc-dataseed2.binance.org')
+      http('https://bsc-dataseed.binance.org')
     ])
   },
 })
