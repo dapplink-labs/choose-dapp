@@ -89,40 +89,6 @@
       </div>
 
       <div class="h5-user-section">
-        <!-- 语言切换下拉菜单 -->
-        <el-dropdown class="h5-language-dropdown" @command="handleLanguageChange" trigger="click">
-          <button class="h5-language-toggle-btn" :title="$t('navbar.language.en') || 'Language'">
-            <!-- <img :src="isDark ? languageIcon : languageIconDark" alt="language" class="language-icon" /> -->
-            <svg t="1766829818391" class="h5-language-toggle-btn" viewBox="0 0 1024 1024" version="1.1"
-              xmlns="http://www.w3.org/2000/svg" p-id="1552" width="32" height="32">
-              <path
-                d="M512 42.666667c259.2 0 469.333333 210.133333 469.333333 469.333333s-210.133333 469.333333-469.333333 469.333333S42.666667 771.2 42.666667 512 252.8 42.666667 512 42.666667z m0 85.333333a384 384 0 1 0 0 768 384 384 0 0 0 0-768z"
-                :fill="isDark ? '#FFFFFF' : '#515151'" p-id="1553"></path>
-              <path
-                d="M512 42.666667c142.208 140.074667 213.333333 296.533333 213.333333 469.333333s-71.125333 329.258667-213.333333 469.333333c-142.208-140.074667-213.333333-296.533333-213.333333-469.333333s71.125333-329.258667 213.333333-469.333333z m0 126.464l-10.325333 13.056C422.570667 284.544 384 393.813333 384 512s38.570667 227.456 117.674667 329.813333l10.325333 13.013334 10.325333-13.013334c75.648-97.92 114.261333-202.197333 117.461334-314.453333L640 512c0-118.144-38.570667-227.456-117.674667-329.813333L512 169.130667z"
-                :fill="isDark ? '#FFFFFF' : '#515151'" p-id="1554"></path>
-              <path d="M85.333333 469.333333h853.333334v85.333334H85.333333z" :fill="isDark ? '#FFFFFF' : '#515151'"
-                p-id="1555"></path>
-            </svg>
-          </button>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item command="zh-cn">
-                {{ $t('navbar.language.cn') || '中文' }}
-              </el-dropdown-item>
-              <el-dropdown-item command="en-us">
-                {{ $t('navbar.language.en') || 'English' }}
-              </el-dropdown-item>
-              <el-dropdown-item command="ko-kr">
-                {{ $t('navbar.language.Korean') || '한국어' }}
-              </el-dropdown-item>
-              <el-dropdown-item command="ja-jp">
-                {{ $t('navbar.language.Japanese') || '日本語' }}
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-
         <!-- 主题切换按钮 -->
         <div class="h5-theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
           <el-icon class="theme-icon" :class="{ 'icon-light': !isDark, 'icon-dark': isDark }">
@@ -132,12 +98,12 @@
         </div>
 
         <!-- 未连接钱包时显示"连接钱包"按钮（跳转到 LinkWallet 页面） -->
-        <button v-if="!isConnected" class="h5-connect-wallet-btn" @click="goLinkWallet">
+        <button v-if="statusReady && !isConnected" class="h5-connect-wallet-btn" @click="goLinkWallet">
           {{ $t('link.titel') || '链接钱包' }}
         </button>
 
         <!-- 已连接钱包显示头像 -->
-        <div v-else class="h5-user-avatar" @click="handleUserInfo">
+        <div v-else-if="statusReady" class="h5-user-avatar" @click="handleUserInfo">
           <img :src="userAvatar" alt="User Avatar" />
         </div>
       </div>
@@ -181,7 +147,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, inject } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, inject, watch } from 'vue'
 import { Search, ArrowDown, Sunny, Moon, CloseBold } from '@element-plus/icons-vue'
 import { injected, useAccount, useChainId, useConnect, useDisconnect } from '@wagmi/vue'
 import { copyText } from 'vue3-clipboard'
@@ -192,8 +158,6 @@ import img from "../assets/wallconnect.svg";
 import router from "@/router";
 import logoLight from "@/assets/logo.png";
 import logoDark from "@/assets/logo-Dark.png";
-import languageIcon from "@/assets/language.png";
-import languageIconDark from "@/assets/languageDark.png";
 
 
 const { disconnect } = useDisconnect();
@@ -223,7 +187,10 @@ const userMenuRef = ref(null)
 // wagmi 连接状态
 const { address, status } = useAccount()
 const { connect, connectors } = useConnect()
+
 const isConnected = computed(() => status.value === 'connected')
+// 在 wagmi 状态未完成（connecting）时不展示按钮/头像，避免闪烁
+const statusReady = computed(() => status.value !== 'connecting')
 
 // 弹窗控制
 const showConnet = ref(false)
@@ -391,7 +358,18 @@ const handleSettings = () => {
   router.push('/settings')
   closeUserMenu()
 }
-const goLinkWallet = () => {
+const goLinkWallet = async () => {
+  // 移动端点击链接钱包按钮时，先断开钱包连接
+  if (status.value === 'connected') {
+    try {
+      await disconnect()
+      // 等待断开完成
+      await new Promise((resolve) => setTimeout(resolve, 300))
+    } catch (error) {
+      console.error('断开连接失败:', error)
+      // 即使断开失败也继续跳转
+    }
+  }
   router.push('/link-wallet')
 }
 const handleLogout = () => {
@@ -480,30 +458,6 @@ onBeforeUnmount(() => {
       align-items: center;
       gap: 15px;
       flex-shrink: 0;
-
-      .h5-language-dropdown {
-        .h5-language-toggle-btn {
-          width: 32px;
-          height: 32px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-color: transparent;
-          border: 1px solid #3a3a3a;
-          border-radius: 8px;
-          cursor: pointer;
-          transition: all 0.2s;
-          padding: 0;
-          flex-shrink: 0;
-
-
-          .language-icon {
-            width: 16px;
-            height: 16px;
-            object-fit: contain;
-          }
-        }
-      }
 
       .h5-theme-toggle-btn {
         width: 32px;
@@ -1045,20 +999,6 @@ onBeforeUnmount(() => {
       .h5-user-section {
         gap: 15px;
 
-        .h5-language-dropdown {
-          .h5-language-toggle-btn {
-            width: 20px;
-            height: 22px;
-            border: none;
-            min-width: 20px;
-
-            .language-icon {
-              width: 100%;
-              height: 100%;
-            }
-          }
-        }
-
         .h5-theme-toggle-btn {
           width: 20px;
           height: 20px;
@@ -1103,8 +1043,8 @@ onBeforeUnmount(() => {
         padding: 8px 12px;
         font-size: 12px;
       }
-      }
     }
+  }
 
   // 弹窗样式
   .popup {
@@ -1116,7 +1056,7 @@ onBeforeUnmount(() => {
       h4 {
         font-size: 16px;
         margin-bottom: 16px;
-          }
+      }
 
       :deep(.el-icon) {
         right: 12px;
@@ -1128,11 +1068,11 @@ onBeforeUnmount(() => {
         img {
           max-width: 140px;
           margin-bottom: 10px;
-            }
-          }
+        }
+      }
 
       .scroll-area {
-            padding: 0 8px;
+        padding: 0 8px;
         max-height: 280px;
 
         li {
@@ -1141,7 +1081,7 @@ onBeforeUnmount(() => {
           margin-bottom: 6px;
           border-radius: 12px;
 
-            img {
+          img {
             width: 24px;
           }
 

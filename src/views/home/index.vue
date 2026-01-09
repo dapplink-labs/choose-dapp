@@ -5,9 +5,26 @@
     <!-- Banner轮播图板块 -->
     <div class="banner-section">
       <div class="banner-container">
-        <div class="banner-item">
-          <img src="/src/assets/images/banner.png" class="banner-image" />
-        </div>
+        <swiper
+          :modules="swiperModules"
+          :slides-per-view="1"
+          :space-between="0"
+          :loop="true"
+          :autoplay="{
+            delay: 3000,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: false
+          }"
+          :pagination="false"
+          :navigation="false"
+          class="banner-swiper"
+        >
+          <swiper-slide v-for="(banner, index) in bannerList" :key="index">
+            <div class="banner-item">
+              <img :src="banner" class="banner-image" />
+            </div>
+          </swiper-slide>
+        </swiper>
       </div>
     </div>
 
@@ -156,8 +173,21 @@ import NavBar2 from '@/components/navBar2.vue'
 import { Search } from '@element-plus/icons-vue'
 import router from '@/router'
 import { useI18n } from 'vue-i18n'
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Autoplay } from 'swiper/modules'
+import 'swiper/css'
 
 const { t } = useI18n()
+
+// Swiper 模块
+const swiperModules = [Autoplay]
+
+// 轮播图数据
+const bannerList = ref([
+  '/src/assets/images/banner.png',
+  '/src/assets/images/banner0.png',
+  '/src/assets/images/linghua1.png'
+])
 
 // 禁止页面滚动
 onMounted(() => {
@@ -348,26 +378,28 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
     display: none; // PC端默认隐藏
 
     .banner-container {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      width: 100%;
 
-      .banner-item {
+      .banner-swiper {
         width: 100%;
-        border-radius: 12px;
-        overflow: hidden;
-        cursor: pointer;
-        transition: transform 0.2s ease;
+        height: 100%;
 
-        &:hover {
-          transform: scale(1.02);
-        }
-
-        .banner-image {
+        .banner-item {
           width: 100%;
-          height: auto;
-          display: block;
-          object-fit: cover;
+          overflow: hidden;
+          cursor: pointer;
+          transition: transform 0.2s ease;
+
+          &:hover {
+            transform: scale(1.02);
+          }
+
+          .banner-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+          }
         }
       }
     }
@@ -887,11 +919,22 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
       box-sizing: border-box;
 
       .banner-container {
-        .banner-item {
-          border-radius: 8px;
+        width: 100%;
 
-          .banner-image {
-            max-height: 200px;
+        .banner-swiper {
+          width: 100%;
+
+          .banner-item {
+            border-radius: 8px;
+            width: 100%;
+
+            .banner-image {
+              width: 100%;
+              height: auto;
+              max-height: 200px;
+              object-fit: cover;
+              display: block;
+            }
           }
         }
       }

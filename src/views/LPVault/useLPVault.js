@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import clusterNodeImg from '@/assets/icon/ClusterNode.png'
@@ -12,6 +12,7 @@ import { config } from '../../wagmi.ts'
 import { useChainId, useAccount } from '@wagmi/vue'
 import { getUserTokenBalance, approveToken, checkAllowance } from '@/utils/requestWEB3.js'
 import { parseUnits } from 'viem'
+import { getNodeStakingList } from '@/api/API'
 
 export const useLPVault = () => {
   const router = useRouter()
@@ -37,62 +38,60 @@ export const useLPVault = () => {
     router.push('/myIncome')
   }
 
-  const nodeList = computed(() => [
-    {
-      type: 'T1',
-      name: t('lpVault.nodeTypes.T1'),
-      icon: DistributedNode,
-      price: '200',
-      dailyEarnings: '0.5%-1%',
-      cycleDays: `2${t('lpVault.days')}`,
-      totalEarnings: '3000000'
-    },
-    {
-      type: 'T2',
-      name: t('lpVault.nodeTypes.T2'),
-      icon: DistributedNode,
-      price: '600',
-      dailyEarnings: '0.6%-1.1%',
-      cycleDays: `3${t('lpVault.days')}`,
-      totalEarnings: '3000000'
-    },
-    {
-      type: 'T3',
-      name: t('lpVault.nodeTypes.T3'),
-      icon: DistributedNode,
-      price: '1200',
-      dailyEarnings: '0.7%-1.2%',
-      cycleDays: `4${t('lpVault.days')}`,
-      totalEarnings: '3000000'
-    },
-    {
-      type: 'T4',
-      name: t('lpVault.nodeTypes.T4'),
-      icon: DistributedNode,
-      price: '2500',
-      dailyEarnings: '0.8%-1.3%',
-      cycleDays: `5${t('lpVault.days')}`,
-      totalEarnings: '3000000'
-    },
-    {
-      type: 'T5',
-      name: t('lpVault.nodeTypes.T5'),
-      icon: DistributedNode,
-      price: '6000',
-      dailyEarnings: '0.9%-1.4%',
-      cycleDays: `6${t('lpVault.days')}`,
-      totalEarnings: '3000000'
-    },
-    {
-      type: 'T6',
-      name: t('lpVault.nodeTypes.T6'),
-      icon: DistributedNode,
-      price: '14000',
-      dailyEarnings: '1%-1.5%',
-      cycleDays: `7${t('lpVault.days')}`,
-      totalEarnings: '3000000'
+  // 节点列表数据（从接口获取）
+  const nodeListData = ref([])
+  const isFetchingNodeList = ref(false)
+
+  // 获取节点质押列表数据
+  const fetchNodeStakingList = async () => {
+    if (isFetchingNodeList.value) {
+      return
     }
-  ])
+
+    isFetchingNodeList.value = true
+    try {
+      const res = await getNodeStakingList()
+      console.log('节点质押列表接口返回：', res)
+
+      // 处理接口返回数据
+      // 接口返回结构: { success: true, message: "success", data: { list: [...] } }
+      const responseData = res?.data || res
+      const list = responseData?.data?.list || responseData?.list || []
+
+      if (!Array.isArray(list) || list.length === 0) {
+        nodeListData.value = []
+        return
+      }
+
+      // 将接口数据映射到组件需要的格式
+      nodeListData.value = list.sort((a, b) => a.node_level - b.node_level).map((item) => {
+        // 映射接口字段到组件字段
+        const type = 'T ' + item.node_level || ''
+        const price = item.staking_amount || '0'
+        const dailyEarnings = item.node_income + "%" || '0%'
+        const cycleDays = item.node_period || item.cycle || 0
+        const totalEarnings = item.forecast_income || '0'
+
+        return {
+          type,
+          name: item.name || t(`lpVault.nodeTypes.${type}`) || type,
+          icon: item.icon || DistributedNode,
+          price: String(price),
+          dailyEarnings: String(dailyEarnings),
+          cycleDays: cycleDays ? `${cycleDays}${t('lpVault.days')}` : `0${t('lpVault.days')}`,
+          totalEarnings: String(totalEarnings)
+        }
+      })
+    } catch (err) {
+      console.warn('获取节点质押列表失败', err)
+      nodeListData.value = []
+    } finally {
+      isFetchingNodeList.value = false
+    }
+  }
+
+  // 计算属性：直接使用接口数据
+  const nodeList = computed(() => nodeListData.value)
 
   const handleActivate = async (type) => {
     if (!address.value) {
@@ -112,15 +111,22 @@ export const useLPVault = () => {
       const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
       const { proxyStakingManager, usdtTokenAddress } = bscNet
 
-      const nodeType = {
-        "T1": 200,
-        "T2": 600,
-        "T3": 1200,
-        "T4": 2500,
-        "T5": 6000,
-        "T6": 14000
+      // 从接口数据中获取对应节点的价格
+      const nodeItem = nodeListData.value.find(item => item.type === type)
+      if (!nodeItem) {
+        ElMessage.error('未找到对应的节点类型')
+        loading.close()
+        return
       }
-      const amountBigInt = parseUnits(String(nodeType[type]), 18);
+
+      const price = parseFloat(nodeItem.price) || 0
+      if (price <= 0) {
+        ElMessage.error('节点价格无效')
+        loading.close()
+        return
+      }
+
+      const amountBigInt = parseUnits(String(price), 18)
       // 余额查询START
       const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value)
       if (userBalance < amountBigInt) {
@@ -168,15 +174,18 @@ export const useLPVault = () => {
       })
       console.log('result', result)
 
-      ElLoading.service({ lock: true, text: '节点激活成功！', background: 'rgba(0, 0, 0, 0.7)' }).close()
     } catch (error) {
       console.error('Activate node failed:', error)
       ElMessage.error('节点激活失败')
     } finally {
       loading.close()
-      ElLoading.service({ lock: true, text: '节点激活成功！', background: 'rgba(0, 0, 0, 0.7)' }).close()
     }
   }
+
+  // 组件挂载时获取数据
+  onMounted(() => {
+    fetchNodeStakingList()
+  })
 
   return {
     activationAvatar,

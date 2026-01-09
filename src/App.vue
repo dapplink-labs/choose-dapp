@@ -6,8 +6,14 @@ import navBar2 from "./components/navBar2.vue"
 import Header from "./components/header.vue"
 import Footer from "./components/footer.vue"
 import FooterNav from "./components/footerNav.vue"
+import Invite from "./components/Invite.vue"
+import { eventBus } from '@/utils/eventBus'
+import { useCounterStore } from '@/stores/counter'
+import { storeToRefs } from 'pinia'
 
 const route = useRoute()
+const counterStore = useCounterStore()
+const { showInvite } = storeToRefs(counterStore)
 
 // 检测是否为移动端
 const isMobile = ref(false)
@@ -25,12 +31,19 @@ onMounted(() => {
   // 再次检查确保准确性
   checkIsMobile()
   window.addEventListener('resize', checkIsMobile)
+  
+  // 监听 showInvite 事件
+  eventBus.on('showInvite', (show) => {
+    showInvite.value = show
+  })
 })
 
 onBeforeUnmount(() => {
   if (typeof window !== 'undefined') {
     window.removeEventListener('resize', checkIsMobile)
   }
+  // 移除事件监听
+  eventBus.off('showInvite')
 })
 
 // 根据路由 meta 判断是否显示 header
@@ -48,6 +61,7 @@ const needBottomPadding = computed(() => {
   return isMobile.value && !route.meta?.hideFooterNav
 })
 
+
 </script>
 
 <template>
@@ -58,6 +72,8 @@ const needBottomPadding = computed(() => {
     <RouterView />
     <Footer v-if="!isMobile" />
     <FooterNav v-if="showFooterNav" />
+    <!-- Invite邀请码组件 - 全局显示 -->
+    <Invite v-model="showInvite" />
     <!-- <bottomBar/> -->
   </div>
 </template>

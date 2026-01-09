@@ -12,6 +12,8 @@
         </div>
       </div>
       <div class="action-icons">
+        <img :src="isDark ? icon29Dark : icon29" :alt="$t('common.share')" class="icon-img"
+          @click="handleShare" />
         <img :src="isDark ? settingIconDark : settingIcon" :alt="$t('common.settings')" class="icon-img"
           @click="handleSettings" />
         <img :src="isDark ? closeIconDark : closeIcon" :alt="$t('common.close')" class="icon-img"
@@ -25,19 +27,6 @@
     <!-- Ecosystem 网格布局 -->
     <div class="section-grid">
       <div v-for="item in ecosystemItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
-        <div class="section-icon-wrapper">
-          <img :src="item.icon" :alt="item.label" class="section-icon" />
-        </div>
-        <div class="section-label">{{ item.label }}</div>
-      </div>
-    </div>
-
-    <!-- Choose Me 标题 -->
-    <div class="section-title">{{ $t('userInfo.chooseMe') }}</div>
-
-    <!-- Choose Me 网格布局 -->
-    <div class="section-grid">
-      <div v-for="item in chooseMeItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
         <div class="section-icon-wrapper">
           <img :src="item.icon" :alt="item.label" class="section-icon" />
         </div>
@@ -71,6 +60,19 @@
       </div>
     </div>
 
+    <!-- Choose Me 标题 -->
+    <div class="section-title">{{ $t('userInfo.chooseMe') }}</div>
+
+    <!-- Choose Me 网格布局 -->
+    <div class="section-grid">
+      <div v-for="item in chooseMeItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
+        <div class="section-icon-wrapper">
+          <img :src="item.icon" :alt="item.label" class="section-icon" />
+        </div>
+        <div class="section-label">{{ item.label }}</div>
+      </div>
+    </div>
+
     <!-- Social links -->
     <div class="social-links">
       <a v-for="(link, idx) in friendLinks" :key="idx" href="javascript:void(0)" class="social-link"
@@ -84,9 +86,33 @@
       <button class="disconnect-btn" @click="handleDisconnect">{{ $t('userInfo.disconnectWallet') }}</button>
     </div>
 
-    <!-- Invite邀请码组件 -->
-    <Invite v-model="showInvite" v-model:invite-code="inviteCode" @confirm="handleInviteConfirm"
-      @skip="handleInviteSkip" @close="handleInviteClose" />
+    <!-- 语言选择弹窗 -->
+    <transition name="slide-up">
+      <div v-if="showLanguageModal" class="language-overlay" @click.self="closeLanguageModal">
+        <div class="language-modal" @click.stop>
+          <!-- 底部拖拽条 -->
+          <div class="drag-handle"></div>
+          
+          <!-- 标题 -->
+          <div class="language-title">{{ $t('userInfo.language') }}</div>
+          
+          <!-- 语言列表 -->
+          <div class="language-list">
+            <div 
+              v-for="lang in languageOptions" 
+              :key="lang.value"
+              class="language-item"
+              :class="{ active: locale === lang.value }"
+              @click="selectLanguage(lang.value)"
+            >
+              <span class="language-name">{{ lang.label }}</span>
+              <span v-if="locale === lang.value" class="check-icon">✓</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </transition>
+
   </div>
 </template>
 
@@ -96,9 +122,9 @@ import { useRouter } from 'vue-router'
 import { useAccount, useDisconnect } from '@wagmi/vue'
 import { useThemeStore } from '@/stores/theme'
 import { useI18n } from 'vue-i18n'
-import Invite from '@/components/Invite.vue'
+import { ElMessage } from 'element-plus'
 
-const { t } = useI18n()
+const { locale, t } = useI18n()
 
 // 批量导入 icon 资源，减少单独 import
 const iconModules = import.meta.glob('@/assets/icon/*.{png,svg}', { eager: true })
@@ -167,6 +193,17 @@ const icon23 = getIcon('23')
 const icon23Dark = getIcon('23Dark')
 const icon24 = getIcon('24')
 const icon24Dark = getIcon('24Dark')
+const icon25 = getIcon('25')
+const icon25Dark = getIcon('25Dark')
+const icon26 = getIcon('26')
+const icon26Dark = getIcon('26Dark')
+const icon27 = getIcon('27')
+const icon27Dark = getIcon('27Dark')
+const icon28 = getIcon('28')
+const icon28Dark = getIcon('28Dark')
+const icon29 = getIcon('29')
+const icon29Dark = getIcon('29Dark')
+
 const friend1Dark = getIcon('FacebookDark')
 const friend2Dark = getIcon('insDark')
 const friend3Dark = getIcon('inDark')
@@ -180,10 +217,6 @@ const { disconnect } = useDisconnect()
 const themeStore = useThemeStore()
 const isDark = computed(() => themeStore.isDark)
 
-// Invite组件控制
-const showInvite = ref(false)
-const inviteCode = ref('')
-
 // 用户信息
 const username = ref('johnsmith2025')
 const walletAddress = computed(() => {
@@ -192,6 +225,17 @@ const walletAddress = computed(() => {
   }
   return '0xf6a0....CfbA'
 })
+
+// 语言选择弹窗状态
+const showLanguageModal = ref(false)
+
+// 语言选项列表
+const languageOptions = [
+  { value: 'zh-cn', label: '简体中文' },
+  { value: 'en-us', label: 'English' },
+  { value: 'ko-kr', label: '한국어' },
+  { value: 'ja-jp', label: '日本語' }
+]
 
 const userAvatar = computed(() => {
   return address.value
@@ -256,20 +300,6 @@ const baseEcosystemItems = computed(() => [
     path: '/create'
   },
   {
-    key: 'launchpad',
-    label: t('userInfo.launchpad'),
-    icon: icon14,
-    iconDark: icon14Dark,
-    path: '/'
-  },
-  {
-    key: 'smart-money',
-    label: t('userInfo.smartMoney'),
-    icon: icon15,
-    iconDark: icon15Dark,
-    path: '/'
-  },
-  {
     key: 'fund',
     label: t('userInfo.assets'),
     icon: icon5,
@@ -281,6 +311,20 @@ const baseEcosystemItems = computed(() => [
     label: t('userInfo.eventPool'),
     icon: icon6,
     iconDark: icon6Dark,
+    path: '/'
+  },
+  {
+    key: 'launchpad',
+    label: t('userInfo.launchpad'),
+    icon: icon14,
+    iconDark: icon14Dark,
+    path: '/'
+  },
+  {
+    key: 'smart-money',
+    label: t('userInfo.smartMoney'),
+    icon: icon15,
+    iconDark: icon15Dark,
     path: '/'
   }
 ])
@@ -304,22 +348,22 @@ const baseChooseMeItems = computed(() => [
   {
     key: 'reward',
     label: '奖励',
-    icon: icon9,
-    iconDark: icon9Dark,
+    icon: icon25,
+    iconDark: icon25Dark,
     path: '/reward'
   },
   {
     key: 'accuracy',
     label: '准确度',
-    icon: icon9,
-    iconDark: icon9Dark,
+    icon: icon26,
+    iconDark: icon26Dark,
     path: '/accuracy'
   },
   {
     key: 'terms',
     label: '使用条款',
-    icon: icon9,
-    iconDark: icon9Dark,
+    icon: icon27,
+    iconDark: icon27Dark,
     path: '/terms'
   }
 ])
@@ -341,17 +385,17 @@ const baseOthersItems = computed(() => [
     path: '/'
   },
   {
-    key: 'developer-docs',
-    label: t('userInfo.developerDocs'),
-    icon: icon8,
-    iconDark: icon8Dark,
-    path: '/doc'
+    key: 'github',
+    label: t('userInfo.github'),
+    icon: icon17,
+    iconDark: icon17Dark,
+    path: '/'
   },
   {
-    key: 'alpha',
-    label: t('userInfo.alpha'),
-    icon: icon9,
-    iconDark: icon9Dark,
+    key: 'technical-support',
+    label: t('userInfo.technicalSupport'),
+    icon: icon18,
+    iconDark: icon18Dark,
     path: '/'
   },
   {
@@ -376,18 +420,12 @@ const baseOthersItems = computed(() => [
     path: '/'
   },
   {
-    key: 'github',
-    label: t('userInfo.github'),
-    icon: icon17,
-    iconDark: icon17Dark,
-    path: '/'
-  },
-  {
-    key: 'technical-support',
-    label: t('userInfo.technicalSupport'),
-    icon: icon18,
-    iconDark: icon18Dark,
-    path: '/'
+    key: 'language',
+    label: t('userInfo.language'),
+    icon: icon28,
+    iconDark: icon28Dark,
+    path: '',
+    action: 'language'
   }
 ])
 
@@ -436,11 +474,11 @@ const baseSupportItems = computed(() => [
     path: '/'
   },
   {
-    key: 'self-service',
-    label: t('userInfo.selfService'),
-    icon: icon24,
-    iconDark: icon24Dark,
-    path: '/'
+    key: 'developer-docs',
+    label: t('userInfo.developerDocs'),
+    icon: icon8,
+    iconDark: icon8Dark,
+    path: '/doc'
   }
 ])
 
@@ -468,6 +506,28 @@ const friendLinks = computed(() =>
   }))
 )
 
+// 处理分享点击
+const handleShare = () => {
+  // 分享功能：可以复制链接或调用原生分享
+  if (navigator.share) {
+    navigator.share({
+      title: 'ChooseMe',
+      text: 'Check out ChooseMe',
+      url: window.location.href
+    }).catch(err => {
+      console.log('分享失败:', err)
+    })
+  } else {
+    // 如果不支持原生分享，可以复制链接到剪贴板
+    const url = window.location.href
+    navigator.clipboard.writeText(url).then(() => {
+      ElMessage.success('链接已复制到剪贴板')
+    }).catch(err => {
+      console.log('复制失败:', err)
+    })
+  }
+}
+
 // 处理设置点击
 const handleSettings = () => {
   router.push('/settings')
@@ -480,11 +540,9 @@ const handleClose = () => {
 
 // 处理菜单项点击
 const handleMenuClick = (item) => {
-  console.log('点击菜单项：', item)
-
-  // 如果是奖励菜单项，打开Invite组件
-  if (item.key === 'fund') {
-    showInvite.value = true
+  // 语言切换处理
+  if (item.action === 'language') {
+    handleLanguageSwitch()
     return
   }
 
@@ -494,18 +552,36 @@ const handleMenuClick = (item) => {
   }
 }
 
+// 打开语言选择弹窗
+const handleLanguageSwitch = () => {
+  showLanguageModal.value = true
+}
+
+// 关闭语言选择弹窗
+const closeLanguageModal = () => {
+  showLanguageModal.value = false
+}
+
+// 选择语言
+const selectLanguage = (langValue) => {
+  locale.value = langValue
+  document.documentElement.setAttribute('data-lang', langValue)
+  localStorage.setItem('app-locale', langValue)
+  closeLanguageModal()
+}
+
 // 处理断开链接
 const handleDisconnect = async () => {
   try {
     console.log('开始断开钱包连接...')
     // 调用 wagmi 断开钱包连接（异步操作）
     await disconnect()
-    
+
     // 等待状态更新（给钱包扩展一些时间处理断开）
     await new Promise(resolve => setTimeout(resolve, 300))
-    
+
     console.log('钱包已断开连接，状态:', status.value)
-    
+
     // 返回首页，header 会根据连接状态自动更新
     router.push('/')
   } catch (error) {
@@ -513,24 +589,6 @@ const handleDisconnect = async () => {
     // 即使断开失败，也尝试返回首页
     router.push('/')
   }
-}
-
-// 处理邀请码确定
-const handleInviteConfirm = (code) => {
-  console.log('确认邀请码：', code)
-  showInvite.value = false
-}
-
-// 处理邀请码跳过
-const handleInviteSkip = () => {
-  console.log('跳过邀请码')
-  showInvite.value = false
-}
-
-// 处理邀请码关闭
-const handleInviteClose = () => {
-  console.log('关闭邀请码弹窗')
-  showInvite.value = false
 }
 
 // 初始化主题
@@ -624,8 +682,8 @@ onMounted(() => {
 
     &.section-title-with-margin {
       margin-top: 32px;
-      }
     }
+  }
 
   // 统一的网格布局样式
   .section-grid {
@@ -722,6 +780,117 @@ onMounted(() => {
         opacity: 0.85;
         transform: scale(0.99);
       }
+    }
+  }
+
+  // 语言选择弹窗样式
+  .language-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 999;
+  }
+
+  .language-modal {
+    width: 100%;
+    background-color: var(--bg-page-h5, #ffffff);
+    border-radius: 20px 20px 0 0;
+    padding: 20px 20px 28px;
+    box-sizing: border-box;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .drag-handle {
+    width: 40px;
+    height: 4px;
+    background-color: var(--border-color, #E0E0E0);
+    border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+
+  .language-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-color, #1a1a1a);
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .language-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .language-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--bg-light, #F3F3F3);
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:active {
+      background-color: var(--bg-light, #F5F5F5);
+    }
+
+    &.active {
+      .language-name {
+        color: var(--text-color, #1a1a1a);
+        font-weight: 500;
+      }
+
+      .check-icon {
+        color: var(--text-color, #1a1a1a);
+        font-weight: 600;
+      }
+    }
+  }
+
+  .language-name {
+    font-size: 16px;
+    color: var(--text-color, #333333);
+  }
+
+  .check-icon {
+    font-size: 18px;
+    color: var(--text-dark-gray, #999999);
+  }
+
+  // 底部弹窗动画
+  .slide-up-enter-active,
+  .slide-up-leave-active {
+    transition: opacity 0.3s ease;
+
+    .language-modal {
+      transition: transform 0.3s ease;
+    }
+  }
+
+  .slide-up-enter-from {
+    opacity: 0;
+
+    .language-modal {
+      transform: translateY(100%);
+    }
+  }
+
+  .slide-up-leave-to {
+    opacity: 0;
+
+    .language-modal {
+      transform: translateY(100%);
     }
   }
 }

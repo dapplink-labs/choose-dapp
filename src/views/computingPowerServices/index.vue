@@ -67,8 +67,13 @@
               <p>{{ node.descText }}</p>
             </div>
 
-            <button class="node-item-btn" @click="handleBuy(node.type)">
-              {{ t('computingPower.activateBtn') }}
+            <button 
+              class="node-item-btn" 
+              :class="{ 'disabled': !isNodeButtonEnabled(node.type) }"
+              :disabled="!isNodeButtonEnabled(node.type)"
+              @click="handleBuy(node.type)"
+            >
+              {{ getButtonText(node.type) }}
             </button>
           </div>
         </div>
@@ -108,7 +113,9 @@ const {
   handleOpenMore,
   handleMyNodes,
   handleBuy,
-  handleConfirmBuy
+  handleConfirmBuy,
+  getButtonText,
+  isNodeButtonEnabled
 } = useComputingPowerServices()
 </script>
 
@@ -280,14 +287,22 @@ const {
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 8px 16px rgba(43, 108, 24, 0.3);
   }
 
-  &:active {
+  &:active:not(:disabled) {
     transform: translateY(0);
     box-shadow: none;
+  }
+
+  &.disabled,
+  &:disabled {
+    background: #CCCCCC;
+    color: #999999;
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 }
 

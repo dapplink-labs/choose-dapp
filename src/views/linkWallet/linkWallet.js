@@ -3,6 +3,8 @@ import { useRouter } from 'vue-router'
 import { useConnect, useChainId, useAccount } from '@wagmi/vue'
 import { injected } from '@wagmi/vue/connectors'
 import { useThemeStore } from '../../stores/theme'
+import { register } from '@/api/API'
+import { eventBus } from '@/utils/eventBus'
 
 import logoLight from '@/assets/icon/logo.png'
 import logoDark from '@/assets/icon/logoDark.png'
@@ -66,7 +68,7 @@ export const useLinkWallet = () => {
   const router = useRouter()
   const { connect, connectors } = useConnect()
   const chainId = useChainId()
-  const { status } = useAccount()
+  const { status, address } = useAccount()
   const themeStore = useThemeStore()
   console.log(chainId)
 
@@ -124,10 +126,29 @@ export const useLinkWallet = () => {
     }
   })
 
+  // 调用注册接口检查用户状态
+  const checkUserStatus = async (walletAddress) => {
+    try {
+      const response = await register({ address: walletAddress })
+      // 根据接口返回的数据结构获取 exists 字段
+      const exists = response?.data?.data?.exists ?? response?.data?.exists
+
+      // 通过事件总线触发显示邀请弹窗
+      eventBus.emit('showInvite', !exists)
+    } catch (error) {
+      console.error('注册接口调用失败:', error)
+    }
+  }
+
   watch(
     () => status.value,
-    (newStatus) => {
+    async (newStatus) => {
       if (newStatus === 'connected') {
+        // 钱包连接成功后，调用注册接口检查用户状态
+        if (address.value) {
+          await checkUserStatus(address.value)
+        }
+
         if (window.history.length > 1) {
           router.back()
         } else {

@@ -13,6 +13,7 @@ import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
 import networks from '@/assets/json/networks.json'
 import { checkAllowance, approveToken, writeContractOptimized, safeBigInt, getUserTokenBalance } from '@/utils/requestWEB3.js'
 import { config } from '../../wagmi.ts'
+import { getNodeServiceProviders } from '@/api/API'
 
 export function useComputingPowerServices() {
   const router = useRouter()
@@ -32,51 +33,17 @@ export function useComputingPowerServices() {
 
   // 节点金额，单位为 wei
   const nodePriceObj = ref({
-    DistributedNode: BigInt('500000000000000000000'),//分布式节点金额
-    ClusterNode: BigInt('1000000000000000000000'),//集群节点金额
+    DistributedNode: BigInt('0'),//分布式节点金额
+    ClusterNode: BigInt('0'),//集群节点金额
   })
 
-  // 节点卡片数据（从服务端获取，空时用默认兜底）
+  // 节点卡片数据
   const nodeProducts = ref([])
   // 防止重复请求的标志
   const isFetchingNodeProducts = ref(false)
 
-  const fallbackNodes = computed(() => [
-    {
-      type: 'distributed',
-      icon: isDark.value ? distributedNodeImgDark : distributedNodeImg,
-      title: t('computingPower.tabs.distributed'),
-      price: '500',
-      badge: '',
-      fee: 0.5,
-      subFee: 3,
-      marketShare: 10,
-      descText: t('computingPower.products.distributedDescTemplate', {
-        fee: 0.5,
-        subFee: 3,
-        marketShare: 10
-      })
-    },
-    {
-      type: 'cluster',
-      icon: isDark.value ? clusterNodeImgDark : clusterNodeImg,
-      title: t('computingPower.tabs.cluster'),
-      price: '10000',
-      badge: '',
-      fee: 0.5,
-      subFee: 2,
-      marketShare: 5,
-      descText: t('computingPower.products.clusterDescTemplate', {
-        fee: 0.5,
-        subFee: 2,
-        marketShare: 5
-      })
-    }
-  ])
-
-  const displayNodes = computed(() =>
-    nodeProducts.value.length > 0 ? nodeProducts.value : fallbackNodes.value
-  )
+  // 直接使用接口数据，不再使用硬编码的 fallback
+  const displayNodes = computed(() => nodeProducts.value)
 
   // 激活提示文案
   const activationAddress = ref('0xb574...4c7d')
@@ -120,42 +87,58 @@ export function useComputingPowerServices() {
 
   const handleOpenMore = () => {
     // 预留「了解更多」跳转逻辑
-    console.log('前往了解更多')
   }
 
   const handleMyNodes = () => {
     router.push('/myNode')
-    console.log('查看我的节点')
   }
 
   const showPurchaseNode = ref(false)
 
   const purchaseTitle = computed(() =>
     activeNodeTab.value === 'distributed'
-      ? t('computingPower.purchaseTitle.distributed')
-      : t('computingPower.purchaseTitle.cluster')
+      ? t('computingPower.tabs.distributed')
+      : t('computingPower.tabs.cluster')
   )
 
-  // 写死的收益数据（后续有接口后替换）
+  // 使用 nodeProducts 中的真实收益数据（百分比格式）
   const purchaseTradeProfit = computed(() => {
-    // 预估交易收益 - 写死数据
-    return activeNodeTab.value === 'distributed'
-      ? '100 USDT+50 MEME'
-      : '2000 USDT+1000 MEME'
+    // 预估交易收益 - 使用 fee_reward（百分比）
+    const currentNode = nodeProducts.value.find(node => node.type === activeNodeTab.value)
+    if (!currentNode || currentNode.fee == null) {
+      return activeNodeTab.value === 'distributed'
+        ? '0.5%'
+        : '0.5%'
+    }
+    // 格式化：fee_reward 作为百分比显示
+    const percent = Number(currentNode.fee)
+    return `${percent}%`
   })
 
   const purchaseFeeProfit = computed(() => {
-    // 子币手续费收益 - 写死数据
-    return activeNodeTab.value === 'distributed'
-      ? '50 USDT+25 MEME'
-      : '1000 USDT+500 MEME'
+    // 子币手续费收益 - 使用 sub_coin_reward（百分比）
+    const currentNode = nodeProducts.value.find(node => node.type === activeNodeTab.value)
+    if (!currentNode || currentNode.subFee == null) {
+      return activeNodeTab.value === 'distributed'
+        ? '3%'
+        : '2%'
+    }
+    // 格式化：sub_coin_reward 作为百分比显示
+    const percent = Number(currentNode.subFee)
+    return `${percent}%`
   })
 
   const purchaseSecondaryProfit = computed(() => {
-    // 二级市场收益 - 写死数据
-    return activeNodeTab.value === 'distributed'
-      ? '200 USDT+100 MEME'
-      : '4000 USDT+2000 MEME'
+    // 二级市场收益 - 使用 market_reward（百分比）
+    const currentNode = nodeProducts.value.find(node => node.type === activeNodeTab.value)
+    if (!currentNode || currentNode.marketShare == null) {
+      return activeNodeTab.value === 'distributed'
+        ? '10%'
+        : '5%'
+    }
+    // 格式化：market_reward 作为百分比显示
+    const percent = Number(currentNode.marketShare)
+    return `${percent}%`
   })
 
   const purchaseWalletBalance = ref('200000 USDT') // 写死的钱包余额
@@ -204,11 +187,11 @@ export function useComputingPowerServices() {
 
   const handleConfirmBuy = async () => {
     if (!address.value) {
-      ElMessage.error('请先连接钱包')
+      ElMessage.error(t('computingPower.connectWalletFirst'))
       return
     }
 
-    const loading = ElLoading.service({ lock: true, text: '正在进行节点激活...', background: 'rgba(0, 0, 0, 0.7)' })
+    const loading = ElLoading.service({ lock: true, text: t('computingPower.activatingNode'), background: 'rgba(0, 0, 0, 0.7)' })
 
     try {
       // 1. 网络环境检查 (BSC 56)
@@ -239,7 +222,7 @@ export function useComputingPowerServices() {
       if (userBalance < amountBigInt) {
         // 如果余额不足，直接报错并停止执行
         ElMessage({
-          message: `余额不足！`,
+          message: t('computingPower.insufficientBalance'),
           type: 'error',
           duration: 5000,
           showClose: true
@@ -252,22 +235,22 @@ export function useComputingPowerServices() {
       // 3. 检查授权 (只有余额充足才会走到这一步)
       const allowance = await checkAllowance(usdtTokenAddress, address.value, proxyNodeManager)
       if (allowance === BigInt(0) || allowance < amountBigInt) {
-        loading.text = '正在请求 USDT 授权...'
+        loading.text = t('computingPower.requestingAuth')
         await approveToken({
           tokenAddress: usdtTokenAddress,
           spenderAddress: proxyNodeManager,
           amount: amountBigInt,
           userAddress: address.value,
           BRIDGE_MESSAGES: {
-            approvalSuccess: '授权成功',
-            userCancelledAuth: '你取消了授权',
-            approveTokenFailed: '授权失败'
+            approvalSuccess: t('bridge.approvalSuccess'),
+            userCancelledAuth: t('bridge.userCancelledAuth'),
+            approveTokenFailed: t('bridge.approveTokenFailed')
           }
         })
       }
 
       // 4. 执行购买
-      loading.text = '正在支付并激活节点...'
+      loading.text = t('computingPower.payingAndActivating')
       await writeContractOptimized({
         abi: nodeManagerABI,
         address: proxyNodeManager,
@@ -275,9 +258,9 @@ export function useComputingPowerServices() {
         args: [amountBigInt],
         userAddress: address.value,
         messages: {
-          success: '节点激活成功！',
-          failed: '支付失败',
-          rejected: '你取消了支付'
+          success: t('computingPower.nodeActivationSuccess'),
+          failed: t('computingPower.paymentFailed'),
+          rejected: t('computingPower.paymentCancelled')
         }
       })
 
@@ -290,7 +273,7 @@ export function useComputingPowerServices() {
     }
   }
 
-  // 拉取节点数据（示例，替换为真实接口）
+  // 拉取节点数据 - 使用真实接口
   const fetchNodeProducts = async () => {
     // 如果正在请求中，直接返回，避免重复请求
     if (isFetchingNodeProducts.value) {
@@ -299,60 +282,41 @@ export function useComputingPowerServices() {
 
     isFetchingNodeProducts.value = true
     try {
-      const res = await fetch('/api/node-products')
-      if (!res.ok) {
-        // 如果是 403 或 404，说明接口不存在或未配置，静默使用 fallback 数据
-        if (res.status === 403 || res.status === 404) {
-          nodeProducts.value = []
-          return
+      const res = await getNodeServiceProviders({ address: address.value })
+
+      const responseData = res?.data || res
+      const list = responseData?.data?.list || responseData?.list || []
+
+      if (!Array.isArray(list) || list.length === 0) {
+        nodeProducts.value = []
+        return
+      }
+
+      // 接口返回字段: id, name, fee_reward, sub_coin_reward, market_reward, status 等
+      nodeProducts.value = list.map((item) => {
+        // node_type: 1: 分布式, 2: 集群
+        const templateKey = item.node_type === 1
+          ? 'computingPower.products.distributedDescTemplate'
+          : 'computingPower.products.clusterDescTemplate'
+
+        return {
+          type: item.node_type === 1 ? 'distributed' : 'cluster', // 1: 分布式, 2: 集群
+          icon: item.icon || (item.node_type === 1
+            ? (isDark.value ? distributedNodeImgDark : distributedNodeImg)
+            : (isDark.value ? clusterNodeImgDark : clusterNodeImg)),
+          title: item.name || (item.node_type === 1
+            ? t('computingPower.tabs.distributed')
+            : t('computingPower.tabs.cluster')),
+          price: item.price || (item.node_type === 1 ? '500' : '10000'),
+          fee: item.fee_reward || 0,
+          subFee: item.sub_coin_reward || 0,
+          marketShare: item.market_reward || 0,
+          is_active: item.is_active || 1,
+          descText: t(templateKey, { fee: item.fee_reward, subFee: item.sub_coin_reward, marketShare: item.market_reward })
         }
-        throw new Error(`fetch node products failed: ${res.status} ${res.statusText}`)
-      }
-      const data = await res.json()
-      // 期望服务端字段：type/icon/title/price/badge/fee/subFee/marketShare/descText(optional)
-      nodeProducts.value = Array.isArray(data)
-        ? data.map((item) => {
-          const type = item.type || 'distributed'
-          const fee = item.fee ?? (type === 'distributed' ? 0.5 : 0.5)
-          const subFee = item.subFee ?? (type === 'distributed' ? 3 : 2)
-          const marketShare = item.marketShare ?? (type === 'distributed' ? 10 : 5)
-
-          const base = {
-            type,
-            icon: item.icon || (type === 'distributed' ? distributedNodeImg : clusterNodeImg),
-            title: item.title || (type === 'distributed'
-              ? t('computingPower.tabs.distributed')
-              : t('computingPower.tabs.cluster')),
-            price: item.price || (type === 'distributed' ? '500' : '10000'),
-            badge: item.badge || '',
-            fee,
-            subFee,
-            marketShare
-          }
-
-          // 如果后端直接给了已拼好的多语言描述，就直接用；否则用本地 i18n 模板和动态数值生成
-          if (item.descText) {
-            return {
-              ...base,
-              descText: item.descText
-            }
-          }
-
-          const templateKey = type === 'distributed'
-            ? 'computingPower.products.distributedDescTemplate'
-            : 'computingPower.products.clusterDescTemplate'
-
-          return {
-            ...base,
-            descText: t(templateKey, { fee, subFee, marketShare })
-          }
-        })
-        : []
+      })
     } catch (err) {
-      // 网络错误或其他错误才输出警告，403/404 已在上方处理
-      if (err.name !== 'TypeError' || !err.message.includes('fetch')) {
-        console.warn('node products fetch failed, use fallback', err)
-      }
+      ElMessage.error(t('computingPower.fetchNodeDataFailed'))
       nodeProducts.value = []
     } finally {
       isFetchingNodeProducts.value = false
@@ -367,6 +331,44 @@ export function useComputingPowerServices() {
   const currentNodeImg = computed(() =>
     activeNodeTab.value === 'distributed' ? distributedNodeImg : clusterNodeImg
   )
+
+  // 判断按钮是否可点击：只有当两个节点的 is_active 都为 1 时，按钮才可点击
+  const isButtonEnabled = computed(() => {
+    const distributedNode = nodeProducts.value.find(node => node.type === 'distributed')
+    const clusterNode = nodeProducts.value.find(node => node.type === 'cluster')
+
+    // 如果两个节点都存在且 is_active 都为 1，则按钮可点击
+    if (distributedNode && clusterNode) {
+      return distributedNode.is_active === 1 && clusterNode.is_active === 1
+    }
+
+    // 如果节点数据不完整，默认不可点击
+    return false
+  })
+
+  // 获取按钮文字
+  const getButtonText = (nodeType) => {
+    const node = nodeProducts.value.find(n => n.type === nodeType)
+    if (!node) {
+      return t('computingPower.activateBtn')
+    }
+
+    const isActive = node.is_active
+    if (isActive === 1) {
+      return t('computingPower.activateBtn')
+    } else if (isActive === 2) {
+      return t('computingPower.activating')
+    } else if (isActive === 3) {
+      return t('computingPower.purchased')
+    }
+
+    return t('computingPower.activateBtn')
+  }
+
+  // 判断单个节点的按钮是否可点击（基于全局状态）
+  const isNodeButtonEnabled = (nodeType) => {
+    return isButtonEnabled.value
+  }
 
   return {
     // 响应式数据
@@ -389,7 +391,10 @@ export function useComputingPowerServices() {
     handleMyNodes,
     handleBuy,
     handleConfirmBuy,
-    fetchNodeProducts
+    fetchNodeProducts,
+    isButtonEnabled,
+    getButtonText,
+    isNodeButtonEnabled
   }
 }
 

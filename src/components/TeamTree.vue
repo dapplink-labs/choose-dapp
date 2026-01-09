@@ -2,7 +2,7 @@
   <div class="team-tree-container">
     <!-- 顶部横向路径列表 -->
     <div class="path-panel">
-      <div class="path-header">本人 —> 直推 —> 间推</div>
+      <div class="path-header">{{ tt('teamTree.pathHeader', '本人 —> 直推 —> 间推') }}</div>
       <div class="path-list" ref="pathListRef">
         <div
           v-for="(node, index) in path"
@@ -16,7 +16,7 @@
           </div>
           <div class="path-info">
             <div class="path-name">{{ shortAddress(node.address) }}</div>
-            <div class="path-amount">Amount: {{ node.amount || '0.00' }}</div>
+            <div class="path-amount">{{ tt('teamTree.amount', 'Amount') }}: {{ node.amount || '0.00' }}</div>
           </div>
           <div v-if="index < path.length - 1" class="path-arrow">/</div>
         </div>
@@ -46,7 +46,7 @@
         ></canvas>
 
         <div class="no-children-text" v-if="visibleChildren.length === 0">
-          没有更多数据了
+          {{ tt('teamTree.noMoreData', '没有更多数据了') }}
         </div>
 
         <!-- 当前查看节点的信息窗 -->
@@ -56,17 +56,17 @@
           :style="infoCardStyle"
           @click.stop
         >
-          <div class="info-title">推广信息</div>
+          <div class="info-title">{{ tt('teamTree.promoInfo', '推广信息') }}</div>
           <div class="info-row">
-            <span class="label">地址：</span>
+            <span class="label">{{ tt('teamTree.address', '地址') }}：</span>
             <span class="value">{{ currentNode.address }}</span>
           </div>
           <div class="info-row">
-            <span class="label">金额：</span>
+            <span class="label">{{ tt('teamTree.amountLabel', '金额') }}：</span>
             <span class="value">{{ currentNode.amount }}</span>
           </div>
           <div class="info-row">
-            <span class="label">直推人数：</span>
+            <span class="label">{{ tt('teamTree.directCount', '直推人数') }}：</span>
             <span class="value">{{ currentNode.children.length }}</span>
           </div>
         </div>
@@ -77,6 +77,13 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref, onMounted, watch, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+const tt = (key: string, fallback: string) => {
+  const v = t(key)
+  return v === key ? fallback : v
+}
 
 const CANVAS_SIZE = 1200
 
@@ -421,7 +428,7 @@ const drawGraph = () => {
       ctx.fillStyle = '#6b7280'
       ctx.font = '18px system-ui'
       ctx.textBaseline = 'bottom'
-      const relationText = path.value.length === 1 ? '直推' : '间推'
+      const relationText = path.value.length === 1 ? tt('teamTree.direct', '直推') : tt('teamTree.indirect', '间推')
       ctx.fillText(relationText, 0, -10)
       ctx.restore()
 

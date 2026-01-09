@@ -17,6 +17,23 @@ export default defineConfig({
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
+      "/staking-api": {
+        target: "http://172.18.1.160:8082",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/staking-api/, ""),
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('staking-api proxy error', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log('Sending Request to staking-api:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log('Received Response from staking-api:', proxyRes.statusCode, req.url);
+          });
+        },
+      },
       "/bsc-rpc": {
         target: "https://bsc-dataseed.binance.org",
         changeOrigin: true,

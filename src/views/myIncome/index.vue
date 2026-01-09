@@ -72,8 +72,8 @@
                     </div>
                 </div>
                 <div class="text">
-                    <span>0%</span>
-                    <span>100%</span>
+                    <span>0(CHO)</span>
+                    <span>18000(CHO)</span>
                 </div>
             </div>
 
@@ -116,7 +116,7 @@
                 </div>
 
                 <div class="team-header">
-                    <span class="invite-count"><span>{{ $t('myNode.inviteAddressCount') }}</span> {{ inviteCount
+                    <span class="invite-count"><span>{{ inviteCountLabel }}</span> {{ inviteCount
                         }}</span>
                     <div class="search-icon" @click="handleSearch">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
@@ -249,6 +249,13 @@ const currentList = computed(() => {
 // 根据当前tab显示对应的邀请地址数
 const inviteCount = computed(() => {
     return activeTab.value === 'direct' ? directList.value.length : teamList.value.length
+})
+
+// 根据当前tab显示对应的标签文本
+const inviteCountLabel = computed(() => {
+    return activeTab.value === 'direct' 
+        ? t('myNode.directAddressCount') 
+        : t('myNode.teamTotalAddressCount')
 })
 
 const handleSearch = () => {

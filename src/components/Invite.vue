@@ -36,53 +36,76 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAccount } from '@wagmi/vue'
+import { ElMessage } from 'element-plus'
+import { bindInviteCode } from '@/api/api'
+import { useCounterStore } from '@/stores/counter'
+import { storeToRefs } from 'pinia'
 
 const { t } = useI18n()
+const { address } = useAccount()
+const counterStore = useCounterStore()
+const { showInvite } = storeToRefs(counterStore)
 
 const props = defineProps({
   modelValue: {
     type: Boolean,
     default: false
-  },
-  inviteCode: {
-    type: String,
-    default: ''
   }
 })
 
 const emit = defineEmits([
-  'update:modelValue',
-  'update:inviteCode',
-  'confirm',
-  'skip',
-  'close'
+  'update:modelValue'
 ])
 
-const visible = computed(() => props.modelValue)
-const localCode = ref(props.inviteCode)
+const visible = computed(() => props.modelValue || showInvite.value)
+// 邀请码完全由用户输入控制，不依赖 props
+const localCode = ref('')
 
-watch(
-  () => props.inviteCode,
-  (val) => {
-    if (val !== localCode.value) {
-      localCode.value = val
-    }
+// 监听弹窗显示状态，每次打开时清空输入框
+watch(visible, (newVal) => {
+  if (newVal) {
+    // 弹窗打开时，清空输入框，让用户重新输入
+    localCode.value = ''
   }
-)
+})
 
+// 处理邀请码关闭
 const handleClose = () => {
+  showInvite.value = false
   emit('update:modelValue', false)
-  emit('close')
 }
 
+// 处理邀请码跳过
 const handleSkip = () => {
-  emit('skip')
+  console.log('跳过邀请码')
   handleClose()
 }
 
+// 处理邀请码确定
 const handleConfirm = () => {
-  emit('update:inviteCode', localCode.value)
-  emit('confirm', localCode.value)
+  console.log('确认邀请码：', localCode.value)
+  if (!address.value) {
+    console.error('钱包地址不存在，无法绑定邀请码')
+    ElMessage.error('请先连接钱包')
+    return
+  }
+  if (!localCode.value) {
+    ElMessage.error('邀请码不能为空')
+    return
+  }
+
+  bindInviteCode({
+    address: address.value,
+    invitation_code: localCode.value || ''
+  }).then(res => {
+    ElMessage.success('绑定邀请码成功')
+    console.log('绑定邀请码成功：', res)
+    handleClose()
+  }).catch(err => {
+    ElMessage.error('绑定邀请码失败')
+    console.error('绑定邀请码失败：', err)
+  })
 }
 </script>
 
@@ -90,7 +113,7 @@ const handleConfirm = () => {
 .invite-overlay {
   position: fixed;
   inset: 0;
-  z-index: 2100;
+  z-index: 1001;
   display: flex;
   align-items: flex-end;
   justify-content: center;

@@ -2,11 +2,7 @@
     <div class="myNode">
 
 
-        <BackHeaderNav 
-            :show-open-btn="true"
-            :use-default-open-action="false"
-            @open-click="handleOpenMore"
-        />
+        <BackHeaderNav :show-open-btn="true" :use-default-open-action="false" @open-click="handleOpenMore" />
 
         <div class="banner1">
             <h1 class="page-title">{{ $t('myNode.title') }}</h1>
@@ -68,7 +64,9 @@
             </div>
 
             <!-- 一键领取按钮 -->
-            <button class="claim-all-btn">{{ $t('myNode.claimAll') }}</button>
+            <button class="claim-all-btn" :disabled="claimLoading" @click="handleClaimReward">
+                {{ claimLoading ? loadingText : $t('myNode.claimAll') }}
+            </button>
 
         </div>
 
@@ -86,7 +84,7 @@
                 </div>
 
                 <div class="team-header">
-                    <span class="invite-count"><span>{{ $t('myNode.inviteAddressCount') }}</span> {{ inviteCount
+                    <span class="invite-count"><span>{{ inviteCountLabel }}</span> {{ inviteCount
                         }}</span>
                     <div class="search-icon" @click="handleSearch">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
@@ -148,6 +146,13 @@ import { ref, onMounted, computed } from "vue"
 import { useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
 import { useI18n } from 'vue-i18n'
+import { ElMessage } from 'element-plus'
+import { useAccount, useChainId } from '@wagmi/vue'
+import { switchChain } from '@wagmi/core'
+import { config } from '../../wagmi.ts'
+import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
+import networks from '@/assets/json/networks.json'
+import { writeContractOptimized, computedGas } from '@/utils/requestWEB3.js'
 import avatarImg from '@/assets/icon/avatar.png'
 import TeamTree from "@/components/TeamTree.vue"
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
@@ -156,10 +161,63 @@ import BackHeaderNav from '@/components/BackHeaderNav.vue'
 const router = useRouter()
 const themeStore = useThemeStore()
 const { t } = useI18n()
+const { address } = useAccount()
+const chainId = useChainId()
+const BSC_CHAIN_ID = 56
+const claimLoading = ref(false)
 
 const handleOpenMore = () => {
     // 预留「了解更多」跳转逻辑
     console.log('前往了解更多')
+}
+
+// 领取节点收益（incomeType: 0 节点收益，1 晋升收益）暂时写死为 0，后续有接口再替换
+const handleClaimReward = async () => {
+    if (claimLoading.value) return
+    if (!address.value) {
+        ElMessage.error('请先连接钱包')
+        return
+    }
+    claimLoading.value = true
+    try {
+        if (Number(chainId.value) !== BSC_CHAIN_ID) {
+            await switchChain(config, { chainId: BSC_CHAIN_ID })
+            await new Promise(r => setTimeout(r, 500))
+        }
+
+        const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
+        if (!bscNet?.proxyNodeManager) {
+            throw new Error('缺少 NodeManager 合约地址')
+        }
+
+        // 预估 gas（仅做预检，实际发送时仍由 writeContractOptimized 估算并附带 buffer）
+        await computedGas(
+            nodeManagerABI,
+            'claimReward',
+            [0], // 先写死 0，接口到位后替换
+            bscNet.proxyNodeManager,
+            address.value
+        )
+
+        await writeContractOptimized({
+            abi: nodeManagerABI,
+            address: bscNet.proxyNodeManager,
+            functionName: 'claimReward',
+            args: [0], // 0: 节点收入，1: 晋升收入（暂时写 0，等接口替换）
+            userAddress: address.value,
+            messages: {
+                success: '领取成功',
+                failed: '领取失败',
+                rejected: '你取消了领取'
+            },
+            showErrorToast: false
+        })
+    } catch (error) {
+        ElMessage.warning('领取失败')
+        console.error('领取失败:', error)
+    } finally {
+        claimLoading.value = false
+    }
 }
 
 // 我的团队相关数据
@@ -219,6 +277,19 @@ const inviteCount = computed(() => {
     return activeTab.value === 'direct' ? directList.value.length : teamList.value.length
 })
 
+// 根据当前tab显示对应的标签文本
+const inviteCountLabel = computed(() => {
+    return activeTab.value === 'direct' 
+        ? t('myNode.directAddressCount') 
+        : t('myNode.teamTotalAddressCount')
+})
+
+// 处理中按钮文案国际化：如果没有配置 common.loading，则回退为中文"处理中..."
+const loadingText = computed(() => {
+    const v = t('common.loading')
+    return v === 'common.loading' ? '处理中...' : v
+})
+
 const handleSearch = () => {
     // 搜索功能
     console.log('搜索团队')
@@ -232,16 +303,35 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .theme-light {
-    .claim-all-btn{
+    .claim-all-btn {
         background-color: #2B6C18 !important;
+        transition: opacity 0.2s ease;
     }
-    .avatar-content{
+
+    .claim-all-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .avatar-content {
         border: 2px solid #2B6C18 !important;
     }
 }
+
 /* 暗色主题下使用深色背景图 */
 .theme-dark .cps-bg {
     background-image: url("@/assets/icon/cpsBgDark.png") !important;
+}
+
+.theme-dark {
+    .claim-all-btn {
+        transition: opacity 0.2s ease;
+    }
+
+    .claim-all-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
 }
 
 .myNode {
@@ -520,7 +610,7 @@ onMounted(() => {
                             width: 100%;
                             height: 100%;
                             object-fit: cover;
-                            border:1px solid var(--bg-page-h5, #FFFFFF);
+                            border: 1px solid var(--bg-page-h5, #FFFFFF);
                             image-rendering: pixelated;
                             box-sizing: border-box;
                         }
@@ -678,7 +768,7 @@ onMounted(() => {
             color: #999999 !important;
         }
 
-        .team-list  {
+        .team-list {
             background: #121212 !important;
             border: none;
             padding: 23px 0;
@@ -711,6 +801,7 @@ onMounted(() => {
 
                 .team-upline-row {
                     .team-upline-left {
+
                         .team-upline-label,
                         .team-upline-address {
                             color: #999999 !important;

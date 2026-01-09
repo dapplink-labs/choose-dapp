@@ -162,7 +162,8 @@ export async function writeContractOptimized({
   userAddress,
   value = undefined,
   messages = { success: 'Transaction Successful', failed: 'Transaction Failed', rejected: 'User Cancelled' },
-  setTxHash
+  setTxHash,
+  showErrorToast = true // 允许调用方关闭报错弹窗
 }) {
   try {
     const gasEstimate = await computedGas(abi, functionName, args, address, userAddress, value)
@@ -189,10 +190,12 @@ export async function writeContractOptimized({
       throw new Error(messages.failed)
     }
   } catch (error) {
-    if (isUserRejectedError(error)) {
-      ElMessage.warning(messages.rejected)
-    } else {
-      ElMessage.error(error.message || messages.failed)
+    if (showErrorToast) {
+      if (isUserRejectedError(error)) {
+        ElMessage.warning(messages.rejected)
+      } else {
+        ElMessage.error(error.message || messages.failed)
+      }
     }
     throw error
   }
