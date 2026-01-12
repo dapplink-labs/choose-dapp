@@ -150,6 +150,7 @@ export function useComputingPowerServices() {
       obj.DistributedNode = safeBigInt(p1)
       obj.ClusterNode = safeBigInt(p2)
     } catch (e) {
+      console.log('e==========================', e)
       console.warn('Fetch price failed, using defaults', e)
     }
     return obj
@@ -176,11 +177,10 @@ export function useComputingPowerServices() {
       // 2. 确定本次交易需要的金额
       const priceKey = activeNodeTab.value === 'distributed' ? 'DistributedNode' : 'ClusterNode'
       let amountBigInt = nodePriceObj.value[priceKey]
-
-      if (amountBigInt <= BigInt(0)) {
-        const latest = await getNodePrice()
-        amountBigInt = latest[priceKey]
-      }
+      const latest = await getNodePrice()
+      console.log('latest', latest)
+      amountBigInt = latest[priceKey]
+      console.log('amountBigInt', amountBigInt)
 
       // ============ 余额检查 ============
       console.log('🔍 Checking balance...')

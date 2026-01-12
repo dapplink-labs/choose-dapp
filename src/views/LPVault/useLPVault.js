@@ -131,7 +131,6 @@ export const useLPVault = () => {
       console.log('usdtTokenAddress', usdtTokenAddress)
       console.log('address.value', address.value)
       const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value, 'balanceOf')
-      console.log('userBalance', userBalance)
       if (userBalance < amountBigInt) {
         ElMessage.error('余额不足')
         loading.close()
@@ -142,9 +141,9 @@ export const useLPVault = () => {
       // 检查授权
       const allowance = await checkAllowance(usdtTokenAddress, address.value, proxyStakingManager)
 
-      console.log('allowance', allowance)
+      console.log('allowance===', allowance)
       console.log('amountBigInt', amountBigInt)
-      console.log('userBalance', userBalance)
+      console.log('userBalance=', userBalance)
       if (allowance === BigInt(0) || allowance < amountBigInt) {
         loading.text = '正在请求USDT授权...'
         await approveToken({
@@ -160,14 +159,12 @@ export const useLPVault = () => {
         })
       }
 
-      // 邀请人地址
-      const inviterAddress = '0xD837FF8cb366D1f9ebDB0659b066b709804D52bc'
 
       const result = await writeContractOptimized({
         abi: stakingManagerABI,
         address: proxyStakingManager,
         functionName: 'liquidityProviderDeposit',
-        args: [inviterAddress, amountBigInt],
+        args: [amountBigInt],
         userAddress: address.value,
         messages: {
           success: '节点激活成功！',
