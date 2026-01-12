@@ -12,6 +12,8 @@ export const useCounterStore = defineStore('counter', () => {
   const isLogin  = ref(false)
   // 是否显示邀请码弹窗
   const showInvite = ref(false)
+  // 邀请码
+  const inviteCode = ref('')
   // 双倍计数器
   const doubleCount = computed(() => count.value * 2)
   // 增加计数器
@@ -19,5 +21,5 @@ export const useCounterStore = defineStore('counter', () => {
     count.value++
   }
 
-  return { count,visible ,isLogin,doubleCount, increment, showInvite }
+  return { count,visible ,isLogin,doubleCount, increment, showInvite, inviteCode }
 })

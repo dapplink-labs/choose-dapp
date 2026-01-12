@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import navBar from "./components/navBar.vue"
 import navBar2 from "./components/navBar2.vue"
@@ -26,6 +26,17 @@ const checkIsMobile = () => {
 
 // 立即检查（在组件渲染前）
 checkIsMobile()
+
+// 监听路由变化，检测 URL 中的 inviteCode 参数
+watch(
+  () => route.query.inviteCode,
+  (inviteCode) => {
+    if (inviteCode) {
+      counterStore.inviteCode = String(inviteCode)
+    }
+  },
+  { immediate: true }
+)
 
 onMounted(() => {
   // 再次检查确保准确性

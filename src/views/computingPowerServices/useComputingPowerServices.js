@@ -25,9 +25,6 @@ export function useComputingPowerServices() {
   const BSC_CHAIN_ID = 56
 
 
-  // 激活提示头像（复用集群节点插图）
-  const activationAvatar = clusterNodeImg
-
   // 节点 TAB 状态（用于弹窗标题）
   const activeNodeTab = ref('distributed')
 
@@ -45,52 +42,27 @@ export function useComputingPowerServices() {
   // 直接使用接口数据，不再使用硬编码的 fallback
   const displayNodes = computed(() => nodeProducts.value)
 
-  // 激活提示文案
-  const activationAddress = ref('0xb574...4c7d')
-  const activationMsg = computed(() =>
-    t('computingPower.activationMsg', {
-      address: activationAddress.value,
-      nodeType: t('computingPower.tabs.cluster')
-    })
-  )
-
-  // 将激活消息拆分成部分，以便地址部分可以加粗
-  const activationMsgParts = computed(() => {
-    const msg = activationMsg.value
-    const addr = activationAddress.value
-    const parts = []
-
-    // 查找地址在消息中的位置
-    const addressIndex = msg.indexOf(addr)
-
-    if (addressIndex === -1) {
-      // 如果找不到地址，直接返回整个消息
-      return [{ text: msg, isAddress: false }]
-    }
-
-    // 地址前的文本
-    if (addressIndex > 0) {
-      parts.push({ text: msg.substring(0, addressIndex), isAddress: false })
-    }
-
-    // 地址部分
-    parts.push({ text: addr, isAddress: true })
-
-    // 地址后的文本
-    const afterIndex = addressIndex + addr.length
-    if (afterIndex < msg.length) {
-      parts.push({ text: msg.substring(afterIndex), isAddress: false })
-    }
-
-    return parts
-  })
-
   const handleOpenMore = () => {
     // 预留「了解更多」跳转逻辑
   }
 
   const handleMyNodes = () => {
-    router.push('/myNode')
+    // 查找 is_active 为 3 的节点（已购买/已激活）
+    const activeNode = nodeProducts.value.find((node) => node.is_active === 3)
+
+    if (!activeNode) {
+      // 如果没有已激活的节点，则不跳转并提示
+      ElMessage.warning(t('common.noData'))
+      return
+    }
+
+    // 跳转到 myNode 页面，并传递已激活节点的 id
+    router.push({
+      path: '/myNode',
+      query: {
+        id: activeNode.id ?? ''
+      }
+    })
   }
 
   const showPurchaseNode = ref(false)
@@ -140,8 +112,6 @@ export function useComputingPowerServices() {
     const percent = Number(currentNode.marketShare)
     return `${percent}%`
   })
-
-  const purchaseWalletBalance = ref('200000 USDT') // 写死的钱包余额
   // mock数据END
 
   // 打开购买节点弹窗
@@ -214,7 +184,7 @@ export function useComputingPowerServices() {
 
       // ============ 余额检查 ============
       console.log('🔍 Checking balance...')
-      const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value)
+      const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value, 'balanceOf')
 
       console.log('userBalance', userBalance)
       console.log('amountBigInt', amountBigInt)
@@ -291,6 +261,7 @@ export function useComputingPowerServices() {
         nodeProducts.value = []
         return
       }
+      console.log('list：', list)
 
       // 接口返回字段: id, name, fee_reward, sub_coin_reward, market_reward, status 等
       nodeProducts.value = list.map((item) => {
@@ -300,6 +271,7 @@ export function useComputingPowerServices() {
           : 'computingPower.products.clusterDescTemplate'
 
         return {
+          id: item.id,
           type: item.node_type === 1 ? 'distributed' : 'cluster', // 1: 分布式, 2: 集群
           icon: item.icon || (item.node_type === 1
             ? (isDark.value ? distributedNodeImgDark : distributedNodeImg)
@@ -332,8 +304,41 @@ export function useComputingPowerServices() {
     activeNodeTab.value === 'distributed' ? distributedNodeImg : clusterNodeImg
   )
 
-  // 判断按钮是否可点击：只有当两个节点的 is_active 都为 1 时，按钮才可点击
-  const isButtonEnabled = computed(() => {
+  // 判断按钮是否显示
+  // 如果当前节点的 is_active 不为 1，则显示按钮
+  // 如果当前节点的 is_active 为 1，但另一个节点的 is_active 不为 1，则隐藏按钮
+  // 如果两个节点的 is_active 都为 1，则都显示按钮
+  const isNodeButtonVisible = (nodeType) => {
+    const currentNode = nodeProducts.value.find(node => node.type === nodeType)
+    const otherNode = nodeProducts.value.find(node => node.type !== nodeType)
+
+    if (!currentNode) {
+      return false
+    }
+
+    // 如果当前节点的 is_active 不为 1（2 或 3），显示按钮
+    if (currentNode.is_active !== 1) {
+      return true
+    }
+
+    // 如果当前节点的 is_active 为 1，检查另一个节点
+    // 如果另一个节点不存在，显示按钮
+    if (!otherNode) {
+      return true
+    }
+
+    // 如果另一个节点的 is_active 不为 1，隐藏当前节点的按钮
+    if (otherNode.is_active !== 1) {
+      return false
+    }
+
+    // 如果两个节点的 is_active 都为 1，显示按钮
+    return true
+  }
+
+  // 判断单个节点的按钮是否可点击
+  // 只有当两个节点的 is_active 都为 1 时，按钮才可点击
+  const isNodeButtonEnabled = (nodeType) => {
     const distributedNode = nodeProducts.value.find(node => node.type === 'distributed')
     const clusterNode = nodeProducts.value.find(node => node.type === 'cluster')
 
@@ -344,7 +349,7 @@ export function useComputingPowerServices() {
 
     // 如果节点数据不完整，默认不可点击
     return false
-  })
+  }
 
   // 获取按钮文字
   const getButtonText = (nodeType) => {
@@ -365,26 +370,16 @@ export function useComputingPowerServices() {
     return t('computingPower.activateBtn')
   }
 
-  // 判断单个节点的按钮是否可点击（基于全局状态）
-  const isNodeButtonEnabled = (nodeType) => {
-    return isButtonEnabled.value
-  }
-
   return {
     // 响应式数据
-    activationAvatar,
     activeNodeTab,
     nodeProducts,
     displayNodes,
-    activationAddress,
-    activationMsg,
-    activationMsgParts,
     showPurchaseNode,
     purchaseTitle,
     purchaseTradeProfit,
     purchaseFeeProfit,
     purchaseSecondaryProfit,
-    purchaseWalletBalance,
     currentNodeImg,
     // 方法
     handleOpenMore,
@@ -392,9 +387,9 @@ export function useComputingPowerServices() {
     handleBuy,
     handleConfirmBuy,
     fetchNodeProducts,
-    isButtonEnabled,
     getButtonText,
-    isNodeButtonEnabled
+    isNodeButtonEnabled,
+    isNodeButtonVisible
   }
 }
 

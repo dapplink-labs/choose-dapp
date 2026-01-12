@@ -44,21 +44,8 @@
                 </div>
             </div>
 
-            <!-- 赚取收益提示模块 -->
-            <div class="earn-prompt">
-                <div class="earn-icon">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                        <rect x="3" y="3" width="7" height="7" rx="1" />
-                        <rect x="14" y="3" width="7" height="7" rx="1" />
-                        <rect x="3" y="14" width="7" height="7" rx="1" />
-                        <rect x="14" y="14" width="7" height="7" rx="1" />
-                    </svg>
-                </div>
-                <div class="earn-text">
-                    {{ $t('myIncome.earnPrompt', { address: '0xb574...4c7d' }) }} <span
-                        class="earn-amount">+1000000CHO</span>
-                </div>
-            </div>
+            <!-- 赚取收益提示模块：使用通用跑马灯组件（type=3 展示收益样式） -->
+            <ActivationMarquee :type="4" />
 
             <h3 style="margin-bottom: 16px;">{{ $t('myIncome.pendingIncome') }}</h3>
 
@@ -189,11 +176,14 @@ import TabNode from '@/components/TabNode.vue'
 import CollectEarnings from '@/components/CollectEarnings.vue'
 import TeamTree from '@/components/TeamTree.vue'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
+import ActivationMarquee from '@/components/ActivationMarquee.vue'
+import { getNodeStakingInfo } from '@/api/API'
+import { useAccount } from '@wagmi/vue'
 
 const router = useRouter()
 const themeStore = useThemeStore()
 const { t } = useI18n()
-
+const { address } = useAccount()
 // 我的团队相关数据
 const activeTab = ref('direct')
 
@@ -331,9 +321,15 @@ const handleCollectConfirm = (selectedOption, selectedIndex) => {
     // 这里可以添加实际的领取逻辑
 }
 
+const fetchNodeStakingInfo = async () => {
+    const res = await getNodeStakingInfo({ address: address.value, id: "1" })
+    const data = res?.data?.data || res?.data || res || {}
+    console.log('节点质押信息接口返回：', data)
+}
 // 初始化主题
 onMounted(() => {
     themeStore.applyTheme()
+    fetchNodeStakingInfo()
 })
 </script>
 

@@ -43,7 +43,9 @@ export default {
     confirm: "확인",
     price: "가격",
     buy: "구매",
-    share: "공유"
+    share: "공유",
+    noData: "데이터 없음...",
+    address: "주소"
   },
   linkWallet: {
     welcome: "CHOOSEME에 오신 것을 환영합니다",
@@ -58,7 +60,15 @@ export default {
   invite: {
     title: "CHOOSEME에 오신 것을 환영합니다",
     placeholder: "초대 코드",
-    tip: "* 초대 코드를 입력하면 더 많은 수익 보상을 받을 기회가 있습니다"
+    tip: "* 초대 코드를 입력하면 더 많은 수익 보상을 받을 기회가 있습니다",
+    codeRequired: "초대 코드는 필수입니다",
+    bindSuccess: "초대 코드가 성공적으로 연동되었습니다",
+    bindFail: "초대 코드 연동에 실패했습니다",
+    contractBindSuccess: "온체인 초대 코드 연동에 성공했습니다",
+    contractBindFailed: "온체인 초대 코드 연동에 실패했습니다",
+    contractBindCancelled: "온체인 연동을 취소했습니다",
+    invalidAddress: "유효하지 않은 초대 주소 형식입니다",
+    missingContract: "NodeManager 컨트랙트 주소가 설정되어 있지 않습니다"
   },
   computingPower: {
     title: "해시파워 서비스 제공자",
@@ -142,6 +152,7 @@ export default {
     choIncome: "CHO 수익",
     subCoinIncome: "하위 코인 수익",
     earnPrompt: "주소 {address} 수익 획득",
+    earnPromptShort: "수익 획득",
     pendingIncome: "수령 대기 수익",
     nodeIncome: "노드 수익",
     networkFeeIncome: "전체 네트워크 수수료 매매 수익",
@@ -151,6 +162,11 @@ export default {
     networkIncome: "팀 수익",
     claimAll: "모든 수익 수령",
     claim: "수령",
+    claimSuccess: "수령 성공",
+    claimFailed: "수령 실패",
+    claimCancelled: "수령을 취소했습니다",
+    connectWalletFirst: "먼저 지갑을 연결하세요",
+    missingContractAddress: "NodeManager 컨트랙트 주소가 없습니다",
     myTeam: "나의 팀",
     inviteAddressCount: "초대 주소 수",
     directAddressCount: "직접 추천 주소 수",

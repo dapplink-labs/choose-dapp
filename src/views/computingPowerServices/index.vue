@@ -13,18 +13,8 @@
           <a href="javascript:void(0)" class="cps-link" @click="handleOpenMore">{{ t('computingPower.learnMore') }}</a>
         </p>
 
-        <!-- 激活提示模块 -->
-        <div class="activation-banner">
-          <div class="activation-avatar">
-            <img :src="activationAvatar" alt="avatar" />
-          </div>
-          <div class="activation-text">
-            <template v-for="(part, index) in activationMsgParts" :key="index">
-              <strong v-if="part.isAddress">{{ part.text }}</strong>
-              <span v-else>{{ part.text }}</span>
-            </template>
-          </div>
-        </div>
+        <!-- 激活提示模块 - 跑马灯 -->
+        <ActivationMarquee :type="2" />
 
         <!-- 购买节点标题区域 -->
         <div class="node-header">
@@ -68,6 +58,7 @@
             </div>
 
             <button 
+              v-if="isNodeButtonVisible(node.type)"
               class="node-item-btn" 
               :class="{ 'disabled': !isNodeButtonEnabled(node.type) }"
               :disabled="!isNodeButtonEnabled(node.type)"
@@ -83,8 +74,7 @@
 
 
     <PurchaseNode v-model="showPurchaseNode" :title="purchaseTitle" :trade-profit="purchaseTradeProfit"
-      :fee-profit="purchaseFeeProfit" :secondary-profit="purchaseSecondaryProfit"
-      :wallet-balance="purchaseWalletBalance" @buy="handleConfirmBuy" />
+      :fee-profit="purchaseFeeProfit" :secondary-profit="purchaseSecondaryProfit" @buy="handleConfirmBuy" />
   </div>
 </template>
 
@@ -95,27 +85,27 @@ import TIcon from '@/assets/icon/TIcon.png'
 import PurchaseNode from '@/components/PurchaseNode.vue'
 // @ts-ignore
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
+// @ts-ignore
+import ActivationMarquee from '@/components/ActivationMarquee.vue'
 import { useComputingPowerServices } from './useComputingPowerServices.js'
 
 const { t } = useI18n()
 
 // 使用 composable 获取所有逻辑
 const {
-  activationAvatar,
   displayNodes,
-  activationMsgParts,
   showPurchaseNode,
   purchaseTitle,
   purchaseTradeProfit,
   purchaseFeeProfit,
   purchaseSecondaryProfit,
-  purchaseWalletBalance,
   handleOpenMore,
   handleMyNodes,
   handleBuy,
   handleConfirmBuy,
   getButtonText,
-  isNodeButtonEnabled
+  isNodeButtonEnabled,
+  isNodeButtonVisible
 } = useComputingPowerServices()
 </script>
 

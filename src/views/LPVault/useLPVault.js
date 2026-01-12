@@ -128,7 +128,10 @@ export const useLPVault = () => {
 
       const amountBigInt = parseUnits(String(price), 18)
       // 余额查询START
-      const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value)
+      console.log('usdtTokenAddress', usdtTokenAddress)
+      console.log('address.value', address.value)
+      const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value, 'balanceOf')
+      console.log('userBalance', userBalance)
       if (userBalance < amountBigInt) {
         ElMessage.error('余额不足')
         loading.close()

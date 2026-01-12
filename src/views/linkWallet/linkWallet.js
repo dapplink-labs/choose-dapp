@@ -70,10 +70,8 @@ export const useLinkWallet = () => {
   const chainId = useChainId()
   const { status, address } = useAccount()
   const themeStore = useThemeStore()
-  console.log(chainId)
 
   const isConnectingFromPage = ref(false)
-
   const safeConnectors = computed(() => {
     const maybeRef = connectors?.value
     if (Array.isArray(maybeRef)) {
@@ -129,10 +127,10 @@ export const useLinkWallet = () => {
   // 调用注册接口检查用户状态
   const checkUserStatus = async (walletAddress) => {
     try {
+      // 调用合约查询用户邀请人是否存在
       const response = await register({ address: walletAddress })
       // 根据接口返回的数据结构获取 exists 字段
       const exists = response?.data?.data?.exists ?? response?.data?.exists
-
       // 通过事件总线触发显示邀请弹窗
       eventBus.emit('showInvite', !exists)
     } catch (error) {

@@ -24,3 +24,18 @@ export const getNodeStakingList = () => {
 export const getNodeStakingRecords = (data) => {
     return request.get('/staking-api/api/v1/staking/nodeStakingRecords', { params: data })
 }
+
+// 获取算力服务商激活消息
+export const getNodeAndNodeServiceRecordNew = (data) => {
+    return request.get('/staking-api/api/v1/staking/nodeAndNodeServiceRecordNew', { params: data })
+}
+
+// 获取算力服务商节点详情金额信息
+export const getNodeServiceProvidersInfo = (data) => {
+    return request.get('/staking-api/api/v1/staking/nodeServiceProvidersInfo', { params: data })
+}
+
+// 获取质押信息
+export const getNodeStakingInfo = (data) => {
+    return request.get('/staking-api/api/v1/staking/nodeStakingInfo', { params: data })
+}

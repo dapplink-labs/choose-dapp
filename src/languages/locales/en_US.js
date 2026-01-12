@@ -10,8 +10,16 @@ export default {
   },
   invite: {
     title: "Welcome to CHOOSEME",
-    placeholder: "Iinvite code",
-    tip: "* By filling out the invitation code, there is a chance to receive more profit rewards"
+    placeholder: "Invite code",
+    tip: "* By filling out the invitation code, there is a chance to receive more profit rewards",
+    codeRequired: "Invitation code cannot be empty",
+    bindSuccess: "Invitation code bound successfully",
+    bindFail: "Failed to bind invitation code",
+    contractBindSuccess: "On-chain invitation binding succeeded",
+    contractBindFailed: "On-chain invitation binding failed",
+    contractBindCancelled: "You cancelled the on-chain binding",
+    invalidAddress: "Invalid inviter address format",
+    missingContract: "NodeManager contract address is not configured"
   },
   bridge: {
     placeholderAmount: "at least 0.1",
@@ -285,6 +293,8 @@ export default {
     close: "Close",
     save: "Save",
     share: "Share",
+    noData: "No data...",
+    address: "Address",
     // Status and labels
     userAvatar: "User Avatar",
     settings: "Settings",
@@ -415,7 +425,8 @@ export default {
     doc: "Documentation",
     walletAddressCopied: "Wallet address copied to clipboard",
     copyFailed: "Copy failed, please copy manually",
-    disconnectWallet: "Disconnect Wallet"
+    disconnectWallet: "Disconnect Wallet",
+    chooseMe: "ChooseMe"
   },
   settings: {
     title: "Settings",
@@ -618,6 +629,7 @@ export default {
     choIncome: "CHO profit",
     subCoinIncome: "Sub-coin profit",
     earnPrompt: "Address {address} Earn Income",
+    earnPromptShort: "Earned",
     pendingIncome: "Pending profit",
     nodeIncome: "Node Profit",
     networkFeeIncome: "Network Trading Fee Profit",
@@ -627,6 +639,11 @@ export default {
     networkIncome: "Network Profit",
     claimAll: "Claim All Profit",
     claim: "Claim",
+    claimSuccess: "Claim successful",
+    claimFailed: "Claim failed",
+    claimCancelled: "You cancelled the claim",
+    connectWalletFirst: "Please connect wallet first",
+    missingContractAddress: "Missing NodeManager contract address",
     myTeam: "My Team",
     inviteAddressCount: "Invite Address Count",
     directAddressCount: "Direct Address Count",

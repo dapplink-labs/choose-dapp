@@ -16,15 +16,8 @@
             </div>
         </div>
 
-        <!-- 激活提示模块 -->
-        <div class="activation-banner">
-            <div class="activation-avatar">
-                <img :src="activationAvatar" alt="avatar" />
-            </div>
-            <div class="activation-text">
-                {{ activationMsg }}
-            </div>
-        </div>
+        <!-- 激活提示模块：使用通用跑马灯组件（type 1 对应质押节点激活消息） -->
+        <ActivationMarquee :type="1" />
 
         <h3>
             <span>{{ $t('lpVault.nodeStaking') }}</span>
@@ -86,11 +79,10 @@
 import { ArrowRightBold } from '@element-plus/icons-vue'
 import TIcon from '@/assets/icon/TIcon.png'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
+import ActivationMarquee from '@/components/ActivationMarquee.vue'
 import { useLPVault } from './useLPVault.js'
 
 const {
-  activationAvatar,
-  activationMsg,
   handleOpenMore,
   handleOpenMyIncome,
   nodeList,

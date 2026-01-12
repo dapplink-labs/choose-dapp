@@ -24,7 +24,15 @@ export default {
   invite: {
     title: "CHOOSEMEへようこそ",
     placeholder: "招待コード",
-    tip: "招待コードを入力すると、より多くの収益報酬を獲得するチャンスがあります"
+    tip: "招待コードを入力すると、より多くの収益報酬を獲得するチャンスがあります",
+    codeRequired: "招待コードは必須です",
+    bindSuccess: "招待コードの連携に成功しました",
+    bindFail: "招待コードの連携に失敗しました",
+    contractBindSuccess: "オンチェーンでの招待コード連携に成功しました",
+    contractBindFailed: "オンチェーンでの招待コード連携に失敗しました",
+    contractBindCancelled: "オンチェーン連携をキャンセルしました",
+    invalidAddress: "無効な招待アドレス形式です",
+    missingContract: "NodeManager コントラクトアドレスが設定されていません"
   },
   navbar2: {
     nav: {
@@ -120,6 +128,7 @@ export default {
     choIncome: "CHO収益",
     subCoinIncome: "サブコイン収益",
     earnPrompt: "アドレス {address} が{amount} CHOの収益を獲得",
+    earnPromptShort: "収益を獲得",
     pendingIncome: "受取待ち収益",
     nodeIncome: "ノード収益",
     networkFeeIncome: "全ネットワーク手数料売買収益",
@@ -129,6 +138,11 @@ export default {
     networkIncome: "チーム収益",
     claimAll: "全収益の受取",
     claim: "受取",
+    claimSuccess: "受取成功",
+    claimFailed: "受取失敗",
+    claimCancelled: "受取をキャンセルしました",
+    connectWalletFirst: "まずウォレットを接続してください",
+    missingContractAddress: "NodeManager コントラクトアドレスが不足しています",
     myTeam: "マイチーム",
     inviteAddressCount: "招待アドレス数",
     directAddressCount: "直接紹介アドレス数",
@@ -273,7 +287,10 @@ export default {
     confirm: "確定",
     complete: "完了",
     price: "価格",
-    share: "共有"
+    share: "共有",
+    noData: "データがありません...",
+    address: "アドレス",
+    noData: "データがありません..."
   }
 }
 

@@ -134,14 +134,14 @@ export async function approveToken({
 /**
  * 获取用户特定代币的余额
  */
-export async function getUserTokenBalance(tokenAddress, userAddress) {
+export async function getUserTokenBalance(tokenAddress, userAddress, functionName) {
   try {
     if (!tokenAddress || !userAddress) return BigInt(0)
 
     const balance = await readContract(config, {
       address: tokenAddress,
       abi: erc20ABI,
-      functionName: 'balanceOf',
+      functionName: functionName,
       args: [userAddress]
     })
     return BigInt(balance || 0)

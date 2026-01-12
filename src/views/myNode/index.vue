@@ -13,53 +13,41 @@
             <div class="box">
                 <div class="item">
                     <b>{{ $t('myNode.choIncome') }}</b>
-                    <p>200,000</p>
+                    <p>{{ choIncome }}</p>
                 </div>
                 <div class="item">
                     <b>{{ $t('myNode.subCoinIncome') }}</b>
-                    <p>200,000</p>
+                    <p>{{ subCoinIncome }}</p>
                 </div>
             </div>
 
-            <div class="earn-prompt">
-                <div class="earn-icon">
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                        <rect x="3" y="3" width="7" height="7" rx="1" />
-                        <rect x="14" y="3" width="7" height="7" rx="1" />
-                        <rect x="3" y="14" width="7" height="7" rx="1" />
-                        <rect x="14" y="14" width="7" height="7" rx="1" />
-                    </svg>
-                </div>
-                <div class="earn-text">
-                    {{ $t('myNode.earnPrompt') }} <span class="earn-amount">+1000000CHO</span>
-                </div>
-            </div>
+            <ActivationMarquee :type="3" />
 
             <h3>{{ $t('myNode.pendingIncome') }}</h3>
             <div class="pending-income-grid">
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.nodeIncome') }}</div>
-                    <div class="income-value">200,000</div>
+                    <div class="income-value">{{ nodeIncome }}</div>
                 </div>
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.networkFeeIncome') }}</div>
-                    <div class="income-value">180,000</div>
+                    <div class="income-value">{{ networkFeeIncome }}</div>
                 </div>
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.subCoinFeeIncome') }}</div>
-                    <div class="income-value">1,200,000</div>
+                    <div class="income-value">{{ subCoinFeeIncome }}</div>
                 </div>
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.secondaryMarketIncome') }}</div>
-                    <div class="income-value">12,000</div>
+                    <div class="income-value">{{ secondaryMarketIncome }}</div>
                 </div>
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.directReferralIncome') }}</div>
-                    <div class="income-value">1,200,000</div>
+                    <div class="income-value">{{ directReferralIncome }}</div>
                 </div>
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.networkIncome') }}</div>
-                    <div class="income-value">12,000</div>
+                    <div class="income-value">{{ teamIncome }}</div>
                 </div>
             </div>
 
@@ -143,7 +131,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue"
-import { useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
@@ -156,15 +144,30 @@ import { writeContractOptimized, computedGas } from '@/utils/requestWEB3.js'
 import avatarImg from '@/assets/icon/avatar.png'
 import TeamTree from "@/components/TeamTree.vue"
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
+import ActivationMarquee from '@/components/ActivationMarquee.vue'
+import { getNodeServiceProvidersInfo } from '@/api/API'
 
 
-const router = useRouter()
+
 const themeStore = useThemeStore()
+const route = useRoute()
 const { t } = useI18n()
 const { address } = useAccount()
 const chainId = useChainId()
 const BSC_CHAIN_ID = 56
 const claimLoading = ref(false)
+
+// 顶部收益数据
+const choIncome = ref('0')
+const subCoinIncome = ref('0') // 子币收益暂无数据，写死 0
+
+// 待领取收益数据
+const nodeIncome = ref('0')
+const networkFeeIncome = ref('0')
+const subCoinFeeIncome = ref('0')
+const secondaryMarketIncome = ref('0')
+const directReferralIncome = ref('0')
+const teamIncome = ref('0')
 
 const handleOpenMore = () => {
     // 预留「了解更多」跳转逻辑
@@ -175,7 +178,7 @@ const handleOpenMore = () => {
 const handleClaimReward = async () => {
     if (claimLoading.value) return
     if (!address.value) {
-        ElMessage.error('请先连接钱包')
+        ElMessage.error(t('myNode.connectWalletFirst'))
         return
     }
     claimLoading.value = true
@@ -187,33 +190,33 @@ const handleClaimReward = async () => {
 
         const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
         if (!bscNet?.proxyNodeManager) {
-            throw new Error('缺少 NodeManager 合约地址')
+            throw new Error(t('myNode.missingContractAddress'))
         }
 
         // 预估 gas（仅做预检，实际发送时仍由 writeContractOptimized 估算并附带 buffer）
-        await computedGas(
-            nodeManagerABI,
-            'claimReward',
-            [0], // 先写死 0，接口到位后替换
-            bscNet.proxyNodeManager,
-            address.value
-        )
+        // await computedGas(
+        //     nodeManagerABI,
+        //     'claimReward',
+        //     [0], // 先写死 0，接口到位后替换
+        //     bscNet.proxyNodeManager,
+        //     address.value
+        // )
 
         await writeContractOptimized({
             abi: nodeManagerABI,
             address: bscNet.proxyNodeManager,
             functionName: 'claimReward',
-            args: [0], // 0: 节点收入，1: 晋升收入（暂时写 0，等接口替换）
+            args: [0], 
             userAddress: address.value,
             messages: {
-                success: '领取成功',
-                failed: '领取失败',
-                rejected: '你取消了领取'
+                success: t('myNode.claimSuccess'),
+                failed: t('myNode.claimFailed'),
+                rejected: t('myNode.claimCancelled')
             },
             showErrorToast: false
         })
     } catch (error) {
-        ElMessage.warning('领取失败')
+        ElMessage.warning(t('myNode.claimFailed'))
         console.error('领取失败:', error)
     } finally {
         claimLoading.value = false
@@ -298,6 +301,32 @@ const handleSearch = () => {
 // 初始化主题
 onMounted(() => {
     themeStore.applyTheme()
+    // CHO收益：total_reward
+    // 子币收益：暂无数据写死0
+    // 全网手续费买卖收益：fee_reward
+    // 子币手续费收益：son_coin_reward
+    // 二级市场盈利收益：market_reward
+    // 直推收益：direct_reward
+    // 团队收益：team_reward
+    // 节点收益：node_reward
+    getNodeServiceProvidersInfo({
+        id: String(route.query.id || ''),
+        address: address.value
+    }).then(res => {
+        const data = res?.data?.data || res?.data || res || {}
+
+        choIncome.value = data.total_reward ?? '0'
+        subCoinIncome.value = '0' // 暂无子币收益数据，写死 0
+
+        nodeIncome.value = data.node_reward ?? '0'
+        networkFeeIncome.value = data.fee_reward ?? '0'
+        subCoinFeeIncome.value = data.son_coin_reward ?? '0'
+        secondaryMarketIncome.value = data.market_reward ?? '0'
+        directReferralIncome.value = data.direct_reward ?? '0'
+        teamIncome.value = data.team_reward ?? '0'
+    }).catch(err => {
+        console.error('获取节点收益详情失败：', err)
+    })
 })
 </script>
 

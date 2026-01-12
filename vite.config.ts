@@ -18,7 +18,7 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
       "/staking-api": {
-        target: "http://172.18.1.160:8082",
+        target: "http://172.18.1.58:8080",
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/staking-api/, ""),

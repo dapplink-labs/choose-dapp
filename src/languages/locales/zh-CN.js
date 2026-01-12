@@ -12,7 +12,15 @@ export default {
   invite: {
     title: "欢迎来到CHOOSEME",
     placeholder: "请输入邀请码",
-    tip: "* 填写邀请码有机会可以获得更多收益奖励"
+    tip: "* 填写邀请码有机会可以获得更多收益奖励",
+    codeRequired: "邀请码不能为空",
+    bindSuccess: "绑定邀请码成功",
+    bindFail: "绑定邀请码失败",
+    contractBindSuccess: "合约绑定邀请码成功",
+    contractBindFailed: "合约绑定邀请码失败",
+    contractBindCancelled: "你取消了合约绑定",
+    invalidAddress: "无效的邀请码地址格式",
+    missingContract: "未找到 nodeManager 合约地址"
   },
   bridge: {
     placeholderAmount: "至少 0.1",
@@ -294,6 +302,8 @@ export default {
     close: "关闭",
     save: "保存",
     share: "分享",
+    noData: "暂无数据...",
+    address: "地址",
     // 状态和标签
     userAvatar: "用户头像",
     settings: "设置",
@@ -627,6 +637,7 @@ export default {
     choIncome: "CHO收益",
     subCoinIncome: "子币收益",
     earnPrompt: "地址 {address} Earn Income",
+    earnPromptShort: "赚取收益",
     pendingIncome: "待领取收益",
     nodeIncome: "节点收益",
     networkFeeIncome: "全网手续费买卖收益",
@@ -636,6 +647,11 @@ export default {
     networkIncome: "团队收益",
     claimAll: "领取所有收益",
     claim: "Claim",
+    claimSuccess: "领取成功",
+    claimFailed: "领取失败",
+    claimCancelled: "你取消了领取",
+    connectWalletFirst: "请先连接钱包",
+    missingContractAddress: "缺少 NodeManager 合约地址",
     myTeam: "我的团队",
     inviteAddressCount: "邀请地址数",
     directAddressCount: "直推地址数",
