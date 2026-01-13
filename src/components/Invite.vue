@@ -98,56 +98,49 @@ const handleConfirm = async () => {
   }
 
   loading.value = true
-  try {
-    // 检查邀请码是否为有效的地址格式
-    if (!localCode.value || !localCode.value.startsWith('0x') || localCode.value.length !== 42) {
-      throw new Error(t('invite.invalidAddress') || '无效的邀请码地址格式')
-    }
-
-    // 切换到 BSC 主网（如果需要）
-    if (Number(chainId.value) !== BSC_CHAIN_ID) {
-      await switchChain(config, { chainId: BSC_CHAIN_ID })
-      await new Promise(r => setTimeout(r, 500))
-    }
-
-    // 获取 BSC 主网配置
-    const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
-    if (!bscNet?.proxyNodeManager) {
-      throw new Error(t('invite.missingContract') || '未找到 nodeManager 合约地址')
-    }
-
-    // 后端绑定邀请码
-    const res = await bindInviteCode({
-      address: address.value,
-      invitation_code: localCode.value || ''
-    })
-    console.log('后端绑定邀请码成功：', res)
-
-    // 合约绑定邀请码
-    await writeContractOptimized({
-      abi: nodeManagerABI,
-      address: bscNet.proxyNodeManager,
-      functionName: 'bindInviter',
-      args: [localCode.value], // 邀请人地址
-      userAddress: address.value,
-      messages: {
-        success: t('invite.contractBindSuccess') || '合约绑定邀请码成功',
-        failed: t('invite.contractBindFailed') || '合约绑定邀请码失败',
-        rejected: t('invite.contractBindCancelled') || '你取消了合约绑定'
-      },
-      showErrorToast: true
-    })
-
-    // 绑定成功后，将邀请码保存到全局 store
-    inviteCode.value = localCode.value || ''
-    ElMessage.success(t('invite.bindSuccess') || '绑定邀请码成功')
-    handleClose()
-  } catch (err) {
-    console.error('绑定邀请码失败：', err)
-    ElMessage.error(t('invite.bindFail') || '绑定邀请码失败')
-  } finally {
-    loading.value = false
+  // 检查邀请码是否为有效的地址格式
+  if (!localCode.value || !localCode.value.startsWith('0x') || localCode.value.length !== 42) {
+    throw new Error(t('invite.invalidAddress') || '无效的邀请码地址格式')
   }
+
+  // 切换到 BSC 主网（如果需要）
+  if (Number(chainId.value) !== BSC_CHAIN_ID) {
+    await switchChain(config, { chainId: BSC_CHAIN_ID })
+    await new Promise(r => setTimeout(r, 500))
+  }
+
+  // 获取 BSC 主网配置
+  const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
+  if (!bscNet?.proxyNodeManager) {
+    throw new Error(t('invite.missingContract') || '未找到 nodeManager 合约地址')
+  }
+
+  // 合约绑定邀请码
+  await writeContractOptimized({
+    abi: nodeManagerABI,
+    address: bscNet.proxyNodeManager,
+    functionName: 'bindInviter',
+    args: [localCode.value], // 邀请人地址
+    userAddress: address.value,
+    messages: {
+      success: t('invite.contractBindSuccess') || '合约绑定邀请码成功',
+      failed: t('invite.contractBindFailed') || '合约绑定邀请码失败',
+      rejected: t('invite.contractBindCancelled') || '你取消了合约绑定'
+    },
+    showErrorToast: true
+  })
+
+  // 后端绑定邀请码
+  const res = await bindInviteCode({
+    address: address.value,
+    invitation_code: localCode.value || ''
+  })
+
+  // 绑定成功后，将邀请码保存到全局 store
+  inviteCode.value = localCode.value || ''
+  ElMessage.success(t('invite.bindSuccess') || '绑定邀请码成功')
+  handleClose()
+  loading.value = false
 }
 </script>
 

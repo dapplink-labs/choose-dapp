@@ -7,6 +7,47 @@ const base = enUS
 
 export default {
   ...base,
+  assetManagement: {
+    totalAssets: "총자산 평가",
+    deposit: "입금",
+    withdraw: "출금",
+    bill: "명세",
+    funds: "자금",
+    earnings: "수익",
+    fo: "FO",
+    assetDistribution: "자산 분포",
+    overview: "자산 요약",
+    prediction: "예측",
+    predictionPlaceholder: "예측 기능 준비 중...",
+    name: "이름",
+    quantity: "수량",
+    value: "가치",
+    profitLoss: "손익",
+    rewards: "보상",
+    winnings: "당첨",
+    amountWon: "획득 금액",
+    action: "작업",
+    claim: "청구",
+    searchPlaceholder: "컨트랙트, 시장 또는 코드를 검색",
+    // 시간 주기
+    timePeriod1d: "1일",
+    timePeriod1w: "1주",
+    timePeriod1m: "1개월",
+    timePeriodAll: "전체",
+    // 포지션 목록
+    positionEvents: "포지션 이벤트",
+    entrustedPositions: "위탁 포지션",
+    historyPositionEvents: "역사 포지션 이벤트",
+    all: "전체",
+    buy: "Buy",
+    sell: "Sell",
+    // 상태
+    lost: "lost",
+    claimed: "claimed",
+    // 기타
+    valueLabel: "가치",
+    search: "Search"
+  },
   link: {
     titel: "지갑 연결",
     exit: "연결 해제"
@@ -41,6 +82,7 @@ export default {
     skip: "건너뛰기",
     continue: "계속",
     confirm: "확인",
+    loading: "로딩 중...",
     price: "가격",
     buy: "구매",
     share: "공유",
@@ -68,7 +110,13 @@ export default {
     contractBindFailed: "온체인 초대 코드 연동에 실패했습니다",
     contractBindCancelled: "온체인 연동을 취소했습니다",
     invalidAddress: "유효하지 않은 초대 주소 형식입니다",
-    missingContract: "NodeManager 컨트랙트 주소가 설정되어 있지 않습니다"
+    missingContract: "NodeManager 컨트랙트 주소가 설정되어 있지 않습니다",
+    bindInvitationTitle: "초대 관계 연동",
+    bindInvitationDesc: "초대 관계를 연동하면 귀하의 계정이 초대인과 연결되어 스테이킹 및 예측 관련 보상 계산 및 지급에 사용됩니다.",
+    myInvitationAddress: "나의 초대 주소",
+    shareNow: "즉시 공유",
+    invitationCodeCopied: "초대 코드가 클립보드에 복사되었습니다",
+    noInvitationCode: "초대 코드 없음"
   },
   computingPower: {
     title: "해시파워 서비스 제공자",
@@ -142,7 +190,19 @@ export default {
       T5: "슈퍼 노드",
       T6: "제네시스 노드"
     },
-    days: "일"
+    days: "일",
+    nodeTypeNotFound: "해당 노드 유형을 찾을 수 없습니다",
+    invalidPrice: "노드 가격이 유효하지 않습니다",
+    connectWalletFirst: "먼저 지갑을 연결하세요",
+    activatingNode: "노드 활성화 중...",
+    insufficientBalance: "잔액 부족",
+    requestingAuth: "USDT 승인 요청 중...",
+    approvalSuccess: "승인 성공",
+    userCancelledAuth: "승인을 취소했습니다",
+    approveTokenFailed: "승인 실패",
+    nodeActivationSuccess: "노드 활성화 성공!",
+    paymentFailed: "결제 실패",
+    paymentCancelled: "결제를 취소했습니다"
   },
   myNodes: {
     title: "내 노드"
@@ -316,7 +376,8 @@ export default {
     terms: "이용약관",
     doc: "문서",
     walletAddressCopied: "지갑 주소가 클립보드에 복사되었습니다",
-    copyFailed: "복사 실패, 수동으로 복사해 주세요"
+    copyFailed: "복사 실패, 수동으로 복사해 주세요",
+    linkCopied: "링크가 클립보드에 복사되었습니다"
   },
   settings: {
     title: "프로필",

@@ -1,4 +1,45 @@
 export default {
+  assetManagement: {
+    totalAssets: "Total Asset Valuation",
+    deposit: "Deposit",
+    withdraw: "Withdraw",
+    bill: "Bill",
+    funds: "Funds",
+    earnings: "Earnings",
+    fo: "FO",
+    assetDistribution: "Asset Distribution",
+    overview: "Overview",
+    prediction: "Prediction",
+    predictionPlaceholder: "Prediction feature coming soon...",
+    name: "Name",
+    quantity: "Quantity",
+    value: "Value",
+    profitLoss: "Profit/Loss",
+    rewards: "Rewards",
+    winnings: "Winnings",
+    amountWon: "Amount Won",
+    action: "Action",
+    claim: "Claim",
+    searchPlaceholder: "Search contracts, markets or codes",
+    // Time periods
+    timePeriod1d: "1 Day",
+    timePeriod1w: "1 Week",
+    timePeriod1m: "1 Month",
+    timePeriodAll: "All",
+    // Position list
+    positionEvents: "Position Events",
+    entrustedPositions: "Entrusted Positions",
+    historyPositionEvents: "Historical Position Events",
+    all: "All",
+    buy: "Buy",
+    sell: "Sell",
+    // Status
+    lost: "lost",
+    claimed: "claimed",
+    // Others
+    valueLabel: "Value",
+    search: "Search"
+  },
   link: {
     titel: "Connect Wallet",
     exit: "Disconnect"
@@ -19,7 +60,13 @@ export default {
     contractBindFailed: "On-chain invitation binding failed",
     contractBindCancelled: "You cancelled the on-chain binding",
     invalidAddress: "Invalid inviter address format",
-    missingContract: "NodeManager contract address is not configured"
+    missingContract: "NodeManager contract address is not configured",
+    bindInvitationTitle: "Bind Invitation Relationship",
+    bindInvitationDesc: "After binding the invitation relationship, your account will be linked with the inviter for calculating and distributing rewards related to staking and prediction.",
+    myInvitationAddress: "My Invitation Address",
+    shareNow: "Share Now",
+    invitationCodeCopied: "Invitation code copied to clipboard",
+    noInvitationCode: "No invitation code"
   },
   bridge: {
     placeholderAmount: "at least 0.1",
@@ -280,9 +327,12 @@ export default {
     }
   },
   common: {
+    // App name
+    appName: "ChooseMe",
     // Buttons and actions
     skip: "Skip",
     confirm: "OK",
+    loading: "Loading...",
     continue: "Continue",
     search: "Search",
     more: "More",
@@ -426,7 +476,8 @@ export default {
     walletAddressCopied: "Wallet address copied to clipboard",
     copyFailed: "Copy failed, please copy manually",
     disconnectWallet: "Disconnect Wallet",
-    chooseMe: "ChooseMe"
+    chooseMe: "ChooseMe",
+    linkCopied: "Link copied to clipboard"
   },
   settings: {
     title: "Settings",
@@ -622,7 +673,19 @@ export default {
       T5: "Super Node",
       T6: "Genesis Node"
     },
-    days: " days"
+    days: " days",
+    nodeTypeNotFound: "Node type not found",
+    invalidPrice: "Invalid node price",
+    connectWalletFirst: "Please connect wallet first",
+    activatingNode: "Activating node...",
+    insufficientBalance: "Insufficient balance",
+    requestingAuth: "Requesting USDT authorization...",
+    approvalSuccess: "Approval successful",
+    userCancelledAuth: "You cancelled the authorization",
+    approveTokenFailed: "Approval failed",
+    nodeActivationSuccess: "Node activation successful!",
+    paymentFailed: "Payment failed",
+    paymentCancelled: "You cancelled the payment"
   },
   myNode: {
     title: "Cluster Node",

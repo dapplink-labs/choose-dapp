@@ -42,10 +42,10 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeft } from '@element-plus/icons-vue'
-import CMTCurrentPrice from '@/components/CMTCurrentPrice.vue'
-import CMTPledge from '@/components/CMTPledge.vue'
-import ComputingPool from '@/components/ComputingPool.vue'
-import LPVault from '@/components/LPVault.vue'
+import CMTCurrentPrice from './CMTCurrentPrice.vue'
+import CMTPledge from './CMTPledge.vue'
+import ComputingPool from './ComputingPool.vue'
+import LPVault from './LPVault.vue'
 
 const { t } = useI18n()
 const router = useRouter()

@@ -1,5 +1,46 @@
 export default {
 
+  assetManagement: {
+    totalAssets: "总资产估值",
+    deposit: "充币",
+    withdraw: "提币",
+    bill: "账单",
+    funds: "资金",
+    earnings: "收益",
+    fo: "FO",
+    assetDistribution: "资产分布",
+    overview: "资产总览",
+    prediction: "预测",
+    predictionPlaceholder: "预测功能开发中...",
+    name: "名称",
+    quantity: "数量",
+    value: "价值",
+    profitLoss: "收益盈亏",
+    rewards: "奖励",
+    winnings: "中奖",
+    amountWon: "赢得金额",
+    action: "操作",
+    claim: "Claim",
+    searchPlaceholder: "搜索合约、标的或代码",
+    // 时间周期
+    timePeriod1d: "1天",
+    timePeriod1w: "1周",
+    timePeriod1m: "1月",
+    timePeriodAll: "全部",
+    // 仓位列表
+    positionEvents: "仓位事件",
+    entrustedPositions: "委托仓位",
+    historyPositionEvents: "历史仓位事件",
+    all: "所有",
+    buy: "Buy",
+    sell: "Sell",
+    // 状态
+    lost: "lost",
+    claimed: "claimed",
+    // 其他
+    valueLabel: "价值",
+    search: "Search"
+  },
   link: {
     titel: "链接钱包",
     exit: "断开链接"
@@ -20,7 +61,13 @@ export default {
     contractBindFailed: "合约绑定邀请码失败",
     contractBindCancelled: "你取消了合约绑定",
     invalidAddress: "无效的邀请码地址格式",
-    missingContract: "未找到 nodeManager 合约地址"
+    missingContract: "未找到 nodeManager 合约地址",
+    bindInvitationTitle: "绑定邀请关系",
+    bindInvitationDesc: "绑定邀请关系后,你的账户将与邀请人建立关联,用于质押与预测相关奖励的计算与发放。",
+    myInvitationAddress: "我的邀请地址",
+    shareNow: "立即分享",
+    invitationCodeCopied: "邀请码已复制到剪贴板",
+    noInvitationCode: "暂无邀请码"
   },
   bridge: {
     placeholderAmount: "至少 0.1",
@@ -289,9 +336,12 @@ export default {
   },
 
   common: {
+    // 应用名称
+    appName: "ChooseMe",
     // 按钮和操作
     skip: "跳过",
     confirm: "确定",
+    loading: "加载中...",
     continue: "继续",
     search: "搜索",
     more: "查看更多",
@@ -434,7 +484,8 @@ export default {
     terms: "使用条款",
     doc: "文档",
     walletAddressCopied: "钱包地址已复制到剪贴板",
-    copyFailed: "复制失败，请手动复制"
+    copyFailed: "复制失败，请手动复制",
+    linkCopied: "链接已复制到剪贴板"
   },
   settings: {
     title: "个人设置",
@@ -630,7 +681,19 @@ export default {
       T5: "超级节点",
       T6: "创世节点"
     },
-    days: "天"
+    days: "天",
+    nodeTypeNotFound: "未找到对应的节点类型",
+    invalidPrice: "节点价格无效",
+    connectWalletFirst: "请先连接钱包",
+    activatingNode: "正在进行节点激活...",
+    insufficientBalance: "余额不足",
+    requestingAuth: "正在请求USDT授权...",
+    approvalSuccess: "授权成功",
+    userCancelledAuth: "你取消了授权",
+    approveTokenFailed: "授权失败",
+    nodeActivationSuccess: "节点激活成功！",
+    paymentFailed: "支付失败",
+    paymentCancelled: "你取消了支付"
   },
   myNode: {
     title: "集群节点",

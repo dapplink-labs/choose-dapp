@@ -95,91 +95,84 @@ export const useLPVault = () => {
 
   const handleActivate = async (type) => {
     if (!address.value) {
-      ElMessage.error('请先连接钱包')
+      ElMessage.error(t('lpVault.connectWalletFirst'))
       return
     }
 
-    const loading = ElLoading.service({ lock: true, text: '正在进行节点激活...', background: 'rgba(0, 0, 0, 0.7)' })
-    try {
-      // 1. 网络环境检查
-      if (Number(chainId.value) !== BSC_CHAIN_ID) {
-        await switchChain(config, { chainId: BSC_CHAIN_ID })
-        await new Promise(r => setTimeout(r, 1000))
-      }
+    const loading = ElLoading.service({ lock: true, text: t('lpVault.activatingNode'), background: 'rgba(0, 0, 0, 0.7)' })
+    // 1. 网络环境检查
+    if (Number(chainId.value) !== BSC_CHAIN_ID) {
+      await switchChain(config, { chainId: BSC_CHAIN_ID })
+      await new Promise(r => setTimeout(r, 1000))
+    }
 
-      // 获取合约地址
-      const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
-      const { proxyStakingManager, usdtTokenAddress } = bscNet
+    // 获取合约地址
+    const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
+    const { proxyStakingManager, usdtTokenAddress } = bscNet
 
-      // 从接口数据中获取对应节点的价格
-      const nodeItem = nodeListData.value.find(item => item.type === type)
-      if (!nodeItem) {
-        ElMessage.error('未找到对应的节点类型')
-        loading.close()
-        return
-      }
+    // 从接口数据中获取对应节点的价格
+    const nodeItem = nodeListData.value.find(item => item.type === type)
+    if (!nodeItem) {
+      ElMessage.error(t('lpVault.nodeTypeNotFound'))
+      loading.close()
+      return
+    }
 
-      const price = parseFloat(nodeItem.price) || 0
-      if (price <= 0) {
-        ElMessage.error('节点价格无效')
-        loading.close()
-        return
-      }
+    const price = parseFloat(nodeItem.price) || 0
+    if (price <= 0) {
+      ElMessage.error(t('lpVault.invalidPrice'))
+      loading.close()
+      return
+    }
 
-      const amountBigInt = parseUnits(String(price), 18)
-      // 余额查询START
-      console.log('usdtTokenAddress', usdtTokenAddress)
-      console.log('address.value', address.value)
-      const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value, 'balanceOf')
-      if (userBalance < amountBigInt) {
-        ElMessage.error('余额不足')
-        loading.close()
-        return
-      }
-      // 余额查询END
+    const amountBigInt = parseUnits(String(price), 18)
+    // 余额查询START
+    console.log('usdtTokenAddress', usdtTokenAddress)
+    console.log('address.value', address.value)
+    const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value, 'balanceOf')
+    if (userBalance < amountBigInt) {
+      ElMessage.error(t('lpVault.insufficientBalance'))
+      loading.close()
+      return
+    }
+    // 余额查询END
 
-      // 检查授权
-      const allowance = await checkAllowance(usdtTokenAddress, address.value, proxyStakingManager)
+    // 检查授权
+    const allowance = await checkAllowance(usdtTokenAddress, address.value, proxyStakingManager)
 
-      console.log('allowance===', allowance)
-      console.log('amountBigInt', amountBigInt)
-      console.log('userBalance=', userBalance)
-      if (allowance === BigInt(0) || allowance < amountBigInt) {
-        loading.text = '正在请求USDT授权...'
-        await approveToken({
-          tokenAddress: usdtTokenAddress,
-          spenderAddress: proxyStakingManager,
-          amount: amountBigInt,
-          userAddress: address.value,
-          BRIDGE_MESSAGES: {
-            approvalSuccess: '授权成功',
-            userCancelledAuth: '你取消了授权',
-            approveTokenFailed: '授权失败'
-          }
-        })
-      }
-
-
-      const result = await writeContractOptimized({
-        abi: stakingManagerABI,
-        address: proxyStakingManager,
-        functionName: 'liquidityProviderDeposit',
-        args: [amountBigInt],
+    console.log('allowance===', allowance)
+    console.log('amountBigInt', amountBigInt)
+    console.log('userBalance=', userBalance)
+    if (allowance === BigInt(0) || allowance < amountBigInt) {
+      loading.text = t('lpVault.requestingAuth')
+      await approveToken({
+        tokenAddress: usdtTokenAddress,
+        spenderAddress: proxyStakingManager,
+        amount: amountBigInt,
         userAddress: address.value,
-        messages: {
-          success: '节点激活成功！',
-          failed: '支付失败',
-          rejected: '你取消了支付'
+        BRIDGE_MESSAGES: {
+          approvalSuccess: t('lpVault.approvalSuccess'),
+          userCancelledAuth: t('lpVault.userCancelledAuth'),
+          approveTokenFailed: t('lpVault.approveTokenFailed')
         }
       })
-      console.log('result', result)
-
-    } catch (error) {
-      console.error('Activate node failed:', error)
-      ElMessage.error('节点激活失败')
-    } finally {
-      loading.close()
     }
+
+
+    const result = await writeContractOptimized({
+      abi: stakingManagerABI,
+      address: proxyStakingManager,
+      functionName: 'liquidityProviderDeposit',
+      args: [amountBigInt],
+      userAddress: address.value,
+      messages: {
+        success: t('lpVault.nodeActivationSuccess'),
+        failed: t('lpVault.paymentFailed'),
+        rejected: t('lpVault.paymentCancelled')
+      }
+    })
+    console.log('result', result)
+    loading.close()
   }
 
   // 组件挂载时获取数据

@@ -63,8 +63,8 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import NavBar2 from '@/components/navBar2.vue'
-import LineChartAccuracy from '@/components/LineChartAccuracy.vue'
-import LineChartAccuracyTow from '@/components/LineChartAccuracyTow.vue'
+import LineChartAccuracy from './LineChartAccuracy.vue'
+import LineChartAccuracyTow from './LineChartAccuracyTow.vue'
 
 const { t } = useI18n()
 

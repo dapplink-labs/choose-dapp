@@ -7,6 +7,47 @@ const base = enUS
 
 export default {
   ...base,
+  assetManagement: {
+    totalAssets: "総資産評価額",
+    deposit: "入金",
+    withdraw: "出金",
+    bill: "明細",
+    funds: "資金",
+    earnings: "収益",
+    fo: "FO",
+    assetDistribution: "資産分布",
+    overview: "資産概要",
+    prediction: "予測",
+    predictionPlaceholder: "予測機能は近日公開予定",
+    name: "名称",
+    quantity: "数量",
+    value: "価値",
+    profitLoss: "損益",
+    rewards: "報酬",
+    winnings: "当選",
+    amountWon: "獲得金額",
+    action: "操作",
+    claim: "請求",
+    searchPlaceholder: "銘柄や市場、コードを検索",
+    // 時間周期
+    timePeriod1d: "1日",
+    timePeriod1w: "1週間",
+    timePeriod1m: "1ヶ月",
+    timePeriodAll: "すべて",
+    // ポジションリスト
+    positionEvents: "ポジションイベント",
+    entrustedPositions: "委託ポジション",
+    historyPositionEvents: "履歴ポジションイベント",
+    all: "すべて",
+    buy: "Buy",
+    sell: "Sell",
+    // ステータス
+    lost: "lost",
+    claimed: "claimed",
+    // その他
+    valueLabel: "価値",
+    search: "Search"
+  },
   link: {
     titel: "ウォレット接続",
     exit: "接続解除"
@@ -32,7 +73,13 @@ export default {
     contractBindFailed: "オンチェーンでの招待コード連携に失敗しました",
     contractBindCancelled: "オンチェーン連携をキャンセルしました",
     invalidAddress: "無効な招待アドレス形式です",
-    missingContract: "NodeManager コントラクトアドレスが設定されていません"
+    missingContract: "NodeManager コントラクトアドレスが設定されていません",
+    bindInvitationTitle: "招待関係の連携",
+    bindInvitationDesc: "招待関係を連携すると、あなたのアカウントが招待者と関連付けられ、ステーキングと予測に関連する報酬の計算と配布に使用されます。",
+    myInvitationAddress: "私の招待アドレス",
+    shareNow: "今すぐ共有",
+    invitationCodeCopied: "招待コードをクリップボードにコピーしました",
+    noInvitationCode: "招待コードなし"
   },
   navbar2: {
     nav: {
@@ -121,7 +168,19 @@ export default {
       T5: "スーパーノード",
       T6: "ジェネシスノード"
     },
-    days: "日"
+    days: "日",
+    nodeTypeNotFound: "対応するノードタイプが見つかりません",
+    invalidPrice: "ノード価格が無効です",
+    connectWalletFirst: "まずウォレットを接続してください",
+    activatingNode: "ノードをアクティベート中...",
+    insufficientBalance: "残高不足",
+    requestingAuth: "USDT 承認をリクエスト中...",
+    approvalSuccess: "承認成功",
+    userCancelledAuth: "承認をキャンセルしました",
+    approveTokenFailed: "承認失敗",
+    nodeActivationSuccess: "ノードアクティベート成功！",
+    paymentFailed: "支払い失敗",
+    paymentCancelled: "支払いをキャンセルしました"
   },
   myNode: {
     title: "クラスターノード",
@@ -261,7 +320,8 @@ export default {
     terms: "利用規約",
     doc: "ドキュメント",
     walletAddressCopied: "ウォレットアドレスをクリップボードにコピーしました",
-    copyFailed: "コピーに失敗しました。手動でコピーしてください"
+    copyFailed: "コピーに失敗しました。手動でコピーしてください",
+    linkCopied: "リンクをクリップボードにコピーしました"
   },
   settings: {
     title: "プロフィール",
@@ -285,6 +345,7 @@ export default {
     skip: "スキップ",
     continue: "続ける",
     confirm: "確定",
+    loading: "読み込み中...",
     complete: "完了",
     price: "価格",
     share: "共有",

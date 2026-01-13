@@ -12,8 +12,7 @@
         </div>
       </div>
       <div class="action-icons">
-        <img :src="isDark ? icon29Dark : icon29" :alt="$t('common.share')" class="icon-img"
-          @click="handleShare" />
+        <img :src="isDark ? icon29Dark : icon29" :alt="$t('common.share')" class="icon-img" @click="handleShare" />
         <img :src="isDark ? settingIconDark : settingIcon" :alt="$t('common.settings')" class="icon-img"
           @click="handleSettings" />
         <img :src="isDark ? closeIconDark : closeIcon" :alt="$t('common.close')" class="icon-img"
@@ -92,19 +91,14 @@
         <div class="language-modal" @click.stop>
           <!-- 底部拖拽条 -->
           <div class="drag-handle"></div>
-          
+
           <!-- 标题 -->
           <div class="language-title">{{ $t('userInfo.language') }}</div>
-          
+
           <!-- 语言列表 -->
           <div class="language-list">
-            <div 
-              v-for="lang in languageOptions" 
-              :key="lang.value"
-              class="language-item"
-              :class="{ active: locale === lang.value }"
-              @click="selectLanguage(lang.value)"
-            >
+            <div v-for="lang in languageOptions" :key="lang.value" class="language-item"
+              :class="{ active: locale === lang.value }" @click="selectLanguage(lang.value)">
               <span class="language-name">{{ lang.label }}</span>
               <span v-if="locale === lang.value" class="check-icon">✓</span>
             </div>
@@ -112,6 +106,9 @@
         </div>
       </div>
     </transition>
+
+    <!-- 分享邀请码弹窗 -->
+    <ShareInvitationCode v-model="showShareModal" />
 
   </div>
 </template>
@@ -123,6 +120,7 @@ import { useAccount, useDisconnect } from '@wagmi/vue'
 import { useThemeStore } from '@/stores/theme'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
+import ShareInvitationCode from '@/components/ShareInvitationCode.vue'
 
 const { locale, t } = useI18n()
 
@@ -229,6 +227,9 @@ const walletAddress = computed(() => {
 // 语言选择弹窗状态
 const showLanguageModal = ref(false)
 
+// 分享邀请码弹窗状态
+const showShareModal = ref(false)
+
 // 语言选项列表
 const languageOptions = [
   { value: 'zh-cn', label: '简体中文' },
@@ -248,24 +249,9 @@ const copyWalletAddress = async () => {
   if (!address.value) return
   const fullAddress = address.value
 
-  try {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      await navigator.clipboard.writeText(fullAddress)
-    } else {
-      // 兼容旧浏览器
-      const textarea = document.createElement('textarea')
-      textarea.value = fullAddress
-      textarea.style.position = 'fixed'
-      textarea.style.opacity = '0'
-      document.body.appendChild(textarea)
-      textarea.select()
-      document.execCommand('copy')
-      document.body.removeChild(textarea)
-    }
-    alert(t('userInfo.walletAddressCopied'))
-  } catch (e) {
-    console.error('复制地址失败', e)
-    alert(t('userInfo.copyFailed'))
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    await navigator.clipboard.writeText(fullAddress)
+    ElMessage.success(t('userInfo.walletAddressCopied'))
   }
 }
 
@@ -304,7 +290,7 @@ const baseEcosystemItems = computed(() => [
     label: t('userInfo.assets'),
     icon: icon5,
     iconDark: icon5Dark,
-    path: '/'
+    path: '/asset-management'
   },
   {
     key: 'event-pool',
@@ -326,7 +312,7 @@ const baseEcosystemItems = computed(() => [
     icon: icon15,
     iconDark: icon15Dark,
     path: '/'
-  }
+  },
 ])
 
 const ecosystemItems = computed(() =>
@@ -347,21 +333,21 @@ const baseChooseMeItems = computed(() => [
   },
   {
     key: 'reward',
-    label: '奖励',
+    label: t('userInfo.reward'),
     icon: icon25,
     iconDark: icon25Dark,
     path: '/reward'
   },
   {
     key: 'accuracy',
-    label: '准确度',
+    label: t('userInfo.accuracy'),
     icon: icon26,
     iconDark: icon26Dark,
     path: '/accuracy'
   },
   {
     key: 'terms',
-    label: '使用条款',
+    label: t('userInfo.terms'),
     icon: icon27,
     iconDark: icon27Dark,
     path: '/terms'
@@ -508,24 +494,8 @@ const friendLinks = computed(() =>
 
 // 处理分享点击
 const handleShare = () => {
-  // 分享功能：可以复制链接或调用原生分享
-  if (navigator.share) {
-    navigator.share({
-      title: 'ChooseMe',
-      text: 'Check out ChooseMe',
-      url: window.location.href
-    }).catch(err => {
-      console.log('分享失败:', err)
-    })
-  } else {
-    // 如果不支持原生分享，可以复制链接到剪贴板
-    const url = window.location.href
-    navigator.clipboard.writeText(url).then(() => {
-      ElMessage.success('链接已复制到剪贴板')
-    }).catch(err => {
-      console.log('复制失败:', err)
-    })
-  }
+  // 打开分享邀请码弹窗
+  showShareModal.value = true
 }
 
 // 处理设置点击
