@@ -4,7 +4,8 @@
 
     <div class="cps-content">
       <div class="cps-card">
-        <BackHeaderNav :show-open-btn="true" :use-default-open-action="false" @open-click="handleOpenMore" />
+        <BackHeaderNav :show-open-btn="true" :show-record-btn="true" :use-default-open-action="false"
+          @open-click="handleOpenMore" />
 
         <h1 class="cps-title">{{ t('computingPower.title') }}</h1>
 
@@ -57,13 +58,9 @@
               <p>{{ node.descText }}</p>
             </div>
 
-            <button 
-              v-if="isNodeButtonVisible(node.type)"
-              class="node-item-btn" 
-              :class="{ 'disabled': !isNodeButtonEnabled(node.type) }"
-              :disabled="!isNodeButtonEnabled(node.type)"
-              @click="handleBuy(node.type)"
-            >
+            <button v-if="isNodeButtonVisible(node.type)" class="node-item-btn"
+              :class="{ 'disabled': !isNodeButtonEnabled(node.type) }" :disabled="!isNodeButtonEnabled(node.type)"
+              @click="handleBuy(node.type)">
               {{ getButtonText(node.type) }}
             </button>
           </div>

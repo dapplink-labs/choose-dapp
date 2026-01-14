@@ -12,10 +12,10 @@
         </div>
       </div>
       <div class="action-icons">
-        <img :src="isDark ? icon29Dark : icon29" :alt="$t('common.share')" class="icon-img" @click="handleShare" />
-        <img :src="isDark ? settingIconDark : settingIcon" :alt="$t('common.settings')" class="icon-img"
+        <img :src="isDark ? getIcon('29Dark') : getIcon('29')" :alt="$t('common.share')" class="icon-img" @click="handleShare" />
+        <img :src="isDark ? getIcon('settingDark') : getIcon('setting')" :alt="$t('common.settings')" class="icon-img"
           @click="handleSettings" />
-        <img :src="isDark ? closeIconDark : closeIcon" :alt="$t('common.close')" class="icon-img"
+        <img :src="isDark ? getIcon('closeDark') : getIcon('close')" :alt="$t('common.close')" class="icon-img"
           @click="handleClose" />
       </div>
     </div>
@@ -135,80 +135,6 @@ const iconMap = Object.fromEntries(
 )
 const getIcon = (name) => iconMap[name]
 
-// 亮色 / 暗色图标引用
-const settingIcon = getIcon('setting')
-const closeIcon = getIcon('close')
-const icon1 = getIcon('1')
-const icon2 = getIcon('2')
-const icon3 = getIcon('3')
-const icon4 = getIcon('4')
-const icon5 = getIcon('5')
-const icon6 = getIcon('6')
-const icon7 = getIcon('7')
-const icon8 = getIcon('8')
-const icon9 = getIcon('9')
-const friend1 = getIcon('Facebook')
-const friend2 = getIcon('ins')
-const friend3 = getIcon('in')
-const friend4 = getIcon('dy')
-const friend5 = getIcon('Twitter')
-const friend6 = getIcon('YouTube')
-
-const settingIconDark = getIcon('settingDark')
-const closeIconDark = getIcon('closeDark')
-const icon1Dark = getIcon('1Dark')
-const icon2Dark = getIcon('2Dark')
-const icon3Dark = getIcon('3Dark')
-const icon4Dark = getIcon('4Dark')
-const icon5Dark = getIcon('5Dark')
-const icon6Dark = getIcon('6Dark')
-const icon7Dark = getIcon('7Dark')
-const icon8Dark = getIcon('8Dark')
-const icon9Dark = getIcon('9Dark')
-const icon12 = getIcon('12')
-const icon12Dark = getIcon('12Dark')
-const icon13 = getIcon('13')
-const icon13Dark = getIcon('13Dark')
-const icon14 = getIcon('14')
-const icon14Dark = getIcon('14Dark')
-const icon15 = getIcon('15')
-const icon15Dark = getIcon('15Dark')
-const icon16 = getIcon('16')
-const icon16Dark = getIcon('16Dark')
-const icon17 = getIcon('17')
-const icon17Dark = getIcon('17Dark')
-const icon18 = getIcon('18')
-const icon18Dark = getIcon('18Dark')
-const icon19 = getIcon('19')
-const icon19Dark = getIcon('19Dark')
-const icon20 = getIcon('20')
-const icon20Dark = getIcon('20Dark')
-const icon21 = getIcon('21')
-const icon21Dark = getIcon('21Dark')
-const icon22 = getIcon('22')
-const icon22Dark = getIcon('22Dark')
-const icon23 = getIcon('23')
-const icon23Dark = getIcon('23Dark')
-const icon24 = getIcon('24')
-const icon24Dark = getIcon('24Dark')
-const icon25 = getIcon('25')
-const icon25Dark = getIcon('25Dark')
-const icon26 = getIcon('26')
-const icon26Dark = getIcon('26Dark')
-const icon27 = getIcon('27')
-const icon27Dark = getIcon('27Dark')
-const icon28 = getIcon('28')
-const icon28Dark = getIcon('28Dark')
-const icon29 = getIcon('29')
-const icon29Dark = getIcon('29Dark')
-
-const friend1Dark = getIcon('FacebookDark')
-const friend2Dark = getIcon('insDark')
-const friend3Dark = getIcon('inDark')
-const friend4Dark = getIcon('dyDark')
-const friend5Dark = getIcon('TwitterDark')
-const friend6Dark = getIcon('YouTubeDark')
-
 const router = useRouter()
 const { address, status } = useAccount()
 const { disconnect } = useDisconnect()
@@ -260,57 +186,113 @@ const baseEcosystemItems = computed(() => [
   {
     key: 'computing-power-services',
     label: t('userInfo.stakingPool'),
-    icon: icon1,
-    iconDark: icon1Dark,
+    icon: getIcon('1'),
+    iconDark: getIcon("1Dark"),
     path: '/computing-power-services'
   },
   {
     key: 'LPVault',
     label: t('userInfo.lpVault'),
-    icon: icon2,
-    iconDark: icon2Dark,
+    icon: getIcon('2'),
+    iconDark: getIcon("2Dark"),
     path: '/LPVault'
   },
   {
     key: 'dashboard',
     label: t('userInfo.onChainData'),
-    icon: icon3,
-    iconDark: icon3Dark,
+    icon: getIcon('3'),
+    iconDark: getIcon("3Dark"),
     path: '/dashboard'
   },
   {
     key: 'create',
     label: t('userInfo.predictionMarket'),
-    icon: icon4,
-    iconDark: icon4Dark,
+    icon: getIcon('4'),
+    iconDark: getIcon("4Dark"),
     path: '/create'
   },
   {
     key: 'fund',
     label: t('userInfo.assets'),
-    icon: icon5,
-    iconDark: icon5Dark,
+    icon: getIcon('5'),
+    iconDark: getIcon("5Dark"),
     path: '/asset-management'
   },
   {
     key: 'event-pool',
     label: t('userInfo.eventPool'),
-    icon: icon6,
-    iconDark: icon6Dark,
+    icon: getIcon('6'),
+    iconDark: getIcon("6Dark"),
     path: '/'
   },
   {
     key: 'launchpad',
     label: t('userInfo.launchpad'),
-    icon: icon14,
-    iconDark: icon14Dark,
+    icon: getIcon('14'),
+    iconDark: getIcon("14Dark"),
     path: '/'
   },
   {
     key: 'smart-money',
     label: t('userInfo.smartMoney'),
-    icon: icon15,
-    iconDark: icon15Dark,
+    icon: getIcon('15'),
+    iconDark: getIcon("15Dark"),
+    path: '/'
+  },
+  {
+    key: 'borrow',
+    label: t('userInfo.borrow'),
+    icon: getIcon('30'),
+    iconDark: getIcon("30Dark"),
+    path: '/'
+  },
+  {
+    key: 'earn',
+    label: t('userInfo.earn'),
+    icon: getIcon('31'),
+    iconDark: getIcon("31Dark"),
+    path: '/'
+  },
+  {
+    key: 'strategyTrading',
+    label: t('userInfo.strategyTrading'),
+    icon: getIcon('32'),
+    iconDark: getIcon("32Dark"),
+    path: '/'
+  },
+  {
+    key: 'copyTrading',
+    label: t('userInfo.copyTrading'),
+    icon: getIcon('33'),
+    iconDark: getIcon("33Dark"),
+    path: '/'
+  },
+  {
+    key: 'airdrop',
+    label: t('userInfo.airdrop'),
+    icon: getIcon('34'),
+    iconDark: getIcon("34Dark"),
+    path: '/'
+  },
+  {
+    key: 'academy',
+    label: t('userInfo.academy'),
+    icon: getIcon('35'),
+    iconDark: getIcon("35Dark"),
+    path: '/'
+  },
+  {
+    key: 'nft',
+    label: t('userInfo.nft'),
+    icon: getIcon('36'),
+    iconDark: getIcon("36Dark"),
+    path: '/'
+  },
+  {
+    key: 'rwa',
+    label: t('userInfo.rwa'),
+    icon: getIcon('37'),
+    iconDark: getIcon("37Dark"),
     path: '/'
   },
 ])
@@ -322,94 +304,55 @@ const ecosystemItems = computed(() =>
   }))
 )
 
-// choose me菜单配置
-const baseChooseMeItems = computed(() => [
-  {
-    key: 'leaderboard',
-    label: t('userInfo.leaderboard'),
-    icon: icon7,
-    iconDark: icon7Dark,
-    path: '/leaderboard'
-  },
-  {
-    key: 'reward',
-    label: t('userInfo.reward'),
-    icon: icon25,
-    iconDark: icon25Dark,
-    path: '/reward'
-  },
-  {
-    key: 'accuracy',
-    label: t('userInfo.accuracy'),
-    icon: icon26,
-    iconDark: icon26Dark,
-    path: '/accuracy'
-  },
-  {
-    key: 'terms',
-    label: t('userInfo.terms'),
-    icon: icon27,
-    iconDark: icon27Dark,
-    path: '/terms'
-  }
-])
-
-const chooseMeItems = computed(() =>
-  baseChooseMeItems.value.map(item => ({
-    ...item,
-    icon: isDark.value ? item.iconDark : item.icon
-  }))
-)
-
 // 其他菜单配置
 const baseOthersItems = computed(() => [
   {
     key: 'audit',
     label: t('userInfo.audit'),
-    icon: icon7,
-    iconDark: icon7Dark,
+    icon: getIcon('7'),
+    iconDark: getIcon("7Dark"),
     path: '/'
   },
   {
     key: 'github',
     label: t('userInfo.github'),
-    icon: icon17,
-    iconDark: icon17Dark,
+    icon: getIcon('17'),
+    iconDark: getIcon("17Dark"),
     path: '/'
   },
   {
     key: 'technical-support',
     label: t('userInfo.technicalSupport'),
-    icon: icon18,
-    iconDark: icon18Dark,
+    icon: getIcon('18'),
+    iconDark: getIcon("18Dark"),
     path: '/'
   },
   {
     key: 'developer-contributions',
     label: t('userInfo.developerContributions'),
-    icon: icon12,
-    iconDark: icon12Dark,
+    icon: getIcon('12'),
+    iconDark: getIcon("12Dark"),
     path: '/'
   },
   {
     key: 'tokenomics',
     label: t('userInfo.tokenomics'),
-    icon: icon13,
-    iconDark: icon13Dark,
+    icon: getIcon('13'),
+    iconDark: getIcon("13Dark"),
     path: '/'
   },
   {
     key: 'bug-bounty',
     label: t('userInfo.bugBounty'),
-    icon: icon16,
-    iconDark: icon16Dark,
+    icon: getIcon('16'),
+    iconDark: getIcon("16Dark"),
     path: '/'
   },
   {
     key: 'language',
     label: t('userInfo.language'),
-    icon: icon28,
-    iconDark: icon28Dark,
+    icon: getIcon('28'),
+    iconDark: getIcon("28Dark"),
     path: '',
     action: 'language'
   }
@@ -427,43 +370,43 @@ const baseSupportItems = computed(() => [
   {
     key: 'official-verification',
     label: t('userInfo.officialVerification'),
-    icon: icon19,
-    iconDark: icon19Dark,
+    icon: getIcon('19'),
+    iconDark: getIcon("19Dark"),
     path: '/'
   },
   {
     key: 'product-feedback',
     label: t('userInfo.productFeedback'),
-    icon: icon20,
-    iconDark: icon20Dark,
+    icon: getIcon('20'),
+    iconDark: getIcon("20Dark"),
     path: '/'
   },
   {
     key: 'api-management',
     label: t('userInfo.apiManagement'),
-    icon: icon21,
-    iconDark: icon21Dark,
+    icon: getIcon('21'),
+    iconDark: getIcon("21Dark"),
     path: '/'
   },
   {
     key: 'help-center',
     label: t('userInfo.helpCenter'),
-    icon: icon22,
-    iconDark: icon22Dark,
+    icon: getIcon('22'),
+    iconDark: getIcon("22Dark"),
     path: '/'
   },
   {
     key: 'customer-support',
     label: t('userInfo.customerSupport'),
-    icon: icon23,
-    iconDark: icon23Dark,
+    icon: getIcon('23'),
+    iconDark: getIcon("23Dark"),
     path: '/'
   },
   {
     key: 'developer-docs',
     label: t('userInfo.developerDocs'),
-    icon: icon8,
-    iconDark: icon8Dark,
+    icon: getIcon('8'),
+    iconDark: getIcon("8Dark"),
     path: '/doc'
   }
 ])
@@ -475,14 +418,54 @@ const supportItems = computed(() =>
   }))
 )
 
+
+// choose me菜单配置
+const baseChooseMeItems = computed(() => [
+  {
+    key: 'leaderboard',
+    label: t('userInfo.leaderboard'),
+    icon: getIcon('38'),
+    iconDark: getIcon('38Dark'),
+    path: '/leaderboard'
+  },
+  {
+    key: 'reward',
+    label: t('userInfo.reward'),
+    icon: getIcon('25'),
+    iconDark: getIcon('25Dark'),
+    path: '/reward'
+  },
+  {
+    key: 'accuracy',
+    label: t('userInfo.accuracy'),
+    icon: getIcon('26'),
+    iconDark: getIcon('26Dark'),
+    path: '/accuracy'
+  },
+  {
+    key: 'terms',
+    label: t('userInfo.terms'),
+    icon: getIcon('27'),
+    iconDark: getIcon('27Dark'),
+    path: '/terms'
+  }
+])
+
+const chooseMeItems = computed(() =>
+  baseChooseMeItems.value.map(item => ({
+    ...item,
+    icon: isDark.value ? item.iconDark : item.icon
+  }))
+)
+
 // 友链图标（使用 assets/icon 中的图片，随主题切换）
 const baseFriendLinks = [
-  { label: 'Facebook', icon: friend1, iconDark: friend1Dark },
-  { label: 'Instagram', icon: friend2, iconDark: friend2Dark },
-  { label: 'LinkedIn', icon: friend3, iconDark: friend3Dark },
-  { label: 'TikTok', icon: friend4, iconDark: friend4Dark },
-  { label: 'Twitter', icon: friend5, iconDark: friend5Dark },
-  { label: 'YouTube', icon: friend6, iconDark: friend6Dark }
+  { label: 'Facebook', icon: getIcon('Facebook'), iconDark: getIcon('FacebookDark') },
+  { label: 'Instagram', icon: getIcon('ins'), iconDark: getIcon('insDark') },
+  { label: 'LinkedIn', icon: getIcon('in'), iconDark: getIcon('inDark') },
+  { label: 'TikTok', icon: getIcon('dy'), iconDark: getIcon('dyDark') },
+  { label: 'Twitter', icon: getIcon('Twitter'), iconDark: getIcon('TwitterDark') },
+  { label: 'YouTube', icon: getIcon('YouTube'), iconDark: getIcon('YouTubeDark') }
 ]
 
 const friendLinks = computed(() =>
@@ -505,7 +488,7 @@ const handleSettings = () => {
 
 // 处理关闭点击
 const handleClose = () => {
-  router.back()
+  router.push('/')
 }
 
 // 处理菜单项点击

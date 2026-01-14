@@ -2,35 +2,37 @@
     <div class="purchase-node-record">
         <BackHeaderNav :title="$t('purchaseNodeRecord.title')" />
 
-        <div class="record-list">
+        <div class="record-container">
             <!-- 加载状态 -->
             <div v-if="isLoading" class="loading-state">
                 <div class="loading-text">{{ $t('common.loading') || '加载中...' }}</div>
             </div>
             <!-- 空状态 -->
             <div v-else-if="recordList.length === 0" class="empty-state">
-                <div class="empty-text">暂无记录</div>
+                <div class="empty-text">{{ $t('purchaseNodeRecord.empty') || '暂无记录' }}</div>
             </div>
-            <!-- 记录列表 -->
-            <div v-else v-for="(item, index) in recordList" :key="index" class="record-item">
-                <div class="record-left">
-                    <div class="node-name-row">
-                        <span class="node-name">{{ item.nodeName }}</span>
-                        <span v-if="item.nodeTag" class="node-tag">{{ item.nodeTag }}</span>
-                    </div>
-                    <div class="node-price">
-                        {{ $t('common.price') }}: {{ item.price }}
+            <!-- 有数据时的表头 + 列表 -->
+            <template v-else>
+                <div class="record-header">
+                    <span class="col col-type">{{ $t('purchaseNodeRecord.nodeType') }}</span>
+                    <span class="col col-price">{{ $t('purchaseNodeRecord.nodePrice') }}</span>
+                    <span class="col col-time">{{ $t('purchaseNodeRecord.purchaseTime') }}</span>
+                </div>
+                <div class="record-list">
+                    <div v-for="(item, index) in recordList" :key="index" class="record-row">
+                        <div class="col col-type">
+                            <span class="node-name">{{ item.nodeName }}</span>
+                            <span v-if="item.nodeTag" class="node-tag">{{ item.nodeTag }}</span>
+                        </div>
+                        <div class="col col-price">
+                            <span class="node-price">{{ item.price }}</span>
+                        </div>
+                        <div class="col col-time">
+                            <span class="record-time">{{ item.dateTime }}</span>
+                        </div>
                     </div>
                 </div>
-                <div class="record-right">
-                    <div class="record-reward">
-                        + {{ item.reward }} CHO
-                    </div>
-                    <div class="record-time">
-                        {{ item.dateTime }}
-                    </div>
-                </div>
-            </div>
+            </template>
         </div>
     </div>
 </template>
@@ -44,18 +46,19 @@ import { getNodeStakingRecords } from '@/api/API'
 import { useAccount } from '@wagmi/vue'
 import { formatDateTime } from '@/utils/format_date.js'
 
-const router = useRouter()
 const { t } = useI18n()
 const { address } = useAccount()
 
 // 节点类型映射：type -> { nodeTag, nodeNameKey }
+// T1~T4：信息 / 数据 / 验证 / 共识节点
+// T5：超级节点，T6：创世节点（仅显示节点名称，不带百分比/CHO）
 const nodeTypeMap = {
     1: { nodeTag: 'T1', nodeNameKey: 'purchaseNodeRecord.informationNode' },
     2: { nodeTag: 'T2', nodeNameKey: 'myIncome.nodeNames.dataNode' },
     3: { nodeTag: 'T3', nodeNameKey: 'myIncome.nodeNames.validationNode' },
     4: { nodeTag: 'T4', nodeNameKey: 'myIncome.nodeNames.consensusNode' },
-    5: { nodeTag: 'T5', nodeNameKey: 'lpVault.nodeTypes.T5' },
-    6: { nodeTag: 'T6', nodeNameKey: 'lpVault.nodeTypes.T6' }
+    5: { nodeTag: 'T5', nodeNameKey: 'myIncome.superNode' }, // 超级节点
+    6: { nodeTag: 'T6', nodeNameKey: 'myIncome.nodeNames.genesisNode' } // 创世节点，仅名称
 }
 
 
@@ -86,7 +89,46 @@ const getNodeStakingRecordsData = async () => {
         const list = responseData?.data?.list || responseData?.list || []
 
         if (!Array.isArray(list) || list.length === 0) {
-            recordList.value = []
+            // 接口没有返回数据时，模拟示例记录：T1~T6 + 分布节点 / 集群节点（无 T 图标）
+            const now = Date.now()
+
+            // T1~T6 节点
+            const mockTypes = [1, 2, 3, 4, 5, 6]
+            const mockCore = mockTypes.map((type, index) => {
+                const nodeType = nodeTypeMap[type] || nodeTypeMap[1]
+                const nodeTag = nodeType.nodeTag
+                const nodeName = t(nodeType.nodeNameKey)
+                const baseAmount = 200 + index * 50 // 200U 起，依次递增
+                const price = formatNumber(baseAmount) + 'U'
+                const dateTime = formatDateTime(now - index * 24 * 60 * 60 * 1000)
+
+                return {
+                    nodeName,
+                    nodeTag,
+                    price,
+                    reward: '0',
+                    dateTime
+                }
+            })
+
+            // 分布节点 / 集群节点（无 T1~T6 图标）
+            const distributed = {
+                nodeName: t('myNode.nodeTypes.distributed'),
+                nodeTag: '', // 不展示 T1~T6 图标
+                price: formatNumber(500) + 'U',
+                reward: '0',
+                dateTime: formatDateTime(now - 7 * 24 * 60 * 60 * 1000)
+            }
+
+            const cluster = {
+                nodeName: t('myNode.nodeTypes.cluster'),
+                nodeTag: '', // 不展示 T1~T6 图标
+                price: formatNumber(800) + 'U',
+                reward: '0',
+                dateTime: formatDateTime(now - 8 * 24 * 60 * 60 * 1000)
+            }
+
+            recordList.value = [...mockCore, distributed, cluster]
             return
         }
 
@@ -124,7 +166,7 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .purchase-node-record {
-    padding: 50px 10px 0 10px;
+    padding: 50px 16px 0 16px;
     background-color: var(--bg-page-h5, #FFFFFF);
     color: var(--text-color, #1a1a1a);
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -133,10 +175,8 @@ onMounted(() => {
     min-height: 100vh;
     box-sizing: border-box;
 
-    .record-list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
+    .record-container {
+        margin-top: 12px;
         padding-bottom: 20px;
 
         .loading-state,
@@ -157,106 +197,92 @@ onMounted(() => {
             }
         }
 
-        .record-item {
+        .record-header {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 16px 0;
-            border-radius: 12px;
-            transition: background-color 0.3s ease;
+            align-items: center;
+            padding: 12px 0;
+            font-family: PingFang SC, PingFang SC;
+            font-weight: 400;
+            font-size: 12px;
+            color: var(--text-dark-gray, #999999);
 
-            .record-left {
+            .col {
+                &.col-type {
+                    flex: 1.4;
+                }
+
+                &.col-price {
+                    flex: 1;
+                    text-align: center;
+                }
+
+                &.col-time {
+                    flex: 1.4;
+                    text-align: right;
+                }
+            }
+        }
+
+        .record-list {
+            .record-row {
                 display: flex;
-                flex-direction: column;
-                gap: 8px;
-                flex: 1;
+                align-items: center;
+                padding: 14px 0;
+                font-family: PingFang SC, PingFang SC;
+                font-size: 14px;
 
-                .node-name-row {
+                .col-type {
+                    flex: 1.4;
                     display: flex;
                     align-items: center;
-                    gap: 8px;
+                    gap: 6px;
 
                     .node-name {
-                        font-family: PingFang SC, PingFang SC;
-                        font-weight: 400;
-                        font-size: 16px;
                         color: var(--text-color, #1a1a1a);
                         transition: color 0.3s ease;
+                        font-family: PingFang SC, PingFang SC;
+                        font-weight: 500;
+                        font-size: 14px;
                     }
 
                     .node-tag {
                         display: inline-block;
                         padding: 2px 8px;
-                        background: rgba(234, 171, 74, 0.2);
+                        background: rgba(234, 171, 74, 0.16);
                         color: #EAAB4A;
-                        border-radius: 6px;
-                        font-family: PingFang SC, PingFang SC;
+                        border-radius: 4px;
                         font-weight: 500;
                         font-size: 12px;
                         line-height: 1.2;
                     }
                 }
 
-                .node-price {
-                    font-family: PingFang SC, PingFang SC;
-                    font-weight: 400;
-                    font-size: 12px;
-                    color: var(--text-dark-gray, #999999);
-                    transition: color 0.3s ease;
-                }
-            }
+                .col-price {
+                    flex: 1;
+                    text-align: center;
 
-            .record-right {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-end;
-                gap: 8px;
-
-                .record-reward {
-                    font-family: PingFang SC, PingFang SC;
-                    font-weight: 500;
-                    font-size: 14px;
-                    color: var(--text-color-y, #2EBE69);
+                    .node-price {
+                        font-weight: 400;
+                    }
                 }
 
-                .record-time {
-                    font-family: PingFang SC, PingFang SC;
-                    font-weight: 400;
-                    font-size: 12px;
-                    color: var(--text-dark-gray, #999999);
-                    transition: color 0.3s ease;
+                .col-time {
+                    flex: 1.4;
+                    text-align: right;
+
+                    .record-time {
+                        font-family: PingFang SC, PingFang SC;
+                        font-weight: 400;
+                        font-size: 14px;
+                        color: var(--text-color, #999999);
+                        transition: color 0.3s ease;
+                    }
                 }
             }
         }
     }
 }
-
-.theme-dark {
-    .purchase-node-record {
-        background-color: #000000;
-
-        .record-list {
-            .record-item {
-
-                .record-left {
-                    .node-name-row {
-                        .node-name {
-                            color: #FFFFFF !important;
-                        }
-                    }
-
-                    .node-price {
-                        color: #999999 !important;
-                    }
-                }
-
-                .record-right {
-                    .record-time {
-                        color: #999999 !important;
-                    }
-                }
-            }
-        }
-    }
+.cps-card-header{
+    border-bottom: 1px solid var(--border-color, #23262F);
 }
 </style>

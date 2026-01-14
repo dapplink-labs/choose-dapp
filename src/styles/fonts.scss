@@ -52,10 +52,18 @@
     
     
   }
-  html[data-lang='zh-cn'] body {
-   
-     font-family   : 'PingFang', sans-serif;
-    /* 默认中文使用 PingFang */
+
+/* Noto Sans SC 字体（简体中文） */
+@font-face {
+    font-family: 'Noto Sans SC';
+    src: url('/src/assets/fonts/Noto_sans_sc.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+html[data-lang='zh-cn'] body {
+    /* 默认中文优先使用 Noto Sans SC，其次 PingFang */
+    font-family: 'Noto Sans SC', 'PingFang', sans-serif;
     // font-family: 'PingFang_Regularr', sans-serif;
 }
 

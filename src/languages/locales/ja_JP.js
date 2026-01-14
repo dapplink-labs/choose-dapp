@@ -214,6 +214,13 @@ export default {
       cluster: "クラスターノード"
     }
   },
+  myIncome: {
+    ...base.myIncome,
+    nodeNames: {
+      ...(base.myIncome?.nodeNames || {}),
+      genesisNode: "ジェネシスノード"
+    }
+  },
   dashboard: {
     title: "ダッシュボード",
     tabs: {
@@ -321,7 +328,15 @@ export default {
     doc: "ドキュメント",
     walletAddressCopied: "ウォレットアドレスをクリップボードにコピーしました",
     copyFailed: "コピーに失敗しました。手動でコピーしてください",
-    linkCopied: "リンクをクリップボードにコピーしました"
+    linkCopied: "リンクをクリップボードにコピーしました",
+    borrow: "借入",
+    earn: "稼ぐ",
+    strategyTrading: "戦略取引",
+    copyTrading: "コピートレード",
+    airdrop: "エアドロップ",
+    academy: "アカデミー",
+    nft: "NFT",
+    rwa: "RWA"
   },
   settings: {
     title: "プロフィール",
@@ -336,7 +351,16 @@ export default {
   },
   purchaseNodeRecord: {
     title: "ノードステーキング記録",
+    nodeType: "ノードタイプ",
+    nodePrice: "ノード価格",
+    purchaseTime: "購入時間",
+    empty: "記録はありません",
     informationNode: "情報ノード"
+  },
+  claimRecord: {
+    title: "受取記録",
+    computingPowerService: "ハッシュパワーサービス",
+    lpVault: "ステーキングプール"
   },
   common: {
     ...base.common,

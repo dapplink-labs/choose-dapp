@@ -17,6 +17,7 @@ import dashboard from "../views/dashboard/index.vue"
 import detailH5 from "../views/detailH5/index.vue"
 import purchaseNodeRecord from "../views/purchaseNodeRecord/index.vue"
 import assetManagement from "../views/assetManagement/index.vue"
+import claimRecord from "../views/claimRecord/index.vue"
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -146,6 +147,15 @@ const router = createRouter({
       path: '/asset-management',
       name: 'assetManagement',
       component: assetManagement,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/claim-record',
+      name: 'claimRecord',
+      component: claimRecord,
       meta: {
         hideHeader: true,
         hideFooterNav: true

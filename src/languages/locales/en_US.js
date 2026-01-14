@@ -422,7 +422,11 @@ export default {
     comingSoon: "Prediction market coming soon.",
     comingSoonAlt: "Not available",
     searchPlaceholder: "Search",
+    multiMarket: "multimarket",
+    all: "All",
     opportunity: "Chance",
+    maxLeverage: "Maximum leverage",
+    maxReturn: "Maximum return",
     filterTags: {
       premium: "Premium",
       ukraine: "Ukraine",
@@ -477,7 +481,23 @@ export default {
     copyFailed: "Copy failed, please copy manually",
     disconnectWallet: "Disconnect Wallet",
     chooseMe: "ChooseMe",
-    linkCopied: "Link copied to clipboard"
+    linkCopied: "Link copied to clipboard",
+    borrow: "Borrow",
+    earn: "Earn",
+    strategyTrading: "Strategy Trading",
+    copyTrading: "Copy Trading",
+    airdrop: "Airdrop",
+    academy: "Academy",
+    nft: "NFT",
+    rwa: "RWA"
+  },
+  purchaseNodeRecord: {
+    title: "Node Staking Record",
+    nodeType: "Node Type",
+    nodePrice: "Node Price",
+    purchaseTime: "Purchase Time",
+    empty: "No records",
+    informationNode: "Information Node"
   },
   settings: {
     title: "Settings",
@@ -700,6 +720,7 @@ export default {
     secondaryMarketIncome: "Secondary Market Profit",
     directReferralIncome: "Direct Referal Profit",
     networkIncome: "Network Profit",
+    claimRecord: "Claim Records",
     claimAll: "Claim All Profit",
     claim: "Claim",
     claimSuccess: "Claim successful",
@@ -729,8 +750,11 @@ export default {
     staticIncomeCHO: "Static Profit",
     directReferralIncomeCHO: "Direct Referral Profit",
     teamIncomeCHO: "Team Profit",
-    genesisNodeIncomeCHO: "Genesis Node Revenue",
-    superNodeIncomeCHO: "Super Node Revenue",
+    genesisNodeIncomeCHO: "Genesis Node 5% Profit",
+    superNodeIncomeCHO: "Super Node Profit",
+    equalLevelIncomeCHO: "Equal Level Profit",
+    flowBonusIncomeCHO: "My Flow Bonus",
+    claimRecord: "Claim Records",
     claimAll: "Claim All Profit",
     myTeam: "My Team",
     mySuperior: "My Superior",
@@ -742,13 +766,19 @@ export default {
       infoNode: "Info Node",
       dataNode: "Data Node",
       validationNode: "Validation Node",
-      consensusNode: "Consensus Node"
+      consensusNode: "Consensus Node",
+      genesisNode: "Genesis Node"
     },
     earningsOptions: {
       allNodeRewards: "All Node Rewards",
       dataNode: "Data Node",
       validationNode: "Validation Node"
     }
+  },
+  claimRecord: {
+    title: "Claim Records",
+    computingPowerService: "Computing Service",
+    lpVault: "LP Vault"
   },
   dashboard: {
     title: "Dashboard",
@@ -816,10 +846,6 @@ export default {
     latestMarketValue: "Latest Market Value",
     volume24hCMT: "24h Volume (CMT)",
     volume24hUSDT: "24h Volume (USDT)"
-  },
-  purchaseNodeRecord: {
-    title: "Node Staking Record",
-    informationNode: "Information Node"
   },
   tabNode: {
     purchaseTime: "Purchase Time"

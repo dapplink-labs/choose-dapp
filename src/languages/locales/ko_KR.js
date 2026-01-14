@@ -262,7 +262,8 @@ export default {
       infoNode: "정보 노드",
       dataNode: "데이터 노드",
       validationNode: "검증 노드",
-      consensusNode: "합의 노드"
+      consensusNode: "합의 노드",
+      genesisNode: "제네시스 노드"
     },
     earningsOptions: {
       allNodeRewards: "모든 수익 수령",
@@ -377,7 +378,15 @@ export default {
     doc: "문서",
     walletAddressCopied: "지갑 주소가 클립보드에 복사되었습니다",
     copyFailed: "복사 실패, 수동으로 복사해 주세요",
-    linkCopied: "링크가 클립보드에 복사되었습니다"
+    linkCopied: "링크가 클립보드에 복사되었습니다",
+    borrow: "빌리기",
+    earn: "벌기",
+    strategyTrading: "전략 거래",
+    copyTrading: "복사 거래",
+    airdrop: "에어드롭",
+    academy: "아카데미",
+    nft: "NFT",
+    rwa: "RWA"
   },
   settings: {
     title: "프로필",
@@ -392,7 +401,16 @@ export default {
   },
   purchaseNodeRecord: {
     title: "노드 스테이킹 기록",
+    nodeType: "노드 유형",
+    nodePrice: "노드 가격",
+    purchaseTime: "구매 시간",
+    empty: "기록이 없습니다",
     informationNode: "정보 노드"
+  },
+  claimRecord: {
+    title: "수령 기록",
+    computingPowerService: "해시파워 서비스",
+    lpVault: "스테이킹 풀"
   }
 }
 

@@ -2,7 +2,6 @@
     <div class="myIncome">
 
         <BackHeaderNav 
-            :show-record-btn="true" 
             :show-open-btn="true"
         />
 
@@ -21,7 +20,12 @@
                     </div>
                 </div>
                 <div class="intro-time">
-                    <Clock class="time-icon" />
+                    <svg class="time-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12"
+                        viewBox="0 0 12 12">
+                        <path
+                            d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
+                            transform="translate(-69.818 -69.818)" fill="currentColor" />
+                    </svg>
                     <span class="time-text">{{ $t('myIncome.purchaseTime') }}: 2025-12-25 12:20:19</span>
                 </div>
             </div>
@@ -47,7 +51,15 @@
             <!-- 赚取收益提示模块：使用通用跑马灯组件（type=3 展示收益样式） -->
             <ActivationMarquee :type="4" />
 
-            <h3 style="margin-bottom: 16px;">{{ $t('myIncome.pendingIncome') }}</h3>
+            <div class="pending-income-header">
+                <h3 class="pending-title">{{ $t('myIncome.pendingIncome') }}</h3>
+                <button class="record-link" type="button" @click="goToClaimRecord">
+                    <span class="record-text">{{ $t('myIncome.claimRecord') }}</span>
+                    <el-icon class="record-arrow">
+                        <ArrowRightBold />
+                    </el-icon>
+                </button>
+            </div>
 
             <div class="processDiv">
                 <div class="progress-bar-container">
@@ -84,6 +96,14 @@
                 <div class="earnings-item">
                     <div class="earnings-label">{{ $t('myIncome.superNodeIncomeCHO') }}</div>
                     <div class="earnings-value">20,000</div>
+                </div>
+                <div class="earnings-item">
+                    <div class="earnings-label">{{ $t('myIncome.equalLevelIncomeCHO') }}</div>
+                    <div class="earnings-value">1,200,000</div>
+                </div>
+                <div class="earnings-item">
+                    <div class="earnings-label">{{ $t('myIncome.flowBonusIncomeCHO') }}</div>
+                    <div class="earnings-value">12,000</div>
                 </div>
             </div>
 
@@ -170,7 +190,6 @@ import { onMounted, ref, computed } from "vue"
 import { useThemeStore } from '@/stores/theme'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Clock } from '@element-plus/icons-vue'
 import avatarImg from '@/assets/icon/avatar.png'
 import TabNode from '@/components/TabNode.vue'
 import CollectEarnings from '@/components/CollectEarnings.vue'
@@ -179,6 +198,7 @@ import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import ActivationMarquee from '@/components/ActivationMarquee.vue'
 import { getNodeStakingInfo } from '@/api/API'
 import { useAccount } from '@wagmi/vue'
+import { ArrowRightBold } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const themeStore = useThemeStore()
@@ -325,6 +345,10 @@ const fetchNodeStakingInfo = async () => {
     const res = await getNodeStakingInfo({ address: address.value, id: "1" })
     const data = res?.data?.data || res?.data || res || {}
     console.log('节点质押信息接口返回：', data)
+}
+
+const goToClaimRecord = () => {
+    router.push('/claim-record')
 }
 // 初始化主题
 onMounted(() => {
@@ -481,11 +505,37 @@ onMounted(() => {
         z-index: 999;
         position: relative;
 
-        h3 {
-            font-size: 20px;
-            color: var(--text-color, #FFFFFF);
-            font-weight: 600;
-            transition: color 0.3s ease;
+        .pending-income-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 16px 0;
+
+            .pending-title {
+                font-size: 20px;
+                color: var(--text-color, #FFFFFF);
+                font-weight: 600;
+                transition: color 0.3s ease;
+            }
+
+            .record-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                border: none;
+                background: transparent;
+                padding: 0;
+                font-family: PingFang SC, PingFang SC;
+                font-size: 14px;
+                color: var(--text-color, #FFFFFF);
+                opacity: 0.8;
+                cursor: pointer;
+            }
+
+            .record-arrow {
+                font-size: 14px;
+                color: inherit; // 继承文字颜色，适配明暗主题
+            }
         }
 
         .processDiv {

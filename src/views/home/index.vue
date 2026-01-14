@@ -5,20 +5,11 @@
     <!-- Banner轮播图板块 -->
     <div class="banner-section">
       <div class="banner-container">
-        <swiper
-          :modules="swiperModules"
-          :slides-per-view="1"
-          :space-between="0"
-          :loop="true"
-          :autoplay="{
+        <swiper :modules="swiperModules" :slides-per-view="1" :space-between="0" :loop="true" :autoplay="{
             delay: 3000,
             disableOnInteraction: false,
             pauseOnMouseEnter: false
-          }"
-          :pagination="false"
-          :navigation="false"
-          class="banner-swiper"
-        >
+        }" :pagination="false" :navigation="false" class="banner-swiper">
           <swiper-slide v-for="(banner, index) in bannerList" :key="index">
             <div class="banner-item">
               <img :src="banner" class="banner-image" />
@@ -39,43 +30,94 @@
       </div>
       <div class="content-wrapper">
 
-
-        <div class="filter-section">
-          <div class="filter-container">
-            <div class="search-box">
-              <el-icon class="search-icon">
+        <!-- PC 顶部筛选栏（PC端显示，移动端隐藏） -->
+        <div class="pc-filter-section">
+          <div class="pc-filter-container">
+            <div class="pc-search-box">
+              <el-icon class="pc-search-icon" aria-hidden="true">
                 <Search />
               </el-icon>
-              <input type="text" :placeholder="$t('home.searchPlaceholder') || '搜索'" class="search-input"
-                v-model="searchQuery" @input="handleSearch" />
+              <input v-model="searchQuery" class="pc-search-input" type="text"
+                :placeholder="`${t('home.searchPlaceholder')}${t('home.multiMarket')}`" />
             </div>
 
-            <div class="action-buttons">
-              <div class="action-btn" @click="handleFilter">
-                <svg t="1765525668660" class="icon" viewBox="0 0 1228 1024" version="1.1"
-                  xmlns="http://www.w3.org/2000/svg" p-id="16362" width="20" height="20">
-                  <path
-                    d="M819.038649 0a204.759662 204.759662 0 0 1 198.309733 153.569747h185.614634a25.594958 25.594958 0 0 1 25.594958 25.594958v51.189915a25.594958 25.594958 0 0 1-25.594958 25.594958l-185.614634 0.10238a204.759662 204.759662 0 0 1-396.619466 0L25.594958 255.949578A25.594958 25.594958 0 0 1 0 230.35462v-51.189915a25.594958 25.594958 0 0 1 25.594958-25.594958h595.133958A204.759662 204.759662 0 0 1 819.038649 0z m0 102.379831a102.379831 102.379831 0 1 0 0 204.759663 102.379831 102.379831 0 0 0 0-204.759663zM409.519325 614.278987a204.759662 204.759662 0 0 1 198.309733 153.569747h595.133958a25.594958 25.594958 0 0 1 25.594958 25.594958v51.189915a25.594958 25.594958 0 0 1-25.594958 25.594958l-595.133958 0.10238a204.759662 204.759662 0 0 1-396.619466 0L25.594958 870.228565A25.594958 25.594958 0 0 1 0 844.633607v-51.189915a25.594958 25.594958 0 0 1 25.594958-25.594958h185.614634A204.759662 204.759662 0 0 1 409.519325 614.278987z m0 102.379831a102.379831 102.379831 0 1 0 0 204.759663 102.379831 102.379831 0 0 0 0-204.759663z"
-                    p-id="16363" fill="currentColor"></path>
+            <div class="pc-action-icons">
+              <div class="pc-action-btn" @click="handleFilter" aria-label="filter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                  <path fill="currentColor"
+                    d="M7,8A4,4,0,0,1,3.126,5H1A1,1,0,0,1,1,3H3.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H10.874A4,4,0,0,1,7,8ZM7,2A2,2,0,1,0,9,4,2,2,0,0,0,7,2Z"
+                    transform="translate(0 10)" />
+                  <path fill="currentColor"
+                    d="M11,8A4,4,0,0,1,7.126,5H1A1,1,0,0,1,1,3H7.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H14.874A4,4,0,0,1,11,8Zm0-6a2,2,0,1,0,2,2A2,2,0,0,0,11,2Z" />
                 </svg>
               </div>
-              <div class="action-btn" @click="handleViewToggle">
-                <svg t="1765591111184" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                  xmlns="http://www.w3.org/2000/svg" p-id="5484" width="32" height="32">
-                  <path
-                    d="M389.461333 85.333333l253.354667 0.021334c5.397333 0.042667 10.602667 0.128 15.616 0.256l14.506667 0.490666 13.482666 0.789334c43.306667 3.072 71.104 10.965333 99.733334 26.282666a197.738667 197.738667 0 0 1 82.005333 82.005334c15.317333 28.629333 23.210667 56.426667 26.282667 99.733333l0.789333 13.482667 0.490667 14.506666 0.149333 7.658667 0.128 16.213333v501.525334a85.333333 85.333333 0 0 1-123.498667 76.330666L518.186667 797.44l-3.2-1.557333-2.965334-1.322667-2.986666 1.322667-257.514667 128.725333A85.333333 85.333333 0 0 1 128 848.298667l0.021333-509.781334c0.042667-5.397333 0.128-10.602667 0.256-15.616l0.490667-14.506666 0.789333-13.482667c3.072-43.306667 10.965333-71.104 26.282667-99.733333a197.738667 197.738667 0 0 1 82.005333-82.005334c28.629333-15.317333 56.426667-23.210667 99.733334-26.282666l13.482666-0.789334 14.506667-0.490666 7.658667-0.149334 16.213333-0.128z m252.16 85.354667H382.378667l-13.184 0.170667-6.122667 0.149333-11.413333 0.426667-10.325334 0.64c-4.906667 0.384-9.493333 0.832-13.76 1.365333l-8.149333 1.173333c-11.712 1.92-21.12 4.650667-29.866667 8.32l-5.76 2.602667c-1.92 0.917333-3.797333 1.877333-5.674666 2.88a112.426667 112.426667 0 0 0-47.018667 47.018667 145.664 145.664 0 0 0-2.88 5.674666l-2.602667 5.76c-3.669333 8.746667-6.4 18.154667-8.32 29.866667l-1.173333 8.149333c-0.533333 4.266667-0.981333 8.832-1.344 13.76l-0.64 10.325334a514.133333 514.133333 0 0 0-0.256 5.546666l-0.341333 11.989334-0.170667 13.184L213.333333 848.277333l256.469334-128.170666c10.965333-5.312 18.112-7.850667 26.88-9.536a80.213333 80.213333 0 0 1 30.634666 0c9.856 1.898667 17.664 4.885333 31.189334 11.648L810.666667 848.298667l-0.021334-508.586667-0.170666-13.226667a709.973333 709.973333 0 0 0-0.149334-6.101333l-0.426666-11.413333-0.64-10.325334c-0.384-4.906667-0.832-9.493333-1.365334-13.76l-1.173333-8.149333a129.984 129.984 0 0 0-8.32-29.866667l-2.602667-5.76a145.664 145.664 0 0 0-2.88-5.674666 112.426667 112.426667 0 0 0-47.018666-47.018667 145.664 145.664 0 0 0-5.674667-2.88l-5.76-2.602667c-8.746667-3.669333-18.154667-6.4-29.866667-8.32l-8.149333-1.173333c-4.266667-0.533333-8.832-0.981333-13.76-1.344l-10.325333-0.64a514.133333 514.133333 0 0 0-5.546667-0.256l-11.989333-0.341333L641.642667 170.666667zM576 298.666667a42.666667 42.666667 0 0 1 3.2 85.226666L576 384h-128a42.666667 42.666667 0 0 1-3.2-85.226667L448 298.666667h128z"
-                    fill="currentColor" p-id="5485"></path>
+              <div class="pc-action-btn" @click="handleBookmark" aria-label="bookmark">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                  <path fill="currentColor"
+                    d="M12.988,19a2.964,2.964,0,0,1-1.789-.606L8,16l-3.2,2.4A2.962,2.962,0,0,1,3.012,19a3.069,3.069,0,0,1-2.089-.836A2.954,2.954,0,0,1,0,16V3A3,3,0,0,1,3,0H13a3,3,0,0,1,3,3V16a2.954,2.954,0,0,1-.923,2.168A3.069,3.069,0,0,1,12.988,19ZM8,14a1.984,1.984,0,0,1,1.2.4l3.2,2.4a.987.987,0,0,0,.6.2,1.024,1.024,0,0,0,.7-.279A.984.984,0,0,0,14,16V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V16a1,1,0,0,0,1,1,.987.987,0,0,0,.6-.2l3.2-2.4A1.984,1.984,0,0,1,8,14Z" />
+                  <path fill="currentColor" d="M0,1A1,1,0,0,1,1,0H7A1,1,0,0,1,7,2H1A1,1,0,0,1,0,1Z"
+                    transform="translate(4 4)" />
                 </svg>
               </div>
             </div>
 
-            <div class="nav-divider">|</div>
+            <div class="pc-divider" aria-hidden="true"></div>
 
-            <div class="filter-tags">
-              <button v-for="tag in filterTags" :key="tag.value" class="filter-tag"
+            <div class="pc-tab-wrapper">
+              <div class="pc-tab-scroll">
+                <button v-for="tag in pcTagButtons" :key="tag.value" class="pc-tab-btn"
                 :class="{ active: activeTag === tag.value }" @click="handleTagClick(tag.value)">
                 {{ tag.label }}
               </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="filter-section">
+          <div class="filter-container">
+            <!-- 标签按钮行 -->
+            <div class="tag-scroll-wrapper">
+              <div class="tag-scroll-container">
+                <button v-for="tag in tagButtons" :key="tag.value" class="tag-btn"
+                  :class="{ active: activeTag === tag.value }" @click="handleTagClick(tag.value)">
+                  {{ tag.label }}
+                </button>
+              </div>
+              <!-- 右侧渐变遮罩 -->
+              <div class="gradient-mask gradient-mask-right"></div>
+            </div>
+
+            <!-- 右侧操作按钮 -->
+            <div class="action-buttons">
+              <div class="action-btn" @click="handleFilter">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="icon">
+                  <g transform="translate(-295 -358)">
+                    <rect fill="none" width="24" height="24" transform="translate(295 358)" />
+                    <g transform="translate(298 361)">
+                      <path fill="currentColor"
+                        d="M7,8A4,4,0,0,1,3.126,5H1A1,1,0,0,1,1,3H3.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H10.874A4,4,0,0,1,7,8ZM7,2A2,2,0,1,0,9,4,2,2,0,0,0,7,2Z"
+                        transform="translate(0 10)" />
+                      <path fill="currentColor"
+                        d="M11,8A4,4,0,0,1,7.126,5H1A1,1,0,0,1,1,3H7.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H14.874A4,4,0,0,1,11,8Zm0-6a2,2,0,1,0,2,2A2,2,0,0,0,11,2Z" />
+                    </g>
+                  </g>
+                </svg>
+              </div>
+              <div class="action-btn bookmark-btn" @click="handleBookmark">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                  <g transform="translate(-336 -358)">
+                    <rect fill="none" width="24" height="24" transform="translate(336 358)" />
+                    <g transform="translate(340 361)">
+                      <path fill="currentColor"
+                        d="M12.988,19a2.964,2.964,0,0,1-1.789-.606L8,16l-3.2,2.4A2.962,2.962,0,0,1,3.012,19a3.069,3.069,0,0,1-2.089-.836A2.954,2.954,0,0,1,0,16V3A3,3,0,0,1,3,0H13a3,3,0,0,1,3,3V16a2.954,2.954,0,0,1-.923,2.168A3.069,3.069,0,0,1,12.988,19ZM8,14a1.984,1.984,0,0,1,1.2.4l3.2,2.4a.987.987,0,0,0,.6.2,1.024,1.024,0,0,0,.7-.279A.984.984,0,0,0,14,16V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V16a1,1,0,0,0,1,1,.987.987,0,0,0,.6-.2l3.2-2.4A1.984,1.984,0,0,1,8,14Z" />
+                      <path fill="currentColor" d="M0,1A1,1,0,0,1,1,0H7A1,1,0,0,1,7,2H1A1,1,0,0,1,0,1Z"
+                        transform="translate(4 4)" />
+                    </g>
+                  </g>
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -103,12 +145,42 @@
                   <div class="percentage-label">{{ $t('home.opportunity') }}</div>
                 </div>
               </div>
+              <div class="item-leverage-info">
+                <div class="leverage-item">
+                  <span class="leverage-label">{{ $t('home.maxLeverage') || '最大杠杆倍数' }}:</span>
+                  <span class="leverage-value">{{ item.maxLeverage || '10X' }}</span>
+                </div>
+                <div class="leverage-item">
+                  <span class="leverage-label">{{ $t('home.maxReturn') || '最大回报' }}:</span>
+                  <span class="leverage-value">{{ item.maxReturn || '182%' }}</span>
+                </div>
+              </div>
               <div class="item-actions">
                 <button class="action-btn yes-btn" @click="navigateToDetail(item, 'yes')">Yes</button>
                 <button class="action-btn no-btn" @click="navigateToDetail(item, 'no')">No</button>
               </div>
               <div class="item-amount">
-                <span>{{ item.amount }}</span>
+                <div class="amount-left">
+                  <div class="time-info" :class="{ urgent: item.isTimeUrgent }">
+                    <span v-if="item.isTimeUrgent" class="time-dot" aria-hidden="true">
+                      <em></em>
+                    </span>
+                    <svg v-else class="time-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12"
+                      height="12" viewBox="0 0 12 12">
+                      <path
+                        d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
+                        transform="translate(-69.818 -69.818)" fill="currentColor" />
+                    </svg>
+                    <span class="time-text">{{ item.timeRemaining }}</span>
+                  </div>
+                  <div class="participant-info">
+                    <el-icon class="participant-icon">
+                      <Avatar />
+                    </el-icon>
+                    <span class="participant-text">{{ item.participantCount.toLocaleString() }}</span>
+                  </div>
+                  <span class="voi-amount">VOI：${{ item.amount }}</span>
+                </div>
                 <svg t="1765591111184" class="icon-sc" :class="{ active: item.isFavorite }" viewBox="0 0 1024 1024"
                   version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5484" width="14" height="14"
                   @click.stop="toggleFavorite(item)">
@@ -121,14 +193,23 @@
           </div>
 
           <div class="right-horizontal-list">
-              <div class="list-item small-item" v-for="(item, index) in rightList"
-                :key="'right-' + index">
+            <div class="list-item small-item" v-for="(item, index) in rightList" :key="'right-' + index">
                 <div class="item-header">
                   <img :src="item.avatar" :alt="$t('common.userAvatar')" class="user-avatar">
                   <div class="item-meta">
                     <div class="item-title">{{ item.title }}</div>
                   </div>
                 </div>
+              <div class="item-leverage-info">
+                <div class="leverage-item">
+                  <span class="leverage-label">{{ $t('home.maxLeverage') || '最大杠杆倍数' }}:</span>
+                  <span class="leverage-value">{{ item.maxLeverage || '10X' }}</span>
+                </div>
+                <div class="leverage-item">
+                  <span class="leverage-label">{{ $t('home.maxReturn') || '最大回报' }}:</span>
+                  <span class="leverage-value">{{ item.maxReturn || '182%' }}</span>
+                </div>
+              </div>
                 <div class="item-options">
                   <div class="option-item">
                     <div class="option-text"><span>{{ item.options[0].text }}</span> <span>{{ item.percentage }}</span>
@@ -148,8 +229,27 @@
                   </div>
                 </div>
                 <div class="item-amount">
-                  <span>{{ item.amount }}</span>
-                  <span>
+                <div class="amount-left">
+                  <div class="time-info" :class="{ urgent: item.isTimeUrgent }">
+                    <span v-if="item.isTimeUrgent" class="time-dot" aria-hidden="true">
+                      <em></em>
+                    </span>
+                    <svg v-else class="time-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12"
+                      height="12" viewBox="0 0 12 12">
+                      <path
+                        d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
+                        transform="translate(-69.818 -69.818)" fill="currentColor" />
+                    </svg>
+                    <span class="time-text">{{ item.timeRemaining }}</span>
+                  </div>
+                  <div class="participant-info">
+                    <el-icon class="participant-icon">
+                      <Avatar />
+                    </el-icon>
+                    <span class="participant-text">{{ item.participantCount.toLocaleString() }}</span>
+                  </div>
+                  <span class="voi-amount">VOI：${{ item.amount }}</span>
+                </div>
                     <svg t="1765591111184" class="icon-sc" :class="{ active: item.isFavorite }" viewBox="0 0 1024 1024"
                       version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5484" width="14" height="14"
                       @click.stop="toggleFavorite(item)">
@@ -157,7 +257,6 @@
                         d="M389.461333 85.333333l253.354667 0.021334c5.397333 0.042667 10.602667 0.128 15.616 0.256l14.506667 0.490666 13.482666 0.789334c43.306667 3.072 71.104 10.965333 99.733334 26.282666a197.738667 197.738667 0 0 1 82.005333 82.005334c15.317333 28.629333 23.210667 56.426667 26.282667 99.733333l0.789333 13.482667 0.490667 14.506666 0.149333 7.658667 0.128 16.213333v501.525334a85.333333 85.333333 0 0 1-123.498667 76.330666L518.186667 797.44l-3.2-1.557333-2.965334-1.322667-2.986666 1.322667-257.514667 128.725333A85.333333 85.333333 0 0 1 128 848.298667l0.021333-509.781334c0.042667-5.397333 0.128-10.602667 0.256-15.616l0.490667-14.506666 0.789333-13.482667c3.072-43.306667 10.965333-71.104 26.282667-99.733333a197.738667 197.738667 0 0 1 82.005333-82.005334c28.629333-15.317333 56.426667-23.210667 99.733334-26.282666l13.482666-0.789334 14.506667-0.490666 7.658667-0.149334 16.213333-0.128z m252.16 85.354667H382.378667l-13.184 0.170667-6.122667 0.149333-11.413333 0.426667-10.325334 0.64c-4.906667 0.384-9.493333 0.832-13.76 1.365333l-8.149333 1.173333c-11.712 1.92-21.12 4.650667-29.866667 8.32l-5.76 2.602667c-1.92 0.917333-3.797333 1.877333-5.674666 2.88a112.426667 112.426667 0 0 0-47.018667 47.018667 145.664 145.664 0 0 0-2.88 5.674666l-2.602667 5.76c-3.669333 8.746667-6.4 18.154667-8.32 29.866667l-1.173333 8.149333c-0.533333 4.266667-0.981333 8.832-1.344 13.76l-0.64 10.325334a514.133333 514.133333 0 0 0-0.256 5.546666l-0.341333 11.989334-0.170667 13.184L213.333333 848.277333l256.469334-128.170666c10.965333-5.312 18.112-7.850667 26.88-9.536a80.213333 80.213333 0 0 1 30.634666 0c9.856 1.898667 17.664 4.885333 31.189334 11.648L810.666667 848.298667l-0.021334-508.586667-0.170666-13.226667a709.973333 709.973333 0 0 0-0.149334-6.101333l-0.426666-11.413333-0.64-10.325334c-0.384-4.906667-0.832-9.493333-1.365334-13.76l-1.173333-8.149333a129.984 129.984 0 0 0-8.32-29.866667l-2.602667-5.76a145.664 145.664 0 0 0-2.88-5.674666 112.426667 112.426667 0 0 0-47.018666-47.018667 145.664 145.664 0 0 0-5.674667-2.88l-5.76-2.602667c-8.746667-3.669333-18.154667-6.4-29.866667-8.32l-8.149333-1.173333c-4.266667-0.533333-8.832-0.981333-13.76-1.344l-10.325333-0.64a514.133333 514.133333 0 0 0-5.546667-0.256l-11.989333-0.341333L641.642667 170.666667zM576 298.666667a42.666667 42.666667 0 0 1 3.2 85.226666L576 384h-128a42.666667 42.666667 0 0 1-3.2-85.226667L448 298.666667h128z"
                         :fill="item.isFavorite ? '#CA4064' : '#909090'" p-id="5485"></path>
                     </svg>
-                  </span>
               </div>
             </div>
           </div>
@@ -170,7 +269,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import NavBar2 from '@/components/navBar2.vue'
-import { Search } from '@element-plus/icons-vue'
+import { Search, Avatar } from '@element-plus/icons-vue'
 import router from '@/router'
 import { useI18n } from 'vue-i18n'
 import { Swiper, SwiperSlide } from 'swiper/vue'
@@ -198,19 +297,23 @@ onUnmounted(() => {
   document.body.style.overflow = ''
 })
 
-// 搜索相关
+// 搜索相关（PC 顶部栏）
 const searchQuery = ref('')
 
-// 筛选标签数据
-const filterTags = computed(() => [
-  { value: 'all', label: t('common.all') },
-  { value: 'premium', label: t('home.filterTags.premium') },
-  { value: 'ukraine', label: t('home.filterTags.ukraine') },
-  { value: 'afghanistan', label: t('home.filterTags.afghanistan') },
-  { value: 'trump', label: t('home.filterTags.trump') },
-  { value: 'fed', label: t('home.filterTags.fed') },
-  { value: 'token', label: t('home.filterTags.token') }
+// 标签按钮数据
+const tagButtons = ref([
+  { value: 'bitcoin', label: 'Bitcoin' },
+  { value: 'ethereum', label: 'Ethereum' },
+  { value: 'solana', label: 'Solana' },
+  { value: 'meme', label: 'Meme' },
+  { value: 'defi', label: 'DeFi' },
+  { value: 'nft', label: 'NFT' },
+  { value: 'web3', label: 'Web3' },
+  { value: 'ai', label: 'AI' }
 ])
+
+// PC tab（含“全部”）
+const pcTagButtons = computed(() => [{ value: 'all', label: t('home.all') }, ...tagButtons.value])
 
 // 当前激活的标签
 const activeTag = ref('all')
@@ -221,46 +324,71 @@ const leftList = ref([
     avatar: 'https://picsum.photos/seed/user1/40/40',
     title: '鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？',
     percentage: '75%',
-    amount: '1.51亿美元交易量',
+    amount: '19.00',
     yesCount: 1234,
     noCount: 567,
-    isFavorite: false
+    isFavorite: false,
+    maxLeverage: '10X',
+    maxReturn: '182%',
+    timeRemaining: '04:30:57',
+    participantCount: 1280,
+    isTimeUrgent: false // 时间是否紧急（控制图标状态）
   },
   {
     avatar: 'https://picsum.photos/seed/user2/40/40',
     title: '鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？',
     percentage: '25%',
-    amount: '1.51亿美元交易量',
+    amount: '19.00',
     yesCount: 1234,
     noCount: 567,
-    isFavorite: false
+    isFavorite: false,
+    maxLeverage: '10X',
+    maxReturn: '182%',
+    timeRemaining: '02:15:30',
+    participantCount: 1280,
+    isTimeUrgent: true // 时间紧急状态
   },
   {
     avatar: 'https://picsum.photos/seed/user3/40/40',
     title: '鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？',
     percentage: '50%',
-    amount: '1.51亿美元交易量',
+    amount: '19.00',
     yesCount: 1234,
     noCount: 567,
-    isFavorite: false
+    isFavorite: false,
+    maxLeverage: '10X',
+    maxReturn: '182%',
+    timeRemaining: '12:45:20',
+    participantCount: 1280,
+    isTimeUrgent: false
   },
   {
     avatar: 'https://picsum.photos/seed/user4/40/40',
     title: '鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？',
     percentage: '90%',
-    amount: '1.51亿美元交易量',
+    amount: '19.00',
     yesCount: 1234,
     noCount: 567,
-    isFavorite: false
+    isFavorite: false,
+    maxLeverage: '10X',
+    maxReturn: '182%',
+    timeRemaining: '01:20:10',
+    participantCount: 1280,
+    isTimeUrgent: true
   },
   {
     avatar: 'https://picsum.photos/seed/user5/40/40',
     title: '鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？',
     percentage: '33%',
-    amount: '1.51亿美元交易量',
+    amount: '19.00',
     yesCount: 1234,
     noCount: 567,
-    isFavorite: false
+    isFavorite: false,
+    maxLeverage: '10X',
+    maxReturn: '182%',
+    timeRemaining: '08:15:45',
+    participantCount: 1280,
+    isTimeUrgent: false
   }
 ])
 
@@ -269,8 +397,13 @@ const createRightListItem = (seed, title = '美联储12月会做出决定吗？'
   avatar: `https://picsum.photos/seed/user${seed}/40/40`,
   title,
   percentage: '14%',
-  amount: '1.51亿美元交易量',
+  amount: '19.00',
   isFavorite: false,
+  maxLeverage: '10X',
+  maxReturn: '182%',
+  timeRemaining: '04:30:57',
+  participantCount: 1280,
+  isTimeUrgent: false,
   options: [
     { text: '下调50个基点以上', percentage: '2%', yesCount: 123, noCount: 456 },
     { text: '增长超过25基点', percentage: '32%', yesCount: 789, noCount: 101 }
@@ -331,6 +464,11 @@ const handleTagClick = (tagValue) => {
   // 这里可以根据标签筛选内容
 }
 
+// 处理收藏点击
+const handleBookmark = () => {
+  // 这里可以实现收藏功能
+}
+
 // 切换收藏状态
 const toggleFavorite = (item) => {
   item.isFavorite = !item.isFavorite
@@ -364,6 +502,53 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
 .icon-sc {
   cursor: pointer;
+}
+
+.theme-dark {
+  .list-item {
+    border: 1px solid #383838 !important;
+  }
+
+  // PC 顶部筛选栏暗黑主题适配
+  .home-page {
+    .main-content {
+      .pc-filter-section {
+        .pc-search-box {
+          background: var(--bg-page, #F5F5F5);
+          border: 1px solid rgba(255, 255, 255, 0.10);
+        }
+
+        .pc-search-icon {
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        .pc-search-input {
+          color: rgba(255, 255, 255, 0.9);
+
+          &::placeholder {
+            color: rgba(255, 255, 255, 0.45);
+          }
+        }
+
+        .pc-action-btn {
+          color: rgba(255, 255, 255, 0.72);
+        }
+
+        .pc-divider {
+          background: rgba(255, 255, 255, 0.18);
+        }
+
+        .pc-tab-btn {
+          color: rgba(255, 255, 255, 0.65);
+
+          &.active {
+            background: #ffffff;
+            color: #000000;
+          }
+        }
+      }
+    }
+  }
 }
 
 .home-page {
@@ -425,100 +610,206 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
       .filter-container {
         display: flex;
+        flex-direction: row;
         align-items: center;
-        gap: 20px;
+        gap: 12px;
         padding: 12px 0;
         border-radius: 8px;
+        position: relative;
 
-        // 搜索框样式
-        .search-box {
+        // 标签滚动容器
+        .tag-scroll-wrapper {
+          position: relative;
+          width: 80%;
+          flex-shrink: 0;
+          overflow: hidden;
+
+          .tag-scroll-container {
           display: flex;
-          align-items: center;
-          background: var(--bg-light, #F5F5F5);
-          border-radius: 6px;
-          padding: 8px 12px;
-          box-sizing: border-box;
-          min-width: 200px;
+            gap: 8px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; // Firefox
+            -ms-overflow-style: none; // IE/Edge
 
-          .search-icon {
-            color: var(--text-dark-gray, #999);
-            margin-right: 8px;
-            font-size: 16px;
+            &::-webkit-scrollbar {
+              display: none; // Chrome/Safari
+            }
+
+            .tag-btn {
+              padding: 6px 14px;
+              border: 1px solid var(--border-color, #E0E0E0);
+              border-radius: 5px;
+              font-size: 13px;
+              color: var(--text-gray, #666666);
+              backdrop-filter: blur(10px);
+              -webkit-backdrop-filter: blur(10px);
+              cursor: pointer;
+              transition: all 0.2s;
+              white-space: nowrap;
+              background: var(--bg-page, #F5F5F5);
+              font-weight: 400;
+
+              &.active {
+                color: var(--text-color, #1a1a1a);
+              }
+            }
           }
 
-          .search-input {
-            border: none;
-            background: transparent;
-            outline: none;
-            font-size: 14px;
-            color: var(--text-color, #333);
-            width: 100%;
-
-            &::placeholder {
-              color: var(--text-dark-gray, #999);
-            }
+          // 渐变遮罩
+          .gradient-mask {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 60px;
+            pointer-events: none;
+            z-index: 1;
           }
         }
 
         // 功能按钮样式
         .action-buttons {
           display: flex;
-          gap: 20px;
+          gap: 8px;
+          align-items: center;
+          flex-shrink: 0;
+          margin-left: auto;
 
           .action-btn {
             display: flex;
             align-items: center;
             justify-content: center;
+            width: 32px;
+            height: 32px;
             cursor: pointer;
             transition: all 0.2s;
             border: none;
-            color: var(--text-color, #000000);
+            background: transparent;
+            color: var(--text-color, #ffffff);
 
             .icon {
-              width: 20px;
-              height: 20px;
               fill: currentColor;
-              font-weight: 600;
 
               path {
                 fill: currentColor;
               }
             }
+
+            &:hover {
+              opacity: 0.8;
+            }
           }
-        }
-
-        // 分隔符样式
-        .nav-divider {
-          color: var(--border-color, #e0e0e0);
-          font-size: 16px;
-          margin: 0 8px;
-          transition: color 0.3s ease;
-        }
-
-        // 筛选标签样式
-        .filter-tags {
-          display: flex;
-          gap: 8px;
-          flex-wrap: wrap;
-
-          .filter-tag {
-            padding: 6px 12px;
-            border: none;
-            border-radius: 3px;
-            font-size: 14px;
-            color: var(--text-gray, #666);
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-            background: rgba(0, 0, 0, 0);
-
-            &.active {
-              background: var(--text-color, #1a1a1a);
-              border-color: var(--text-color, #1a1a1a);
-              color: var(--bg-card, #ffffff);
             }
           }
         }
+
+    // PC 顶部筛选栏（仅 PC 显示）
+    .pc-filter-section {
+      display: block;
+      margin-bottom: 18px;
+
+      .pc-filter-container {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 0 10px;
+        }
+
+      .pc-search-box {
+          display: flex;
+        align-items: center;
+          gap: 8px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        background: #F4F4F4;
+        border: 1px solid #F1F1F1;
+        min-width: 260px;
+        height: 40px;
+        box-sizing: border-box;
+      }
+
+      .pc-search-icon {
+        font-size: 16px;
+        color: rgba(0, 0, 0, 0.35);
+      }
+
+      .pc-search-input {
+            border: none;
+        outline: none;
+        background: transparent;
+        font-size: 13px;
+        color: var(--text-color, #1a1a1a);
+        width: 100%;
+
+        &::placeholder {
+          color: rgba(0, 0, 0, 0.40);
+        }
+      }
+
+      .pc-action-icons {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 6px;
+        height: 28px;
+      }
+
+      .pc-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(0, 0, 0, 0.62);
+            cursor: pointer;
+        border-radius: 8px;
+        transition: background 0.2s, color 0.2s;
+
+      }
+
+      .pc-divider {
+        width: 1px;
+        height: 18px;
+        background: rgba(0, 0, 0, 0.10);
+        flex-shrink: 0;
+      }
+
+      .pc-tab-wrapper {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .pc-tab-scroll {
+        display: flex;
+        align-items: center;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
+
+      .pc-tab-btn {
+        min-width: 90px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        padding: 8px 16px;
+        font-family: PingFang SC, PingFang SC;
+        font-weight: 500;
+        font-size: 12px;
+        color: var(--text-color, #1a1a1a);
+        background: transparent;
+        transition: background 0.2s, color 0.2s;
+
+        &.active {
+          background: #000;
+          color: #fff;
+          font-weight: 600;
+            }
+
       }
     }
 
@@ -541,20 +832,30 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr)); // 默认每行 3 个
         gap: 16px;
+
+        // 仅右侧卡片：头像与标题垂直居中对齐
+        .item-header {
+          align-items: center;
+
+          .item-meta {
+            display: flex;
+            align-items: center;
+          }
+
+          .item-title {
+            margin-bottom: 0;
+          }
+        }
       }
 
       // 列表项基础样式
       .list-item {
         background: var(--bg-card, #ffffff);
         border-radius: 8px;
-        padding: 16px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border: 1px solid #F4F4F4;
         transition: all 0.2s;
         box-sizing: border-box;
 
-        &:hover {
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
       }
 
       // 大列表项样式
@@ -573,6 +874,9 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         display: flex;
         align-items: flex-start;
         margin-bottom: 16px;
+        padding: 16px 16px 0;
+        box-sizing: border-box;
+        min-height: 63px;
       }
 
       // 用户头像样式
@@ -680,10 +984,39 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
       }
 
       // 列表项操作按钮样式
+      .item-leverage-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding: 0 16px;
+        box-sizing: border-box;
+
+        .leverage-item {
+          display: flex;
+          align-items: center;
+
+          .leverage-label {
+            font-size: 12px;
+            color: var(--text-gray, #666666);
+            white-space: nowrap;
+          }
+
+          .leverage-value {
+            font-size: 12px;
+            color: var(--text-color, #333333);
+            font-weight: 600;
+            white-space: nowrap;
+          }
+        }
+      }
+
       .item-actions {
         display: flex;
         gap: 12px;
         margin-bottom: 8px;
+        padding: 0 16px;
+        box-sizing: border-box;
       }
 
       // 操作按钮基础样式
@@ -714,17 +1047,83 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         display: flex;
         align-items: center;
         justify-content: space-between;
+        padding: 7px 16px;
+        box-sizing: border-box;
+        background: var(--bg-page, #F5F5F5);
+        border-radius: 0 0 8px 8px;
+        gap: 8px;
 
-        .icon {
-          width: 20px;
-          height: 20px;
+        .amount-left {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          flex: 1;
+          min-width: 0;
+
+          .time-info,
+          .participant-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+          }
+
+          .time-info {
+            &.urgent {
+              .time-dot {
+                background: rgba(246, 70, 93, 0.2);
+              }
+            }
+
+            .time-dot {
+              width: 15px;
+              height: 15px;
+              border-radius: 50%;
+              flex-shrink: 0;
+              text-align: center;
+              line-height: 14px;
+
+              em {
+                display: inline-block;
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: rgba(246, 70, 93, 1);
+              }
+            }
+          }
+
+          .time-text,
+          .participant-text,
+          .voi-amount,
+          .time-icon,
+          .participant-icon {
+            font-family: PingFang SC, PingFang SC;
+            font-weight: 400;
+            font-size: 12px;
           color: var(--text-dark-gray, #999);
+          }
+
+        }
+
+        .icon-sc {
+          width: 14px;
+          height: 14px;
+          cursor: pointer;
+          transition: all 0.2s;
+          flex-shrink: 0;
+
+          &.active {
+            fill: #CA4064;
+          }
         }
       }
 
       // 选项列表样式
       .item-options {
         margin-bottom: 8px;
+        padding: 0 16px;
+        box-sizing: border-box;
       }
 
       // 选项项样式
@@ -746,7 +1145,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         flex: 1;
         margin-right: 7px;
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
       }
 
       // 选项百分比样式
@@ -798,27 +1197,20 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
       .filter-section {
         .filter-container {
-          flex-wrap: wrap;
-          gap: 16px;
+          gap: 10px;
+          flex-direction: row;
+          align-items: center;
 
-          .search-box {
-            order: 1;
-            flex: 1;
-            min-width: 200px;
+          .tag-scroll-wrapper {
+            width: 80%;
+
+            .gradient-mask {
+              width: 40px;
+            }
           }
 
           .action-buttons {
-            order: 2;
-            gap: 12px;
-          }
-
-          .nav-divider {
-            order: 3;
-            display: none;
-          }
-
-          .filter-tags {
-            display: none; // 移动端隐藏
+            margin-left: auto;
           }
         }
       }
@@ -842,74 +1234,21 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
   }
 }
 
-@media (max-width: 1024px) {
-  .home-page {
-    .main-content {
-      padding: 24px 20px 48px;
-
-      .filter-section {
-        margin-bottom: 20px;
-
-        .filter-container {
-          gap: 12px;
-
-          .search-box {
-            min-width: 180px;
-            padding: 8px 10px;
-          }
-
-          .action-buttons {
-            gap: 10px;
-
-            .action-btn {
-              .icon {
-                width: 18px;
-                height: 18px;
-              }
-            }
-          }
-
-          .filter-tags {
-            display: none; // 移动端隐藏
-          }
-        }
-      }
-
-      .main-list-section {
-        gap: 14px;
-
-        .left-vertical-list {
-          gap: 14px;
-
-          .list-item {
-            padding: 16px;
-
-            .item-header {
-              .percentage-semicircle {
-                .semicircle-chart {
-                  width: 55px;
-                  height: 28px;
-                }
-              }
-            }
-          }
-        }
-
-        .right-horizontal-list {
-          grid-template-columns: repeat(2, minmax(0, 1fr)); // 1024px 以下每行 2 个
-
-            .list-item {
-              padding: 16px;
-          }
-        }
-      }
-    }
+// 移动端样式（480px 及以下）
+@media (max-width: 480px) {
+  .gradient-mask-right{
+    right: -1px;
+    display: block;
+    background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.3) 30%, rgba(255, 255, 255, 0.7) 70%, var(--bg-page-h5, #1a1a1a) 100%) !important;
   }
-}
+  .theme-dark {
+    .gradient-mask-right {
+      background: linear-gradient(to right, transparent 0%, rgba(26, 26, 26, 0.3) 30%, rgba(26, 26, 26, 0.7) 70%, var(--bg-page-h5, #1a1a1a) 100%) !important;
+          }
+        }
 
-@media (max-width: 768px) {
   .home-page {
-    padding-top: 108px;
+    padding-top: 60px;
     background-color: var(--bg-page-h5, #FFFFFF);
 
     .banner-section {
@@ -941,416 +1280,49 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
     }
 
     .main-content {
-      padding: 16px 16px 40px;
-
-
-      .filter-section {
-        margin-bottom: 16px;
-
-        .filter-container {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 0;
-
-          .search-box {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            background: var(--bg-light, #F5F5F5);
-            border-radius: 8px;
-            padding: 10px 12px;
-            min-width: 0; // 允许收缩
-
-            .search-icon {
-              color: var(--text-dark-gray, #999);
-              margin-right: 8px;
-              font-size: 16px;
-              flex-shrink: 0;
-            }
-
-            .search-input {
-              border: none;
-              background: transparent;
-              outline: none;
-              font-size: 14px;
-              color: var(--text-color, #333);
-              width: 100%;
-              flex: 1;
-
-              &::placeholder {
-                color: var(--text-dark-gray, #999);
-              }
-            }
-          }
-
-          .action-buttons {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-
-            .action-btn {
-              padding: 0;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              cursor: pointer;
-              transition: all 0.2s;
-              flex-shrink: 0;
-
-              .icon {
-                width: 20px;
-                height: 20px;
-                fill: currentColor;
-                color: var(--text-color, #333);
-              }
-            }
-          }
-
-          .nav-divider {
-            display: none;
-          }
-
-          .filter-tags {
-            display: none; // 移动端隐藏
-          }
-        }
-      }
-
-      .main-list-section {
-        gap: 12px;
-
-        .left-vertical-list {
-          gap: 12px;
-
-          .list-item {
-            padding: 16px;
-            border-radius: 12px;
-            background: #ffffff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-
-            .item-header {
-              margin-bottom: 16px;
-              align-items: center;
-              gap: 12px;
-
-              .user-avatar {
-                width: 48px;
-                height: 48px;
-                border-radius: 8px; // 方形头像，圆角
-                object-fit: cover;
-                flex-shrink: 0;
-              }
-
-              .item-meta {
-                padding-left: 0;
-                flex: 1;
-                min-width: 0;
-
-                .item-title {
-                  font-size: 14px;
-                  line-height: 1.5;
-                  color: var(--text-color, #333);
-                  font-weight: 500;
-                }
-              }
-
-              .percentage-semicircle {
-                flex-shrink: 0;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 4px;
-
-                .semicircle-chart {
-                  width: 60px;
-                  height: 30px;
-                }
-
-                .percentage-label {
-                  font-size: 10px;
-                  color: var(--text-dark-gray, #999);
-                  margin-top: 0;
-                }
-              }
-            }
-
-            .item-actions {
-              gap: 12px;
-              margin-bottom: 12px;
-
-              .action-btn {
-                flex: 1;
-                padding: 12px 16px;
-                font-size: 14px;
-                font-weight: 600;
-                min-height: 44px; // 触摸友好的最小高度
-                border-radius: 8px;
-                border: none;
-                cursor: pointer;
-                transition: all 0.2s;
-
-                &.yes-btn {
-                  background: #E8F5E9; // 浅绿色背景
-                  color: #4CAF50; // 绿色文字
-
-                  &:hover {
-                    background: #C8E6C9;
-                  }
-
-                  &.active {
-                    background: #4CAF50;
-                    color: #ffffff;
-                  }
-                }
-
-                &.no-btn {
-                  background: #FCE4EC; // 浅粉色背景
-                  color: #E91E63; // 粉色文字
-
-                  &:hover {
-                    background: #F8BBD0;
-                  }
-
-                  &.active {
-                    background: #E91E63;
-                    color: #ffffff;
-                  }
-                }
-              }
-            }
-
-            .item-amount {
-              font-size: 12px;
-              color: var(--text-dark-gray, #999);
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-
-              .icon-sc {
-                width: 16px;
-                height: 16px;
-                cursor: pointer;
-                transition: all 0.2s;
-
-                &:hover {
-                  transform: scale(1.1);
-                }
-
-                &.active {
-                  fill: #CA4064;
-                }
-              }
-            }
-          }
-        }
-
-        .right-horizontal-list {
-          gap: 12px;
-          grid-template-columns: 1fr; // 768px 以下每行 1 个
-
-            .list-item {
-              width: 100%;
-              padding: 16px;
-              border-radius: 12px;
-              background: var(--bg-card, #ffffff);
-              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-
-              .item-header {
-                margin-bottom: 16px;
-                align-items: center;
-                gap: 12px;
-
-                .user-avatar {
-                  width: 48px;
-                  height: 48px;
-                  border-radius: 8px; // 方形头像，圆角
-                  object-fit: cover;
-                  flex-shrink: 0;
-                }
-
-                .item-meta {
-                  padding-left: 0;
-                  flex: 1;
-                  min-width: 0;
-
-                  .item-title {
-                    font-size: 14px;
-                    line-height: 1.5;
-                    color: var(--text-color, #333);
-                    font-weight: 500;
-                  }
-                }
-              }
-
-              .item-options {
-                margin-bottom: 12px;
-
-                .option-item {
-                  margin-bottom: 12px;
-                  display: flex;
-                  flex-direction: row;
-                  align-items: center;
-                  justify-content: space-between;
-                  gap: 12px;
-
-                  &:last-child {
-                    margin-bottom: 0;
-                  }
-
-                  .option-text {
-                    flex: 1;
-                    font-size: 13px;
-                    color: var(--text-color, #333);
-                    margin-right: auto;
-                    display: flex;
-                    align-items: center;
-
-                    span:first-child {
-                      flex: 1;
-                    }
-
-                    span:last-child {
-                      display: none; // 移动端隐藏百分比
-                    }
-                  }
-
-                  .option-buttons {
-                    display: flex;
-                    gap: 8px;
-                    flex-shrink: 0;
-
-                    .option-btn {
-                      padding: 6px 12px;
-                      font-size: 12px;
-                      font-weight: 600;
-                      min-height: 32px;
-                      border-radius: 6px;
-                      border: none;
-                      cursor: pointer;
-                      transition: all 0.2s;
-                      white-space: nowrap;
-
-                      &.yes-btn {
-                        background: rgba(188, 255, 51, 0.2);
-                        color: var(--text-color-p, #BBFF2E);
-
-                        &:hover {
-                          background: rgba(37, 167, 80, 0.3);
-                        }
-
-                        &.active {
-                          background: #25A750;
-                          color: #ffffff;
-                        }
-                      }
-
-                      &.no-btn {
-                        background: rgba(226, 56, 145, 0.2);
-                        color: #E44096;
-
-                        &:hover {
-                          background: rgba(202, 64, 100, 0.3);
-                        }
-
-                        &.active {
-                          background: #CA4064;
-                          color: #ffffff;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-
-              .item-amount {
-                font-size: 12px;
-                color: var(--text-dark-gray, #999);
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                margin-top: 8px;
-
-                span:first-child {
-                  &::before {
-                    content: '交易额: ';
-                  }
-                }
-
-                .icon-sc {
-                  width: 16px;
-                  height: 16px;
-                  cursor: pointer;
-                  transition: all 0.2s;
-
-                  &:hover {
-                    transform: scale(1.1);
-                  }
-
-                  &.active {
-                    fill: #CA4064;
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-      // 480px 及以下屏幕的样式覆盖
-@media (max-width: 480px) {
-    padding-top: 60px;
-
-    .main-content {
       padding: 12px 12px 32px;
 
       .filter-section {
         margin-bottom: 12px;
 
         .filter-container {
-          gap: 22px;
+          gap: 6px;
+          padding: 0;
+          flex-direction: row;
+            align-items: center;
 
-          .search-box {
-            padding: 8px 10px;
-            border-radius: 6px;
-            height: 40px;
-            border-radius: 8px 8px 8px 8px;
-            border: 1px solid var(--border-color, #e0e0e0);
-            background-color: var(--bg-page-h5, #F5F5F5);
+          .tag-scroll-wrapper {
+            width: 80%;
 
-            .search-icon {
-              font-size: 14px;
-              margin-right: 6px;
+            .tag-scroll-container {
+              gap: 5px;
+
+              .tag-btn {
+                padding: 4px 10px;
+                font-size: 11px;
+                }
+              }
+
+            .gradient-mask {
+                  width: 60px;
             }
-
-            .search-input {
-              font-size: 13px;
-            }
-          }
+                }
 
           .action-buttons {
-            gap: 16px;
+            margin-left: auto;
+            gap: 8px;
 
-            .action-btn {
-              padding: 0;
-
-              .icon {
-                width: 24px;
-                height: 24px;
+              .action-btn {
+              width: 28px;
+              height: 28px;
+                }
+                  }
+                }
               }
-            }
-          }
 
-          .filter-tags {
-            gap: 6px;
-
-            .filter-tag {
-              padding: 5px 10px;
-              font-size: 12px;
-              min-height: 30px; // 触摸友好的最小高度
-            }
-          }
-        }
+      // 移动端隐藏 PC 顶部栏
+      .pc-filter-section {
+        display: none;
       }
 
       .main-list-section {
@@ -1360,13 +1332,12 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
           gap: 12px;
 
           .list-item {
-            padding: 14px;
             border-radius: 12px;
             background: var(--bg-card, #ffffff);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #F4F4F4;
 
             .item-header {
-              margin-bottom: 14px;
+              margin-bottom: 10px;
               align-items: center;
               gap: 10px;
 
@@ -1411,9 +1382,8 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
               }
             }
 
-              // 当存在 .item-options 时，.item-header 需要更大的 margin-bottom
-              &:has(.item-options) .item-header {
-                margin-bottom: 33px;
+            .item-leverage-info {
+              margin-bottom: 10px;
             }
 
             .item-actions {
@@ -1474,12 +1444,14 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
               display: flex;
               align-items: center;
               justify-content: space-between;
+              gap: 6px;
 
               .icon-sc {
                 width: 16px;
                 height: 16px;
                 cursor: pointer;
                 transition: all 0.2s;
+                flex-shrink: 0;
 
                 &:hover {
                   transform: scale(1.1);
@@ -1488,23 +1460,6 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
                 &.active {
                   fill: #CA4064;
                 }
-              }
-            }
-
-              // 当存在 .item-options 时，.item-amount 的样式需要调整
-              &:has(.item-options) .item-amount {
-                font-size: 10px;
-                margin-top: 8px;
-
-                span:first-child {
-                  &::before {
-                    content: '交易额: ';
-                  }
-                }
-
-                .icon-sc {
-                  width: 12px;
-                  height: 12px;
                 }
               }
 
@@ -1556,17 +1511,16 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
         .right-horizontal-list {
           gap: 12px;
-          grid-template-columns: 1fr; // 480px 以下每行 1 个
+          grid-template-columns: 1fr; // 移动端每行 1 个
 
             .list-item {
               width: 100%;
-              padding: 14px;
               border-radius: 12px;
               background: var(--bg-card, #ffffff);
-              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #F4F4F4;
 
               .item-header {
-                margin-bottom: 14px;
+              margin-bottom: 10px;
                 align-items: center;
                 gap: 10px;
 
@@ -1679,18 +1633,15 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
                 align-items: center;
                 justify-content: space-between;
                 margin-top: 8px;
+              gap: 6px;
 
-                span:first-child {
-                  &::before {
-                    content: '交易额: ';
-                  }
-                }
 
                 .icon-sc {
                   width: 16px;
                   height: 16px;
                   cursor: pointer;
                   transition: all 0.2s;
+                flex-shrink: 0;
 
                   &:hover {
                     transform: scale(1.1);
@@ -1704,6 +1655,16 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
             }
           }
         }
+    }
+  }
+}
+
+// PC 端隐藏移动端 filter-section（> 480px）
+@media (min-width: 481px) {
+  .home-page {
+    .main-content {
+      .filter-section {
+        display: none;
       }
     }
   }
@@ -1711,9 +1672,9 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
 /* 功能暂不开放覆盖层 */
 .coming-soon-overlay {
-  display: block;
+  display: none;
   position: absolute;
-  top: 60px;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;

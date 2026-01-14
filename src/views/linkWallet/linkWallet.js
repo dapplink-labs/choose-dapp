@@ -146,12 +146,7 @@ export const useLinkWallet = () => {
         if (address.value) {
           await checkUserStatus(address.value)
         }
-
-        if (window.history.length > 1) {
-          router.back()
-        } else {
-          router.push('/')
-        }
+        router.push('/')
       }
     }
   )

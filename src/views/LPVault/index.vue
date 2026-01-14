@@ -2,9 +2,7 @@
     <div class="LPVault">
 
         <!-- 通用返回头部导航 -->
-        <BackHeaderNav
-            :show-open-btn="true"
-        />
+        <BackHeaderNav :show-record-btn="true" :show-open-btn="true" />
 
         <div class="banner1" style="margin: 0  -10px;">
 
@@ -83,10 +81,10 @@ import ActivationMarquee from '@/components/ActivationMarquee.vue'
 import { useLPVault } from './useLPVault.js'
 
 const {
-  handleOpenMore,
-  handleOpenMyIncome,
-  nodeList,
-  handleActivate
+    handleOpenMore,
+    handleOpenMyIncome,
+    nodeList,
+    handleActivate
 } = useLPVault()
 </script>
 
@@ -109,6 +107,7 @@ const {
         width: 100%;
         height: 230px;
     }
+
     .banner1 {
         flex-direction: column;
         display: flex;
@@ -488,17 +487,21 @@ const {
     .activation-banner {
         background: #2F2F2F !important;
     }
-    .node-card-item{
+
+    .node-card-item {
         background: #1D1D1D !important;
     }
-    .node-item-name{
+
+    .node-item-name {
         color: #FFFFFF !important;
     }
-    .node-item-type-badge{
+
+    .node-item-type-badge {
         background: rgba(234, 171, 74, 0.1) !important;
         color: #EAAB4A !important;
     }
-    .node-item-btn{
+
+    .node-item-btn {
         background: var(--text-color-y, #BBFF2E) !important;
         color: #000000 !important;
     }

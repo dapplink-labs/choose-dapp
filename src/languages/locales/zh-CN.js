@@ -431,7 +431,11 @@ export default {
     comingSoon: "预测市场即将开放",
     comingSoonAlt: "暂不开放",
     searchPlaceholder: "搜索",
+    multiMarket: "multimarket",
+    all: "全部",
     opportunity: "机会",
+    maxLeverage: "最大杠杆倍数",
+    maxReturn: "最大回报",
     filterTags: {
       premium: "王牌",
       ukraine: "乌克兰",
@@ -485,7 +489,23 @@ export default {
     doc: "文档",
     walletAddressCopied: "钱包地址已复制到剪贴板",
     copyFailed: "复制失败，请手动复制",
-    linkCopied: "链接已复制到剪贴板"
+    linkCopied: "链接已复制到剪贴板",
+    borrow: "借币",
+    earn: "赚币",
+    strategyTrading: "策略交易",
+    copyTrading: "跟单",
+    airdrop: "空投",
+    academy: "学院",
+    nft: "NFT",
+    rwa: "RWA"
+  },
+  purchaseNodeRecord: {
+    title: "节点购买记录",
+    nodeType: "节点类型",
+    nodePrice: "节点价格",
+    purchaseTime: "购买时间",
+    empty: "暂无记录",
+    informationNode: "信息节点"
   },
   settings: {
     title: "个人设置",
@@ -708,6 +728,7 @@ export default {
     secondaryMarketIncome: "二级市场盈利收益",
     directReferralIncome: "直推收益",
     networkIncome: "团队收益",
+    claimRecord: "领取记录",
     claimAll: "领取所有收益",
     claim: "Claim",
     claimSuccess: "领取成功",
@@ -737,8 +758,11 @@ export default {
     staticIncomeCHO: "静态收益(CHO)",
     directReferralIncomeCHO: "直推收益(CHO)",
     teamIncomeCHO: "团队收益(CHO)",
-    genesisNodeIncomeCHO: "创世节点收益(CHO)",
+    genesisNodeIncomeCHO: "创世节点5%收益(CHO)",
     superNodeIncomeCHO: "超级节点收益(CHO)",
+    equalLevelIncomeCHO: "平级收益(CHO)",
+    flowBonusIncomeCHO: "我的流水分红(CHO)",
+    claimRecord: "领取记录",
     claimAll: "领取收益",
     myTeam: "我的团队",
     mySuperior: "我的上级",
@@ -750,13 +774,19 @@ export default {
       infoNode: "信息节点",
       dataNode: "数据节点",
       validationNode: "认证节点",
-      consensusNode: "共识节点"
+      consensusNode: "共识节点",
+      genesisNode: "创世节点"
     },
     earningsOptions: {
       allNodeRewards: "所有节点收益",
       dataNode: "数据节点",
       validationNode: "认证节点"
     }
+  },
+  claimRecord: {
+    title: "领取记录",
+    computingPowerService: "算力服务",
+    lpVault: "质押池"
   },
   dashboard: {
     title: "仪表盘",
@@ -824,10 +854,6 @@ export default {
     latestMarketValue: "最新市值",
     volume24hCMT: "24小时量(CMT)",
     volume24hUSDT: "24小时量(USDT)"
-  },
-  purchaseNodeRecord: {
-    title: "节点质押记录",
-    informationNode: "信息节点"
   },
   purchaseNode: {
     nodeType: "节点类型",

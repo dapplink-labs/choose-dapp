@@ -23,7 +23,15 @@
 
             <ActivationMarquee :type="3" />
 
-            <h3>{{ $t('myNode.pendingIncome') }}</h3>
+            <div class="pending-income-header">
+                <h3 class="pending-title">{{ $t('myNode.pendingIncome') }}</h3>
+                <button class="record-link" type="button" @click="goToClaimRecord">
+                    <span class="record-text">{{ $t('myNode.claimRecord') }}</span>
+                    <el-icon class="record-arrow">
+                        <ArrowRightBold />
+                    </el-icon>
+                </button>
+            </div>
             <div class="pending-income-grid">
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.nodeIncome') }}</div>
@@ -131,7 +139,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from "vue"
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
@@ -145,11 +153,13 @@ import avatarImg from '@/assets/icon/avatar.png'
 import TeamTree from "@/components/TeamTree.vue"
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import ActivationMarquee from '@/components/ActivationMarquee.vue'
+import { ArrowRightBold } from '@element-plus/icons-vue'
 import { getNodeServiceProvidersInfo } from '@/api/API'
 
 
 
 const themeStore = useThemeStore()
+const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
 const { address } = useAccount()
@@ -296,6 +306,10 @@ const loadingText = computed(() => {
 const handleSearch = () => {
     // 搜索功能
     console.log('搜索团队')
+}
+
+const goToClaimRecord = () => {
+    router.push('/claim-record')
 }
 
 // 初始化主题
@@ -471,13 +485,37 @@ onMounted(() => {
             }
         }
 
-        h3 {
-            font-family: PingFang SC, PingFang SC;
-            font-weight: 600;
-            font-size: 20px;
-            color: var(--text-color, #1a1a1a);
-            margin-bottom: 24px;
-            transition: color 0.3s ease;
+        .pending-income-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 16px 0 8px;
+
+            .pending-title {
+                font-family: PingFang SC, PingFang SC;
+                font-weight: 600;
+                font-size: 20px;
+                color: var(--text-color, #1a1a1a);
+                transition: color 0.3s ease;
+            }
+
+            .record-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 4px;
+                border: none;
+                background: transparent;
+                padding: 0;
+                font-family: PingFang SC, PingFang SC;
+                font-size: 14px;
+                color: var(--text-color, #1a1a1a);
+                cursor: pointer;
+            }
+
+            .record-arrow {
+                font-size: 14px;
+                color: inherit; // 继承文字颜色，适配明暗主题
+            }
         }
 
         .pending-income-grid {
