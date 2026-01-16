@@ -119,8 +119,8 @@ export default {
     noInvitationCode: "초대 코드 없음"
   },
   computingPower: {
-    title: "해시파워 서비스 제공자",
-    desc: "해시파워 서비스 제공자가 되어 데이터 노드 수익, 거래 수수료 수익, 서브 토큰 수수료 수익, 2차 시장 수익을 누리고, 더 많은 노드 참여를 유도하여 더 많은 수익을 얻으세요.",
+    title: "노드 구매",
+    desc: "노드를 구매하여 데이터 노드 수익, 거래 수수료 수익, 서브 토큰 수수료 수익, 2차 시장 수익을 누리고, 더 많은 노드 참여를 유도하여 더 많은 수익을 얻으세요.",
     learnMore: "자세히 보기",
     buyNode: "노드 활성화",
     myNodes: "내 노드",
@@ -241,11 +241,11 @@ export default {
   },
   myIncome: {
     title: "나의 수익",
-    myIncomeCMT: "나의 수익(CMT)",
-    computingPowerIncomeCMT: "해시 파워(Mining) 수익 (CMT)",
-    networkIncomeCMT: "네트워크 수익 (CMT)",
+    myIncomeCMT: "나의 수익(CHO)",
+    computingPowerIncomeCMT: "해시 파워(Mining) 수익 (CHO)",
+    networkIncomeCMT: "네트워크 수익 (CHO)",
     earnPrompt: "주소 {address} 수익 획득",
-    pendingIncome: "수령 대기 수익",
+    pendingIncome: "지급된 보상",
     staticIncomeCHO: "스테이킹(Static) 수익 (CHO)",
     directReferralIncomeCHO: "직접 추천 수익 (CHO)",
     teamIncomeCHO: "팀(Team) 수익 (CHO)",
@@ -258,6 +258,8 @@ export default {
     superNode: "정보 노드",
     purchaseTime: "활성화 시간 %s",
     upline: "직접 추천",
+    noStakingNode: "알림",
+    noStakingNodeMessage: "스테이킹 노드가 아직 없습니다. 수익을 확인하려면 먼저 노드를 스테이킹해주세요",
     nodeNames: {
       infoNode: "정보 노드",
       dataNode: "데이터 노드",
@@ -410,7 +412,9 @@ export default {
   claimRecord: {
     title: "수령 기록",
     computingPowerService: "해시파워 서비스",
-    lpVault: "스테이킹 풀"
+    lpVault: "스테이킹 풀",
+    distributedNode: "분산 노드",
+    clusterNode: "클러스터 노드"
   }
 }
 

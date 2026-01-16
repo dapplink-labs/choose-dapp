@@ -36,7 +36,7 @@
                     <div class="node-item-main">
                         <div class="node-item-title-wrapper">
                             <span class="node-item-name">{{ node.name }}</span>
-                            <span class="node-item-type-badge">{{ node.type }}</span>
+                            <span class="node-item-type-badge">{{ node.nodeLevel }}</span>
                         </div>
                         <div class="node-item-price">
                             <span class="label">{{ $t('lpVault.activationPrice') }}</span>

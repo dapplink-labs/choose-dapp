@@ -13,8 +13,9 @@
                 <div class="nodes-list">
                     <div
                         v-for="(node, index) in nodes"
-                        :key="index"
+                        :key="node.id || index"
                         class="tab-node-item"
+                        @click="handleSelect(node)"
                     >
                         <div class="node-name-row">
                             <span class="node-name">{{ node.nodeName }}</span>
@@ -67,12 +68,13 @@ const props = defineProps({
         default: false
     },
     nodes: {
+        // 期望结构：{ id, nodeName, nodeTag, purchaseTime }
         type: Array,
         default: () => []
     }
 })
 
-const emit = defineEmits(['update:modelValue', 'close'])
+const emit = defineEmits(['update:modelValue', 'close', 'select'])
 
 // 判断是否为弹窗模式
 const isModal = computed(() => {
@@ -145,6 +147,13 @@ onUnmounted(() => {
 const handleClose = () => {
     emit('update:modelValue', false)
     emit('close')
+}
+
+const handleSelect = (node) => {
+    if (!node) return
+    // 先向父组件传递节点 id，再关闭弹窗
+    emit('select', node.id)
+    handleClose()
 }
 </script>
 

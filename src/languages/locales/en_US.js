@@ -622,8 +622,8 @@ export default {
     connect: "Connect"
   },
   computingPower: {
-    title: "Computing Provider",
-    desc: "Become a computing provider, enjoy node revenue, transaction fee revenue, sub-coin fee revenue, and secondary market revenue, and promote more nodes to join and obtain more revenue. Learn more ",
+    title: "Node Purchase",
+    desc: "Purchase nodes, enjoy node revenue, transaction fee revenue, sub-coin fee revenue, and secondary market revenue, and promote more nodes to join and obtain more revenue. Learn more ",
     learnMore: "Learn more",
     buyNode: "Acquire Nodes",
     myNodes: "My Nodes",
@@ -742,11 +742,11 @@ export default {
   },
   myIncome: {
     title: "My Profit",
-    myIncomeCMT: "My Profit",
-    computingPowerIncomeCMT: "Computing Profit",
-    networkIncomeCMT: "Network Profit",
+    myIncomeCMT: "My Profit (CHO)",
+    computingPowerIncomeCMT: "Computing Profit (CHO)",
+    networkIncomeCMT: "Network Profit (CHO)",
     earnPrompt: "Address {address} earned",
-    pendingIncome: "Pending Profit",
+    pendingIncome: "Issued Rewards",
     staticIncomeCHO: "Static Profit",
     directReferralIncomeCHO: "Direct Referral Profit",
     teamIncomeCHO: "Team Profit",
@@ -762,6 +762,8 @@ export default {
     superNode: "Super Node",
     purchaseTime: "Activation Time",
     upline: "Upline",
+    noStakingNode: "Notice",
+    noStakingNodeMessage: "You don't have any staked nodes yet. Please stake a node first before viewing earnings",
     nodeNames: {
       infoNode: "Info Node",
       dataNode: "Data Node",
@@ -778,7 +780,9 @@ export default {
   claimRecord: {
     title: "Claim Records",
     computingPowerService: "Computing Service",
-    lpVault: "LP Vault"
+    lpVault: "LP Vault",
+    distributedNode: "Distributed Node",
+    clusterNode: "Cluster Node"
   },
   dashboard: {
     title: "Dashboard",

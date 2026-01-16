@@ -56,7 +56,7 @@ const tabs = computed(() => [
   t('dashboard.tabs.currentPrice'),
   t('dashboard.tabs.pledge'),
   t('dashboard.tabs.computingPool'),
-  t('dashboard.tabs.marketReturns')
+//   t('dashboard.tabs.marketReturns')
 ])
 
 // 返回上一页

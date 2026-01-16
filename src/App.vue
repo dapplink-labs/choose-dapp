@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useAccount } from '@wagmi/vue'
 import navBar from "./components/navBar.vue"
 import navBar2 from "./components/navBar2.vue"
 import Header from "./components/header.vue"
@@ -14,6 +15,38 @@ import { storeToRefs } from 'pinia'
 const route = useRoute()
 const counterStore = useCounterStore()
 const { showInvite } = storeToRefs(counterStore)
+
+// 监听钱包地址变化
+const { address } = useAccount()
+const isInitialMount = ref(true)
+
+// 监听地址变化，如果地址改变则刷新页面
+watch(
+  () => address.value,
+  (newAddress, oldAddress) => {
+    // 跳过首次挂载时的触发（避免页面加载时刷新）
+    if (isInitialMount.value) {
+      isInitialMount.value = false
+      return
+    }
+
+    // 如果地址从有值变为另一个值（切换钱包），则刷新页面
+    if (oldAddress && newAddress && oldAddress !== newAddress) {
+      console.log('钱包地址已更改，刷新页面...', { oldAddress, newAddress })
+      window.location.reload()
+      return
+    }
+
+    // 如果地址从有值变为无值（断开连接），也刷新页面
+    if (oldAddress && !newAddress) {
+      console.log('钱包已断开连接，刷新页面...')
+      window.location.reload()
+      return
+    }
+
+    // 如果地址从无值变为有值（首次连接），不刷新（让页面正常加载）
+  }
+)
 
 // 检测是否为移动端
 const isMobile = ref(false)

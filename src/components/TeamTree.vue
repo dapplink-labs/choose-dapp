@@ -12,11 +12,11 @@
           @click="handleClickPath(index)"
         >
           <div class="path-avatar-wrap">
-            <img src="@/assets/icon/avatar.png" class="path-avatar" alt="avatar" />
+            <img :src="getNodeAvatar(node.address, index === 0)" class="path-avatar" alt="avatar" />
           </div>
           <div class="path-info">
             <div class="path-name">{{ shortAddress(node.address) }}</div>
-            <div class="path-amount">{{ tt('teamTree.amount', 'Amount') }}: {{ node.amount || '0.00' }}</div>
+            <div v-if="index !== 0" class="path-amount">{{ tt('teamTree.amount', 'Amount') }}: {{ node.amount || '0.00' }}</div>
           </div>
           <div v-if="index < path.length - 1" class="path-arrow">/</div>
         </div>
@@ -34,9 +34,8 @@
       @mousemove="onMouseMove"
       @mouseup="onMouseUp"
       @mouseleave="onMouseUp"
-      @click="hideCenterInfo"
     >
-      <div class="graph-inner" :style="{ transform: `translate(${translateX}px, ${translateY}px) scale(${scale})` }" @click="hideCenterInfo">
+      <div class="graph-inner" :style="{ transform: `translate(${translateX}px, ${translateY}px) scale(${scale})` }">
         <canvas
           ref="canvasRef"
           class="graph-canvas"
@@ -48,28 +47,6 @@
         <div class="no-children-text" v-if="visibleChildren.length === 0">
           {{ tt('teamTree.noMoreData', '没有更多数据了') }}
         </div>
-
-        <!-- 当前查看节点的信息窗 -->
-        <div
-          v-if="centerInfoVisible"
-          class="center-info-card"
-          :style="infoCardStyle"
-          @click.stop
-        >
-          <div class="info-title">{{ tt('teamTree.promoInfo', '推广信息') }}</div>
-          <div class="info-row">
-            <span class="label">{{ tt('teamTree.address', '地址') }}：</span>
-            <span class="value">{{ currentNode.address }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">{{ tt('teamTree.amountLabel', '金额') }}：</span>
-            <span class="value">{{ currentNode.amount }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">{{ tt('teamTree.directCount', '直推人数') }}：</span>
-            <span class="value">{{ currentNode.children.length }}</span>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -78,6 +55,24 @@
 <script setup lang="ts">
 import { computed, reactive, ref, onMounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAccount } from '@wagmi/vue'
+// @ts-ignore
+import { getMyTeamInfo } from '@/api/API.js'
+import avatarImg1 from '@/assets/icon/avatarImg1.png'
+import avatarImg2 from '@/assets/icon/avatarImg2.png'
+import avatarImg3 from '@/assets/icon/avatarImg3.png'
+import avatarImg4 from '@/assets/icon/avatarImg4.png'
+import avatarImg5 from '@/assets/icon/avatarImg5.png'
+import defaultAvatar from '@/assets/icon/avatar.png'
+
+// Props定义
+const props = defineProps<{
+  type?: number // 1: 直推, 2: 团队
+  node_type?: number // 1: myIncome页面, 2: myNode页面
+}>()
+
+// 获取当前用户地址
+const { address } = useAccount()
 
 const { t } = useI18n()
 const tt = (key: string, fallback: string) => {
@@ -98,6 +93,36 @@ type PromotionNode = {
   children: string[]
 }
 
+// 随机头像数组
+const avatarImages = [avatarImg1, avatarImg2, avatarImg3, avatarImg4, avatarImg5]
+
+// 根据地址生成稳定的随机头像（同一地址总是返回相同头像）
+const getRandomAvatar = (addr: string) => {
+  if (!addr) return avatarImg1
+  // 使用地址的字符码总和来选择头像，确保同一地址总是返回相同头像
+  let hash = 0
+  for (let i = 0; i < addr.length; i++) {
+    hash = ((hash << 5) - hash) + addr.charCodeAt(i)
+    hash = hash & hash // 转换为32位整数
+  }
+  const index = Math.abs(hash) % avatarImages.length
+  return avatarImages[index]
+}
+
+// 获取钱包地址的头像（effigy.im）
+const getWalletAvatar = (addr: string) => {
+  if (!addr) return defaultAvatar
+  return `https://effigy.im/a/${addr}.svg`
+}
+
+// 根据地址和是否是当前用户返回头像
+const getNodeAvatar = (nodeAddress: string, isCurrentUser: boolean) => {
+  if (isCurrentUser) {
+    return getWalletAvatar(nodeAddress)
+  }
+  return getRandomAvatar(nodeAddress)
+}
+
 // -------- Mock 数据：树结构，后续可换成接口 --------
 const createMockTree = (): Record<string, PromotionNode> => {
   const map: Record<string, PromotionNode> = {}
@@ -105,8 +130,8 @@ const createMockTree = (): Record<string, PromotionNode> => {
   // 根节点（我自己）
   map['me'] = {
     id: 'me',
-    address: '0xME000000000000000000000000000000000000',
-    amount: '1000.00',
+    address: address.value || '0xME000000000000000000000000000000000000',
+    amount: '',
     children: [],
   }
 
@@ -304,53 +329,11 @@ const onCanvasClick = (e: MouseEvent) => {
     }
     return
   }
-  
-  // 检测中心节点点击（用于弹出信息卡片）
-  const distToCenter = Math.hypot(x - CANVAS_SIZE / 2, y - CANVAS_SIZE / 2)
-  if (distToCenter <= CENTER_RADIUS + 10) {
-      centerInfoVisible.value = !centerInfoVisible.value
-  }
 }
 
 // 每一级最多展示10条数据
 const visibleChildren = computed(() => {
   return children.value.slice(0, 10)
-})
-
-// 当前查看节点的信息窗显隐控制
-const centerInfoVisible = ref(false)
-const hideCenterInfo = () => {
-  centerInfoVisible.value = false
-}
-
-// 根据缩放程度计算信息弹窗样式
-const infoCardStyle = computed(() => {
-  const s = scale.value
-  // 调整 factor 范围
-  const factor = Math.max(0.2, Math.min(0.8, s / 2.5))
-  
-  const baseWidth = 240
-  const basePadding = 16
-  const baseFontSize = 14
-  const baseTitleFontSize = 16
-  const baseBorderRadius = 12
-  const baseTranslateX = 20
-  const baseTranslateY = -80
-  const baseMarginBottom = 10
-  const baseRowMarginBottom = 6
-  const baseLabelMinWidth = 70
-  
-  return {
-    width: `${baseWidth * factor}px`,
-    padding: `${basePadding * factor}px`,
-    fontSize: `${baseFontSize * factor}px`,
-    borderRadius: `${baseBorderRadius * factor}px`,
-    transform: `translate(${baseTranslateX * factor}px, ${baseTranslateY * factor}px)`,
-    '--title-font-size': `${baseTitleFontSize * factor}px`,
-    '--title-margin-bottom': `${baseMarginBottom * factor}px`,
-    '--row-margin-bottom': `${baseRowMarginBottom * factor}px`,
-    '--label-min-width': `${baseLabelMinWidth * factor}px`,
-  }
 })
 
 // 子节点环形分布
@@ -419,19 +402,6 @@ const drawGraph = () => {
       ctx.lineWidth = 3
       ctx.stroke()
 
-      // 线条上的文字 "直推/间推"
-      const t = 0.45
-      const tx = (1 - t) * (1 - t) * centerX + 2 * (1 - t) * t * cpX + t * t * pos.x
-      const ty = (1 - t) * (1 - t) * centerY + 2 * (1 - t) * t * cpY + t * t * pos.y
-      ctx.save()
-      ctx.translate(tx, ty)
-      ctx.fillStyle = '#6b7280'
-      ctx.font = '18px system-ui'
-      ctx.textBaseline = 'bottom'
-      const relationText = path.value.length === 1 ? tt('teamTree.direct', '直推') : tt('teamTree.indirect', '间推')
-      ctx.fillText(relationText, 0, -10)
-      ctx.restore()
-
       // 2. 绘制子节点（放大并加渐变发光）
       ctx.shadowBlur = 15
       ctx.shadowColor = 'rgba(59, 130, 246, 0.5)'
@@ -483,8 +453,30 @@ const drawGraph = () => {
   ctx.fillText(shortAddress(currentNode.value.address), centerX, centerY + CENTER_RADIUS + 15)
 }
 
-// 根据当前点击的人模拟一次"接口请求"，刷新其直推列表
-const refreshChildren = (node: PromotionNode, depth = 0) => {
+// 获取邀请列表数据
+const fetchTeamInfo = async (nodeAddress: string, nodeType: number) => {
+  if (!nodeAddress || !address.value) return []
+  
+  try {
+    const res = await getMyTeamInfo({ 
+      address: nodeAddress, 
+      type: nodeType, 
+      node_type: props.node_type ?? 1,
+      page: 10,
+    })
+    const data = res?.data?.data || {}
+    
+    // 根据 type 获取对应的列表
+    const rawList = nodeType === 1 ? data.direct_team_list : data.team_list
+    return rawList || []
+  } catch (error) {
+    console.error('获取邀请列表失败:', error)
+    return []
+  }
+}
+
+// 根据当前节点获取其邀请列表
+const refreshChildren = async (node: PromotionNode) => {
   const oldChildren = [...node.children]
   oldChildren.forEach((childId) => {
     delete nodeMap[childId]
@@ -492,30 +484,56 @@ const refreshChildren = (node: PromotionNode, depth = 0) => {
   
   node.children.splice(0, node.children.length)
   
-  const baseCount = depth >= 1 ? 200 : 70
-  const randSpan = depth >= 1 ? 60 : 51
-  const count = baseCount + Math.floor(Math.random() * randSpan)
+  // 获取当前 type，如果没有传入则默认为 1（直推）
+  const currentType = props.type ?? 1
+  
+  // 调用 API 获取邀请列表
+  const teamList = await fetchTeamInfo(node.address, currentType)
+  
+  if (teamList.length === 0) {
+    return
+  }
   
   const newChildren: string[] = []
-  for (let i = 0; i < count; i++) {
-    const id = `N_${++nodeCounter.value}`
-    const addrBase = `0x${id}`
-    nodeMap[id] = {
-      id,
-      address: addrBase.padEnd(42, 'x'),
-      amount: (Math.random() * 500).toFixed(2),
-      children: [],
+  teamList.forEach((item: any) => {
+    // 跳过空值或无效项
+    if (!item || !item.address) {
+      return
     }
+    
+    const id = item.address || `N_${++nodeCounter.value}`
+    
+    // 如果节点已存在，更新数据；否则创建新节点
+    if (!nodeMap[id]) {
+      nodeMap[id] = {
+        id,
+        address: item.address || '',
+        amount: String(item.total_reward || '0.00'),
+        children: [],
+      }
+    } else {
+      // 更新已存在节点的数据
+      nodeMap[id].amount = String(item.total_reward || '0.00')
+    }
+    
     newChildren.push(id)
-  }
+  })
   
   node.children.push(...newChildren)
 }
 
-// 初次进入页面，模拟请求一次“我的直推”并绘制
-onMounted(() => {
-  refreshChildren(currentNode.value, 0)
+// 初次进入页面，获取邀请列表并绘制
+onMounted(async () => {
+  await refreshChildren(currentNode.value)
   drawGraph()
+})
+
+// 监听 type 变化，重新获取数据
+watch(() => props.type, async (newType) => {
+  if (newType !== undefined) {
+    await refreshChildren(currentNode.value)
+    drawGraph()
+  }
 })
 
 // 当直推列表/可见直推或中心标签、缩放变化时重绘
@@ -524,11 +542,9 @@ watch([children, visibleChildren, centerLabel, scale], () => {
 })
 
 // 点击左侧路径
-const handleClickPath = (index: number) => {
+const handleClickPath = async (index: number) => {
   path.value = path.value.slice(0, index + 1)
-  const depth = index
-  refreshChildren(currentNode.value, depth)
-  hideCenterInfo()
+  await refreshChildren(currentNode.value)
   drawGraph()
 }
 
@@ -550,12 +566,10 @@ const handleClickChild = async (node: PromotionNode) => {
     })
   }
 
-  const depth = path.value.length - 1
-  refreshChildren(nodeInMap, depth)
+  await refreshChildren(nodeInMap)
   
   await nextTick()
   
-  hideCenterInfo()
   drawGraph()
 }
 
@@ -712,52 +726,11 @@ function shortAddress(addr: string) {
 
 .no-children-text {
   position: absolute;
-  top: 60%;
+  top: 80%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 14px;
   color: #475569;
   pointer-events: none;
-}
-
-/* 当前查看节点的信息卡片 */
-.center-info-card {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  background: rgba(15, 23, 42, 0.9);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(59, 130, 246, 0.4);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-  z-index: 100;
-  pointer-events: auto;
-}
-
-.center-info-card .info-title {
-  color: #3b82f6;
-  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
-  padding-bottom: 8px;
-  margin-bottom: var(--title-margin-bottom);
-  font-size: var(--title-font-size, 16px);
-  font-weight: bold;
-}
-
-.center-info-card .info-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: var(--row-margin-bottom);
-}
-
-.center-info-card .info-row .label {
-  min-width: var(--label-min-width, 70px);
-  color: #94a3b8;
-}
-
-.center-info-card .info-row .value {
-  flex: 1;
-  word-break: break-all;
-  color: #f8fafc;
-  text-align: right;
-  font-family: monospace;
 }
 </style>

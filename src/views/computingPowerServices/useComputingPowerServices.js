@@ -13,7 +13,7 @@ import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
 import networks from '@/assets/json/networks.json'
 import { checkAllowance, approveToken, writeContractOptimized, safeBigInt, getUserTokenBalance } from '@/utils/requestWEB3.js'
 import { config } from '../../wagmi.ts'
-import { getNodeServiceProviders } from '@/api/API'
+import { getNodeServiceProviders, purchaseNode } from '@/api/API'
 
 export function useComputingPowerServices() {
   const router = useRouter()
@@ -143,6 +143,7 @@ export function useComputingPowerServices() {
     return obj
   }
 
+  // 确认购买节点
   const handleConfirmBuy = async () => {
     if (!address.value) {
       ElMessage.error(t('computingPower.connectWalletFirst'))
@@ -163,6 +164,7 @@ export function useComputingPowerServices() {
     // 2. 确定本次交易需要的金额
     const latest = await getNodePrice()
     let amountBigInt = activeNodeTab.value === 1 ? latest.DistributedNode : latest.ClusterNode
+    let nodeId = nodeProducts.value.find(node => node.type == activeNodeTab.value)?.id;
 
     // ============ 余额检查 ============
     const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value, 'balanceOf')
@@ -198,7 +200,7 @@ export function useComputingPowerServices() {
 
     // 4. 执行购买
     loading.text = t('computingPower.payingAndActivating')
-    await writeContractOptimized({
+    const result = await writeContractOptimized({
       abi: nodeManagerABI,
       address: proxyNodeManager,
       functionName: 'purchaseNode',
@@ -210,8 +212,22 @@ export function useComputingPowerServices() {
         rejected: t('computingPower.paymentCancelled')
       }
     })
+    console.log('result', result)
+    console.log('购买节点参数：', {
+      address: address.value,
+      node_id: nodeId,
+      hash: result.hash,
+    })
+
+    // 调用接口记录购买节点
+    const res = await purchaseNode({
+      address: address.value,
+      node_id: nodeId,
+      hash: result.hash,
+    })
 
     showPurchaseNode.value = false
+    await fetchNodeProducts()
     loading.close()
   }
 

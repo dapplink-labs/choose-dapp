@@ -850,12 +850,12 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
       // 列表项基础样式
       .list-item {
+        overflow: hidden;
         background: var(--bg-card, #ffffff);
         border-radius: 8px;
         border: 1px solid #F4F4F4;
         transition: all 0.2s;
         box-sizing: border-box;
-
       }
 
       // 大列表项样式

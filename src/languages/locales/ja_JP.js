@@ -106,8 +106,8 @@ export default {
     breaking: "速報"
   },
   computingPower: {
-    title: "ハッシュパワー・サービスプロバイダー",
-    desc: "ハッシュパワー・サービスプロバイダーになり、データノード収益、取引手数料収益、サブトークン手数料収益、二次市場収益を享受し、より多くのノード参加を促進してさらなる収益を獲得しましょう。詳細を見る",
+    title: "ノード購入",
+    desc: "ノードを購入し、データノード収益、取引手数料収益、サブトークン手数料収益、二次市場収益を享受し、より多くのノード参加を促進してさらなる収益を獲得しましょう。詳細を見る",
     learnMore: "詳細を見る",
     buyNode: "ノードをアクティベート",
     myNodes: "マイノード",
@@ -188,7 +188,7 @@ export default {
     subCoinIncome: "サブコイン収益",
     earnPrompt: "アドレス {address} が{amount} CHOの収益を獲得",
     earnPromptShort: "収益を獲得",
-    pendingIncome: "受取待ち収益",
+    pendingIncome: "発行済み報酬",
     nodeIncome: "ノード収益",
     networkFeeIncome: "全ネットワーク手数料売買収益",
     subCoinFeeIncome: "サブコイン手数料収益",
@@ -216,6 +216,9 @@ export default {
   },
   myIncome: {
     ...base.myIncome,
+    pendingIncome: "発行済み報酬",
+    noStakingNode: "通知",
+    noStakingNodeMessage: "ステーキングノードがまだありません。収益を表示する前に、まずノードをステーキングしてください",
     nodeNames: {
       ...(base.myIncome?.nodeNames || {}),
       genesisNode: "ジェネシスノード"
@@ -360,7 +363,9 @@ export default {
   claimRecord: {
     title: "受取記録",
     computingPowerService: "ハッシュパワーサービス",
-    lpVault: "ステーキングプール"
+    lpVault: "ステーキングプール",
+    distributedNode: "分散ノード",
+    clusterNode: "クラスターノード"
   },
   common: {
     ...base.common,

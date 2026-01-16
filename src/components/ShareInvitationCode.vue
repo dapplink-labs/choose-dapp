@@ -65,7 +65,35 @@ const handleClose = () => {
     emit('update:modelValue', false)
 }
 
-// 处理分享
+// 通用复制函数：优先使用 Clipboard API，失败则回退到 textarea + execCommand
+const copyToClipboard = async (text) => {
+    try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text)
+            return true
+        }
+    } catch (e) {
+        // ignore and fallback
+    }
+
+    try {
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        textarea.style.position = 'fixed'
+        textarea.style.opacity = '0'
+        textarea.style.left = '-9999px'
+        document.body.appendChild(textarea)
+        textarea.focus()
+        textarea.select()
+        const successful = document.execCommand('copy')
+        document.body.removeChild(textarea)
+        return successful
+    } catch (e) {
+        return false
+    }
+}
+
+// 处理分享（复制邀请链接到剪贴板，兼容手机端）
 const handleShare = async () => {
     const code = displayInvitationCode.value
     if (!code) {
@@ -75,10 +103,15 @@ const handleShare = async () => {
 
     // 构建分享链接地址：当前网站地址?inviteCode=当前用户地址
     const shareUrl = `${window.location.origin}/link-wallet?inviteCode=${code}`
-    await navigator.clipboard.writeText(shareUrl)
-    ElMessage.success(t('invite.invitationCodeCopied'))
-    // 复制成功后关闭弹窗
-    handleClose()
+
+    const ok = await copyToClipboard(shareUrl)
+    if (ok) {
+        ElMessage.success(t('invite.invitationCodeCopied'))
+        // 复制成功后关闭弹窗
+        handleClose()
+    } else {
+        ElMessage.error(t('invite.copyFailed') || '复制失败，请手动复制链接')
+    }
 }
 </script>
 
@@ -86,7 +119,7 @@ const handleShare = async () => {
 .share-invite-overlay {
     position: fixed;
     inset: 0;
-    z-index: 1001;
+    z-index: 2001;
     display: flex;
     align-items: center;
     justify-content: center;

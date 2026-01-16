@@ -288,13 +288,6 @@ const baseEcosystemItems = computed(() => [
     iconDark: getIcon("36Dark"),
     path: '/'
   },
-  {
-    key: 'rwa',
-    label: t('userInfo.rwa'),
-    icon: getIcon('37'),
-    iconDark: getIcon("37Dark"),
-    path: '/'
-  },
 ])
 
 const ecosystemItems = computed(() =>
@@ -530,17 +523,12 @@ const handleDisconnect = async () => {
     // 调用 wagmi 断开钱包连接（异步操作）
     await disconnect()
 
-    // 等待状态更新（给钱包扩展一些时间处理断开）
-    await new Promise(resolve => setTimeout(resolve, 300))
-
-    console.log('钱包已断开连接，状态:', status.value)
-
-    // 返回首页，header 会根据连接状态自动更新
-    router.push('/')
+    // 立即跳转到首页，不等待状态更新
+    router.replace('/')
   } catch (error) {
     console.error('断开连接失败:', error)
-    // 即使断开失败，也尝试返回首页
-    router.push('/')
+    // 即使断开失败，也立即返回首页
+    router.replace('/')
   }
 }
 

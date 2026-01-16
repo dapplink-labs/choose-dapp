@@ -42,23 +42,23 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
-import { getNodeStakingRecords } from '@/api/API'
+import { getNodeStakingRecords, getNodeServiceProviderRecords } from '@/api/API'
 import { useAccount } from '@wagmi/vue'
 import { formatDateTime } from '@/utils/format_date.js'
 
 const { t } = useI18n()
 const { address } = useAccount()
 
-// 节点类型映射：type -> { nodeTag, nodeNameKey }
-// T1~T4：信息 / 数据 / 验证 / 共识节点
-// T5：超级节点，T6：创世节点（仅显示节点名称，不带百分比/CHO）
+
 const nodeTypeMap = {
-    1: { nodeTag: 'T1', nodeNameKey: 'purchaseNodeRecord.informationNode' },
-    2: { nodeTag: 'T2', nodeNameKey: 'myIncome.nodeNames.dataNode' },
-    3: { nodeTag: 'T3', nodeNameKey: 'myIncome.nodeNames.validationNode' },
-    4: { nodeTag: 'T4', nodeNameKey: 'myIncome.nodeNames.consensusNode' },
-    5: { nodeTag: 'T5', nodeNameKey: 'myIncome.superNode' }, // 超级节点
-    6: { nodeTag: 'T6', nodeNameKey: 'myIncome.nodeNames.genesisNode' } // 创世节点，仅名称
+    'T1': { nodeTag: 'T1', nodeNameKey: 'purchaseNodeRecord.informationNode' },
+    'T2': { nodeTag: 'T2', nodeNameKey: 'myIncome.nodeNames.dataNode' },
+    'T3': { nodeTag: 'T3', nodeNameKey: 'myIncome.nodeNames.validationNode' },
+    'T4': { nodeTag: 'T4', nodeNameKey: 'myIncome.nodeNames.consensusNode' },
+    'T5': { nodeTag: 'T5', nodeNameKey: 'myIncome.superNode' },
+    'T6': { nodeTag: 'T6', nodeNameKey: 'myIncome.nodeNames.genesisNode' },
+    '1': { nodeTag: '', nodeNameKey: 'myNode.nodeTypes.distributed' },
+    '2': { nodeTag: '', nodeNameKey: 'myNode.nodeTypes.cluster' },
 }
 
 
@@ -72,7 +72,7 @@ const formatNumber = (num) => {
 const recordList = ref([])
 const isLoading = ref(false)
 
-// 获取节点质押记录数据
+// 获取节点购买记录数据
 const getNodeStakingRecordsData = async () => {
     if (!address.value) {
         recordList.value = []
@@ -80,83 +80,25 @@ const getNodeStakingRecordsData = async () => {
     }
 
     isLoading.value = true
-    try {
-        const res = await getNodeStakingRecords({ address: address.value })
-        console.log('质押节点记录接口返回：', res)
-
-        // 处理接口返回数据
-        const responseData = res?.data || res
-        const list = responseData?.data?.list || responseData?.list || []
-
-        if (!Array.isArray(list) || list.length === 0) {
-            // 接口没有返回数据时，模拟示例记录：T1~T6 + 分布节点 / 集群节点（无 T 图标）
-            const now = Date.now()
-
-            // T1~T6 节点
-            const mockTypes = [1, 2, 3, 4, 5, 6]
-            const mockCore = mockTypes.map((type, index) => {
-                const nodeType = nodeTypeMap[type] || nodeTypeMap[1]
-                const nodeTag = nodeType.nodeTag
-                const nodeName = t(nodeType.nodeNameKey)
-                const baseAmount = 200 + index * 50 // 200U 起，依次递增
-                const price = formatNumber(baseAmount) + 'U'
-                const dateTime = formatDateTime(now - index * 24 * 60 * 60 * 1000)
-
-                return {
-                    nodeName,
-                    nodeTag,
-                    price,
-                    reward: '0',
-                    dateTime
-                }
-            })
-
-            // 分布节点 / 集群节点（无 T1~T6 图标）
-            const distributed = {
-                nodeName: t('myNode.nodeTypes.distributed'),
-                nodeTag: '', // 不展示 T1~T6 图标
-                price: formatNumber(500) + 'U',
-                reward: '0',
-                dateTime: formatDateTime(now - 7 * 24 * 60 * 60 * 1000)
-            }
-
-            const cluster = {
-                nodeName: t('myNode.nodeTypes.cluster'),
-                nodeTag: '', // 不展示 T1~T6 图标
-                price: formatNumber(800) + 'U',
-                reward: '0',
-                dateTime: formatDateTime(now - 8 * 24 * 60 * 60 * 1000)
-            }
-
-            recordList.value = [...mockCore, distributed, cluster]
-            return
+    // 获取质押节点记录数据
+    const NodeStakingRecords = (await getNodeStakingRecords({ address: address.value }))?.data?.data?.list || []
+    recordList.value = NodeStakingRecords.map(item => {
+        return {
+            nodeName: t(nodeTypeMap[item.type]?.nodeNameKey || ''),
+            nodeTag: nodeTypeMap[item.type]?.nodeTag || '',
+            price: String(parseFloat(item.amount).toFixed(2)),
+            dateTime: formatDateTime(item.created),
         }
-
-        // 将接口数据映射到组件需要的格式
-        recordList.value = list.map((item) => {
-            const nodeType = nodeTypeMap[item.type] || nodeTypeMap[1] // 默认使用 T1
-            const nodeTag = nodeType.nodeTag
-            const nodeName = t(nodeType.nodeNameKey)
-
-            // 格式化金额：amount 是质押金额，income 是收益
-            const price = formatNumber(item.amount || 0) + 'U'
-            const reward = formatNumber(item.income || 0)
-            const dateTime = formatDateTime(item.created || 0)
-
-            return {
-                nodeName,
-                nodeTag,
-                price,
-                reward,
-                dateTime
-            }
+    })
+    const nodeServiceProviderRecords = (await getNodeServiceProviderRecords({ address: address.value }))?.data?.data?.list || []
+    nodeServiceProviderRecords.forEach(item => {
+        recordList.value.push({
+            nodeName: t(nodeTypeMap[item.type]?.nodeNameKey || ''),
+            price: String(parseFloat(item.amount).toFixed(2)),
+            dateTime: formatDateTime(item.created),
         })
-    } catch (err) {
-        console.error('获取节点质押记录失败:', err)
-        recordList.value = []
-    } finally {
-        isLoading.value = false
-    }
+    })
+    isLoading.value = false
 }
 
 onMounted(() => {
@@ -282,7 +224,8 @@ onMounted(() => {
         }
     }
 }
-.cps-card-header{
+
+.cps-card-header {
     border-bottom: 1px solid var(--border-color, #23262F);
 }
 </style>

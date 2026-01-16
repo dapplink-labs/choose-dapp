@@ -26,7 +26,7 @@
         </svg>
       </div>
       
-      <!-- 打开更多按钮 -->
+      <!-- 分享按钮 -->
       <div v-if="showOpenBtn" class="open-btn" @click="handleOpenClick">
         <svg t="1766051224777" class="icon" viewBox="0 0 1024 1024" version="1.1"
           xmlns="http://www.w3.org/2000/svg" p-id="4731" width="32" height="32">
@@ -38,6 +38,9 @@
       </div>
     </div>
   </div>
+  
+  <!-- 分享邀请码弹窗 -->
+  <ShareInvitationCode v-model="showShareModal" />
 </template>
 
 <script setup>
@@ -45,6 +48,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { defineEmits, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
+import ShareInvitationCode from '@/components/ShareInvitationCode.vue'
 
 const props = defineProps({
   // 是否显示记录按钮
@@ -67,11 +71,6 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
-  // 是否使用默认的打开更多行为（如果为 false，则只触发事件，不执行默认行为）
-  useDefaultOpenAction: {
-    type: Boolean,
-    default: true
-  },
   // 是否使用默认的返回行为（如果为 false，则只触发事件，不执行 router.back()）
   useDefaultBackAction: {
     type: Boolean,
@@ -85,11 +84,13 @@ const props = defineProps({
 })
 
 const router = useRouter()
-const emit = defineEmits(['back', 'record-click', 'open-click'])
+const emit = defineEmits(['back', 'record-click'])
 const themeStore = useThemeStore()
 
 const scrollY = ref(0)
 const isDark = computed(() => themeStore.isDark)
+// 分享弹窗显示状态
+const showShareModal = ref(false)
 
 // 使用 requestAnimationFrame 优化滚动性能
 let rafId = null
@@ -176,12 +177,8 @@ const handleRecordClick = () => {
 }
 
 const handleOpenClick = () => {
-  emit('open-click')
-  // 如果使用默认行为，则执行默认操作（目前是预留功能）
-  if (props.useDefaultOpenAction) {
-    // 预留「了解更多」跳转逻辑
-    console.log('前往了解更多')
-  }
+  // 打开分享弹窗
+  showShareModal.value = true
 }
 </script>
 

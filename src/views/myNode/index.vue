@@ -2,7 +2,7 @@
     <div class="myNode">
 
 
-        <BackHeaderNav :show-open-btn="true" :use-default-open-action="false" @open-click="handleOpenMore" />
+        <BackHeaderNav :show-open-btn="true" />
 
         <div class="banner1">
             <h1 class="page-title">{{ $t('myNode.title') }}</h1>
@@ -82,18 +82,11 @@
                 <div class="team-header">
                     <span class="invite-count"><span>{{ inviteCountLabel }}</span> {{ inviteCount
                         }}</span>
-                    <div class="search-icon" @click="handleSearch">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="m21 21-4.35-4.35" />
-                        </svg>
-                    </div>
                 </div>
 
                 <!-- 层级树状图占位 -->
                 <div class="team-tree-placeholder">
-                    <TeamTree />
+                    <TeamTree :type="activeTab === 'direct' ? 1 : 2" :node_type="2" />
                 </div>
 
                 <div class="team-list">
@@ -116,13 +109,13 @@
                                     </div>
                                 </div>
                                 <div class="team-right-info">
-                                    <span class="team-reward">+ {{ item.reward || '32,567' }} CHO</span>
+                                    <span class="team-reward">+ {{ item.reward || '0' }} CHO</span>
                                 </div>
                             </div>
                             <!-- 团队地址列表：显示Upline和时间 -->
                             <div v-if="activeTab === 'team'" class="team-upline-row">
                                 <div class="team-upline-left">
-                                    <span class="team-upline-label">Upline:</span>
+                                    <span class="team-upline-label">{{ $t('myIncome.upline') }}:</span>
                                     <span class="team-upline-address">{{ item.upline || item.address }}</span>
                                 </div>
                                 <span class="team-time">{{ item.activationTime }}</span>
@@ -138,7 +131,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed, watch } from "vue"
 import { useRoute, useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
 import { useI18n } from 'vue-i18n'
@@ -154,7 +147,13 @@ import TeamTree from "@/components/TeamTree.vue"
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import ActivationMarquee from '@/components/ActivationMarquee.vue'
 import { ArrowRightBold } from '@element-plus/icons-vue'
-import { getNodeServiceProvidersInfo } from '@/api/API'
+import { getNodeServiceProvidersInfo, getMyTeamInfo } from '@/api/API'
+import { formatDateTime } from '@/utils/format_date.js'
+import avatarImg1 from '@/assets/icon/avatarImg1.png'
+import avatarImg2 from '@/assets/icon/avatarImg2.png'
+import avatarImg3 from '@/assets/icon/avatarImg3.png'
+import avatarImg4 from '@/assets/icon/avatarImg4.png'
+import avatarImg5 from '@/assets/icon/avatarImg5.png'
 
 
 
@@ -178,11 +177,6 @@ const subCoinFeeIncome = ref('0')
 const secondaryMarketIncome = ref('0')
 const directReferralIncome = ref('0')
 const teamIncome = ref('0')
-
-const handleOpenMore = () => {
-    // 预留「了解更多」跳转逻辑
-    console.log('前往了解更多')
-}
 
 // 领取节点收益（incomeType: 0 节点收益，1 晋升收益）暂时写死为 0，后续有接口再替换
 const handleClaimReward = async () => {
@@ -233,62 +227,69 @@ const handleClaimReward = async () => {
     }
 }
 
-// 我的团队相关数据
+// 我的团队相关数据（直推=direct，团队=team）
 const activeTab = ref('direct')
 
-// 直推地址列表
-const directList = ref([
-    {
-        address: '0xb574...4c7d',
-        activationTime: '2025-09-01 10:23',
-        nodeType: t('myNode.nodeTypes.distributed'),
-        nodeTag: 'T1',
-        reward: '32,567',
-        avatar: avatarImg,
-        upline: '0xb574...4c7d'
-    },
-    {
-        address: '0xb574...4c7d',
-        activationTime: '2025-09-01 10:23',
-        nodeType: t('myNode.nodeTypes.distributed'),
-        nodeTag: 'T1',
-        reward: '32,567',
-        avatar: avatarImg,
-        upline: '0xb574...4c7d'
-    }
-])
+// 邀请人数
+const inviteCount = ref(0)
+// 邀请列表
+const inviteList = ref([])
 
-// 团队地址列表
-const teamList = ref([
-    {
-        address: '0xa123...5f6g',
-        activationTime: '2025-09-02 14:30',
-        nodeType: t('myNode.nodeTypes.cluster'),
-        nodeTag: 'T2',
-        reward: '45,890',
-        avatar: avatarImg,
-        upline: '0xb574...4c7d'
-    },
-    {
-        address: '0xc789...1a2b',
-        activationTime: '2025-09-03 09:15',
-        nodeType: t('myNode.nodeTypes.distributed'),
-        nodeTag: 'T1',
-        reward: '28,123',
-        avatar: avatarImg,
-        upline: '0xa123...5f6g'
+// 地址截取：前6位 + ... + 后4位
+const shortAddress = (addr) => {
+    if (!addr) return ''
+    if (addr.length <= 12) return addr
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`
+}
+
+// 随机头像数组
+const avatarImages = [avatarImg1, avatarImg2, avatarImg3, avatarImg4, avatarImg5]
+
+// 随机选择头像（基于地址的稳定随机）
+const getRandomAvatar = (addr) => {
+    if (!addr) return avatarImg
+    let hash = 0
+    for (let i = 0; i < addr.length; i++) {
+        hash = ((hash << 5) - hash) + addr.charCodeAt(i)
+        hash = hash & hash
     }
-])
+    const index = Math.abs(hash) % avatarImages.length
+    return avatarImages[index]
+}
+
+// 格式化金额
+const formatAmount = (value) => {
+    const num = Number(value ?? 0)
+    if (!Number.isFinite(num)) return '0'
+    const fixed = num.toFixed(4)
+    const trimmed = fixed.replace(/\.?0+$/, '')
+    const [intPart, decimalPart] = trimmed.split('.')
+    const intFormatted = Number(intPart).toLocaleString('en-US')
+    return decimalPart ? `${intFormatted}.${decimalPart}` : intFormatted
+}
+
+// 获取邀请列表：直推为 type=1，团队为 type=2
+const getMyTeamInfoList = async () => {
+    const type = activeTab.value === 'direct' ? 1 : 2
+    const res = await getMyTeamInfo({ address: address.value, type, node_type: 2 })
+    const data = res?.data?.data
+    // data.direct_count为直推人数，data.team_count为团队人数
+    inviteCount.value = activeTab.value === 'direct' ? data.direct_count : data.team_count
+    const rawList = activeTab.value === 'direct' ? data.direct_team_list : data.team_list
+    // 映射接口数据到模板需要的格式：
+    // address(截取), created(时间戳) -> activationTime, total_reward -> reward, parent_address -> 上级地址
+    inviteList.value = (rawList || []).map(item => ({
+        address: shortAddress(item.address),
+        activationTime: formatDateTime(item.created),
+        reward: formatAmount(item.total_reward),
+        avatar: getRandomAvatar(item.address), // 使用基于地址的稳定随机头像
+        // 接口字段 parent_address 为上级地址
+        upline: shortAddress(item.parent_address || item.address)
+    }))
+}
 
 // 根据当前tab显示对应的列表
-const currentList = computed(() => {
-    return activeTab.value === 'direct' ? directList.value : teamList.value
-})
-
-// 根据当前tab显示对应的邀请地址数
-const inviteCount = computed(() => {
-    return activeTab.value === 'direct' ? directList.value.length : teamList.value.length
-})
+const currentList = computed(() => inviteList.value || [])
 
 // 根据当前tab显示对应的标签文本
 const inviteCountLabel = computed(() => {
@@ -297,16 +298,16 @@ const inviteCountLabel = computed(() => {
         : t('myNode.teamTotalAddressCount')
 })
 
+// 监听 tab 切换，重新请求对应的邀请列表（直推/团队）
+watch(activeTab, () => {
+    getMyTeamInfoList()
+})
+
 // 处理中按钮文案国际化：如果没有配置 common.loading，则回退为中文"处理中..."
 const loadingText = computed(() => {
     const v = t('common.loading')
     return v === 'common.loading' ? '处理中...' : v
 })
-
-const handleSearch = () => {
-    // 搜索功能
-    console.log('搜索团队')
-}
 
 const goToClaimRecord = () => {
     router.push('/claim-record')
@@ -341,6 +342,11 @@ onMounted(() => {
     }).catch(err => {
         console.error('获取节点收益详情失败：', err)
     })
+    
+    // 获取邀请列表
+    if (address.value) {
+        getMyTeamInfoList()
+    }
 })
 </script>
 

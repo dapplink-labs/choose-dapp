@@ -29,7 +29,7 @@ import { useAccount, useChainId } from '@wagmi/vue'
 import { ElMessage } from 'element-plus'
 import { switchChain } from '@wagmi/core'
 import { config } from '@/wagmi.ts'
-import { bindInviteCode } from '@/api/api'
+import { bindInviteCode } from '@/api/API'
 import { useCounterStore } from '@/stores/counter'
 import { storeToRefs } from 'pinia'
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
@@ -98,49 +98,84 @@ const handleConfirm = async () => {
   }
 
   loading.value = true
-  // 检查邀请码是否为有效的地址格式
-  if (!localCode.value || !localCode.value.startsWith('0x') || localCode.value.length !== 42) {
-    throw new Error(t('invite.invalidAddress') || '无效的邀请码地址格式')
+  
+  try {
+    // 检查邀请码是否为有效的地址格式
+    if (!localCode.value || !localCode.value.startsWith('0x') || localCode.value.length !== 42) {
+      ElMessage.error(t('invite.invalidAddress') || '无效的邀请码地址格式')
+      loading.value = false
+      return
+    }
+
+    // 切换到 BSC 主网（如果需要）
+    try {
+      if (Number(chainId.value) !== BSC_CHAIN_ID) {
+        await switchChain(config, { chainId: BSC_CHAIN_ID })
+        await new Promise(r => setTimeout(r, 500))
+      }
+    } catch (switchError) {
+      console.error('切换网络失败:', switchError)
+      ElMessage.error(t('invite.switchNetworkFailed') || '切换网络失败')
+      loading.value = false
+      return
+    }
+
+    // 获取 BSC 主网配置
+    const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
+    if (!bscNet?.proxyNodeManager) {
+      ElMessage.error(t('invite.missingContract') || '未找到 nodeManager 合约地址')
+      loading.value = false
+      return
+    }
+
+    // 合约绑定邀请码
+    try {
+      // await writeContractOptimized({
+      //   abi: nodeManagerABI,
+      //   address: bscNet.proxyNodeManager,
+      //   functionName: 'bindInviter',
+      //   args: [localCode.value], // 邀请人地址
+      //   userAddress: address.value,
+      //   messages: {
+      //     success: t('invite.contractBindSuccess') || '合约绑定邀请码成功',
+      //     failed: t('invite.contractBindFailed') || '合约绑定邀请码失败',
+      //     rejected: t('invite.contractBindCancelled') || '你取消了合约绑定'
+      //   },
+      //   showErrorToast: true
+      // })
+    } catch (contractError) {
+      // writeContractOptimized 已经处理了错误提示
+      // 交易失败或被取消时，直接返回，确保 loading 被重置
+      console.error('合约调用失败:', contractError)
+      loading.value = false
+      return
+    }
+
+    // 后端绑定邀请码
+    try {
+      const res = await bindInviteCode({
+        address: address.value,
+        invitation_code: localCode.value || ''
+      })
+
+      // 绑定成功后，将邀请码保存到全局 store
+      inviteCode.value = localCode.value || ''
+      ElMessage.success(t('invite.bindSuccess') || '绑定邀请码成功')
+      handleClose()
+    } catch (apiError) {
+      console.error('后端绑定失败:', apiError)
+      ElMessage.error(t('invite.apiBindFailed') || '后端绑定邀请码失败')
+      loading.value = false
+      return
+    }
+  } catch (error) {
+    // 兜底错误处理
+    console.error('绑定邀请码失败:', error)
+    ElMessage.error(error.message || t('invite.bindFailed') || '绑定邀请码失败')
+  } finally {
+    // 无论成功或失败，都重置 loading 状态，使按钮可以重新点击
+    loading.value = false
   }
-
-  // 切换到 BSC 主网（如果需要）
-  if (Number(chainId.value) !== BSC_CHAIN_ID) {
-    await switchChain(config, { chainId: BSC_CHAIN_ID })
-    await new Promise(r => setTimeout(r, 500))
-  }
-
-  // 获取 BSC 主网配置
-  const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
-  if (!bscNet?.proxyNodeManager) {
-    throw new Error(t('invite.missingContract') || '未找到 nodeManager 合约地址')
-  }
-
-  // 合约绑定邀请码
-  await writeContractOptimized({
-    abi: nodeManagerABI,
-    address: bscNet.proxyNodeManager,
-    functionName: 'bindInviter',
-    args: [localCode.value], // 邀请人地址
-    userAddress: address.value,
-    messages: {
-      success: t('invite.contractBindSuccess') || '合约绑定邀请码成功',
-      failed: t('invite.contractBindFailed') || '合约绑定邀请码失败',
-      rejected: t('invite.contractBindCancelled') || '你取消了合约绑定'
-    },
-    showErrorToast: true
-  })
-
-  // 后端绑定邀请码
-  const res = await bindInviteCode({
-    address: address.value,
-    invitation_code: localCode.value || ''
-  })
-
-  // 绑定成功后，将邀请码保存到全局 store
-  inviteCode.value = localCode.value || ''
-  ElMessage.success(t('invite.bindSuccess') || '绑定邀请码成功')
-  handleClose()
-  loading.value = false
 }
 </script>
 

@@ -12,7 +12,7 @@ import { config } from '../../wagmi.ts'
 import { useChainId, useAccount } from '@wagmi/vue'
 import { getUserTokenBalance, approveToken, checkAllowance } from '@/utils/requestWEB3.js'
 import { parseUnits } from 'viem'
-import { getNodeStakingList } from '@/api/API'
+import { getNodeStakingList, nodeStakingActivate } from '@/api/API'
 
 export const useLPVault = () => {
   const router = useRouter()
@@ -50,11 +50,9 @@ export const useLPVault = () => {
 
     isFetchingNodeList.value = true
     try {
-      const res = await getNodeStakingList()
-      console.log('节点质押列表接口返回：', res)
+      const res = await getNodeStakingList({ address: address.value })
 
       // 处理接口返回数据
-      // 接口返回结构: { success: true, message: "success", data: { list: [...] } }
       const responseData = res?.data || res
       const list = responseData?.data?.list || responseData?.list || []
 
@@ -64,22 +62,18 @@ export const useLPVault = () => {
       }
 
       // 将接口数据映射到组件需要的格式
-      nodeListData.value = list.sort((a, b) => a.node_level - b.node_level).map((item) => {
-        // 映射接口字段到组件字段
-        const type = 'T ' + item.node_level || ''
-        const price = item.staking_amount || '0'
-        const dailyEarnings = item.node_income + "%" || '0%'
-        const cycleDays = item.node_period || item.cycle || 0
-        const totalEarnings = item.forecast_income || '0'
+      nodeListData.value = list.sort((a, b) => parseInt(a.node_level.match(/\d+/)[0]) - parseInt(b.node_level.match(/\d+/)[0])).map((item) => {
 
         return {
-          type,
-          name: item.name || t(`lpVault.nodeTypes.${type}`) || type,
+          id: item.id,
+          type: (item.node_level.match(/\d+/)[0]),
+          name: t(`lpVault.nodeTypes.${item.node_level}`),
+          nodeLevel: item.node_level,
           icon: item.icon || DistributedNode,
-          price: String(price),
-          dailyEarnings: String(dailyEarnings),
-          cycleDays: cycleDays ? `${cycleDays}${t('lpVault.days')}` : `0${t('lpVault.days')}`,
-          totalEarnings: String(totalEarnings)
+          price: String(parseFloat(item.staking_amount).toFixed(2)),
+          dailyEarnings: String(item.node_income) + "%",
+          cycleDays: item.node_period ? `${item.node_period}${t('lpVault.days')}` : `0${t('lpVault.days')}`,
+          totalEarnings: String(item.forecast_income || '0')
         }
       })
     } catch (err) {
@@ -90,9 +84,9 @@ export const useLPVault = () => {
     }
   }
 
-  // 计算属性：直接使用接口数据
   const nodeList = computed(() => nodeListData.value)
 
+  // 激活节点
   const handleActivate = async (type) => {
     if (!address.value) {
       ElMessage.error(t('lpVault.connectWalletFirst'))
@@ -100,79 +94,98 @@ export const useLPVault = () => {
     }
 
     const loading = ElLoading.service({ lock: true, text: t('lpVault.activatingNode'), background: 'rgba(0, 0, 0, 0.7)' })
-    // 1. 网络环境检查
-    if (Number(chainId.value) !== BSC_CHAIN_ID) {
-      await switchChain(config, { chainId: BSC_CHAIN_ID })
-      await new Promise(r => setTimeout(r, 1000))
-    }
+    
+    try {
+      // 1. 网络环境检查
+      if (Number(chainId.value) !== BSC_CHAIN_ID) {
+        try {
+          await switchChain(config, { chainId: BSC_CHAIN_ID })
+          await new Promise(r => setTimeout(r, 1000))
+        } catch (switchError) {
+          // 用户取消切换网络时关闭加载层
+          loading.close()
+          return
+        }
+      }
 
-    // 获取合约地址
-    const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
-    const { proxyStakingManager, usdtTokenAddress } = bscNet
+      // 获取合约地址
+      const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
+      const { proxyStakingManager, usdtTokenAddress } = bscNet
 
-    // 从接口数据中获取对应节点的价格
-    const nodeItem = nodeListData.value.find(item => item.type === type)
-    if (!nodeItem) {
-      ElMessage.error(t('lpVault.nodeTypeNotFound'))
-      loading.close()
-      return
-    }
+      // 从接口数据中获取对应节点的价格
+      const nodeItem = nodeListData.value.find(item => item.type === type)
+      if (!nodeItem) {
+        ElMessage.error(t('lpVault.nodeTypeNotFound'))
+        return
+      }
 
-    const price = parseFloat(nodeItem.price) || 0
-    if (price <= 0) {
-      ElMessage.error(t('lpVault.invalidPrice'))
-      loading.close()
-      return
-    }
+      const price = parseFloat(nodeItem.price) || 0
+      if (price <= 0) {
+        ElMessage.error(t('lpVault.invalidPrice'))
+        return
+      }
 
-    const amountBigInt = parseUnits(String(price), 18)
-    // 余额查询START
-    console.log('usdtTokenAddress', usdtTokenAddress)
-    console.log('address.value', address.value)
-    const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value, 'balanceOf')
-    if (userBalance < amountBigInt) {
-      ElMessage.error(t('lpVault.insufficientBalance'))
-      loading.close()
-      return
-    }
-    // 余额查询END
+      const amountBigInt = parseUnits(String(price), 18)
+      console.log(amountBigInt)
+      // 余额查询START
+      const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value, 'balanceOf')
+      if (userBalance < amountBigInt) {
+        ElMessage.error(t('lpVault.insufficientBalance'))
+        return
+      }
+      // 余额查询END
 
-    // 检查授权
-    const allowance = await checkAllowance(usdtTokenAddress, address.value, proxyStakingManager)
+      // 检查授权
+      const allowance = await checkAllowance(usdtTokenAddress, address.value, proxyStakingManager)
 
-    console.log('allowance===', allowance)
-    console.log('amountBigInt', amountBigInt)
-    console.log('userBalance=', userBalance)
-    if (allowance === BigInt(0) || allowance < amountBigInt) {
-      loading.text = t('lpVault.requestingAuth')
-      await approveToken({
-        tokenAddress: usdtTokenAddress,
-        spenderAddress: proxyStakingManager,
-        amount: amountBigInt,
+      if (allowance === BigInt(0) || allowance < amountBigInt) {
+        loading.text = t('lpVault.requestingAuth')
+        try {
+          await approveToken({
+            tokenAddress: usdtTokenAddress,
+            spenderAddress: proxyStakingManager,
+            amount: amountBigInt,
+            userAddress: address.value,
+            BRIDGE_MESSAGES: {
+              approvalSuccess: t('lpVault.approvalSuccess'),
+              userCancelledAuth: t('lpVault.userCancelledAuth'),
+              approveTokenFailed: t('lpVault.approveTokenFailed')
+            }
+          })
+        } catch (approveError) {
+          // 用户取消授权时关闭加载层
+          return
+        }
+      }
+
+      const result = await writeContractOptimized({
+        abi: stakingManagerABI,
+        address: proxyStakingManager,
+        functionName: 'liquidityProviderDeposit',
+        args: [amountBigInt],
         userAddress: address.value,
-        BRIDGE_MESSAGES: {
-          approvalSuccess: t('lpVault.approvalSuccess'),
-          userCancelledAuth: t('lpVault.userCancelledAuth'),
-          approveTokenFailed: t('lpVault.approveTokenFailed')
+        messages: {
+          success: t('lpVault.nodeActivationSuccess'),
+          failed: t('lpVault.paymentFailed'),
+          rejected: t('lpVault.paymentCancelled')
         }
       })
+      // 调用接口记录质押节点
+      const res = await nodeStakingActivate({
+        address: address.value,
+        node_id: nodeItem.id,
+        hash: result.hash,
+      })
+      
+      // 激活成功后刷新列表数据
+      await fetchNodeStakingList()
+    } catch (e) {
+      // 所有错误情况（包括用户取消交易）都会在这里处理
+      console.error('激活节点失败:', e)
+    } finally {
+      // 确保在所有情况下都关闭加载层
+      loading.close()
     }
-
-
-    const result = await writeContractOptimized({
-      abi: stakingManagerABI,
-      address: proxyStakingManager,
-      functionName: 'liquidityProviderDeposit',
-      args: [amountBigInt],
-      userAddress: address.value,
-      messages: {
-        success: t('lpVault.nodeActivationSuccess'),
-        failed: t('lpVault.paymentFailed'),
-        rejected: t('lpVault.paymentCancelled')
-      }
-    })
-    console.log('result', result)
-    loading.close()
   }
 
   // 组件挂载时获取数据

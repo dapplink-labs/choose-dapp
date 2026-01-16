@@ -45,6 +45,11 @@ import 'swiper/css'
 import { getNodeAndNodeServiceRecordNew } from '@/api/API'
 import { useI18n } from 'vue-i18n'
 import clusterNodeImg from '@/assets/icon/11.png'
+import avatarImg1 from '@/assets/icon/avatarImg1.png'
+import avatarImg2 from '@/assets/icon/avatarImg2.png'
+import avatarImg3 from '@/assets/icon/avatarImg3.png'
+import avatarImg4 from '@/assets/icon/avatarImg4.png'
+import avatarImg5 from '@/assets/icon/avatarImg5.png'
 
 const { t } = useI18n()
 
@@ -57,6 +62,22 @@ const props = defineProps({
 
 // Swiper 模块
 const swiperModules = [Autoplay]
+
+// 随机头像数组
+const avatarImages = [avatarImg1, avatarImg2, avatarImg3, avatarImg4, avatarImg5]
+
+// 根据地址生成稳定的随机头像（同一地址总是返回相同头像）
+const getRandomAvatar = (addr) => {
+  if (!addr) return avatarImg1
+  // 使用地址的字符码总和来选择头像，确保同一地址总是返回相同头像
+  let hash = 0
+  for (let i = 0; i < addr.length; i++) {
+    hash = ((hash << 5) - hash) + addr.charCodeAt(i)
+    hash = hash & hash // 转换为32位整数
+  }
+  const index = Math.abs(hash) % avatarImages.length
+  return avatarImages[index]
+}
 
 // 激活消息列表
 const activationMessages = ref([])
@@ -73,6 +94,7 @@ const getNodeAndNodeServiceRecordNewData = async () => {
 
     // 转换数据格式
     activationMessages.value = list.map(item => {
+      item.type = item.type.match(/\d+/)[0]
       const address = item.address || ''
       const addressText = address.length > 10 ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : address
 
@@ -87,7 +109,7 @@ const getNodeAndNodeServiceRecordNewData = async () => {
             address: addressText,
             nodeType: nodeTypeText
           }),
-          avatar: clusterNodeImg,
+          avatar: getRandomAvatar(address),
           amountText: ''
         }
       }
@@ -101,14 +123,14 @@ const getNodeAndNodeServiceRecordNewData = async () => {
 
         return {
           message: `${t('common.address') || '地址'} ${addressText} ${t('myNode.earnPromptShort') || '赚取收益'}`,
-          avatar: clusterNodeImg,
+          avatar: getRandomAvatar(address),
           amountText
         }
       }
 
       return {
         message: `${addressText} 已成功激活[ ${typeText} ]`,
-        avatar: clusterNodeImg,
+        avatar: getRandomAvatar(address),
         amountText: ''
       }
     })
@@ -133,7 +155,7 @@ const displayItems = computed(() => {
     }
 
     // 默认按地址拆分
-    const addrMatch = msg.match(/0x[a-zA-Z0-9]{4,}/)
+    const addrMatch = msg.match(/0x[a-zA-Z0-9.]{11,}/)
     const addr = addrMatch ? addrMatch[0] : ''
     if (!addr || msg.indexOf(addr) === -1) {
       parts.push({ text: msg, isAddress: false })

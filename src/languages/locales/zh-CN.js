@@ -630,8 +630,8 @@ export default {
     connect: "链接"
   },
   computingPower: {
-    title: "算力服务商",
-    desc: "成为算力服务商，享受数据节点收益，交易手续费收益，子币手续费收益，二级市场收益，推动更多的节点加入获取更多收益。",
+    title: "节点购买",
+    desc: "购买节点，享受数据节点收益，交易手续费收益，子币手续费收益，二级市场收益，推动更多的节点加入获取更多收益。",
     learnMore: "了解更多",
     buyNode: "激活节点",
     myNodes: "我的节点",
@@ -750,11 +750,11 @@ export default {
   },
   myIncome: {
     title: "我的收益",
-    myIncomeCMT: "我的收益(CMT)",
-    computingPowerIncomeCMT: "算力收益(CMT)",
-    networkIncomeCMT: "网络收益(CMT)",
+    myIncomeCMT: "我的收益(CHO)",
+    computingPowerIncomeCMT: "算力收益(CHO)",
+    networkIncomeCMT: "网络收益(CHO)",
     earnPrompt: "地址 {address} 赚取收益",
-    pendingIncome: "待领取收益",
+    pendingIncome: "已发放奖励",
     staticIncomeCHO: "静态收益(CHO)",
     directReferralIncomeCHO: "直推收益(CHO)",
     teamIncomeCHO: "团队收益(CHO)",
@@ -770,6 +770,8 @@ export default {
     superNode: "超级节点",
     purchaseTime: "激活时间",
     upline: "上线",
+    noStakingNode: "提示",
+    noStakingNodeMessage: "您还没有质押节点，请先质押节点后再查看收益",
     nodeNames: {
       infoNode: "信息节点",
       dataNode: "数据节点",
@@ -786,7 +788,9 @@ export default {
   claimRecord: {
     title: "领取记录",
     computingPowerService: "算力服务",
-    lpVault: "质押池"
+    lpVault: "质押池",
+    distributedNode: "分布节点",
+    clusterNode: "集群节点"
   },
   dashboard: {
     title: "仪表盘",
