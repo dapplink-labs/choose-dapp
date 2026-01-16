@@ -42,7 +42,9 @@ export default {
   },
   link: {
     titel: "Connect Wallet",
-    exit: "Disconnect"
+    exit: "Disconnect",
+    connectFailed: "Failed to connect wallet, please try again",
+    signatureRequired: "Wallet connection requires signature authorization, please reconnect and complete the signature"
   },
   bindEmail: {
     title: "Bind Email",

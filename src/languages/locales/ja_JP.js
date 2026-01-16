@@ -50,7 +50,9 @@ export default {
   },
   link: {
     titel: "ウォレット接続",
-    exit: "接続解除"
+    exit: "接続解除",
+    connectFailed: "ウォレット接続に失敗しました。もう一度お試しください",
+    signatureRequired: "ウォレット接続には署名認証が必要です。再接続して署名を完了してください"
   },
   linkWallet: {
     welcome: "CHOOSEMEへようこそ",

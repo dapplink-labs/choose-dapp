@@ -275,6 +275,9 @@ import { useI18n } from 'vue-i18n'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Autoplay } from 'swiper/modules'
 import 'swiper/css'
+import bannerImg from '@/assets/images/banner.png'
+import banner0Img from '@/assets/images/banner0.png'
+import linghua1Img from '@/assets/images/linghua1.png'
 
 const { t } = useI18n()
 
@@ -283,9 +286,9 @@ const swiperModules = [Autoplay]
 
 // 轮播图数据
 const bannerList = ref([
-  '/src/assets/images/banner.png',
-  '/src/assets/images/banner0.png',
-  '/src/assets/images/linghua1.png'
+  bannerImg,
+  banner0Img,
+  linghua1Img
 ])
 
 // 禁止页面滚动

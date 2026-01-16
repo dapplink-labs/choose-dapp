@@ -1,10 +1,11 @@
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { useConnect, useChainId, useAccount } from '@wagmi/vue'
+import { useConnect, useChainId, useAccount, useSignMessage, useDisconnect } from '@wagmi/vue'
 import { injected } from '@wagmi/vue/connectors'
 import { useThemeStore } from '../../stores/theme'
 import { register } from '@/api/API'
 import { eventBus } from '@/utils/eventBus'
+import { ElMessage } from 'element-plus'
 
 import logoLight from '@/assets/icon/logo.png'
 import logoDark from '@/assets/icon/logoDark.png'
@@ -69,9 +70,13 @@ export const useLinkWallet = () => {
   const { connect, connectors } = useConnect()
   const chainId = useChainId()
   const { status, address } = useAccount()
+  const { signMessage, data: signatureData, isSuccess: isSignatureSuccess, isError: isSignatureError } = useSignMessage()
+  const { disconnect } = useDisconnect()
   const themeStore = useThemeStore()
 
   const isConnectingFromPage = ref(false)
+  const isWaitingForSignature = ref(false)
+  const pendingWalletAddress = ref(null)
   const safeConnectors = computed(() => {
     const maybeRef = connectors?.value
     if (Array.isArray(maybeRef)) {
@@ -90,6 +95,80 @@ export const useLinkWallet = () => {
     router.back()
   }
 
+  // 延迟创建 watch，只在需要时创建
+  let stopWatchConnection = null
+  let stopWatchSuccess = null
+  let stopWatchError = null
+
+  // 创建所有 watch 监听器
+  const setupWatchers = () => {
+    if (stopWatchConnection) return // 已经创建过，不再重复创建
+
+    // 监听连接状态，连接成功后请求签名
+    stopWatchConnection = watch(
+      () => [status.value, address.value],
+      ([newStatus, newAddress]) => {
+        if (newStatus === 'connected' && newAddress && isConnectingFromPage.value && !isWaitingForSignature.value) {
+          // 生成签名消息
+          const message = `Welcome to ChooseMe!\n\nPlease sign this message to connect your wallet.\n\nAddress: ${newAddress}\nTimestamp: ${Date.now()}`
+          
+          // 设置等待签名状态
+          isWaitingForSignature.value = true
+          pendingWalletAddress.value = newAddress
+          
+          // 请求用户签名（通过 watch 监听结果）
+          signMessage({ message })
+        }
+      }
+    )
+
+    // 监听签名成功，如果签名成功则调用后端接口
+    stopWatchSuccess = watch(
+      () => isSignatureSuccess.value,
+      async (isSuccess) => {
+        if (isSuccess && isWaitingForSignature.value && pendingWalletAddress.value) {
+          console.log('签名成功，开始调用后端接口')
+          // 调用后端接口验证是否绑定邀请码
+          await checkUserStatus(pendingWalletAddress.value)
+          
+          // 重置状态
+          isWaitingForSignature.value = false
+          isConnectingFromPage.value = false
+          const walletAddr = pendingWalletAddress.value
+          pendingWalletAddress.value = null
+          
+          // 跳转到首页
+          await router.push('/')
+        }
+      }
+    )
+
+    // 监听签名失败
+    stopWatchError = watch(
+      () => isSignatureError.value,
+      async (isError) => {
+        if (isError && isWaitingForSignature.value) {
+          console.log('签名失败')
+          isWaitingForSignature.value = false
+          const walletAddr = pendingWalletAddress.value
+          pendingWalletAddress.value = null
+          isConnectingFromPage.value = false
+          
+          // 断开连接
+          await disconnect()
+          ElMessage.error('签名失败，请重试')
+        }
+      }
+    )
+  }
+
+  // 组件卸载时清理 watch
+  onBeforeUnmount(() => {
+    if (stopWatchSuccess) stopWatchSuccess()
+    if (stopWatchError) stopWatchError()
+    if (stopWatchConnection) stopWatchConnection()
+  })
+
   // navBar 的连接逻辑
   const wallconnects = async (walletId, targetChainId) => {
     const list = safeConnectors.value || []
@@ -99,14 +178,11 @@ export const useLinkWallet = () => {
   }
 
   const handleConnect = async (wallet) => {
-    try {
-      isConnectingFromPage.value = true
-      await wallconnects(wallet.id, chainId.value)
-    } catch (error) {
-      console.error('connect error', error)
-    } finally {
-      isConnectingFromPage.value = false
-    }
+    // 在连接时创建 watch（延迟创建，提升首次加载性能）
+    setupWatchers()
+    isConnectingFromPage.value = true
+    // 连接钱包，watch 会监听连接状态并请求签名
+    await wallconnects(wallet.id, chainId.value)
   }
 
   onMounted(() => {
@@ -126,30 +202,14 @@ export const useLinkWallet = () => {
 
   // 调用注册接口检查用户状态
   const checkUserStatus = async (walletAddress) => {
-    try {
-      // 调用合约查询用户邀请人是否存在
-      const response = await register({ address: walletAddress })
-      // 根据接口返回的数据结构获取 exists 字段
-      const exists = response?.data?.data?.exists ?? response?.data?.exists
-      // 通过事件总线触发显示邀请弹窗
-      eventBus.emit('showInvite', !exists)
-    } catch (error) {
-      console.error('注册接口调用失败:', error)
-    }
+    // 调用合约查询用户邀请人是否存在
+    const response = await register({ address: walletAddress })
+    // 根据接口返回的数据结构获取 exists 字段
+    const exists = response?.data?.data?.exists ?? response?.data?.exists
+    // 通过事件总线触发显示邀请弹窗
+    eventBus.emit('showInvite', !exists)
   }
 
-  watch(
-    () => status.value,
-    async (newStatus) => {
-      if (newStatus === 'connected') {
-        // 钱包连接成功后，调用注册接口检查用户状态
-        if (address.value) {
-          await checkUserStatus(address.value)
-        }
-        router.push('/')
-      }
-    }
-  )
 
   return {
     logoUrl,

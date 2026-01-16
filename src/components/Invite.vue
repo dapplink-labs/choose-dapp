@@ -130,19 +130,19 @@ const handleConfirm = async () => {
 
     // 合约绑定邀请码
     try {
-      // await writeContractOptimized({
-      //   abi: nodeManagerABI,
-      //   address: bscNet.proxyNodeManager,
-      //   functionName: 'bindInviter',
-      //   args: [localCode.value], // 邀请人地址
-      //   userAddress: address.value,
-      //   messages: {
-      //     success: t('invite.contractBindSuccess') || '合约绑定邀请码成功',
-      //     failed: t('invite.contractBindFailed') || '合约绑定邀请码失败',
-      //     rejected: t('invite.contractBindCancelled') || '你取消了合约绑定'
-      //   },
-      //   showErrorToast: true
-      // })
+      await writeContractOptimized({
+        abi: nodeManagerABI,
+        address: bscNet.proxyNodeManager,
+        functionName: 'bindInviter',
+        args: [localCode.value], // 邀请人地址
+        userAddress: address.value,
+        messages: {
+          success: t('invite.contractBindSuccess') || '合约绑定邀请码成功',
+          failed: t('invite.contractBindFailed') || '合约绑定邀请码失败',
+          rejected: t('invite.contractBindCancelled') || '你取消了合约绑定'
+        },
+        showErrorToast: true
+      })
     } catch (contractError) {
       // writeContractOptimized 已经处理了错误提示
       // 交易失败或被取消时，直接返回，确保 loading 被重置

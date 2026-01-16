@@ -129,7 +129,10 @@ const getNodeAndNodeServiceRecordNewData = async () => {
       }
 
       return {
-        message: `${addressText} 已成功激活[ ${typeText} ]`,
+        message: t('computingPower.activationMsg', {
+          address: addressText,
+          nodeType: typeText
+        }),
         avatar: getRandomAvatar(address),
         amountText: ''
       }

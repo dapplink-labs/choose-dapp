@@ -372,9 +372,14 @@ const goLinkWallet = async () => {
   }
   router.push('/link-wallet')
 }
-const handleLogout = () => {
-  disconnect();
-  closeUserMenu()
+const handleLogout = async () => {
+  try {
+    await disconnect()
+    closeUserMenu()
+  } catch (error) {
+    console.error('断开连接失败:', error)
+    closeUserMenu()
+  }
 }
 
 // 点击外部关闭菜单

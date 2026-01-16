@@ -58,6 +58,7 @@ import { useI18n } from 'vue-i18n'
 import { useAccount } from '@wagmi/vue'
 // @ts-ignore
 import { getMyTeamInfo } from '@/api/API.js'
+import { formatUnits } from 'viem'
 import avatarImg1 from '@/assets/icon/avatarImg1.png'
 import avatarImg2 from '@/assets/icon/avatarImg2.png'
 import avatarImg3 from '@/assets/icon/avatarImg3.png'
@@ -95,6 +96,26 @@ type PromotionNode = {
 
 // 随机头像数组
 const avatarImages = [avatarImg1, avatarImg2, avatarImg3, avatarImg4, avatarImg5]
+
+// 格式化金额（CHO为18精度，需要先转换）
+const formatAmount = (value: string | number | bigint | undefined): string => {
+  if (!value || value === '0' || value === 0) return '0.00'
+  try {
+    // 将18精度的数值转换为正常数量
+    let num: number
+    if (typeof value === 'bigint' || (typeof value === 'string' && value.length > 15)) {
+      num = parseFloat(formatUnits(BigInt(value.toString()), 18))
+    } else {
+      num = Number(value) / 1e18
+    }
+    
+    if (!Number.isFinite(num)) return '0.00'
+    return num.toFixed(2)
+  } catch (error) {
+    console.error('格式化金额失败:', error, value)
+    return '0.00'
+  }
+}
 
 // 根据地址生成稳定的随机头像（同一地址总是返回相同头像）
 const getRandomAvatar = (addr: string) => {
@@ -508,12 +529,12 @@ const refreshChildren = async (node: PromotionNode) => {
       nodeMap[id] = {
         id,
         address: item.address || '',
-        amount: String(item.total_reward || '0.00'),
+        amount: formatAmount(item.total_reward),
         children: [],
       }
     } else {
       // 更新已存在节点的数据
-      nodeMap[id].amount = String(item.total_reward || '0.00')
+      nodeMap[id].amount = formatAmount(item.total_reward)
     }
     
     newChildren.push(id)

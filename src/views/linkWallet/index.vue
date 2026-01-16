@@ -1,11 +1,9 @@
 <template>
   <div class="link-wallet-page">
-    <!-- 右上角关闭按钮 -->
     <button class="close-btn" type="button" @click="handleClose">
       ✕
     </button>
 
-    <!-- 欢迎卡片 / banner -->
     <div class="welcome-section">
       <div class="logo-box">
         <img :src="logoUrl" alt="CHOOSME Logo" class="logo-img" />
@@ -18,16 +16,15 @@
       </div>
     </div>
 
-    <!-- 钱包列表 -->
     <div class="wallet-list">
-      <div v-for="wallet in wallets" :key="wallet.id" class="wallet-card" @click="handleConnect(wallet)">
+      <div v-for="wallet in wallets" :key="wallet.id" class="wallet-card">
         <div class="wallet-info">
           <div class="wallet-icon-box">
             <img :src="wallet.icon" :alt="wallet.name" class="wallet-icon" />
           </div>
           <span class="wallet-name">{{ wallet.name }}</span>
         </div>
-        <button class="connect-btn" type="button">
+        <button class="connect-btn" type="button" @click.stop="handleConnect(wallet)">
           {{ $t('linkWallet.connect') }}
         </button>
       </div>

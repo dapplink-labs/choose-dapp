@@ -506,9 +506,14 @@ async function wallconnects(id, chainId) {
   closeLogin()
   // @click="connect({ connector, chainId })"
 }
-function disconnectbtn() {
-  disconnect();
-  showExit.value = false;
+async function disconnectbtn() {
+  try {
+    await disconnect()
+    showExit.value = false
+  } catch (error) {
+    console.error('断开连接失败:', error)
+    showExit.value = false
+  }
 }
 const newTop = ref();
 // 计算 header 的样式

@@ -50,7 +50,9 @@ export default {
   },
   link: {
     titel: "지갑 연결",
-    exit: "연결 해제"
+    exit: "연결 해제",
+    connectFailed: "지갑 연결에 실패했습니다. 다시 시도해주세요",
+    signatureRequired: "지갑 연결에는 서명 인증이 필요합니다. 다시 연결하여 서명을 완료해주세요"
   },
   navbar2: {
     nav: {

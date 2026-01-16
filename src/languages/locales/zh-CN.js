@@ -43,7 +43,9 @@ export default {
   },
   link: {
     titel: "链接钱包",
-    exit: "断开链接"
+    exit: "断开链接",
+    connectFailed: "连接钱包失败，请重试",
+    signatureRequired: "连接钱包需要签名授权，请重新连接并完成签名"
   },
   bindEmail: {
     title: "绑定邮箱",
