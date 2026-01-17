@@ -37,9 +37,17 @@ watch(
       return
     }
 
+    // 清除邀请人地址
+    counterStore.inviterAddress = '';
     if (oldAddress && newAddress && oldAddress !== newAddress) {
-      console.log('钱包地址已更改，刷新页面...', { oldAddress, newAddress })
+      // 钱包地址更改，刷新页面
       window.location.reload()
+      // 检查当前用户是否注册
+      const res = register({ address: newAddress });
+      // 如果未注册，显示邀请弹窗
+      if (res?.data?.data?.exists === false) {
+        eventBus.emit('showInvite', true);
+      }
       return
     }
 
@@ -76,7 +84,7 @@ watch(
 onMounted(() => {
   checkIsMobile()
   window.addEventListener('resize', checkIsMobile)
-  
+
   eventBus.on('showInvite', (show) => {
     showInvite.value = show
   })
@@ -120,11 +128,11 @@ const needBottomPadding = computed(() => {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  
+
   @media (max-width: 768px) {
     &.has-footer-nav {
       padding-bottom: 60px;
-      
+
       @media (max-width: 480px) {
         padding-bottom: 56px;
       }
