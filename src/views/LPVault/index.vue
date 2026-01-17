@@ -4,7 +4,7 @@
         <!-- 通用返回头部导航 -->
         <BackHeaderNav :show-record-btn="true" :show-open-btn="true" />
 
-        <div class="banner1" style="margin: 0  -10px;">
+        <div class="banner1">
 
             <div class="intro">
                 <h1>{{ $t('lpVault.title') }}</h1>
@@ -91,7 +91,7 @@ const {
 <style scoped lang="scss">
 .LPVault {
     min-height: 100vh;
-    padding: 100px 10px 60px 10px;
+    padding:80px 10px 60px 10px;
     background-color: var(--bg-page-h5, #FCFCFC);
     color: var(--text-color, #1a1a1a);
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -113,6 +113,7 @@ const {
         display: flex;
         height: 100%;
         justify-content: space-between;
+        margin-bottom: 20px;
 
         h3 {
             padding: 0 10px;
@@ -174,7 +175,6 @@ const {
     }
 
     .intro {
-        padding: 0 10px;
 
         h1 {
             font-family: Noto Sans SC, Noto Sans SC;
@@ -445,7 +445,7 @@ const {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin: 22px 0 24px 0;
+        margin: 25px 0 24px 0;
 
         span {
             font-weight: bold;

@@ -93,6 +93,8 @@ const handleConfirm = async () => {
   loading.value = true
 
   try {
+    console.log('localCode.value', localCode.value)
+
     if (!localCode.value || !localCode.value.startsWith('0x') || localCode.value.length !== 42) {
       ElMessage.error(t('invite.invalidAddress') || '无效的邀请码地址格式')
       loading.value = false

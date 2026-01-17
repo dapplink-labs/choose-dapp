@@ -85,28 +85,6 @@
       <button class="disconnect-btn" @click="handleDisconnect">{{ $t('userInfo.disconnectWallet') }}</button>
     </div>
 
-    <!-- 语言选择弹窗 -->
-    <transition name="slide-up">
-      <div v-if="showLanguageModal" class="language-overlay" @click.self="closeLanguageModal">
-        <div class="language-modal" @click.stop>
-          <!-- 底部拖拽条 -->
-          <div class="drag-handle"></div>
-
-          <!-- 标题 -->
-          <div class="language-title">{{ $t('userInfo.language') }}</div>
-
-          <!-- 语言列表 -->
-          <div class="language-list">
-            <div v-for="lang in languageOptions" :key="lang.value" class="language-item"
-              :class="{ active: locale === lang.value }" @click="selectLanguage(lang.value)">
-              <span class="language-name">{{ lang.label }}</span>
-              <span v-if="locale === lang.value" class="check-icon">✓</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </transition>
-
     <!-- 分享邀请码弹窗 -->
     <ShareInvitationCode v-model="showShareModal" />
 
@@ -150,19 +128,8 @@ const walletAddress = computed(() => {
   return '0xf6a0....CfbA'
 })
 
-// 语言选择弹窗状态
-const showLanguageModal = ref(false)
-
 // 分享邀请码弹窗状态
 const showShareModal = ref(false)
-
-// 语言选项列表
-const languageOptions = [
-  { value: 'zh-cn', label: '简体中文' },
-  { value: 'en-us', label: 'English' },
-  { value: 'ko-kr', label: '한국어' },
-  { value: 'ja-jp', label: '日本語' }
-]
 
 const userAvatar = computed(() => {
   return address.value
@@ -341,14 +308,6 @@ const baseOthersItems = computed(() => [
     iconDark: getIcon("16Dark"),
     path: '/'
   },
-  {
-    key: 'language',
-    label: t('userInfo.language'),
-    icon: getIcon('28'),
-    iconDark: getIcon("28Dark"),
-    path: '',
-    action: 'language'
-  }
 ])
 
 const othersItems = computed(() =>
@@ -486,34 +445,10 @@ const handleClose = () => {
 
 // 处理菜单项点击
 const handleMenuClick = (item) => {
-  // 语言切换处理
-  if (item.action === 'language') {
-    handleLanguageSwitch()
-    return
-  }
-
-  // 其他菜单项的路由跳转
+  // 菜单项的路由跳转
   if (item.path) {
     router.push(item.path)
   }
-}
-
-// 打开语言选择弹窗
-const handleLanguageSwitch = () => {
-  showLanguageModal.value = true
-}
-
-// 关闭语言选择弹窗
-const closeLanguageModal = () => {
-  showLanguageModal.value = false
-}
-
-// 选择语言
-const selectLanguage = (langValue) => {
-  locale.value = langValue
-  document.documentElement.setAttribute('data-lang', langValue)
-  localStorage.setItem('app-locale', langValue)
-  closeLanguageModal()
 }
 
 // 处理断开链接
@@ -601,8 +536,8 @@ onMounted(() => {
       gap: 16px;
 
       .icon-img {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         cursor: pointer;
         transition: opacity 0.2s;
 
@@ -724,115 +659,5 @@ onMounted(() => {
     }
   }
 
-  // 语言选择弹窗样式
-  .language-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    z-index: 999;
-  }
-
-  .language-modal {
-    width: 100%;
-    background-color: var(--bg-page-h5, #ffffff);
-    border-radius: 20px 20px 0 0;
-    padding: 20px 20px 28px;
-    box-sizing: border-box;
-    max-height: 80vh;
-    overflow-y: auto;
-  }
-
-  .drag-handle {
-    width: 40px;
-    height: 4px;
-    background-color: var(--border-color, #E0E0E0);
-    border-radius: 2px;
-    margin: 0 auto 20px;
-  }
-
-  .language-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-color, #1a1a1a);
-    margin-bottom: 24px;
-    text-align: center;
-  }
-
-  .language-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  .language-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--bg-light, #F3F3F3);
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    &:active {
-      background-color: var(--bg-light, #F5F5F5);
-    }
-
-    &.active {
-      .language-name {
-        color: var(--text-color, #1a1a1a);
-        font-weight: 500;
-      }
-
-      .check-icon {
-        color: var(--text-color, #1a1a1a);
-        font-weight: 600;
-      }
-    }
-  }
-
-  .language-name {
-    font-size: 16px;
-    color: var(--text-color, #333333);
-  }
-
-  .check-icon {
-    font-size: 18px;
-    color: var(--text-dark-gray, #999999);
-  }
-
-  // 底部弹窗动画
-  .slide-up-enter-active,
-  .slide-up-leave-active {
-    transition: opacity 0.3s ease;
-
-    .language-modal {
-      transition: transform 0.3s ease;
-    }
-  }
-
-  .slide-up-enter-from {
-    opacity: 0;
-
-    .language-modal {
-      transform: translateY(100%);
-    }
-  }
-
-  .slide-up-leave-to {
-    opacity: 0;
-
-    .language-modal {
-      transform: translateY(100%);
-    }
-  }
 }
 </style>

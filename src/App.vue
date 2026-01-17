@@ -57,7 +57,7 @@ watch(
 
     if (oldAddress && !newAddress) {
       console.log('钱包已断开连接，刷新页面...')
-      window.location.reload()
+      // window.location.reload()
       return
     }
   },

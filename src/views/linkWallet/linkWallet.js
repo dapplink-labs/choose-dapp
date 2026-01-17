@@ -7,6 +7,12 @@ import { useCounterStore } from '@/stores/counter'
 import { register } from '@/api/API'
 import { eventBus } from '@/utils/eventBus'
 import { ElMessage } from 'element-plus'
+import { readContract } from '@wagmi/core'
+import { config } from '@/wagmi.ts'
+import networks from '@/assets/json/networks.json'
+import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
+
+const BSC_CHAIN_ID = 56
 
 import logoLight from '@/assets/icon/logo.png'
 import logoDark from '@/assets/icon/logoDark.png'
@@ -198,9 +204,20 @@ export const useLinkWallet = () => {
   const checkUserStatus = async (walletAddress) => {
     const response = await register({ address: walletAddress })
     const exists = response?.data?.data?.exists ?? response?.data?.exists
-    // 如果已经绑定邀请码，清除邀请码
-    if (exists)
+    // 读取合约中邀请人是否存在
+    const inviter = await readContract(config, {
+      address: networks.find(n => Number(n.chainId) === BSC_CHAIN_ID).proxyNodeManager,
+      abi: nodeManagerABI,
+      functionName: 'inviters',
+      args: [walletAddress]
+    })
+    // 如果用户没有绑定邀请码，则改变邀请弹窗的显示状态
+    if (!exists && inviter == '0x0000000000000000000000000000000000000000') {
+      eventBus.emit('showInvite', true)
+    } else {
+      // 如果已经绑定邀请码，清除邀请码
       counterStore.inviteCode = ''
+    }
   }
 
 
