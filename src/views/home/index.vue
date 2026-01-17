@@ -42,7 +42,7 @@
             </div>
 
             <div class="pc-action-icons">
-              <div class="pc-action-btn" @click="handleFilter" aria-label="filter">
+              <div class="pc-action-btn" @click="handleFilter" :class="{ active: showFilterPanel }" aria-label="filter">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
                   <path fill="currentColor"
                     d="M7,8A4,4,0,0,1,3.126,5H1A1,1,0,0,1,1,3H3.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H10.874A4,4,0,0,1,7,8ZM7,2A2,2,0,1,0,9,4,2,2,0,0,0,7,2Z"
@@ -60,6 +60,50 @@
                 </svg>
               </div>
             </div>
+
+            <!-- 筛选面板 -->
+            <transition name="filter-panel">
+              <div v-if="showFilterPanel" class="pc-filter-panel">
+                <div class="pc-filter-dropdowns">
+                  <!-- 排序下拉菜单 -->
+                  <div class="pc-filter-dropdown" @click.stop="showSortDropdown = !showSortDropdown">
+                    <span class="pc-filter-label">{{ $t('home.sort') || '排序' }}:</span>
+                    <span class="pc-filter-value">{{ getSortLabel(selectedSort) }}</span>
+                    <svg class="pc-filter-arrow" :class="{ 'open': showSortDropdown }" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <transition name="dropdown">
+                      <div v-if="showSortDropdown" class="pc-filter-dropdown-menu" @click.stop>
+                        <div v-for="option in sortOptions" :key="option.value" 
+                             class="pc-filter-dropdown-item" 
+                             :class="{ 'active': selectedSort === option.value }"
+                             @click="handleSortChange(option.value); showSortDropdown = false">
+                          {{ option.label }}
+                        </div>
+                      </div>
+                    </transition>
+                  </div>
+                  <!-- 频率下拉菜单 -->
+                  <div class="pc-filter-dropdown" @click.stop="showFrequencyDropdown = !showFrequencyDropdown">
+                    <span class="pc-filter-label">{{ $t('home.frequency') || '频率' }}:</span>
+                    <span class="pc-filter-value">{{ getFrequencyLabel(selectedFrequency) }}</span>
+                    <svg class="pc-filter-arrow" :class="{ 'open': showFrequencyDropdown }" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <transition name="dropdown">
+                      <div v-if="showFrequencyDropdown" class="pc-filter-dropdown-menu" @click.stop>
+                        <div v-for="option in frequencyOptions" :key="option.value" 
+                             class="pc-filter-dropdown-item" 
+                             :class="{ 'active': selectedFrequency === option.value }"
+                             @click="handleFrequencyChange(option.value); showFrequencyDropdown = false">
+                          {{ option.label }}
+                        </div>
+                      </div>
+                    </transition>
+                  </div>
+                </div>
+              </div>
+            </transition>
 
             <div class="pc-divider" aria-hidden="true"></div>
 
@@ -89,9 +133,53 @@
               <div class="gradient-mask gradient-mask-right"></div>
             </div>
 
+            <!-- 筛选面板（移动端） -->
+            <transition name="filter-panel">
+              <div v-if="showFilterPanel" class="filter-panel">
+                <div class="filter-dropdowns">
+                  <!-- 排序下拉菜单 -->
+                  <div class="filter-dropdown" @click.stop="showSortDropdown = !showSortDropdown">
+                    <span class="filter-label">{{ $t('home.sort') || '排序' }}:</span>
+                    <span class="filter-value">{{ getSortLabel(selectedSort) }}</span>
+                    <svg class="filter-arrow" :class="{ 'open': showSortDropdown }" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <transition name="dropdown">
+                      <div v-if="showSortDropdown" class="filter-dropdown-menu" @click.stop>
+                        <div v-for="option in sortOptions" :key="option.value" 
+                             class="filter-dropdown-item" 
+                             :class="{ 'active': selectedSort === option.value }"
+                             @click="handleSortChange(option.value); showSortDropdown = false">
+                          {{ option.label }}
+                        </div>
+                      </div>
+                    </transition>
+                  </div>
+                  <!-- 频率下拉菜单 -->
+                  <div class="filter-dropdown" @click.stop="showFrequencyDropdown = !showFrequencyDropdown">
+                    <span class="filter-label">{{ $t('home.frequency') || '频率' }}:</span>
+                    <span class="filter-value">{{ getFrequencyLabel(selectedFrequency) }}</span>
+                    <svg class="filter-arrow" :class="{ 'open': showFrequencyDropdown }" width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <transition name="dropdown">
+                      <div v-if="showFrequencyDropdown" class="filter-dropdown-menu" @click.stop>
+                        <div v-for="option in frequencyOptions" :key="option.value" 
+                             class="filter-dropdown-item" 
+                             :class="{ 'active': selectedFrequency === option.value }"
+                             @click="handleFrequencyChange(option.value); showFrequencyDropdown = false">
+                          {{ option.label }}
+                        </div>
+                      </div>
+                    </transition>
+                  </div>
+                </div>
+              </div>
+            </transition>
+
             <!-- 右侧操作按钮 -->
             <div class="action-buttons">
-              <div class="action-btn" @click="handleFilter">
+              <div class="action-btn" @click="handleFilter" :class="{ active: showFilterPanel }">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="icon">
                   <g transform="translate(-295 -358)">
                     <rect fill="none" width="24" height="24" transform="translate(295 358)" />
@@ -423,11 +511,79 @@ const handleSearch = () => {
   // 这里可以实现搜索逻辑
 }
 
+// 筛选面板显示状态
+const showFilterPanel = ref(false)
+
+// 选中的排序方式
+const selectedSort = ref('volume24h')
+
+// 选中的频率
+const selectedFrequency = ref('all')
+
+// 排序选项
+const sortOptions = [
+  { value: 'volume24h', label: '24小时交易量' },
+  { value: 'default', label: '默认排序' },
+  { value: 'time', label: '时间排序' }
+]
+
+// 频率选项
+const frequencyOptions = [
+  { value: 'all', label: '全部' },
+  { value: 'high', label: '高频' },
+  { value: 'low', label: '低频' }
+]
+
+// 显示排序下拉菜单
+const showSortDropdown = ref(false)
+
+// 显示频率下拉菜单
+const showFrequencyDropdown = ref(false)
+
 // 处理筛选
 const handleFilter = () => {
-  // 这里可以实现筛选面板逻辑
-  router.push('/accuracy')
+  showFilterPanel.value = !showFilterPanel.value
 }
+
+// 处理排序变化
+const handleSortChange = (sort) => {
+  selectedSort.value = sort
+  // 这里可以实现排序逻辑
+}
+
+// 处理频率变化
+const handleFrequencyChange = (frequency) => {
+  selectedFrequency.value = frequency
+  // 这里可以实现频率筛选逻辑
+}
+
+// 获取排序标签
+const getSortLabel = (value) => {
+  const option = sortOptions.find(opt => opt.value === value)
+  return option ? option.label : sortOptions[0].label
+}
+
+// 获取频率标签
+const getFrequencyLabel = (value) => {
+  const option = frequencyOptions.find(opt => opt.value === value)
+  return option ? option.label : frequencyOptions[0].label
+}
+
+// 点击外部关闭下拉菜单
+let handleClickOutside = null
+onMounted(() => {
+  handleClickOutside = () => {
+    showSortDropdown.value = false
+    showFrequencyDropdown.value = false
+  }
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  if (handleClickOutside) {
+    document.removeEventListener('click', handleClickOutside)
+  }
+})
 
 // 处理视图切换
 const handleViewToggle = () => {
@@ -692,6 +848,11 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
             background: transparent;
             color: var(--text-color, #ffffff);
 
+            &.active {
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 4px;
+            }
+
             .icon {
               fill: currentColor;
 
@@ -704,9 +865,99 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
               opacity: 0.8;
             }
           }
+        }
+
+        // 移动端筛选面板
+        .filter-panel {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          margin-top: 8px;
+          padding: 12px;
+          background: var(--bg-page, #FFFFFF);
+          border: 1px solid var(--border-color, #E0E0E0);
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          z-index: 100;
+
+          .filter-dropdowns {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+
+            .filter-dropdown {
+              position: relative;
+              flex: 1;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 8px 12px;
+              background: rgba(0, 0, 0, 0.05);
+              border-radius: 6px;
+              cursor: pointer;
+              transition: all 0.2s;
+
+              .filter-label {
+                font-size: 13px;
+                color: var(--text-color, #1a1a1a);
+                white-space: nowrap;
+              }
+
+              .filter-value {
+                flex: 1;
+                font-size: 13px;
+                color: var(--text-color, #1a1a1a);
+                white-space: nowrap;
+                text-align: right;
+              }
+
+              .filter-arrow {
+                width: 12px;
+                height: 12px;
+                color: var(--text-color, #1a1a1a);
+                transition: transform 0.2s;
+                flex-shrink: 0;
+
+                &.open {
+                  transform: rotate(180deg);
+                }
+              }
+
+              .filter-dropdown-menu {
+                position: absolute;
+                top: calc(100% + 4px);
+                left: 0;
+                right: 0;
+                background: var(--bg-page, #FFFFFF);
+                border: 1px solid var(--border-color, #E0E0E0);
+                border-radius: 6px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                z-index: 101;
+                overflow: hidden;
+
+                .filter-dropdown-item {
+                  padding: 10px 12px;
+                  font-size: 13px;
+                  color: var(--text-color, #1a1a1a);
+                  cursor: pointer;
+                  transition: background 0.2s;
+
+                  &:hover {
+                    background: rgba(0, 0, 0, 0.05);
+                  }
+
+                  &.active {
+                    background: rgba(0, 0, 0, 0.1);
+                    font-weight: 500;
+                  }
+                }
+              }
             }
           }
         }
+      }
+    }
 
     // PC 顶部筛选栏（仅 PC 显示）
     .pc-filter-section {
@@ -768,6 +1019,99 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         border-radius: 8px;
         transition: background 0.2s, color 0.2s;
 
+        &.active {
+          background: rgba(0, 0, 0, 0.05);
+          color: rgba(0, 0, 0, 0.85);
+        }
+      }
+
+      // PC 筛选面板
+      .pc-filter-panel {
+        position: absolute;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        padding: 12px 16px;
+        background: var(--bg-page, #FFFFFF);
+        border: 1px solid var(--border-color, #E0E0E0);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+
+        .pc-filter-dropdowns {
+          display: flex;
+          gap: 12px;
+          align-items: center;
+
+          .pc-filter-dropdown {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 160px;
+
+            .pc-filter-label {
+              font-size: 13px;
+              color: var(--text-color, #1a1a1a);
+              white-space: nowrap;
+            }
+
+            .pc-filter-value {
+              flex: 1;
+              font-size: 13px;
+              color: var(--text-color, #1a1a1a);
+              white-space: nowrap;
+              text-align: right;
+            }
+
+            .pc-filter-arrow {
+              width: 12px;
+              height: 12px;
+              color: var(--text-color, #1a1a1a);
+              transition: transform 0.2s;
+              flex-shrink: 0;
+
+              &.open {
+                transform: rotate(180deg);
+              }
+            }
+
+            .pc-filter-dropdown-menu {
+              position: absolute;
+              top: calc(100% + 4px);
+              left: 0;
+              right: 0;
+              background: var(--bg-page, #FFFFFF);
+              border: 1px solid var(--border-color, #E0E0E0);
+              border-radius: 6px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+              z-index: 101;
+              overflow: hidden;
+
+              .pc-filter-dropdown-item {
+                padding: 10px 12px;
+                font-size: 13px;
+                color: var(--text-color, #1a1a1a);
+                cursor: pointer;
+                transition: background 0.2s;
+
+                &:hover {
+                  background: rgba(0, 0, 0, 0.05);
+                }
+
+                &.active {
+                  background: rgba(0, 0, 0, 0.1);
+                  font-weight: 500;
+                }
+              }
+            }
+          }
+        }
       }
 
       .pc-divider {
@@ -1716,5 +2060,82 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 .home-page.no-scroll {
   overflow: hidden;
   height: 100vh;
+}
+
+// 筛选面板过渡动画
+.filter-panel-enter-active,
+.filter-panel-leave-active {
+  transition: all 0.3s ease;
+}
+
+.filter-panel-enter-from {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.filter-panel-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+// 下拉菜单过渡动画
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.dropdown-enter-from {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+// 深色模式适配
+[data-theme="dark"] {
+  .pc-filter-dropdown,
+  .filter-dropdown {
+    background: rgba(255, 255, 255, 0.1) !important;
+
+    .pc-filter-label,
+    .pc-filter-value,
+    .filter-label,
+    .filter-value {
+      color: #ffffff !important;
+    }
+
+    .pc-filter-arrow,
+    .filter-arrow {
+      color: #ffffff !important;
+    }
+
+    .pc-filter-dropdown-menu,
+    .filter-dropdown-menu {
+      background: #2a2a2a !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+
+      .pc-filter-dropdown-item,
+      .filter-dropdown-item {
+        color: #ffffff !important;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        &.active {
+          background: rgba(255, 255, 255, 0.15) !important;
+        }
+      }
+    }
+  }
+
+  .pc-filter-panel,
+  .filter-panel {
+    background: #1a1a1a !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
 }
 </style>

@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import { useConnect, useChainId, useAccount, useSignMessage, useDisconnect } from '@wagmi/vue'
 import { injected } from '@wagmi/vue/connectors'
 import { useThemeStore } from '../../stores/theme'
+import { useCounterStore } from '@/stores/counter'
 import { register } from '@/api/API'
 import { eventBus } from '@/utils/eventBus'
 import { ElMessage } from 'element-plus'
@@ -73,7 +74,7 @@ export const useLinkWallet = () => {
   const { signMessage, data: signatureData, isSuccess: isSignatureSuccess, isError: isSignatureError } = useSignMessage()
   const { disconnect } = useDisconnect()
   const themeStore = useThemeStore()
-
+  const counterStore = useCounterStore()
   const isConnectingFromPage = ref(false)
   const isWaitingForSignature = ref(false)
   const pendingWalletAddress = ref(null)
@@ -142,7 +143,6 @@ export const useLinkWallet = () => {
       () => isSignatureError.value,
       async (isError) => {
         if (isError && isWaitingForSignature.value) {
-          console.log('签名失败')
           isWaitingForSignature.value = false
           const walletAddr = pendingWalletAddress.value
           pendingWalletAddress.value = null
@@ -198,7 +198,9 @@ export const useLinkWallet = () => {
   const checkUserStatus = async (walletAddress) => {
     const response = await register({ address: walletAddress })
     const exists = response?.data?.data?.exists ?? response?.data?.exists
-    eventBus.emit('showInvite', !exists)
+    // 如果已经绑定邀请码，清除邀请码
+    if (exists)
+      counterStore.inviteCode = ''
   }
 
 

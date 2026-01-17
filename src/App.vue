@@ -11,6 +11,7 @@ import Invite from "./components/Invite.vue"
 import { eventBus } from '@/utils/eventBus'
 import { useCounterStore } from '@/stores/counter'
 import { storeToRefs } from 'pinia'
+import { register } from '@/api/API'
 
 const route = useRoute()
 const counterStore = useCounterStore()
@@ -40,14 +41,17 @@ watch(
     // 清除邀请人地址
     counterStore.inviterAddress = '';
     if (oldAddress && newAddress && oldAddress !== newAddress) {
-      // 钱包地址更改，刷新页面
-      window.location.reload()
-      // 检查当前用户是否注册
-      const res = register({ address: newAddress });
-      // 如果未注册，显示邀请弹窗
-      if (res?.data?.data?.exists === false) {
-        eventBus.emit('showInvite', true);
+      const checkUserStatus = async (walletAddress) => {
+        const response = await register({ address: walletAddress })
+        const exists = response?.data?.data?.exists ?? response?.data?.exists
+        if (exists) {
+          window.location.reload()
+        } else {
+          eventBus.emit('showInvite', true);
+        }
       }
+      // 检查当前用户是否注册
+      checkUserStatus(newAddress)
       return
     }
 

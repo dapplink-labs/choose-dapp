@@ -89,6 +89,29 @@
       </div>
 
       <div class="h5-user-section">
+        <!-- 语言切换下拉菜单 -->
+        <el-dropdown class="h5-language-dropdown" @command="handleLanguageChange" trigger="click">
+          <div class="h5-language-toggle-btn" :title="$t('navbar.language.en') || 'Language'">
+            <img :src="languageIcon" alt="language" class="h5-language-icon" />
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="zh-cn">
+                {{ $t('navbar.language.cn') || '中文' }}
+              </el-dropdown-item>
+              <el-dropdown-item command="en-us">
+                {{ $t('navbar.language.en') || 'English' }}
+              </el-dropdown-item>
+              <el-dropdown-item command="ko-kr">
+                {{ $t('navbar.language.Korean') || '한국어' }}
+              </el-dropdown-item>
+              <el-dropdown-item command="ja-jp">
+                {{ $t('navbar.language.Japanese') || '日本語' }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+
         <!-- 主题切换按钮 -->
         <div class="h5-theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
           <el-icon class="theme-icon" :class="{ 'icon-light': !isDark, 'icon-dark': isDark }">
@@ -165,6 +188,23 @@ const counterStore = useCounterStore()
 const chainId = useChainId();
 const { locale, t } = useI18n();
 
+// 批量导入 icon 资源，减少单独 import
+const iconModules = import.meta.glob('@/assets/icon/*.{png,svg}', { eager: true })
+const iconMap = Object.fromEntries(
+  Object.entries(iconModules).map(([path, mod]) => {
+    const fileName = path.split('/').pop() || path
+    const name = fileName.replace(/\.(png|svg)$/i, '')
+    // 获取图标路径，优先使用 mod.default，如果不存在则使用 mod 本身
+    const iconValue = mod?.default ?? mod
+    return [name, iconValue]
+  })
+)
+const getIcon = (name) => {
+  const icon = iconMap[name]
+  // 如果图标不存在或不是字符串，返回空字符串
+  return (icon && typeof icon === 'string') ? icon : ''
+}
+
 const props = defineProps({
   portfolioAmount: {
     type: [String, Number],
@@ -198,6 +238,12 @@ const showConnet = ref(false)
 // 主题管理
 const themeStore = useThemeStore()
 const isDark = computed(() => themeStore.isDark)
+
+// 语言图标（响应式）
+const languageIcon = computed(() => {
+  const iconName = isDark.value ? '28Dark' : '28'
+  return getIcon(iconName) || ''
+})
 
 // 根据主题返回对应的logo
 const logoUrl = computed(() => {
@@ -463,6 +509,33 @@ onBeforeUnmount(() => {
       align-items: center;
       gap: 15px;
       flex-shrink: 0;
+
+      .h5-language-dropdown {
+        .h5-language-toggle-btn {
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid #3a3a3a;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.2s;
+          flex-shrink: 0;
+          background-color: transparent;
+          padding: 0;
+
+          &:active {
+            transform: scale(0.95);
+          }
+
+          .h5-language-icon {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+          }
+        }
+      }
 
       .h5-theme-toggle-btn {
         width: 32px;
@@ -1003,6 +1076,20 @@ onBeforeUnmount(() => {
 
       .h5-user-section {
         gap: 15px;
+
+        .h5-language-dropdown {
+          .h5-language-toggle-btn {
+            width: 20px;
+            height: 20px;
+            border: none;
+            min-width: 20px;
+
+            .h5-language-icon {
+              width: 20px;
+              height: 20px;
+            }
+          }
+        }
 
         .h5-theme-toggle-btn {
           width: 20px;
