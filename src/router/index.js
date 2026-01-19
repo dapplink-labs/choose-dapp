@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+
 import bridge from "../views/bridge/index.vue"
 import home from "../views/home/index.vue"
 import earnings from "../views/earnings/index.vue"
@@ -18,11 +19,21 @@ import detailH5 from "../views/detailH5/index.vue"
 import purchaseNodeRecord from "../views/purchaseNodeRecord/index.vue"
 import assetManagement from "../views/assetManagement/index.vue"
 import claimRecord from "../views/claimRecord/index.vue"
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
+      name: 'linkWallet',
+      component: linkWallet,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/home',
       name: 'home',
       component: home,
     },
@@ -80,15 +91,6 @@ const router = createRouter({
       }
     },
     {
-      path: '/link-wallet',
-      name: 'linkWallet',
-      component: linkWallet,
-      meta: {
-        hideHeader: true,
-        hideFooterNav: true
-      }
-    },
-    {
       path: '/personal-center',
       name: 'personalCenter',
       component: personalCenter,
@@ -106,7 +108,6 @@ const router = createRouter({
         hideFooterNav: true
       }
     },
-    // myIncome
     {
       path: '/myIncome',
       name: 'myIncome',
@@ -162,11 +163,36 @@ const router = createRouter({
       }
     }
   ],
-  scrollBehavior(to, from, savedPosition) {
-    // 处理滚动行为：如果有保存的滚动位置，则恢复到该位置，否则滚动到顶部
+  scrollBehavior() {
+    return { top: 0 }
+  }
+})
 
-    return { top: 0 }; // 跳转时滚动到顶部
+/* ================== 路由守卫 ================== */
 
-  },
-});
+// 钱包是否已连接（先用 localStorage，后面可换 wagmi / pinia）
+function isWalletConnected() {
+  return !!sessionStorage.getItem('walletAddress')
+}
+
+router.beforeEach((to) => {
+  const connected = isWalletConnected()
+  console.log(to)
+  // 未连接钱包
+  if (!connected) {
+    // 只允许进入连接钱包页
+    if (to.name === 'linkWallet') {
+      return true
+    }
+    return '/'
+  }
+   
+  // // // 已连接钱包，禁止回到连接页
+  // if (connected && to.name === 'linkWallet') {
+  //   return '/home'
+  // }
+
+  return true
+})
+
 export default router

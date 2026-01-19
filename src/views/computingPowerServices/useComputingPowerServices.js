@@ -27,7 +27,8 @@ export function useComputingPowerServices() {
 
 
   // 节点 TAB 状态（用于弹窗标题）
-  const activeNodeTab = ref('distributed')
+  // 0: 分布节点, 1: 集群节点（与接口 node_type 对齐）
+  const activeNodeTab = ref(0)
 
   // 节点金额，单位为 wei
   const nodePriceObj = ref({
@@ -69,7 +70,7 @@ export function useComputingPowerServices() {
   const showPurchaseNode = ref(false)
 
   const purchaseTitle = computed(() =>
-    activeNodeTab.value === 1
+    activeNodeTab.value === 0
       ? t('computingPower.tabs.distributed')
       : t('computingPower.tabs.cluster')
   )
@@ -79,9 +80,7 @@ export function useComputingPowerServices() {
     // 预估交易收益 - 使用 fee_reward（百分比）
     const currentNode = nodeProducts.value.find(node => node.type === activeNodeTab.value)
     if (!currentNode || currentNode.fee == null) {
-      return activeNodeTab.value === 1
-        ? '0.5%'
-        : '0.5%'
+      return activeNodeTab.value === 0 ? '0.5%' : '0.5%'
     }
     // 格式化：fee_reward 作为百分比显示
     const percent = Number(currentNode.fee)
@@ -92,9 +91,7 @@ export function useComputingPowerServices() {
     // 子币手续费收益 - 使用 sub_coin_reward（百分比）
     const currentNode = nodeProducts.value.find(node => node.type === activeNodeTab.value)
     if (!currentNode || currentNode.subFee == null) {
-      return activeNodeTab.value === 1
-        ? '3%'
-        : '2%'
+      return activeNodeTab.value === 0 ? '3%' : '2%'
     }
     // 格式化：sub_coin_reward 作为百分比显示
     const percent = Number(currentNode.subFee)
@@ -105,9 +102,7 @@ export function useComputingPowerServices() {
     // 二级市场收益 - 使用 market_reward（百分比）
     const currentNode = nodeProducts.value.find(node => node.type === activeNodeTab.value)
     if (!currentNode || currentNode.marketShare == null) {
-      return activeNodeTab.value === 1
-        ? '10%'
-        : '5%'
+      return activeNodeTab.value === 0 ? '10%' : '5%'
     }
     // 格式化：market_reward 作为百分比显示
     const percent = Number(currentNode.marketShare)
@@ -178,7 +173,7 @@ export function useComputingPowerServices() {
 
     // 2. 确定本次交易需要的金额
     const latest = await getNodePrice()
-    let amountBigInt = activeNodeTab.value === 1 ? latest.DistributedNode : latest.ClusterNode
+    let amountBigInt = activeNodeTab.value === 0 ? latest.DistributedNode : latest.ClusterNode
     let nodeId = nodeProducts.value.find(node => node.type == activeNodeTab.value)?.id;
 
     // ============ 余额检查 ============
@@ -266,21 +261,23 @@ export function useComputingPowerServices() {
       }
       // 接口返回字段: id, name, fee_reward, sub_coin_reward, market_reward, status 等
       nodeProducts.value = list.map((item) => {
-        // node_type: 1: 分布式, 2: 集群
-        const templateKey = item.node_type === 1
+        // node_type: 0: 分布节点, 1: 集群节点（兼容历史 2 也视为集群）
+        const rawNodeType = Number(item.node_type)
+        const isDistributed = rawNodeType === 0
+        const templateKey = isDistributed
           ? 'computingPower.products.distributedDescTemplate'
           : 'computingPower.products.clusterDescTemplate'
 
         return {
           id: item.id,
-          type: item.node_type, // 1: 分布式, 2: 集群
-          icon: item.icon || (item.node_type === 1
+          type: rawNodeType, // 0: 分布节点, 1: 集群节点
+          icon: item.icon || (isDistributed
             ? (isDark.value ? distributedNodeImgDark : distributedNodeImg)
             : (isDark.value ? clusterNodeImgDark : clusterNodeImg)),
-          title: item.name || (item.node_type === 1
+          title: item.name || (isDistributed
             ? t('computingPower.tabs.distributed')
             : t('computingPower.tabs.cluster')),
-          price: item.price || (item.node_type === 1 ? '500' : '10000'),
+          price: item.price || (isDistributed ? '500' : '10000'),
           fee: item.fee_reward || 0,
           subFee: item.sub_coin_reward || 0,
           marketShare: item.market_reward || 0,
@@ -303,7 +300,7 @@ export function useComputingPowerServices() {
 
   // 保留当前选中节点图（弹窗可能复用）
   const currentNodeImg = computed(() =>
-    activeNodeTab.value === 1 ? distributedNodeImg : clusterNodeImg
+    activeNodeTab.value === 0 ? distributedNodeImg : clusterNodeImg
   )
 
   // 判断按钮是否显示

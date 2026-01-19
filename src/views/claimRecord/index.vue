@@ -195,10 +195,10 @@ const fetchRecords = async (isLoadMore = false) => {
         // 映射 type 字段（仅针对算力服务）
         const mapNodeType = (type, serviceType) => {
             if (serviceType === 'computingPower') {
-                // 算力服务：type 1 为分布节点，type 2 为集群节点
-                if (type === 1 || type === '1') {
+                // 算力服务：type/node_type 0 为分布节点，1 为集群节点（兼容历史 2 也视为集群）
+                if (type === 0 || type === '0') {
                     return t('claimRecord.distributedNode')
-                } else if (type === 2 || type === '2') {
+                } else if (type === 1 || type === '1' || type === 2 || type === '2') {
                     return t('claimRecord.clusterNode')
                 }
             }

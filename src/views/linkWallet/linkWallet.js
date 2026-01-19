@@ -1,9 +1,10 @@
 import { computed, onMounted, ref, watch, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useConnect, useChainId, useAccount, useDisconnect } from '@wagmi/vue'
 import { injected } from '@wagmi/vue/connectors'
 import { useThemeStore } from '../../stores/theme'
 import { useCounterStore } from '@/stores/counter'
+import { ElMessage, ElLoading } from 'element-plus'
 import { register } from '@/api/API'
 import { eventBus } from '@/utils/eventBus'
 import { readContract } from '@wagmi/core'
@@ -11,11 +12,14 @@ import { config } from '@/wagmi.ts'
 import networks from '@/assets/json/networks.json'
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
 
+// 基础配置
 const BSC_CHAIN_ID = 56
+const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 import logoLight from '@/assets/icon/logo.png'
 import logoDark from '@/assets/icon/logoDark.png'
 
+// 钱包配置列表
 export const wallets = [
   {
     name: 'TokenPocket',
@@ -32,122 +36,164 @@ export const wallets = [
     icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAJDSURBVHgB7Zq9jtpAEMfHlhEgQLiioXEkoAGECwoKxMcTRHmC5E3IoyRPkPAEkI7unJYmTgEFTYwA8a3NTKScLnCHN6c9r1e3P2llWQy7M/s1Gv1twCP0ej37dDq9x+Zut1t3t9vZjDEHIiSRSPg4ZpDL5fxkMvn1cDh8m0wmfugfO53OoFQq/crn8wxfY9EymQyrVCqMfHvScZx1p9ls3pFxXBy/bKlUipGPrVbLuQqAfsCliq3zl0H84zwtjQrOw4Mt1W63P5LvBm2d+Xz+YzqdgkqUy+WgWCy+Mc/nc282m4FqLBYL+3g8fjDxenq72WxANZbLJeA13zDX67UDioL5ybXwafMYu64Ltn3bdDweQ5R97fd7GyhBQMipx4POeEDHIu2LfDdBIGGz+hJ9CQ1ABjoA2egAZPM6AgiCAEQhsi/C4jHyPA/6/f5NG3Ks2+3CYDC4aTccDrn6ojG54MnEvG00GoVmWLIRNZ7wTCwDHYBsdACy0QHIhiuRETxlICWpMMhGZHmqS8qH6JLyGegAZKMDkI0uKf8X4SWlaZo+Pp1bRrwlJU8ZKLIvUjKh0WiQ3sRUbNVq9c5Ebew7KEo2m/1p4jJ4qAmDaqDQBzj5XyiAT4VCQezJigAU+IDU+z8vJFnGWeC+bKQV/5VZ71FV6L7PA3gg3tXrdQ+DgLhC+75Wq3no69P3MC0NFQpx2lL04Ql9gHK1bRDjsSBIvScBnDTk1WrlGIZBorIDEYJj+rhdgnQ67VmWRe0zlplXl81vcyEt0rSoYDUAAAAASUVORK5CYII=',
     id: 'com.okex.wallet'
   },
-
-  
 ]
 
 export const useLinkWallet = () => {
   const router = useRouter()
+  const route = useRoute()
   const { connect, connectors } = useConnect()
   const chainId = useChainId()
   const { status, address } = useAccount()
   const { disconnect } = useDisconnect()
   const themeStore = useThemeStore()
   const counterStore = useCounterStore()
-  const isConnectingFromPage = ref(false)
-  let stopWatchConnection = null
 
-  const safeConnectors = computed(() => {
-    const maybeRef = connectors?.value
-    if (Array.isArray(maybeRef)) {
-      return maybeRef
-    }
-    if (Array.isArray(connectors)) {
-      return connectors
-    }
-    return []
-  })
+  // 响应式状态
+  let loadingInstance = null
+  let stopWatchConnection = null
 
   const isDark = computed(() => themeStore.isDark)
   const logoUrl = computed(() => (isDark.value ? logoDark : logoLight))
+
+  // 获取可用的连接器列表
+  const safeConnectors = computed(() => connectors.value || [])
 
   const handleClose = () => {
     router.back()
   }
 
-  // navBar 的连接逻辑
-  const wallconnects = async (walletId, targetChainId) => {
-    const list = safeConnectors.value || []
-    const connector = list.find((c) => c.id === walletId)
-    const finalConnector = connector || injected()
-    await connect({ connector: finalConnector, chainId: targetChainId })
-  }
-
-  // 调用注册接口检查用户状态
+  /**
+   * 核心逻辑：检查用户状态与邀请码
+   */
   const checkUserStatus = async (walletAddress) => {
-    const response = await register({ address: walletAddress })
-    // 读取合约中邀请人是否存在
-    const inviter = await readContract(config, {
-      address: networks.find(n => Number(n.chainId) === BSC_CHAIN_ID).proxyNodeManager,
-      abi: nodeManagerABI,
-      functionName: 'inviters',
-      args: [walletAddress]
-    })
-    console.log("--------------------------------------------")
-    // 如果用户没有绑定邀请码，则改变邀请弹窗的显示状态
-    if (inviter == '0x0000000000000000000000000000000000000000') {
-      eventBus.emit('showInvite', true)
-    } else {
-      // 如果已经绑定邀请码，清除邀请码
-      counterStore.inviteCode = ''
-    }
-    await router.push('/')
-  }
-
-  const handleConnect = async (wallet) => {
     try {
-      // 如果链接钱包就先断开
-      if (status.value === 'connected' && address.value) {
-        await disconnect()
-        await new Promise(resolve => setTimeout(resolve, 100))
-      }
+      // 1. 后端注册接口记录
+      await register({ address: walletAddress })
 
-      isConnectingFromPage.value = true
-      // 链接钱包
-      await wallconnects(wallet.id, chainId.value)
-      // 存储address，请求头需要携带
-      localStorage.setItem('address', address.value)
-      // 后端接口记录用户地址，合约检查是否绑定邀请用户
-      await checkUserStatus(address.value)
-      isConnectingFromPage.value = false
+      // 2. 获取网络配置中的合约地址
+      const currentNetwork = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
+      if (!currentNetwork || !currentNetwork.proxyNodeManager) {
+        throw new Error('未找到 BSC 网络合约配置')
+      }
+    console.log("------------------------")
+      // 3. 读取合约检查邀请人
+      const inviter = await readContract(config, {
+        address: currentNetwork.proxyNodeManager,
+        abi: nodeManagerABI,
+        functionName: 'inviters',
+        args: [walletAddress]
+      })
+
+      // 4. 处理邀请逻辑
+      if (inviter === ZERO_ADDRESS) {
+        eventBus.emit('showInvite', true)
+      } else {
+        counterStore.inviteCode = '' // 已绑定则清空本地暂存的邀请码
+      }
+   
+      if(route.path.includes('/')) {
+        router.push('/home')
+        
+      }
+      // 5. 只有在登录页面连接成功才进行跳转
+      // if (route.path.includes('l') || route.path.includes('connect')) {
+      //   router.push('/')
+      // }
     } catch (error) {
-      console.error('连接钱包失败:', error)
-      isConnectingFromPage.value = false
+      console.error('Check user status failed:', error)
+      ElMessage.error('用户信息核验失败')
     }
   }
 
-  onMounted(async () => {
-    if (status.value === 'connected' && address.value) {
-      await disconnect()
-    }
+  /**
+   * 监听连接状态变化
+   */
+  stopWatchConnection = watch(
+    [status, address],
+    async ([newStatus, newAddress]) => {
+      if (newStatus === 'connected' && newAddress) {
+        sessionStorage.setItem("walletAddress",newAddress)
+        localStorage.setItem('address', newAddress)
+      
+        // 执行登录后的业务逻辑
+        await checkUserStatus(newAddress)
+        
+        // 关闭加载动画
+        if (loadingInstance) {
+          loadingInstance.close()
+          loadingInstance = null
+        }
+      }
+      
+      if (newStatus === 'disconnected') {
+        localStorage.removeItem('address')
+      }
+    },
+    { immediate: false }
+  )
 
-    if (safeConnectors.value && safeConnectors.value.length > 0) {
-      console.log(
-        '✅ Connectors已就绪:',
-        safeConnectors.value.map((c) => ({
-          id: c.id,
-          name: c.name,
-          type: c.type
-        }))
-      )
-    } else {
-      console.error('❌ Connectors未初始化或为空')
+  /**
+   * 点击连接钱包
+   */
+  const handleConnect = async (wallet) => {
+    // 开启全屏加载
+    loadingInstance = ElLoading.service({
+      lock: true,
+      text: '正在唤起钱包...',
+      background: 'rgba(0, 0, 0, 0.8)'
+    })
+
+    try {
+      // 如果当前已经是连接状态，先断开以便重新授权（切换账号）
+      // if (status.value === 'connected') {
+      //   await disconnect()
+      //   await new Promise(resolve => setTimeout(resolve, 500))
+      // }
+
+      // 寻找对应的 Connector
+      const connector = safeConnectors.value.find(c => c.id === wallet.id)
+      
+      // 执行连接，如果找不到匹配的 ID，则回退到 injected（浏览器插件）
+      await connect({ 
+        connector: connector || injected(), 
+        chainId: chainId.value || BSC_CHAIN_ID 
+      })
+
+    } catch (error) {
+      console.error('Wallet connection error:', error)
+      loadingInstance.close()
+      
+      if (error.message?.includes('User rejected')) {
+        ElMessage.warning('用户取消了连接')
+      } else {
+        ElMessage.error('连接失败，请确保钱包已解锁并尝试刷新')
+      }
+    }
+  }
+
+  onMounted(() => {
+    // 检查 Connectors 加载情况（调试用）
+    if (safeConnectors.value.length === 0) {
+      console.warn('Wagmi Connectors 尚未就绪')
     }
   })
 
+  // 组件销毁前清理，防止内存泄漏和重复监听
   onBeforeUnmount(() => {
     if (stopWatchConnection) {
       stopWatchConnection()
-      stopWatchConnection = null
+    }
+    if (loadingInstance) {
+      loadingInstance.close()
     }
   })
 
   return {
     logoUrl,
     wallets,
-    isConnectingFromPage,
     handleConnect,
-    handleClose
+    handleClose,
+    status,
+    address
   }
 }
-

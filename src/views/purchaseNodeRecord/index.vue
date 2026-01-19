@@ -45,6 +45,7 @@ import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import { getNodeStakingRecords, getNodeServiceProviderRecords } from '@/api/API'
 import { useAccount } from '@wagmi/vue'
 import { formatDateTime } from '@/utils/format_date.js'
+import { formatUnits } from 'viem'
 
 const { t } = useI18n()
 const { address } = useAccount()
@@ -57,8 +58,9 @@ const nodeTypeMap = {
     'T4': { nodeTag: 'T4', nodeNameKey: 'myIncome.nodeNames.consensusNode' },
     'T5': { nodeTag: 'T5', nodeNameKey: 'myIncome.superNode' },
     'T6': { nodeTag: 'T6', nodeNameKey: 'myIncome.nodeNames.genesisNode' },
-    '1': { nodeTag: '', nodeNameKey: 'myNode.nodeTypes.distributed' },
-    '2': { nodeTag: '', nodeNameKey: 'myNode.nodeTypes.cluster' },
+    '0': { nodeTag: '', nodeNameKey: 'myNode.nodeTypes.distributed' }, // 分布节点
+    '1': { nodeTag: '', nodeNameKey: 'myNode.nodeTypes.cluster' },     // 集群节点
+    '2': { nodeTag: '', nodeNameKey: 'myNode.nodeTypes.cluster' },     // 兼容历史 2
 }
 
 
@@ -66,6 +68,16 @@ const nodeTypeMap = {
 const formatNumber = (num) => {
     if (!num && num !== 0) return '0'
     return Number(num).toLocaleString('en-US')
+}
+
+// 格式化金额（将18精度转换为正常金额）
+const formatAmount = (value) => {
+    if (!value || value === '0' || value === 0) return '0'
+        // 将18精度的数值转换为正常数量
+        let num = typeof value === 'bigint' || typeof value === 'string' 
+            ? parseFloat(formatUnits(BigInt(value.toString()), 18))
+            : Number(value) / 1e18
+        return num.toFixed(2)
 }
 
 // 记录列表
@@ -86,7 +98,7 @@ const getNodeStakingRecordsData = async () => {
         return {
             nodeName: t(nodeTypeMap[item.type]?.nodeNameKey || ''),
             nodeTag: nodeTypeMap[item.type]?.nodeTag || '',
-            price: String(parseFloat(item.amount).toFixed(2)),
+            price: formatAmount(item.amount),
             dateTime: formatDateTime(item.created),
         }
     })
@@ -94,7 +106,7 @@ const getNodeStakingRecordsData = async () => {
     nodeServiceProviderRecords.forEach(item => {
         recordList.value.push({
             nodeName: t(nodeTypeMap[item.type]?.nodeNameKey || ''),
-            price: String(parseFloat(item.amount).toFixed(2)),
+            price: formatAmount(item.amount),
             dateTime: formatDateTime(item.created),
         })
     })

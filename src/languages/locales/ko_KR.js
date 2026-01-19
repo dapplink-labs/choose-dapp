@@ -393,7 +393,8 @@ export default {
     airdrop: "에어드롭",
     academy: "아카데미",
     nft: "NFT",
-    rwa: "RWA"
+    rwa: "RWA",
+    underDevelopment: "개발 중입니다"
   },
   settings: {
     title: "프로필",

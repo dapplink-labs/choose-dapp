@@ -12,7 +12,8 @@
         </div>
       </div>
       <div class="action-icons">
-        <img :src="isDark ? getIcon('29Dark') : getIcon('29')" :alt="$t('common.share')" class="icon-img" @click="handleShare" />
+        <img :src="isDark ? getIcon('29Dark') : getIcon('29')" :alt="$t('common.share')" class="icon-img"
+          @click="handleShare" />
         <img :src="isDark ? getIcon('settingDark') : getIcon('setting')" :alt="$t('common.settings')" class="icon-img"
           @click="handleSettings" />
         <img :src="isDark ? getIcon('closeDark') : getIcon('close')" :alt="$t('common.close')" class="icon-img"
@@ -440,19 +441,34 @@ const handleSettings = () => {
 
 // 处理关闭点击
 const handleClose = () => {
-  router.push('/')
+  router.push('/home')
 }
+
+// 允许访问的路径列表（除了这些路径外，其他都显示"正在开发中"）
+const allowedPaths = [
+  '/computing-power-services', // 节点购买
+  '/LPVault', // 质押池
+  '/dashboard', // 链上数据
+  '/asset-management' // 链上资产
+]
 
 // 处理菜单项点击
 const handleMenuClick = (item) => {
   // 菜单项的路由跳转
   if (item.path) {
-    router.push(item.path)
+    // 检查路径是否在允许列表中
+    if (allowedPaths.includes(item.path)) {
+      router.push(item.path)
+    } else {
+      // 不在允许列表中的路径，显示"正在开发中"提示
+      ElMessage.info(t('userInfo.underDevelopment'))
+    }
   }
 }
 
 // 处理断开链接
 const handleDisconnect = async () => {
+  window.sessionStorage.clear()
   try {
     console.log('开始断开钱包连接...')
     // 调用 wagmi 断开钱包连接（异步操作）
@@ -462,6 +478,7 @@ const handleDisconnect = async () => {
     router.replace('/')
   } catch (error) {
     console.error('断开连接失败:', error)
+  
     // 即使断开失败，也立即返回首页
     router.replace('/')
   }
