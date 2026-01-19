@@ -56,7 +56,7 @@ const { t } = useI18n()
 
 // 导航项配置
 const navItems = computed(() => [
-  { key: 'home', label: t('footerNav.home') || '首页', path: '/' },
+  { key: 'home', label: t('footerNav.home') || '首页', path: '/home' },
   { key: 'search', label: t('common.search') || '搜索', path: '/breaking' },
   { key: 'breaking', label: t('footerNav.breaking') || '突发', path: '/breaking' },
   { key: 'more', label: t('common.more') || '更多', path: '/personal-center' }
@@ -67,7 +67,7 @@ const activeNav = ref('home')
 
 // 路由到导航key的映射
 const routeToNavKey = {
-  '/': 'home',
+  '/home': 'home',
   '/breaking': 'breaking',
   '/settings': 'more',
   '/personal-center': 'more',
