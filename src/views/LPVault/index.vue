@@ -65,7 +65,11 @@
                     </div>
                 </div>
 
-                <button class="node-item-btn" @click="handleActivate(node.type)">
+                <button
+                    class="node-item-btn"
+                    :disabled="isActivationDisabled"
+                    @click="handleActivate(node.type)"
+                >
                     {{ $t('lpVault.activateComputingPower') }}
                 </button>
             </div>
@@ -84,7 +88,8 @@ const {
     handleOpenMore,
     handleOpenMyIncome,
     nodeList,
-    handleActivate
+    handleActivate,
+    isActivationDisabled
 } = useLPVault()
 </script>
 
@@ -438,6 +443,14 @@ const {
 
         &:active {
             transform: translateY(0);
+        }
+
+        &:disabled {
+            background: #c5c5c5;
+            color: #f5f5f5;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
     }
 
