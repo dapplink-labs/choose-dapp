@@ -37,7 +37,7 @@ import { useI18n } from 'vue-i18n'
 import { wallets, useLinkWallet } from './linkWallet'
 
 const { t } = useI18n()
-const { logoUrl, isConnectingFromPage, handleConnect, handleClose } = useLinkWallet()
+const { logoUrl,  handleConnect, handleClose } = useLinkWallet()
 </script>
 
 <style scoped lang="scss">

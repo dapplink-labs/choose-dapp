@@ -220,7 +220,7 @@ const handleNavClick = (key) => {
 
       .nav-text {
         color: var(--text-gray, #666666);
-        font-size: 14px;
+        font-size: 16px;
         transition: color 0.2s, font-size 0.2s, font-weight 0.2s;
       }
 
@@ -301,12 +301,6 @@ const handleNavClick = (key) => {
 
         .nav-icon {
           font-size: 14px;
-        }
-
-        &.active {
-          .nav-text {
-            font-size: 14px;
-          }
         }
       }
 
@@ -420,7 +414,7 @@ const handleNavClick = (key) => {
           }
 
           .nav-text {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-color, #000000);
           }
@@ -526,7 +520,7 @@ const handleNavClick = (key) => {
           }
 
           .nav-text {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-color, #000000);
           }
@@ -633,7 +627,7 @@ const handleNavClick = (key) => {
           }
 
           .nav-text {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-color, #000000);
           }

@@ -4,6 +4,7 @@ import { useConnect, useChainId, useAccount, useDisconnect } from '@wagmi/vue'
 import { injected } from '@wagmi/vue/connectors'
 import { useThemeStore } from '../../stores/theme'
 import { useCounterStore } from '@/stores/counter'
+import { ElMessage, ElLoading } from 'element-plus'
 import { register } from '@/api/API'
 import { eventBus } from '@/utils/eventBus'
 import { readContract } from '@wagmi/core'
@@ -78,7 +79,6 @@ export const useLinkWallet = () => {
   const { disconnect } = useDisconnect()
   const themeStore = useThemeStore()
   const counterStore = useCounterStore()
-  const isConnectingFromPage = ref(false)
   let stopWatchConnection = null
 
   const safeConnectors = computed(() => {
@@ -126,8 +126,20 @@ export const useLinkWallet = () => {
     }
     await router.push('/')
   }
-
+  let loading = null
+  watch(status, async (newStatus) => {
+    console.log(newStatus)
+    if (newStatus === 'connected' && address.value) {
+      // 存储address，请求头需要携带
+      localStorage.setItem('address', address.value)
+      // 后端接口记录用户地址，合约检查是否绑定邀请用户
+      await checkUserStatus(address.value)
+      loading.close()
+    }
+  })
   const handleConnect = async (wallet) => {
+    // 加载动画
+    loading = ElLoading.service({ lock: true, text: '连接钱包中...', background: 'rgba(0, 0, 0, 0.7)' })
     try {
       // 如果链接钱包就先断开
       if (status.value === 'connected' && address.value) {
@@ -135,17 +147,10 @@ export const useLinkWallet = () => {
         await new Promise(resolve => setTimeout(resolve, 100))
       }
 
-      isConnectingFromPage.value = true
       // 链接钱包
       await wallconnects(wallet.id, chainId.value)
-      // 存储address，请求头需要携带
-      localStorage.setItem('address', newAddress)
-      // 后端接口记录用户地址，合约检查是否绑定邀请用户
-      await checkUserStatus(newAddress)
-      isConnectingFromPage.value = false
     } catch (error) {
-      console.error('连接钱包失败:', error)
-      isConnectingFromPage.value = false
+      loading.close()
     }
   }
 
@@ -178,7 +183,6 @@ export const useLinkWallet = () => {
   return {
     logoUrl,
     wallets,
-    isConnectingFromPage,
     handleConnect,
     handleClose
   }

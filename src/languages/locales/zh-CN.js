@@ -505,7 +505,8 @@ export default {
     airdrop: "空投",
     academy: "学院",
     nft: "NFT",
-    rwa: "RWA"
+    rwa: "RWA",
+    underDevelopment: "正在开发中"
   },
   purchaseNodeRecord: {
     title: "节点购买记录",

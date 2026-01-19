@@ -24,23 +24,35 @@
 
       <div class="right-section">
         <!-- 语言切换下拉菜单 -->
-        <el-dropdown class="language-dropdown" @command="handleLanguageChange" trigger="click">
+        <el-dropdown class="language-dropdown" popper-class="language-dropdown-popper" @command="handleLanguageChange" trigger="click">
           <button class="language-toggle-btn" :title="$t('navbar.language.en') || 'Language'">
             <img src="@/assets/language.png" alt="language" class="language-icon" />
           </button>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item command="zh-cn">
-                {{ $t('navbar.language.cn') || '中文' }}
+                <span class="language-item">
+                  <img :src="cnIcon" alt="中文" class="language-flag-icon" />
+                  <span>{{ $t('navbar.language.cn') || '中文' }}</span>
+                </span>
               </el-dropdown-item>
               <el-dropdown-item command="en-us">
-                {{ $t('navbar.language.en') || 'English' }}
+                <span class="language-item">
+                  <img :src="usIcon" alt="English" class="language-flag-icon" />
+                  <span>{{ $t('navbar.language.en') || 'English' }}</span>
+                </span>
               </el-dropdown-item>
               <el-dropdown-item command="ko-kr">
-                {{ $t('navbar.language.Korean') || '한국어' }}
+                <span class="language-item">
+                  <img :src="krIcon" alt="한국어" class="language-flag-icon" />
+                  <span>{{ $t('navbar.language.Korean') || '한국어' }}</span>
+                </span>
               </el-dropdown-item>
               <el-dropdown-item command="ja-jp">
-                {{ $t('navbar.language.Japanese') || '日本語' }}
+                <span class="language-item">
+                  <img :src="jpIcon" alt="日本語" class="language-flag-icon" />
+                  <span>{{ $t('navbar.language.Japanese') || '日本語' }}</span>
+                </span>
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -90,23 +102,35 @@
 
       <div class="h5-user-section">
         <!-- 语言切换下拉菜单 -->
-        <el-dropdown class="h5-language-dropdown" @command="handleLanguageChange" trigger="click">
+        <el-dropdown class="h5-language-dropdown" popper-class="language-dropdown-popper" @command="handleLanguageChange" trigger="click">
           <div class="h5-language-toggle-btn" :title="$t('navbar.language.en') || 'Language'">
             <img :src="languageIcon" alt="language" class="h5-language-icon" />
           </div>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item command="zh-cn">
-                {{ $t('navbar.language.cn') || '中文' }}
+                <span class="language-item">
+                  <img :src="cnIcon" alt="中文" class="language-flag-icon" />
+                  <span>{{ $t('navbar.language.cn') || '中文' }}</span>
+                </span>
               </el-dropdown-item>
               <el-dropdown-item command="en-us">
-                {{ $t('navbar.language.en') || 'English' }}
+                <span class="language-item">
+                  <img :src="usIcon" alt="English" class="language-flag-icon" />
+                  <span>{{ $t('navbar.language.en') || 'English' }}</span>
+                </span>
               </el-dropdown-item>
               <el-dropdown-item command="ko-kr">
-                {{ $t('navbar.language.Korean') || '한국어' }}
+                <span class="language-item">
+                  <img :src="krIcon" alt="한국어" class="language-flag-icon" />
+                  <span>{{ $t('navbar.language.Korean') || '한국어' }}</span>
+                </span>
               </el-dropdown-item>
               <el-dropdown-item command="ja-jp">
-                {{ $t('navbar.language.Japanese') || '日本語' }}
+                <span class="language-item">
+                  <img :src="jpIcon" alt="日本語" class="language-flag-icon" />
+                  <span>{{ $t('navbar.language.Japanese') || '日本語' }}</span>
+                </span>
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -181,6 +205,10 @@ import img from "../assets/wallconnect.svg";
 import router from "@/router";
 import logoLight from "@/assets/logo.png";
 import logoDark from "@/assets/logo-Dark.png";
+import cnIcon from "@/assets/languagesIcon/cn.svg";
+import jpIcon from "@/assets/languagesIcon/jp.svg";
+import krIcon from "@/assets/languagesIcon/kr.svg";
+import usIcon from "@/assets/languagesIcon/us.svg";
 
 
 const { disconnect } = useDisconnect();
@@ -538,6 +566,48 @@ onBeforeUnmount(() => {
             object-fit: contain;
           }
         }
+
+        // 移动端语言下拉菜单项样式
+        :deep(.el-dropdown-menu) {
+          background-color: #1e1e1e;
+          border: 1px solid #3a3a3a;
+          border-radius: 8px;
+          padding: 4px 0;
+          min-width: 140px;
+        }
+
+        :deep(.el-dropdown-menu__item) {
+          padding: 8px 12px;
+          color: #ffffff;
+          transition: all 0.2s ease;
+
+          &:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+          }
+
+          .language-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+
+            .language-flag-icon {
+              width: 18px;
+              height: 14px;
+              object-fit: cover;
+              flex-shrink: 0;
+              border-radius: 2px;
+              box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            }
+
+            span {
+              font-size: 13px;
+              font-weight: 400;
+              color: #ffffff;
+              flex: 1;
+            }
+          }
+        }
       }
 
       .h5-theme-toggle-btn {
@@ -688,6 +758,48 @@ onBeforeUnmount(() => {
         width: 18px;
         height: 18px;
         object-fit: contain;
+      }
+    }
+
+    // 语言下拉菜单项样式
+    :deep(.el-dropdown-menu) {
+      background-color: var(--bg-page, #1E1E1E);
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      padding: 4px 0;
+      min-width: 140px;
+    }
+
+    :deep(.el-dropdown-menu__item) {
+      padding: 8px 12px;
+      color: #ffffff;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .language-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+
+        .language-flag-icon {
+          width: 18px;
+          height: 14px;
+          object-fit: cover;
+          flex-shrink: 0;
+          border-radius: 2px;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        span {
+          font-size: 13px;
+          font-weight: 400;
+          color: #ffffff;
+          flex: 1;
+        }
       }
     }
   }
@@ -846,6 +958,56 @@ onBeforeUnmount(() => {
       }
     }
   }
+}
+
+/* ✅ 关键：下拉菜单是 teleport 到 body 的，需要用 popper-class + :global 才能稳定命中 */
+:global(.language-dropdown-popper.el-dropdown__popper) {
+  --language-item-gap: 8px;
+  --language-flag-w: 18px;
+  --language-flag-h: 14px;
+  --language-item-padding-y: 8px;
+  --language-item-padding-x: 12px;
+}
+
+:global(.language-dropdown-popper .el-dropdown-menu) {
+  background-color: #ffffff;
+  border: 1px solid var(--border-color, #3A3A3A);
+  border-radius: 8px;
+  padding: 4px 0;
+  min-width: 140px;
+}
+
+:global(.language-dropdown-popper .el-dropdown-menu__item) {
+  padding: var(--language-item-padding-y) var(--language-item-padding-x);
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+:global(.language-dropdown-popper .el-dropdown-menu__item:hover) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+:global(.language-dropdown-popper .language-item) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--language-item-gap);
+  width: 100%;
+}
+
+:global(.language-dropdown-popper .language-flag-icon) {
+  width: var(--language-flag-w);
+  height: var(--language-flag-h);
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+:global(.language-dropdown-popper .language-item > span) {
+  font-size: 13px;
+  font-weight: 400;
+  color: #000000;
+  flex: 1;
 }
 
 // popup 弹窗样式（仅连接弹窗）

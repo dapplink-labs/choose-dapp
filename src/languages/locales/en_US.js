@@ -497,7 +497,8 @@ export default {
     airdrop: "Airdrop",
     academy: "Academy",
     nft: "NFT",
-    rwa: "RWA"
+    rwa: "RWA",
+    underDevelopment: "Under Development"
   },
   purchaseNodeRecord: {
     title: "Node Staking Record",

@@ -344,7 +344,8 @@ export default {
     airdrop: "エアドロップ",
     academy: "アカデミー",
     nft: "NFT",
-    rwa: "RWA"
+    rwa: "RWA",
+    underDevelopment: "開発中です"
   },
   settings: {
     title: "プロフィール",
