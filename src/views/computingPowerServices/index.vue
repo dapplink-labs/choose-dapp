@@ -57,7 +57,7 @@
               <p>{{ node.descText }}</p>
             </div>
 
-            <button v-if="isNodeButtonVisible(node.type)" class="node-item-btn"
+            <button class="node-item-btn"
               :class="{ 'disabled': !isNodeButtonEnabled(node.type) }" :disabled="!isNodeButtonEnabled(node.type)"
               @click="handleBuy(node.type)">
               {{ getButtonText(node.type) }}
@@ -101,7 +101,6 @@ const {
   handleConfirmBuy,
   getButtonText,
   isNodeButtonEnabled,
-  isNodeButtonVisible
 } = useComputingPowerServices()
 </script>
 

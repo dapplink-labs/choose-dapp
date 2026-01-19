@@ -603,7 +603,7 @@ onBeforeUnmount(() => {
             span {
               font-size: 13px;
               font-weight: 400;
-              color: #ffffff;
+              color: var(--text-color, #FFFFFF);
               flex: 1;
             }
           }
@@ -772,7 +772,7 @@ onBeforeUnmount(() => {
 
     :deep(.el-dropdown-menu__item) {
       padding: 8px 12px;
-      color: #ffffff;
+      color: var(--text-color, #FFFFFF);
       transition: all 0.2s ease;
 
       &:hover {
@@ -797,7 +797,7 @@ onBeforeUnmount(() => {
         span {
           font-size: 13px;
           font-weight: 400;
-          color: #ffffff;
+          color: var(--text-color, #FFFFFF);
           flex: 1;
         }
       }
@@ -970,7 +970,7 @@ onBeforeUnmount(() => {
 }
 
 :global(.language-dropdown-popper .el-dropdown-menu) {
-  background-color: #ffffff;
+  background-color: var(--bg-page, #1E1E1E);
   border: 1px solid var(--border-color, #3A3A3A);
   border-radius: 8px;
   padding: 4px 0;
@@ -979,7 +979,7 @@ onBeforeUnmount(() => {
 
 :global(.language-dropdown-popper .el-dropdown-menu__item) {
   padding: var(--language-item-padding-y) var(--language-item-padding-x);
-  color: #ffffff;
+  color: var(--text-color, #FFFFFF);
   transition: all 0.2s ease;
 }
 
@@ -1006,8 +1006,35 @@ onBeforeUnmount(() => {
 :global(.language-dropdown-popper .language-item > span) {
   font-size: 13px;
   font-weight: 400;
-  color: #000000;
+  color: var(--text-color, #FFFFFF);
   flex: 1;
+}
+
+/* 语言下拉的小三角颜色适配（背景 + 边框） */
+:global(.language-dropdown-popper.el-popper > .el-popper__arrow::before) {
+  background-color: var(--bg-page, #1E1E1E) !important;
+  border: 1px solid var(--border-color, #3A3A3A) !important;
+}
+/* Element Plus 会按 placement 把部分边框色设为 transparent，这里需要逐方向覆盖 */
+:global(.language-dropdown-popper.el-popper[data-popper-placement^='bottom'] > .el-popper__arrow::before) {
+  border-bottom-color: var(--border-color, #3A3A3A) !important;
+  border-right-color: var(--border-color, #3A3A3A) !important;
+}
+:global(.language-dropdown-popper.el-popper[data-popper-placement^='top'] > .el-popper__arrow::before) {
+  border-top-color: var(--border-color, #3A3A3A) !important;
+  border-left-color: var(--border-color, #3A3A3A) !important;
+}
+:global(.language-dropdown-popper.el-popper[data-popper-placement^='left'] > .el-popper__arrow::before) {
+  border-left-color: var(--border-color, #3A3A3A) !important;
+  border-bottom-color: var(--border-color, #3A3A3A) !important;
+}
+:global(.language-dropdown-popper.el-popper[data-popper-placement^='right'] > .el-popper__arrow::before) {
+  border-right-color: var(--border-color, #3A3A3A) !important;
+  border-top-color: var(--border-color, #3A3A3A) !important;
+}
+/* 兜底：其他下拉保持透明箭头，不影响 */
+:global(.el-dropdown__popper.el-popper > .el-popper__arrow::before) {
+  border-color: transparent;
 }
 
 // popup 弹窗样式（仅连接弹窗）

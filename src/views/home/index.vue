@@ -540,7 +540,7 @@ const toggleFavorite = (item) => {
 
 <style scoped lang="scss">
 // 公共样式变量（使用CSS变量以支持主题切换）
-$yes-color: #25A750;
+$yes-color: #BBFF2E;
 $no-color: #CA4064;
 $yes-bg-light: rgba(37, 167, 80, 0.2);
 $no-bg-light: rgba(202, 64, 100, 0.2);
@@ -1442,7 +1442,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
               .tag-btn {
                 padding: 4px 10px;
-                font-size: 11px;
+                font-size: 12px;
                 }
               }
 
@@ -1545,30 +1545,20 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
                 transition: all 0.2s;
 
                 &.yes-btn {
-                  background: rgba(37, 167, 80, 0.2);
-                  color: #4CAF50;
-
-                  &:hover {
-                    background: #C8E6C9;
-                  }
+                  background: var(--button-bg-y, #2EBE69);
+                  color: var(--text-color-y, #2EBE69);
 
                   &.active {
-                    background: #4CAF50;
-                    color: #ffffff;
+                    background: var(--button-bg-y, #2EBE69);
                   }
                 }
 
                 &.no-btn {
-                  background: rgba(202, 64, 100, 0.2);
-                  color: #E91E63;
-
-                  &:hover {
-                    background: #F8BBD0;
-                  }
+                  background: var(--button-bg-n, #E44096);
+                  color: var(--text-color-n, #E44096);
 
                   &.active {
-                    background: #E91E63;
-                    color: #ffffff;
+                    background: rgba(228, 64, 150, 1);
                   }
                 }
               }

@@ -11,7 +11,7 @@ import networks from '@/assets/json/networks.json'
 import { config } from '../../wagmi.ts'
 import { useChainId, useAccount } from '@wagmi/vue'
 import { getUserTokenBalance, approveToken, checkAllowance } from '@/utils/requestWEB3.js'
-import { parseUnits } from 'viem'
+import { parseUnits, formatUnits } from 'viem'
 import { getNodeStakingList, nodeStakingActivate } from '@/api/API'
 import { eventBus } from '@/utils/eventBus'
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
@@ -72,10 +72,10 @@ export const useLPVault = () => {
           name: t(`lpVault.nodeTypes.${item.node_level}`),
           nodeLevel: item.node_level,
           icon: item.icon || DistributedNode,
-          price: String(parseFloat(item.staking_amount).toFixed(2)),
+          price: String(formatUnits(BigInt(item.staking_amount.toString()), 18)),
           dailyEarnings: String(item.node_income) + "%",
           cycleDays: item.node_period ? `${item.node_period}${t('lpVault.days')}` : `0${t('lpVault.days')}`,
-          totalEarnings: String(item.forecast_income || '0')
+          totalEarnings: String(formatUnits(BigInt(item.forecast_income.toString()), 18) || '0')
         }
       })
     } catch (err) {

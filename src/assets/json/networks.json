@@ -61,15 +61,15 @@
         "cpContract": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
         "ethContract": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
         "bridgeContract": "0x0000000000000000000000000000000000000000",
-        "usdtTokenAddress": "0x28A2216BEC305a0866e81E122C8a70a892E0d211",
-        "proxyAirdropManager": "0x9ADeb874bEe63bf0D75e089dD3956c57392faE40",
-        "proxyChooseMeToken": "0x7F1dD4f256C9A6947e5ec590cB3C7940cd3ccaf0",
-        "proxyDaoRewardManager": "0x613B301419056Db13a144d57696776a886B8A05D",
-        "proxyEventFundingManager": "0xf7d606439C235C27C8599C217F1A3a080831a06D",
-        "proxyFomoTreasureManager": "0x544f494b082B8B1109A027Cb71b52C6785c166d6",
-        "proxyMarketManager": "0xE604b7A2394D8706AD42b9524CaB5057EFFE03E5",
-        "proxyNodeManager": "0x98480C54DB27F716E8d3c2c7038C235CE9d5ad7f",
-        "proxyStakingManager": "0xC5a032F480C1154780dE794d1Fb9B902a83dd262",
-        "proxySubTokenFundingManager": "0xCF03b6fCbBcFCB1a24D076b76006EeD883DF18C8"
+        "usdtTokenAddress": "0x01700420Df2AD2d22856eC0D39c6d1fC312Cbbb4",
+        "proxyAirdropManager": "0x2E2F9957F91FFD25A049Fd0fcf01a9d249341cC8",
+        "proxyChooseMeToken": "0x2dC6DDb0e5E774eA427f12f9A6b94D3c806988F5",
+        "proxyDaoRewardManager": "0x814c0A56e3Ae095114D6939F856e61D1eCB0bea5",
+        "proxyEventFundingManager": "0x5FD56415efb171B51F522BFb7Ed33E9693Fe48b3",
+        "proxyFomoTreasureManager": "0x47708eA534eF8f82ed83571C73EFc384AEC27FD2",
+        "proxyMarketManager": "0xd9992884b363B3ceBc1Ac4BE327223111648932f",
+        "proxyNodeManager": "0xD467852E40C6e437d4014033254b1d5b2a17E5A5",
+        "proxyStakingManager": "0xaf8D460fE61121e030DA2bAC800DD20c1c812798",
+        "proxySubTokenFundingManager": "0x6502a0C304869321b2c37CCa27f6F2585c39A6A1"
     }
 ]

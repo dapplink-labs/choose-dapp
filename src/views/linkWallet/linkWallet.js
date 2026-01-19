@@ -146,7 +146,7 @@ export const useLinkWallet = () => {
         await disconnect()
         await new Promise(resolve => setTimeout(resolve, 100))
       }
-
+      console.log('==========================')
       // 链接钱包
       await wallconnects(wallet.id, chainId.value)
     } catch (error) {

@@ -25,15 +25,14 @@ export function useComputingPowerServices() {
   // BSC 主网chainId
   const BSC_CHAIN_ID = 56
 
-
   // 节点 TAB 状态（用于弹窗标题）
   // 0: 分布节点, 1: 集群节点（与接口 node_type 对齐）
   const activeNodeTab = ref(0)
 
   // 节点金额，单位为 wei
   const nodePriceObj = ref({
-    DistributedNode: BigInt('0'),//分布式节点金额
-    ClusterNode: BigInt('0'),//集群节点金额
+    DistributedNode: BigInt('0'), // 分布式节点金额
+    ClusterNode: BigInt('0'), // 集群节点金额
   })
 
   // 节点卡片数据
@@ -108,14 +107,12 @@ export function useComputingPowerServices() {
     const percent = Number(currentNode.marketShare)
     return `${percent}%`
   })
-  // mock数据END
 
   // 打开购买节点弹窗
   const handleBuy = (type) => {
     activeNodeTab.value = type
     showPurchaseNode.value = true
   }
-
 
   // 获取节点价格
   const getNodePrice = async () => {
@@ -146,99 +143,108 @@ export function useComputingPowerServices() {
       return
     }
 
-    const loading = ElLoading.service({ lock: true, text: t('computingPower.activatingNode'), background: 'rgba(0, 0, 0, 0.7)' })
+    let loading
+    try {
+      loading = ElLoading.service({ lock: true, text: t('computingPower.activatingNode'), background: 'rgba(0, 0, 0, 0.7)' })
 
-    // 1. 网络环境检查 (BSC 56)
-    if (Number(chainId.value) !== BSC_CHAIN_ID) {
-      await switchChain(config, { chainId: BSC_CHAIN_ID })
-      await new Promise(r => setTimeout(r, 1000))
-    }
+      // 1. 网络环境检查 (BSC 56)
+      if (Number(chainId.value) !== BSC_CHAIN_ID) {
+        await switchChain(config, { chainId: BSC_CHAIN_ID })
+        await new Promise(r => setTimeout(r, 1000))
+      }
 
-    const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
-    const { proxyNodeManager, usdtTokenAddress } = bscNet
+      const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
+      const { proxyNodeManager, usdtTokenAddress } = bscNet
 
-    // 检查当前用户是否绑定邀请码
-    const inviter = await readContract(config, {
-      address: bscNet.proxyNodeManager,
-      abi: nodeManagerABI,
-      functionName: 'inviters',
-      args: [address.value]
-    })
-    if (inviter == '0x0000000000000000000000000000000000000000') {
-      ElMessage.warning(t('请先绑定邀请码'))
-      eventBus.emit('showInvite', true)
-      loading.close()
-      return
-    }
-
-    // 2. 确定本次交易需要的金额
-    const latest = await getNodePrice()
-    let amountBigInt = activeNodeTab.value === 0 ? latest.DistributedNode : latest.ClusterNode
-    let nodeId = nodeProducts.value.find(node => node.type == activeNodeTab.value)?.id;
-
-    // ============ 余额检查 ============
-    const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value, 'balanceOf')
-
-    if (userBalance < amountBigInt) {
-      loading.close()
-      // 如果余额不足，直接报错并停止执行
-      ElMessage({
-        message: t('computingPower.insufficientBalance'),
-        type: 'error',
-        duration: 5000,
-        showClose: true
+      // 检查当前用户是否绑定邀请码
+      const inviter = await readContract(config, {
+        address: bscNet.proxyNodeManager,
+        abi: nodeManagerABI,
+        functionName: 'inviters',
+        args: [address.value]
       })
-      return
-    }
+      if (inviter == '0x0000000000000000000000000000000000000000') {
+        ElMessage.warning(t('请先绑定邀请码'))
+        eventBus.emit('showInvite', true)
+        return
+      }
 
-    // 3. 检查授权 余额充足
-    const allowance = await checkAllowance(usdtTokenAddress, address.value, proxyNodeManager)
-    if (allowance === BigInt(0) || allowance < amountBigInt) {
-      loading.text = t('computingPower.requestingAuth')
-      await approveToken({
-        tokenAddress: usdtTokenAddress,
-        spenderAddress: proxyNodeManager,
-        amount: amountBigInt,
+      // 2. 确定本次交易需要的金额
+      const latest = await getNodePrice()
+      let amountBigInt = activeNodeTab.value === 0 ? latest.DistributedNode : latest.ClusterNode
+      let nodeId = nodeProducts.value.find(node => node.type == activeNodeTab.value)?.id;
+
+      // ============ 余额检查 ============
+      const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value, 'balanceOf')
+      console.log('amountBigInt', amountBigInt)
+      if (userBalance < amountBigInt) {
+        // 如果余额不足，直接报错并停止执行
+        ElMessage({
+          message: t('computingPower.insufficientBalance'),
+          type: 'error',
+          duration: 5000,
+          showClose: true
+        })
+        return
+      }
+
+      // 3. 检查授权 余额充足
+      const allowance = await checkAllowance(usdtTokenAddress, address.value, proxyNodeManager)
+      if (allowance === BigInt(0) || allowance < amountBigInt) {
+        loading.text = t('computingPower.requestingAuth')
+        await approveToken({
+          tokenAddress: usdtTokenAddress,
+          spenderAddress: proxyNodeManager,
+          amount: amountBigInt,
+          userAddress: address.value,
+          BRIDGE_MESSAGES: {
+            approvalSuccess: t('bridge.approvalSuccess'),
+            userCancelledAuth: t('bridge.userCancelledAuth'),
+            approveTokenFailed: t('bridge.approveTokenFailed')
+          }
+        })
+      }
+
+      // 4. 执行购买
+      loading.text = t('computingPower.payingAndActivating')
+      const result = await writeContractOptimized({
+        abi: nodeManagerABI,
+        address: proxyNodeManager,
+        functionName: 'purchaseNode',
+        args: [amountBigInt],
         userAddress: address.value,
-        BRIDGE_MESSAGES: {
-          approvalSuccess: t('bridge.approvalSuccess'),
-          userCancelledAuth: t('bridge.userCancelledAuth'),
-          approveTokenFailed: t('bridge.approveTokenFailed')
+        messages: {
+          success: t('computingPower.nodeActivationSuccess'),
+          failed: t('computingPower.paymentFailed'),
+          rejected: t('computingPower.paymentCancelled')
         }
       })
-    }
+      console.log('result', result)
+      console.log('购买节点参数：', {
+        address: address.value,
+        node_id: nodeId,
+        hash: result.hash,
+      })
 
-    // 4. 执行购买
-    loading.text = t('computingPower.payingAndActivating')
-    const result = await writeContractOptimized({
-      abi: nodeManagerABI,
-      address: proxyNodeManager,
-      functionName: 'purchaseNode',
-      args: [amountBigInt],
-      userAddress: address.value,
-      messages: {
-        success: t('computingPower.nodeActivationSuccess'),
-        failed: t('computingPower.paymentFailed'),
-        rejected: t('computingPower.paymentCancelled')
+      // 调用接口记录购买节点
+      const res = await purchaseNode({
+        address: address.value,
+        node_id: nodeId,
+        hash: result.hash,
+      })
+
+      showPurchaseNode.value = false
+      await fetchNodeProducts()
+    } catch (error) {
+      // 可选：根据错误类型提示
+      if (error?.code === 'ACTION_REJECTED' || error?.message?.includes('user rejected')) {
+        ElMessage.info(t('computingPower.paymentCancelled'))
       }
-    })
-    console.log('result', result)
-    console.log('购买节点参数：', {
-      address: address.value,
-      node_id: nodeId,
-      hash: result.hash,
-    })
-
-    // 调用接口记录购买节点
-    const res = await purchaseNode({
-      address: address.value,
-      node_id: nodeId,
-      hash: result.hash,
-    })
-
-    showPurchaseNode.value = false
-    await fetchNodeProducts()
-    loading.close()
+    } finally {
+      if (loading) {
+        loading.close()
+      }
+    }
   }
 
   // 拉取节点数据 
@@ -303,43 +309,27 @@ export function useComputingPowerServices() {
     activeNodeTab.value === 0 ? distributedNodeImg : clusterNodeImg
   )
 
-  // 判断按钮是否显示
-  const isNodeButtonVisible = (nodeType) => {
-    const currentNode = nodeProducts.value.find(node => node.type === nodeType)
-    const otherNode = nodeProducts.value.find(node => node.type !== nodeType)
-
-    if (!currentNode) {
-      return false
-    }
-
-    // 如果当前节点的 is_active 不为 1（2 或 3），显示按钮
-    if (currentNode.is_active !== 1) {
-      return true
-    }
-
-    // 如果当前节点的 is_active 为 1，检查另一个节点
-    // 如果另一个节点不存在，显示按钮
-    if (!otherNode) {
-      return true
-    }
-
-    // 如果另一个节点的 is_active 不为 1，隐藏当前节点的按钮
-    if (otherNode.is_active !== 1) {
-      return false
-    }
-
-    // 如果两个节点的 is_active 都为 1，显示按钮
-    return true
-  }
-
   // 判断单个节点的按钮是否可点击
-  // 只有当两个节点的 is_active 都为 1 时，按钮才可点击
+  // 规则：
+  // - is_active === 1：可购买（前提是两条数据都为 1）
+  // - is_active === 2/3：置灰不可点
+  // - 两条数据任意一条为 2 或 3，则两颗按钮都置灰不可点
   const isNodeButtonEnabled = (nodeType) => {
-    // 如果两个节点都存在且 is_active 都为 1，则按钮可点击
-    if (nodeProducts?.value?.length >= 2) {
-      return nodeProducts.value.every(node => node.is_active === 1)
+    const currentNode = nodeProducts.value.find(node => node.type === nodeType)
+    if (!currentNode) return false
+
+    // 任意节点处于激活中/已购买，则全部按钮都不可点击
+    const hasInProgressOrPurchased = nodeProducts.value.some(
+      (node) => node.is_active === 2 || node.is_active === 3
+    )
+    if (hasInProgressOrPurchased) return false
+
+    // 两条数据都为 1 且当前节点为 1 才可点击
+    if (nodeProducts.value.length >= 2) {
+      return currentNode.is_active === 1 && nodeProducts.value.every((node) => node.is_active === 1)
     }
-    // 如果节点数据不完整，默认不可点击
+
+    // 数据不足两条时，保守起见不可点击（避免状态不一致）
     return false
   }
 
@@ -381,7 +371,7 @@ export function useComputingPowerServices() {
     fetchNodeProducts,
     getButtonText,
     isNodeButtonEnabled,
-    isNodeButtonVisible
   }
 }
+
 

@@ -120,7 +120,7 @@ const themeStore = useThemeStore()
 const isDark = computed(() => themeStore.isDark)
 
 // 用户信息
-const username = ref('johnsmith2025')
+const username = ref('')
 const walletAddress = computed(() => {
   if (address.value) {
     return `${address.value.slice(0, 6)}....${address.value.slice(-4)}`
