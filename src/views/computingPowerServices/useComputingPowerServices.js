@@ -264,8 +264,6 @@ export function useComputingPowerServices() {
         nodeProducts.value = []
         return
       }
-
-
       // 接口返回字段: id, name, fee_reward, sub_coin_reward, market_reward, status 等
       nodeProducts.value = list.map((item) => {
         // node_type: 1: 分布式, 2: 集群

@@ -692,7 +692,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
               padding: 6px 14px;
               border: 1px solid var(--border-color, #E0E0E0);
               border-radius: 5px;
-              font-size: 13px;
+              font-size: 14px;
               color: var(--text-gray, #666666);
               backdrop-filter: blur(10px);
               -webkit-backdrop-filter: blur(10px);

@@ -56,9 +56,7 @@ watch(
       const checkUserStatus = async (walletAddress) => {
         const response = await register({ address: walletAddress })
         const exists = response?.data?.data?.exists ?? response?.data?.exists
-        if (exists) {
-          window.location.reload()
-        } else {
+        if (!exists) {
           eventBus.emit('showInvite', true);
         }
       }
@@ -85,15 +83,6 @@ const checkIsMobile = () => {
 }
 
 checkIsMobile()
-
-// 监听路由变化，用于调试
-watch(
-  () => route.path,
-  (newPath, oldPath) => {
-    console.log('路由变化:', { from: oldPath, to: newPath, routeName: route.name })
-  },
-  { immediate: true }
-)
 
 watch(
   () => route.query.inviteCode,

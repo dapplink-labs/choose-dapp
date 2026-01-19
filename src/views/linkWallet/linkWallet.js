@@ -110,7 +110,6 @@ export const useLinkWallet = () => {
   // 调用注册接口检查用户状态
   const checkUserStatus = async (walletAddress) => {
     const response = await register({ address: walletAddress })
-    const exists = response?.data?.data?.exists ?? response?.data?.exists
     // 读取合约中邀请人是否存在
     const inviter = await readContract(config, {
       address: networks.find(n => Number(n.chainId) === BSC_CHAIN_ID).proxyNodeManager,
@@ -125,47 +124,27 @@ export const useLinkWallet = () => {
       // 如果已经绑定邀请码，清除邀请码
       counterStore.inviteCode = ''
     }
+    await router.push('/')
   }
 
   const handleConnect = async (wallet) => {
     try {
+      // 如果链接钱包就先断开
       if (status.value === 'connected' && address.value) {
         await disconnect()
         await new Promise(resolve => setTimeout(resolve, 100))
       }
-      
+
       isConnectingFromPage.value = true
-      
-      if (stopWatchConnection) {
-        stopWatchConnection()
-      }
-      
-      stopWatchConnection = watch(
-        () => [status.value, address.value],
-        async ([newStatus, newAddress]) => {
-          if (newStatus === 'connected' && newAddress && isConnectingFromPage.value) {
-            // 保存地址到 localStorage
-            localStorage.setItem('address', newAddress)
-            
-            if (stopWatchConnection) {
-              stopWatchConnection()
-              stopWatchConnection = null
-            }
-            
-            await checkUserStatus(newAddress)
-            await router.push('/')
-            isConnectingFromPage.value = false
-          }
-        }
-      )
-      
+      // 链接钱包
       await wallconnects(wallet.id, chainId.value)
+      // 存储address，请求头需要携带
+      localStorage.setItem('address', newAddress)
+      // 后端接口记录用户地址，合约检查是否绑定邀请用户
+      await checkUserStatus(newAddress)
+      isConnectingFromPage.value = false
     } catch (error) {
       console.error('连接钱包失败:', error)
-      if (stopWatchConnection) {
-        stopWatchConnection()
-        stopWatchConnection = null
-      }
       isConnectingFromPage.value = false
     }
   }
