@@ -14,6 +14,7 @@ import networks from '@/assets/json/networks.json'
 import { checkAllowance, approveToken, writeContractOptimized, safeBigInt, getUserTokenBalance } from '@/utils/requestWEB3.js'
 import { config } from '../../wagmi.ts'
 import { getNodeServiceProviders, purchaseNode } from '@/api/API'
+import { eventBus } from '@/utils/eventBus'
 
 export function useComputingPowerServices() {
   const router = useRouter()
@@ -160,6 +161,20 @@ export function useComputingPowerServices() {
 
     const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
     const { proxyNodeManager, usdtTokenAddress } = bscNet
+
+    // 检查当前用户是否绑定邀请码
+    const inviter = await readContract(config, {
+      address: bscNet.proxyNodeManager,
+      abi: nodeManagerABI,
+      functionName: 'inviters',
+      args: [address.value]
+    })
+    if (inviter == '0x0000000000000000000000000000000000000000') {
+      ElMessage.warning(t('请先绑定邀请码'))
+      eventBus.emit('showInvite', true)
+      loading.close()
+      return
+    }
 
     // 2. 确定本次交易需要的金额
     const latest = await getNodePrice()

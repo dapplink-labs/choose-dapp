@@ -713,7 +713,8 @@ export default {
     approveTokenFailed: "Approval failed",
     nodeActivationSuccess: "Node activation successful!",
     paymentFailed: "Payment failed",
-    paymentCancelled: "You cancelled the payment"
+    paymentCancelled: "You cancelled the payment",
+    bindInviteCodeFirst: "Please bind invitation code first"
   },
   myNode: {
     title: "Cluster Node",

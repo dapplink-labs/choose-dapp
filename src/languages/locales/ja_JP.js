@@ -184,7 +184,8 @@ export default {
     approveTokenFailed: "承認失敗",
     nodeActivationSuccess: "ノードアクティベート成功！",
     paymentFailed: "支払い失敗",
-    paymentCancelled: "支払いをキャンセルしました"
+    paymentCancelled: "支払いをキャンセルしました",
+    bindInviteCodeFirst: "まず招待コードを連携してください"
   },
   myNode: {
     title: "クラスターノード",

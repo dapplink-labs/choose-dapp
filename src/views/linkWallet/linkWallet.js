@@ -1,12 +1,11 @@
 import { computed, onMounted, ref, watch, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { useConnect, useChainId, useAccount, useSignMessage, useDisconnect } from '@wagmi/vue'
+import { useConnect, useChainId, useAccount, useDisconnect } from '@wagmi/vue'
 import { injected } from '@wagmi/vue/connectors'
 import { useThemeStore } from '../../stores/theme'
 import { useCounterStore } from '@/stores/counter'
 import { register } from '@/api/API'
 import { eventBus } from '@/utils/eventBus'
-import { ElMessage } from 'element-plus'
 import { readContract } from '@wagmi/core'
 import { config } from '@/wagmi.ts'
 import networks from '@/assets/json/networks.json'
@@ -16,7 +15,6 @@ const BSC_CHAIN_ID = 56
 
 import logoLight from '@/assets/icon/logo.png'
 import logoDark from '@/assets/icon/logoDark.png'
-import walletConnectIcon from '@/assets/wallconnect.svg'
 
 export const wallets = [
   {
@@ -77,13 +75,12 @@ export const useLinkWallet = () => {
   const { connect, connectors } = useConnect()
   const chainId = useChainId()
   const { status, address } = useAccount()
-  const { signMessage, data: signatureData, isSuccess: isSignatureSuccess, isError: isSignatureError } = useSignMessage()
   const { disconnect } = useDisconnect()
   const themeStore = useThemeStore()
   const counterStore = useCounterStore()
   const isConnectingFromPage = ref(false)
-  const isWaitingForSignature = ref(false)
-  const pendingWalletAddress = ref(null)
+  let stopWatchConnection = null
+
   const safeConnectors = computed(() => {
     const maybeRef = connectors?.value
     if (Array.isArray(maybeRef)) {
@@ -102,73 +99,6 @@ export const useLinkWallet = () => {
     router.back()
   }
 
-  // 延迟创建 watch，只在需要时创建
-  let stopWatchConnection = null
-  let stopWatchSuccess = null
-  let stopWatchError = null
-
-  // 创建所有 watch 监听器
-  const setupWatchers = () => {
-    if (stopWatchConnection) return // 已经创建过，不再重复创建
-
-    // 监听连接状态，连接成功后请求签名
-    stopWatchConnection = watch(
-      () => [status.value, address.value],
-      ([newStatus, newAddress]) => {
-        if (newStatus === 'connected' && newAddress && isConnectingFromPage.value && !isWaitingForSignature.value) {
-          const message = `Welcome to ChooseMe!\n\nPlease sign this message to connect your wallet.\n\nAddress: ${newAddress}\nTimestamp: ${Date.now()}`
-
-          isWaitingForSignature.value = true
-          pendingWalletAddress.value = newAddress
-
-          signMessage({ message })
-        }
-      }
-    )
-
-    // 监听签名成功，如果签名成功则调用后端接口
-    stopWatchSuccess = watch(
-      () => isSignatureSuccess.value,
-      async (isSuccess) => {
-        if (isSuccess && isWaitingForSignature.value && pendingWalletAddress.value) {
-          await checkUserStatus(pendingWalletAddress.value)
-
-          // 重置状态
-          isWaitingForSignature.value = false
-          isConnectingFromPage.value = false
-          const walletAddr = pendingWalletAddress.value
-          pendingWalletAddress.value = null
-
-          await router.push('/')
-        }
-      }
-    )
-
-    // 监听签名失败
-    stopWatchError = watch(
-      () => isSignatureError.value,
-      async (isError) => {
-        if (isError && isWaitingForSignature.value) {
-          isWaitingForSignature.value = false
-          const walletAddr = pendingWalletAddress.value
-          pendingWalletAddress.value = null
-          isConnectingFromPage.value = false
-
-          // 断开连接
-          await disconnect()
-          ElMessage.error('签名失败，请重试')
-        }
-      }
-    )
-  }
-
-  // 组件卸载时清理 watch
-  onBeforeUnmount(() => {
-    if (stopWatchSuccess) stopWatchSuccess()
-    if (stopWatchError) stopWatchError()
-    if (stopWatchConnection) stopWatchConnection()
-  })
-
   // navBar 的连接逻辑
   const wallconnects = async (walletId, targetChainId) => {
     const list = safeConnectors.value || []
@@ -177,15 +107,74 @@ export const useLinkWallet = () => {
     await connect({ connector: finalConnector, chainId: targetChainId })
   }
 
-  const handleConnect = async (wallet) => {
-    // 在连接时创建 watch（延迟创建，提升首次加载性能）
-    setupWatchers()
-    isConnectingFromPage.value = true
-    // 连接钱包，watch 会监听连接状态并请求签名
-    await wallconnects(wallet.id, chainId.value)
+  // 调用注册接口检查用户状态
+  const checkUserStatus = async (walletAddress) => {
+    const response = await register({ address: walletAddress })
+    const exists = response?.data?.data?.exists ?? response?.data?.exists
+    // 读取合约中邀请人是否存在
+    const inviter = await readContract(config, {
+      address: networks.find(n => Number(n.chainId) === BSC_CHAIN_ID).proxyNodeManager,
+      abi: nodeManagerABI,
+      functionName: 'inviters',
+      args: [walletAddress]
+    })
+    // 如果用户没有绑定邀请码，则改变邀请弹窗的显示状态
+    if (inviter == '0x0000000000000000000000000000000000000000') {
+      eventBus.emit('showInvite', true)
+    } else {
+      // 如果已经绑定邀请码，清除邀请码
+      counterStore.inviteCode = ''
+    }
   }
 
-  onMounted(() => {
+  const handleConnect = async (wallet) => {
+    try {
+      if (status.value === 'connected' && address.value) {
+        await disconnect()
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
+      
+      isConnectingFromPage.value = true
+      
+      if (stopWatchConnection) {
+        stopWatchConnection()
+      }
+      
+      stopWatchConnection = watch(
+        () => [status.value, address.value],
+        async ([newStatus, newAddress]) => {
+          if (newStatus === 'connected' && newAddress && isConnectingFromPage.value) {
+            // 保存地址到 localStorage
+            localStorage.setItem('address', newAddress)
+            
+            if (stopWatchConnection) {
+              stopWatchConnection()
+              stopWatchConnection = null
+            }
+            
+            await checkUserStatus(newAddress)
+            await router.push('/')
+            isConnectingFromPage.value = false
+          }
+        }
+      )
+      
+      await wallconnects(wallet.id, chainId.value)
+    } catch (error) {
+      console.error('连接钱包失败:', error)
+      if (stopWatchConnection) {
+        stopWatchConnection()
+        stopWatchConnection = null
+      }
+      isConnectingFromPage.value = false
+    }
+  }
+
+  onMounted(async () => {
+    if (status.value === 'connected' && address.value) {
+      await disconnect()
+    }
+
     if (safeConnectors.value && safeConnectors.value.length > 0) {
       console.log(
         '✅ Connectors已就绪:',
@@ -200,26 +189,12 @@ export const useLinkWallet = () => {
     }
   })
 
-  // 调用注册接口检查用户状态
-  const checkUserStatus = async (walletAddress) => {
-    const response = await register({ address: walletAddress })
-    const exists = response?.data?.data?.exists ?? response?.data?.exists
-    // 读取合约中邀请人是否存在
-    const inviter = await readContract(config, {
-      address: networks.find(n => Number(n.chainId) === BSC_CHAIN_ID).proxyNodeManager,
-      abi: nodeManagerABI,
-      functionName: 'inviters',
-      args: [walletAddress]
-    })
-    // 如果用户没有绑定邀请码，则改变邀请弹窗的显示状态
-    if (!exists && inviter == '0x0000000000000000000000000000000000000000') {
-      eventBus.emit('showInvite', true)
-    } else {
-      // 如果已经绑定邀请码，清除邀请码
-      counterStore.inviteCode = ''
+  onBeforeUnmount(() => {
+    if (stopWatchConnection) {
+      stopWatchConnection()
+      stopWatchConnection = null
     }
-  }
-
+  })
 
   return {
     logoUrl,

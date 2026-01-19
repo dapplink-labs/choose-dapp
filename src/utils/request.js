@@ -25,7 +25,7 @@ const serive = axios.create({
 // Add a request interceptor
 serive.interceptors.request.use((config)=> {
     // Do something before request is sent
-    config.headers['token'] = localStorage.getItem('token') || ''
+    config.headers['address'] = localStorage.getItem('address') || ''
     
     // 禁用请求缓存 - 确保联调时不会使用缓存
     config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'

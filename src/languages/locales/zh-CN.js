@@ -721,7 +721,8 @@ export default {
     approveTokenFailed: "授权失败",
     nodeActivationSuccess: "节点激活成功！",
     paymentFailed: "支付失败",
-    paymentCancelled: "你取消了支付"
+    paymentCancelled: "你取消了支付",
+    bindInviteCodeFirst: "请先绑定邀请码"
   },
   myNode: {
     title: "集群节点",

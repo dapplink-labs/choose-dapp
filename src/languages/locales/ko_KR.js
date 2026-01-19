@@ -206,7 +206,8 @@ export default {
     approveTokenFailed: "승인 실패",
     nodeActivationSuccess: "노드 활성화 성공!",
     paymentFailed: "결제 실패",
-    paymentCancelled: "결제를 취소했습니다"
+    paymentCancelled: "결제를 취소했습니다",
+    bindInviteCodeFirst: "먼저 초대 코드를 연동하세요"
   },
   myNodes: {
     title: "내 노드"

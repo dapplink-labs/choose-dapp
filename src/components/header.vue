@@ -325,8 +325,11 @@ const toggleTheme = () => {
 
 // 语言切换处理
 const handleLanguageChange = (command) => {
+  if (!command) return
   locale.value = command
+  if (locale.value) {
   document.documentElement.setAttribute("data-lang", locale.value)
+  }
   // 保存语言选择到 localStorage
   localStorage.setItem('app-locale', command)
 }
@@ -424,7 +427,7 @@ const handleLogout = async () => {
     closeUserMenu()
   } catch (error) {
     console.error('断开连接失败:', error)
-    closeUserMenu()
+  closeUserMenu()
   }
 }
 

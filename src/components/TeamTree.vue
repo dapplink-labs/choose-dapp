@@ -526,11 +526,11 @@ const refreshChildren = async (node: PromotionNode) => {
     
     // 如果节点已存在，更新数据；否则创建新节点
     if (!nodeMap[id]) {
-      nodeMap[id] = {
-        id,
+    nodeMap[id] = {
+      id,
         address: item.address || '',
         amount: formatAmount(item.total_reward),
-        children: [],
+      children: [],
       }
     } else {
       // 更新已存在节点的数据

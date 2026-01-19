@@ -1,7 +1,7 @@
 <template>
   <transition name="fade">
-    <div v-if="visible" class="invite-overlay">
-      <div class="invite-card">
+    <div v-if="visible" class="invite-overlay" @click="handleClose">
+      <div class="invite-card" @click.stop>
         <div class="card-handle"></div>
 
         <h2 class="card-title">{{ $t('invite.title') }}</h2>
@@ -138,15 +138,10 @@ const handleConfirm = async () => {
       showErrorToast: true
     })
 
-    const res = await bindInviteCode({
-      address: address.value,
-      invitation_code: localCode.value || ''
-    })
-
     ElMessage.success(t('invite.bindSuccess') || '绑定邀请码成功')
     handleClose()
   } catch (error) {
-    ElMessage.error(error.message || t('invite.bindFailed') || '绑定邀请码失败')
+    ElMessage.error(t('invite.bindFailed') || '绑定邀请码失败')
   }
   loading.value = false
 }

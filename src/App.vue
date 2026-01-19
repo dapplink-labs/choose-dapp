@@ -28,6 +28,14 @@ eventBus.on('wallet-connecting', (connecting) => {
 watch(
   () => address.value,
   (newAddress, oldAddress) => {
+    // 每次地址变化时，保存到 localStorage
+    if (newAddress) {
+      localStorage.setItem('address', newAddress)
+    } else {
+      // 如果地址为空，清除 localStorage 中的地址
+      localStorage.removeItem('address')
+    }
+
     if (isWalletConnecting.value) {
       console.log('正在连接钱包中，暂时忽略地址变化')
       return
@@ -35,6 +43,10 @@ watch(
 
     if (isInitialMount.value) {
       isInitialMount.value = false
+      // 初始化时如果有地址，也保存到 localStorage
+      if (newAddress) {
+        localStorage.setItem('address', newAddress)
+      }
       return
     }
 
@@ -61,7 +73,7 @@ watch(
       return
     }
   },
-  { flush: 'post' }
+  { flush: 'post', immediate: true }
 )
 
 const isMobile = ref(false)
@@ -73,6 +85,15 @@ const checkIsMobile = () => {
 }
 
 checkIsMobile()
+
+// 监听路由变化，用于调试
+watch(
+  () => route.path,
+  (newPath, oldPath) => {
+    console.log('路由变化:', { from: oldPath, to: newPath, routeName: route.name })
+  },
+  { immediate: true }
+)
 
 watch(
   () => route.query.inviteCode,
@@ -91,6 +112,15 @@ onMounted(() => {
 
   eventBus.on('showInvite', (show) => {
     showInvite.value = show
+  })
+  
+  // 调试信息：检查路由和组件加载
+  console.log('App.vue mounted:', {
+    route: route.path,
+    routeName: route.name,
+    isMobile: isMobile.value,
+    showHeader: showHeader.value,
+    showFooterNav: showFooterNav.value
   })
 })
 

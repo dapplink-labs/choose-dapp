@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import clusterNodeImg from '@/assets/icon/ClusterNode.png'
 import DistributedNode from '@/assets/icon/DistributedNode.png'
 import stakingManagerABI from '@/assets/abi/stakingManagerABI.json'
-import { switchChain } from '@wagmi/core'
+import { switchChain, readContract } from '@wagmi/core'
 import { ElMessage, ElLoading } from 'element-plus'
 import { writeContractOptimized } from '@/utils/requestWEB3.js'
 import networks from '@/assets/json/networks.json'
@@ -13,6 +13,8 @@ import { useChainId, useAccount } from '@wagmi/vue'
 import { getUserTokenBalance, approveToken, checkAllowance } from '@/utils/requestWEB3.js'
 import { parseUnits } from 'viem'
 import { getNodeStakingList, nodeStakingActivate } from '@/api/API'
+import { eventBus } from '@/utils/eventBus'
+import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
 
 export const useLPVault = () => {
   const router = useRouter()
@@ -22,7 +24,7 @@ export const useLPVault = () => {
   const { address } = useAccount()
 
   const activationAvatar = clusterNodeImg
-  const activationAddress = ref('0xb574...4c7d')
+  const activationAddress = ref('')
   const activationMsg = computed(() =>
     t('lpVault.activationMsg', {
       address: activationAddress.value,
@@ -110,7 +112,21 @@ export const useLPVault = () => {
 
       // 获取合约地址
       const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
-      const { proxyStakingManager, usdtTokenAddress } = bscNet
+      const { proxyStakingManager, usdtTokenAddress, proxyNodeManager } = bscNet
+
+      // 检查当前用户是否绑定邀请码
+      const inviter = await readContract(config, {
+        address: proxyNodeManager,
+        abi: nodeManagerABI,
+        functionName: 'inviters',
+        args: [address.value]
+      })
+      if (inviter == '0x0000000000000000000000000000000000000000') {
+        ElMessage.warning(t('lpVault.bindInviteCodeFirst'))
+        eventBus.emit('showInvite', true)
+        loading.close()
+        return
+      }
 
       // 从接口数据中获取对应节点的价格
       const nodeItem = nodeListData.value.find(item => item.type === type)
