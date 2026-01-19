@@ -195,13 +195,14 @@ export default {
       }
     },
     language: {
-      cn: "Chinese",
-      chFan: "Chinese (Traditional)",
+      // 与设计保持一致：语言名称使用各自常用本地写法
+      cn: "中文",
+      chFan: "繁體中文",
       en: "English",
-      Vietnamese: "Vietnamese",
-      Turkish: "Turkish",
-      Korean: "Korean",
-      Japanese: "Japanese"
+      Vietnamese: "Tiếng Việt",
+      Turkish: "Türkçe",
+      Korean: "한국어",
+      Japanese: "日本語"
     },
     link: "Connect",
     warining:"Multiple wallet extensions detected in your browser. Please keep only one!",
