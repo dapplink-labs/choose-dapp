@@ -172,7 +172,7 @@ const router = createRouter({
 
 // 钱包是否已连接（先用 localStorage，后面可换 wagmi / pinia）
 function isWalletConnected() {
-  return !!sessionStorage.getItem('walletAddress')
+  return !!localStorage.getItem('address')
 }
 
 router.beforeEach((to) => {
@@ -184,7 +184,7 @@ router.beforeEach((to) => {
     if (to.name === 'linkWallet') {
       return true
     }
-    return '/'
+    return '/' 
   }
    
   // // // 已连接钱包，禁止回到连接页

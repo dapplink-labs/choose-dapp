@@ -24,8 +24,10 @@
                             d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
                             transform="translate(-69.818 -69.818)" fill="currentColor" />
                     </svg>
-                    <span class="time-text">{{ $t('myIncome.purchaseTime') }}: {{
-                        formatDateTime(currentNodeStakingInfo.created) }}</span>
+                    <span class="time-text">
+                        {{ $t('myIncome.purchaseTime') }}:
+                        {{ Number(currentNodeStakingInfo.status) === 1 ? $t('computingPower.activating') : formatDateTime(currentNodeStakingInfo.created) }}
+                    </span>
                 </div>
             </div>
         </div>

@@ -127,41 +127,7 @@ const checkUserStatus = async (walletAddress) => {
   }
 }
 
-const handleConnect = async (wallet) => {
-  // 开启全屏加载
-  loadingInstance = ElLoading.service({
-    lock: true,
-    text: '正在唤起钱包...',
-    background: 'rgba(0, 0, 0, 0.8)'
-  })
 
-  try {
-    // 如果当前已经是连接状态，先断开以便重新授权（切换账号）
-    // if (status.value === 'connected') {
-    //   await disconnect()
-    //   await new Promise(resolve => setTimeout(resolve, 500))
-    // }
-
-    // 寻找对应的 Connector
-    const connector = safeConnectors.value.find(c => c.id === wallet.id)
-
-    // 执行连接，如果找不到匹配的 ID，则回退到 injected（浏览器插件）
-    await connect({
-      connector: connector || injected(),
-      chainId: chainId.value || BSC_CHAIN_ID
-    })
-
-  } catch (error) {
-    console.error('Wallet connection error:', error)
-    loadingInstance.close()
-
-    if (error.message?.includes('User rejected')) {
-      ElMessage.warning('用户取消了连接')
-    } else {
-      ElMessage.error('连接失败，请确保钱包已解锁并尝试刷新')
-    }
-  }
-}
 async function wallconnects(id, chainId) {
 
 
@@ -189,25 +155,30 @@ watch(
   [status, address],
   async ([newStatus, newAddress]) => {
     if (newStatus === 'connected' && newAddress) {
-      sessionStorage.setItem("walletAddress", newAddress)
-      localStorage.setItem('address', newAddress)
+    
+       sessionStorage.setItem("walletAddress", newAddress)
+       localStorage.setItem('address', newAddress)
 
       // 执行登录后的业务逻辑
       await checkUserStatus(newAddress)
 
-      // 关闭加载动画
-      // if (loadingInstance) {
-      //   loadingInstance.close()
-      //   loadingInstance = null
-      // }
+     
     }
 
     if (newStatus === 'disconnected') {
+      window.sessionStorage.clear()
+   
       localStorage.removeItem('address')
     }
   },
   { immediate: false }
 )
+onMounted(async ()=>{
+ 
+  // await  disconnect()
+  // window.sessionStorage.clear()
+    
+})
 </script>
 
 <style scoped lang="scss">
