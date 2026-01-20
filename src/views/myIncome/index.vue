@@ -26,7 +26,8 @@
                     </svg>
                     <span class="time-text">
                         {{ $t('myIncome.purchaseTime') }}:
-                        {{ Number(currentNodeStakingInfo.status) === 1 ? $t('computingPower.activating') : formatDateTime(currentNodeStakingInfo.created) }}
+                        {{ Number(currentNodeStakingInfo.status) === 1 ? $t('computingPower.activating') :
+                            formatDateTime(currentNodeStakingInfo.created) }}
                     </span>
                 </div>
             </div>
@@ -65,8 +66,10 @@
             <div class="processDiv">
                 <div class="progress-bar-container">
                     <div class="progress-bar">
-                        <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
-                        <div class="progress-indicator" :style="{ left: progressPercent + '%' }">
+                        <div class="progress-fill"
+                            :style="{ width: (progressPercent < 4) ? 4 + '%' : progressPercent + '%' }"></div>
+                        <div class="progress-indicator"
+                            :style="{ left: (progressPercent < 4) ? 4 + '%' : progressPercent + '%' }">
                             <span class="indicator-text">{{ progressPercent }}%</span>
                         </div>
                     </div>
@@ -127,7 +130,7 @@
 
                 <div class="team-header">
                     <span class="invite-count"><span>{{ inviteCountLabel }}</span> {{ inviteCount
-                        }}</span>
+                    }}</span>
                 </div>
 
                 <!-- 层级树状图占位 -->
@@ -298,10 +301,10 @@ const formatAmount = (value) => {
     if (!value || value === '0' || value === 0) return '0'
     try {
         // 将18精度的数值转换为正常数量
-        let num = typeof value === 'bigint' || typeof value === 'string' 
+        let num = typeof value === 'bigint' || typeof value === 'string'
             ? parseFloat(formatUnits(BigInt(value.toString()), 18))
             : Number(value) / 1e18
-        
+
         if (!Number.isFinite(num)) return '0'
         const fixed = num.toFixed(4)
         const trimmed = fixed.replace(/\.?0+$/, '')
@@ -377,21 +380,21 @@ const progressPercent = computed(() => {
     const info = currentNodeStakingInfo.value
     // 基础收益
     let total = Number(info.node_reward ?? 0) +
-                Number(info.direct_reward ?? 0) +
-                Number(info.team_reward ?? 0) +
-                Number(info.lateral_reward ?? 0) +
-                Number(info.dividend_reward ?? 0)
-    
+        Number(info.direct_reward ?? 0) +
+        Number(info.team_reward ?? 0) +
+        Number(info.lateral_reward ?? 0) +
+        Number(info.dividend_reward ?? 0)
+
     // 如果是创世节点（T6），加上创世节点5%收益
     if (info.node_level === 'T6') {
         total += Number(info.creation_reward ?? 0)
     }
-    
+
     // 如果是超级节点（T5），加上超级节点收益
     if (info.node_level === 'T5') {
         total += Number(info.super_node_reward ?? 0)
     }
-    
+
     const target = Number(info.forecast_income ?? 0)
     if (!target || !Number.isFinite(total) || !Number.isFinite(target)) return 0
     const ratio = (total / target) * 100
@@ -455,7 +458,7 @@ watch(activeTab, () => {
 
 .myIncome {
     min-height: 100vh;
-    padding: 100px 10px 0 10px;
+    padding: 80px 10px 0 10px;
     background-color: var(--bg-page-h5, #FCFCFC);
     color: var(--text-color, #1a1a1a);
     transition: background-color 0.3s ease, color 0.3s ease;

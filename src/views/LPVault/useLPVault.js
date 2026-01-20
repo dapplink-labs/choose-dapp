@@ -22,6 +22,8 @@ export const useLPVault = () => {
   const chainId = useChainId()
   const BSC_CHAIN_ID = 56
   const { address } = useAccount()
+  // 临时禁用激活按钮开关，后续开放时改为 false 即可
+  const isActivationDisabled = true
 
   const activationAvatar = clusterNodeImg
   const activationAddress = ref('')
@@ -215,7 +217,8 @@ export const useLPVault = () => {
     handleOpenMore,
     handleOpenMyIncome,
     nodeList,
-    handleActivate
+    handleActivate,
+    isActivationDisabled
   }
 }
 

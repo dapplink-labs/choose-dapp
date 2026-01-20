@@ -195,13 +195,14 @@ export default {
       }
     },
     language: {
-      cn: "简体中文",
-      chFan: "繁体",
-      en: "英文",
-      Vietnamese: "越南语",
-      Turkish: "土耳其语",
-      Korean: "韩语",
-      Japanese: "日语"
+      // 语言名称统一使用各自母语写法，保持与设计稿展示一致
+      cn: "中文",
+      chFan: "繁體中文",
+      en: "English",
+      Vietnamese: "Tiếng Việt",
+      Turkish: "Türkçe",
+      Korean: "한국어",
+      Japanese: "日本語"
     },
     link: "连接钱包",
     warining: "检测到浏览器里有多个钱包插件,请保留一个!",
