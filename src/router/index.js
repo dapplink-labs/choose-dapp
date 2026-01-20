@@ -187,10 +187,7 @@ router.beforeEach((to) => {
     return '/' 
   }
    
-  // // // 已连接钱包，禁止回到连接页
-  // if (connected && to.name === 'linkWallet') {
-  //   return '/home'
-  // }
+
 
   return true
 })

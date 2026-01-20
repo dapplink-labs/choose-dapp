@@ -1,8 +1,8 @@
 <template>
   <div class="link-wallet-page">
-    <!-- <button class="close-btn" type="button" @click="handleClose">
+    <button class="close-btn" type="button" @click="handleClose">
       ✕
-    </button> -->
+    </button>
 
     <div class="welcome-section">
       <div class="logo-box">
@@ -36,6 +36,7 @@
 import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref, watch, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { reconnect } from '@wagmi/core'
 import { useConnect, useChainId, useAccount, useDisconnect } from '@wagmi/vue'
 import { injected } from '@wagmi/vue/connectors'
 import { useThemeStore } from '../../stores/theme'
@@ -49,6 +50,7 @@ import networks from '@/assets/json/networks.json'
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
 import logoLight from '@/assets/icon/logo.png'
 import logoDark from '@/assets/icon/logoDark.png'
+import { UserRejectedRequestError } from 'viem'
 // 基础配置
 const { t } = useI18n()
 const BSC_CHAIN_ID = 56
@@ -57,7 +59,7 @@ const isDark = computed(() => themeStore.isDark)
 const logoUrl = computed(() => (isDark.value ? logoDark : logoLight))
 const router = useRouter()
 const route = useRoute()
-const { connect, connectors } = useConnect()
+const { connect, connectors, connectAsync } = useConnect()
 const chainId = useChainId()
 console.log(chainId)
 const { status, address } = useAccount()
@@ -71,7 +73,7 @@ const counterStore = useCounterStore()
 
 
 // 获取可用的连接器列表
-const safeConnectors = computed(() => connectors.value || [])
+// const safeConnectors = computed(() => connectors.value || [])
 const wallets = [
   {
     name: 'TokenPocket',
@@ -115,11 +117,8 @@ const checkUserStatus = async (walletAddress) => {
     } else {
       counterStore.inviteCode = '' // 已绑定则清空本地暂存的邀请码
     }
+    router.push("/home")
 
-    if (route.path.includes('/')) {
-      router.push('/home')
-
-    }
 
   } catch (error) {
     console.error('Check user status failed:', error)
@@ -127,57 +126,56 @@ const checkUserStatus = async (walletAddress) => {
   }
 }
 
+async function handleClose() {
+
+}
 
 async function wallconnects(id, chainId) {
-
+  // 切断重连 
+  const result = await reconnect(config, { connectors: [injected()] })
 
 
   const connectMetaMask = async () => {
     const connector = connectors.find(c => c.id === id)
+    try {
+      if (connector) {
 
-    if (connector) {
 
+        await connectAsync({ connector, chainId })
 
-      await connect({ connector, chainId })
+      } else {
 
-    } else {
+        const connector = injected(); // ✅
+        await connectAsync({ connector, chainId })
+      }
+      router.push("/home")
+    } catch (err) {
+      if (err instanceof UserRejectedRequestError) {
+        // ✅ 用户主动拒绝，不提示错误
+        ElMessage.error("用户取消操作")
+        return
+      }
 
-      const connector = injected(); // ✅
-      await connect({ connector, chainId })
+      // ElMessage.error(err)
     }
+
+    // checkUserStatus()
 
   }
   connectMetaMask()
 
 }
 
-watch(
-  [status, address],
-  async ([newStatus, newAddress]) => {
-    if (newStatus === 'connected' && newAddress) {
-    
-       sessionStorage.setItem("walletAddress", newAddress)
-       localStorage.setItem('address', newAddress)
 
-      // 执行登录后的业务逻辑
-      await checkUserStatus(newAddress)
+onMounted(async () => {
+  setTimeout(async () => {
+    disconnect()
 
-     
-    }
+    console.log("--------------------------------------------------")
+  }, 500)
 
-    if (newStatus === 'disconnected') {
-      window.sessionStorage.clear()
-   
-      localStorage.removeItem('address')
-    }
-  },
-  { immediate: false }
-)
-onMounted(async ()=>{
- 
-  // await  disconnect()
   // window.sessionStorage.clear()
-    
+
 })
 </script>
 

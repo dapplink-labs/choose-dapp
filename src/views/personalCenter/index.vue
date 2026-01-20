@@ -126,7 +126,7 @@ const walletAddress = computed(() => {
   if (address.value) {
     return `${address.value.slice(0, 6)}....${address.value.slice(-4)}`
   }
-  return '0xf6a0....CfbA'
+  return ''
 })
 
 // 分享邀请码弹窗状态
@@ -135,7 +135,7 @@ const showShareModal = ref(false)
 const userAvatar = computed(() => {
   return address.value
     ? `https://effigy.im/a/${address.value}.svg`
-    : '/src/assets/icon/avatar.png'
+    : '/src/assets/icon/noperson.png'
 })
 
 // 点击钱包地址复制

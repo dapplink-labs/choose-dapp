@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useAccount } from '@wagmi/vue'
+import { useAccount  ,useDisconnect} from '@wagmi/vue'
 import navBar from "./components/navBar.vue"
 import navBar2 from "./components/navBar2.vue"
 import Header from "./components/header.vue"
@@ -16,7 +16,7 @@ import { register } from '@/api/API'
 const route = useRoute()
 const counterStore = useCounterStore()
 const { showInvite } = storeToRefs(counterStore)
-
+const { disconnect } = useDisconnect()
 const { address } = useAccount()
 const isInitialMount = ref(true)
 const isWalletConnecting = ref(false)
@@ -28,6 +28,7 @@ eventBus.on('wallet-connecting', (connecting) => {
 watch(
   () => address.value,
   (newAddress, oldAddress) => {
+ 
     // 每次地址变化时，保存到 localStorage
     if (newAddress) {
       localStorage.setItem('address', newAddress)
@@ -54,6 +55,7 @@ watch(
     counterStore.inviterAddress = '';
     if (oldAddress && newAddress && oldAddress !== newAddress) {
       const checkUserStatus = async (walletAddress) => {
+        
         const response = await register({ address: walletAddress })
         const exists = response?.data?.data?.exists ?? response?.data?.exists
         if (!exists) {
@@ -102,6 +104,7 @@ onMounted(() => {
   eventBus.on('showInvite', (show) => {
     showInvite.value = show
   })
+  
   
   // 调试信息：检查路由和组件加载
   console.log('App.vue mounted:', {

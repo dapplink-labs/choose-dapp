@@ -447,7 +447,7 @@ const goLinkWallet = async () => {
       // 即使断开失败也继续跳转
     }
   }
-  router.push('/link-wallet')
+  router.push('/')
 }
 const handleLogout = async () => {
 
