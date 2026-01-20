@@ -629,7 +629,9 @@ export default {
   linkWallet: {
     welcome: "Welcome to CHOOSEME",
     selectLoginMethod: "Please select login method",
-    connect: "Connect"
+    connect: "Connect",
+    userVerificationFailed: "User verification failed",
+    userCancelled: "Operation cancelled by user"
   },
   computingPower: {
     title: "Node Purchase",

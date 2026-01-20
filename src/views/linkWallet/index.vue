@@ -122,7 +122,7 @@ const checkUserStatus = async () => {
 
   } catch (error) {
     console.error('Check user status failed:', error)
-    ElMessage.error('用户信息核验失败')
+    ElMessage.error(t('linkWallet.userVerificationFailed'))
   }
 }
 
@@ -152,7 +152,7 @@ async function wallconnects(id, chainId) {
     } catch (err) {
       if (err instanceof UserRejectedRequestError) {
         // ✅ 用户主动拒绝，不提示错误
-        ElMessage.error("用户取消操作")
+        ElMessage.error(t('linkWallet.userCancelled'))
       }
 
       // ElMessage.error(err)

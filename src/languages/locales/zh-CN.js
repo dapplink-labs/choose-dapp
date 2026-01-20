@@ -637,7 +637,9 @@ export default {
   linkWallet: {
     welcome: "欢迎来到 CHOOSEME",
     selectLoginMethod: "请选择一个钱包",
-    connect: "链接"
+    connect: "链接",
+    userVerificationFailed: "用户信息核验失败",
+    userCancelled: "用户取消操作"
   },
   computingPower: {
     title: "节点购买",

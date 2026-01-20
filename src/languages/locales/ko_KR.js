@@ -94,7 +94,9 @@ export default {
   linkWallet: {
     welcome: "CHOOSEME에 오신 것을 환영합니다",
     selectLoginMethod: "지갑을 선택해 주세요",
-    connect: "연결"
+    connect: "연결",
+    userVerificationFailed: "사용자 정보 확인에 실패했습니다",
+    userCancelled: "사용자가 작업을 취소했습니다"
   },
   bindEmail: {
     title: "이메일 연동",

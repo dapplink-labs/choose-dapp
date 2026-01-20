@@ -194,7 +194,7 @@ router.beforeEach((to) => {
     if (to.name === 'linkWallet') {
       return true
     }
-    return '/' 
+    return '/' || `/?inviteCode=${to?.fullPath}`
   }
    
 

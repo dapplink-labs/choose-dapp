@@ -57,7 +57,9 @@ export default {
   linkWallet: {
     welcome: "CHOOSEMEへようこそ",
     selectLoginMethod: "ウォレットを選択してください",
-    connect: "接続"
+    connect: "接続",
+    userVerificationFailed: "ユーザー情報の確認に失敗しました",
+    userCancelled: "ユーザーが操作をキャンセルしました"
   },
   bindEmail: {
     title: "メールアドレス連携",
