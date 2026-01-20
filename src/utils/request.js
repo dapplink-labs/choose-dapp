@@ -19,7 +19,7 @@ import axios from "axios"
 // create an axios instance
 const serive = axios.create({
   baseURL: 'https://event-services.chooseme.vip',
-  withCredentials: true, // send cookies when cross-domain requests
+  // withCredentials: true, // send cookies when cross-domain requests
   timeout: 30000  // request timeout (30 seconds)
 })
 // 添加请求头
