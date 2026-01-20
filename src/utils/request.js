@@ -18,16 +18,16 @@ import axios from "axios"
 
 // create an axios instance
 const serive = axios.create({
-  baseURL: 'http://13.214.178.17:8080',
+  baseURL: 'https://event-services.chooseme.vip',
   withCredentials: true, // send cookies when cross-domain requests
   timeout: 30000  // request timeout (30 seconds)
 })
 // 添加请求头
-serive.interceptors.request.use((config) => {
-  config.headers = config.headers || {}
-  config.headers.address = localStorage.getItem('address') || ''
-  return config
-})
+// serive.interceptors.request.use((config) => {
+//   config.headers = config.headers || {}
+//   config.headers.address = localStorage.getItem('address') || ''
+//   return config
+// })
 // serive.interceptors.request.use((config) => {
 //   config.headers = config.headers || {}
 
