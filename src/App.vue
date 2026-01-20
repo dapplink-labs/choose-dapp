@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useAccount  ,useDisconnect} from '@wagmi/vue'
+import { useAccount, useDisconnect } from '@wagmi/vue'
 import navBar from "./components/navBar.vue"
 import navBar2 from "./components/navBar2.vue"
 import Header from "./components/header.vue"
@@ -11,68 +11,50 @@ import Invite from "./components/Invite.vue"
 import { eventBus } from '@/utils/eventBus'
 import { useCounterStore } from '@/stores/counter'
 import { storeToRefs } from 'pinia'
-import { register } from '@/api/API'
+import { useRouter } from 'vue-router'
 
 const route = useRoute()
 const counterStore = useCounterStore()
 const { showInvite } = storeToRefs(counterStore)
 const { disconnect } = useDisconnect()
 const { address } = useAccount()
-const isInitialMount = ref(true)
 const isWalletConnecting = ref(false)
+const router = useRouter()
 
+// 用于记录当前是否正在连接钱包
 eventBus.on('wallet-connecting', (connecting) => {
   isWalletConnecting.value = connecting
 })
 
+// 用于记录当前钱包地址变化
 watch(
   () => address.value,
-  (newAddress, oldAddress) => {
- 
-    // 每次地址变化时，保存到 localStorage
-    if (newAddress) {
-      localStorage.setItem('address', newAddress)
-    } else {
-      // 如果地址为空，清除 localStorage 中的地址
-      localStorage.removeItem('address')
-    }
+  async (newAddress, oldAddress) => {
 
     if (isWalletConnecting.value) {
       console.log('正在连接钱包中，暂时忽略地址变化')
       return
     }
 
-    if (isInitialMount.value) {
-      isInitialMount.value = false
-      // 初始化时如果有地址，也保存到 localStorage
-      if (newAddress) {
-        localStorage.setItem('address', newAddress)
-      }
-      return
-    }
+    console.log('newAddress', newAddress)
+    console.log('oldAddress', oldAddress)
 
-    // 清除邀请人地址
-    counterStore.inviterAddress = '';
-    if (oldAddress && newAddress && oldAddress !== newAddress) {
-      const checkUserStatus = async (walletAddress) => {
-        
-        const response = await register({ address: walletAddress })
-        const exists = response?.data?.data?.exists ?? response?.data?.exists
-        if (!exists) {
-          eventBus.emit('showInvite', true);
-        }
-      }
-      // 检查当前用户是否注册
-      checkUserStatus(newAddress)
-      return
-    }
-
-    if (oldAddress && !newAddress) {
-      console.log('钱包已断开连接，刷新页面...')
-      // window.location.reload()
-      return
+    if (!oldAddress && newAddress) {
+      // 用户首次连接钱包操作
+      localStorage.setItem('address', newAddress)
+    } else if (oldAddress && newAddress && oldAddress !== newAddress) {
+      // 用户切换钱包操作
+      counterStore.inviteCode = '';
+      localStorage.removeItem('address')
+      router.replace('/')
+    } else if (oldAddress && !newAddress) {
+      // 已经断开钱包连接操作
+      counterStore.inviteCode = '';
+      localStorage.removeItem('address')
+      router.replace('/')
     }
   },
+  // 每次地址变化时，保存到 localStorage
   { flush: 'post', immediate: true }
 )
 
@@ -104,16 +86,16 @@ onMounted(() => {
   eventBus.on('showInvite', (show) => {
     showInvite.value = show
   })
-  
-  
+
+
   // 调试信息：检查路由和组件加载
-  console.log('App.vue mounted:', {
-    route: route.path,
-    routeName: route.name,
-    isMobile: isMobile.value,
-    showHeader: showHeader.value,
-    showFooterNav: showFooterNav.value
-  })
+  // console.log('App.vue mounted:', {
+  //   route: route.path,
+  //   routeName: route.name,
+  //   isMobile: isMobile.value,
+  //   showHeader: showHeader.value,
+  //   showFooterNav: showFooterNav.value
+  // })
 })
 
 onBeforeUnmount(() => {

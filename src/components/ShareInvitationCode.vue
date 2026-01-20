@@ -102,7 +102,7 @@ const handleShare = async () => {
     }
 
     // 构建分享链接地址：当前网站地址?inviteCode=当前用户地址
-    const shareUrl = `${window.location.origin}/link-wallet?inviteCode=${code}`
+    const shareUrl = `${window.location.origin}?inviteCode=${code}`
 
     const ok = await copyToClipboard(shareUrl)
     if (ok) {

@@ -18,8 +18,8 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
       "/staking-api": {
-        target: "https://chooseme-es-hcmc.gis-data.cn:8090",//外网地址
-        // target: "13.214.178.17:8080",//新加坡
+        // target: "https://chooseme-es-hcmc.gis-data.cn:8090",//外网地址
+        target: "http://13.214.178.17:8080",//新加坡
         // target: "http://172.18.1.58:8080",
         // target: "http://172.18.1.158:8082",
         changeOrigin: true,

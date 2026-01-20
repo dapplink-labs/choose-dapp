@@ -1,8 +1,8 @@
 <template>
   <div class="link-wallet-page">
-    <button class="close-btn" type="button" @click="handleClose">
+    <!-- <button class="close-btn" type="button" @click="handleClose">
       ✕
-    </button>
+    </button> -->
 
     <div class="welcome-section">
       <div class="logo-box">
@@ -92,10 +92,10 @@ const wallets = [
   },
 ]
 
-const checkUserStatus = async (walletAddress) => {
+const checkUserStatus = async () => {
   try {
     // 1. 后端注册接口记录
-    await register({ address: walletAddress })
+    await register({ address: address.value })
 
     // 2. 获取网络配置中的合约地址
     const currentNetwork = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
@@ -108,7 +108,7 @@ const checkUserStatus = async (walletAddress) => {
       address: currentNetwork.proxyNodeManager,
       abi: nodeManagerABI,
       functionName: 'inviters',
-      args: [walletAddress]
+      args: [address.value]
     })
 
     // 4. 处理邀请逻辑
@@ -117,7 +117,7 @@ const checkUserStatus = async (walletAddress) => {
     } else {
       counterStore.inviteCode = '' // 已绑定则清空本地暂存的邀请码
     }
-    router.push("/home")
+    // router.push("/home")
 
 
   } catch (error) {
@@ -126,9 +126,9 @@ const checkUserStatus = async (walletAddress) => {
   }
 }
 
-async function handleClose() {
+// async function handleClose() {
 
-}
+// }
 
 async function wallconnects(id, chainId) {
   // 切断重连 
@@ -153,13 +153,12 @@ async function wallconnects(id, chainId) {
       if (err instanceof UserRejectedRequestError) {
         // ✅ 用户主动拒绝，不提示错误
         ElMessage.error("用户取消操作")
-        return
       }
 
       // ElMessage.error(err)
     }
 
-    // checkUserStatus()
+    checkUserStatus()
 
   }
   connectMetaMask()
