@@ -1868,7 +1868,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
 /* 功能暂不开放覆盖层 */
 .coming-soon-overlay {
-  display: none;
+  display: block;
   position: absolute;
   top: 0;
   left: 0;
