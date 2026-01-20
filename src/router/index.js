@@ -19,6 +19,7 @@ import detailH5 from "../views/detailH5/index.vue"
 import purchaseNodeRecord from "../views/purchaseNodeRecord/index.vue"
 import assetManagement from "../views/assetManagement/index.vue"
 import claimRecord from "../views/claimRecord/index.vue"
+import searchPage from "../views/searchPage/index.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -160,6 +161,15 @@ const router = createRouter({
       meta: {
         hideHeader: true,
         hideFooterNav: true
+      }
+    },
+    {
+      path: '/searchPage',
+      name: 'searchPage',
+      component: searchPage,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: false
       }
     }
   ],

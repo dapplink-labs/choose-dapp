@@ -270,9 +270,6 @@ export function useComputingPowerServices() {
         // node_type: 0: 分布节点, 1: 集群节点（兼容历史 2 也视为集群）
         const rawNodeType = Number(item.node_type)
         const isDistributed = rawNodeType === 0
-        const templateKey = isDistributed
-          ? 'computingPower.products.distributedDescTemplate'
-          : 'computingPower.products.clusterDescTemplate'
 
         return {
           id: item.id,
@@ -288,7 +285,9 @@ export function useComputingPowerServices() {
           subFee: item.sub_coin_reward || 0,
           marketShare: item.market_reward || 0,
           is_active: item.is_active || 1,
-          descText: t(templateKey, { fee: item.fee_reward, subFee: item.sub_coin_reward, marketShare: item.market_reward })
+          descText: isDistributed
+            ? t('computingPower.products.distributedDescTemplate')
+            : t('computingPower.products.clusterDescTemplate')
         }
       })
     } catch (err) {

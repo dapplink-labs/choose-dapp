@@ -155,9 +155,11 @@ const needBottomPadding = computed(() => {
   @media (max-width: 768px) {
     &.has-footer-nav {
       padding-bottom: 60px;
+      box-sizing: border-box;
 
       @media (max-width: 480px) {
         padding-bottom: 56px;
+        box-sizing: border-box;
       }
     }
   }

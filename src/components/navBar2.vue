@@ -56,9 +56,9 @@ const emit = defineEmits(['nav-click'])
 
 // 导航项配置
 const navItems = [
-  { key: 'trends', label: '趋势', path: '/' }, // 使用自定义 SVG
-  { key: 'breaking', label: '热点', path: '/breaking' }, // 使用自定义 SVG
-  { key: 'news', label: '最新', path: '/news' }, // 使用自定义 SVG
+  { key: 'trends', label: '趋势', path: '/home' }, // 使用自定义 SVG
+  { key: 'breaking', label: '热点', path: '/home' }, // 使用自定义 SVG  breaking
+  { key: 'news', label: '最新', path: '/home' }, // 使用自定义 SVG
   { key: 'esports', label: '电子竞技', path: null },
   { key: 'sports', label: '体育', path: null }, 
   { key: 'finance', label: '经济', path: null }, 
@@ -71,7 +71,7 @@ const navItems = [
 
 // 路由到导航key的映射
 const routeToNavKey = {
-  '/': 'trends',
+  '/home': 'trends',
   '/breaking': 'breaking',
   '/news': 'news',
 }

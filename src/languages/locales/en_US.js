@@ -679,8 +679,10 @@ export default {
     paymentFailed: "Payment failed",
     paymentCancelled: "You cancelled the payment",
     products: {
-      distributedDescTemplate: "{fee}% revenue share from network trading fees, {subFee}% sub-token transaction fee rewards, up to {marketShare}% profit sharing from secondary market activities, participation in distributed computing node expansion.",
-      clusterDescTemplate: "{fee}% share of global transaction fees, {subFee}% sub-token fee rewards, {marketShare}% profit sharing from secondary market performance, with eligibility for ecosystem-level node promotion and governance participation."
+      // Distributed node detail description
+      distributedDescTemplate: "A lightweight Web3 node service that supports major blockchains, ideal for startups and individual developers to join quickly. The prediction platform integrates lightweight nodes to provide stable on-chain data reads and transaction broadcasting for ecosystem dApps. Invite your friends now and earn more rewards together.",
+      // Cluster node detail description
+      clusterDescTemplate: "An advanced Web3 node service that supports major blockchains and serves as the core infrastructure of the prediction platform, powering high-concurrency real-time investing, on-chain oracle price feeds, and instant settlement of large prize pools. Invite your friends now and earn more rewards together."
     }
   },
   lpVault: {
@@ -881,5 +883,24 @@ export default {
     title: "Claim Method",
     allNodeRewards: "All Node Rewards",
     tip: "* You can claim all node rewards, or choose to claim rewards from a single node"
+  },
+  searchPage: {
+    title: "Search",
+    searchPlaceholder: "Search",
+    browse: "Browse",
+    themes: "Themes",
+    browseItems: {
+      latest: "Latest",
+      trends: "Trends",
+      popular: "Popular",
+      liquidity: "Liquidity",
+      endingSoon: "Ending Soon"
+    },
+    themeItems: {
+      crypto: "Crypto",
+      finance: "Finance",
+      sports: "Sports",
+      esports: "Esports"
+    }
   }
 };

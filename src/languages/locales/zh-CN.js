@@ -687,8 +687,10 @@ export default {
     paymentFailed: "支付失败",
     paymentCancelled: "你取消了支付",
     products: {
-      distributedDescTemplate: "享受数据节点收益，交易全网手续费买卖 {fee}% 收益，子币手续费 {subFee}% 。二级市场分润 {marketShare}% 收益，分布式算力节点推分布式算力节点。",
-      clusterDescTemplate: "享受数据节点收益，交易全网手续费 {fee}% 分润，子币手续费 {subFee}% 分润，二级市场业绩 {marketShare}% 分润，享受生态级节点推广与治理参与。"
+      // 分布节点详情介绍
+      distributedDescTemplate: "轻量级 Web3 节点服务，支持主流链，适合初创项目与个人开发者快速加入。预测平台内置轻量节点，为生态内应用提供稳定链上数据读取与交易广播。赶快邀请你的好友来参与赢取更多的收益奖励。",
+      // 集群节点详情介绍
+      clusterDescTemplate: "高阶级 Web3 节点服务，支持主流链，是预测平台的核心基础设施，支撑高并发实时投资、链上预言机喂价及大型奖池即时结算。赶快邀请你的好友来参与赢取更多的收益奖励。"
     }
   },
   lpVault: {
@@ -889,5 +891,24 @@ export default {
     title: "领取方式",
     allNodeRewards: "所有节点收益",
     tip: "* 您可以领取所有节点收益，或选择领取单个节点的收益"
+  },
+  searchPage: {
+    title: "搜索",
+    searchPlaceholder: "搜索",
+    browse: "浏览",
+    themes: "主题",
+    browseItems: {
+      latest: "最新",
+      trends: "趋势",
+      popular: "受欢迎的",
+      liquidity: "流动性",
+      endingSoon: "即将结束"
+    },
+    themeItems: {
+      crypto: "加密",
+      finance: "金融",
+      sports: "体育",
+      esports: "电子竞技"
+    }
   }
 };

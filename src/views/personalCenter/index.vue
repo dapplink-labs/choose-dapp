@@ -436,7 +436,7 @@ const handleShare = () => {
 
 // 处理设置点击
 const handleSettings = () => {
-  router.push('/settings')
+  // router.push('/settings')
 }
 
 // 处理关闭点击
@@ -448,8 +448,8 @@ const handleClose = () => {
 const allowedPaths = [
   '/computing-power-services', // 节点购买
   '/LPVault', // 质押池
-  '/dashboard', // 链上数据
-  '/asset-management' // 链上资产
+  // '/dashboard', // 链上数据
+  // '/asset-management' // 链上资产
 ]
 
 // 处理菜单项点击

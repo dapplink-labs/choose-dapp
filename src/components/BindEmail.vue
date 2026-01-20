@@ -181,8 +181,8 @@ const handleConfirm = () => {
 }
 
 .primary-btn {
-  background-color: #c1272e;
-  color: #ffffff;
+  background-color: var(--bg-opposite, #ffffff);
+  color: var();
 }
 
 .fade-enter-active,

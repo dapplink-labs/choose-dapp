@@ -67,7 +67,7 @@
 
                 <button
                     class="node-item-btn"
-                    :disabled="isActivationDisabled"
+                    :disabled="!isActivationDisabled"
                     @click="handleActivate(node.type)"
                 >
                     {{ $t('lpVault.activateComputingPower') }}
