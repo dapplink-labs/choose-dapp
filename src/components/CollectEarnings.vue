@@ -298,11 +298,12 @@ const switchToBSC = async (loading) => {
 
 // 调用合约领取收益
 const callClaimRewardContract = async (amount, loading) => {
+   
     const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
     if (!bscNet?.proxyStakingManager) {
         throw new Error('未找到 StakingManager 合约地址')
     }
-
+ 
     loading.text = '调用合约中...'
     const result = await writeContractOptimized({
         abi: stakingManagerABI,
@@ -344,7 +345,13 @@ const handleError = (error) => {
 
 // 领取收益
 const handleConfirm = async () => {
+   
     const selectedOption = options.value[selectedIndex.value]
+    if (selectedOption.rawAmount <= 0) {
+        // alert(1)
+        ElMessage.warning(t('myNode.noIncome'))
+        return
+    }
     if (!validateSelection(selectedOption)) return
 
     const loading = ElLoading.service({

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory,createWebHashHistory } from 'vue-router'
 
 import bridge from "../views/bridge/index.vue"
 import home from "../views/home/index.vue"
@@ -22,7 +22,7 @@ import claimRecord from "../views/claimRecord/index.vue"
 import searchPage from "../views/searchPage/index.vue"
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history:  createWebHashHistory(),
   routes: [
     {
       path: '/',
