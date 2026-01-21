@@ -1,271 +1,561 @@
-import enUS from './en_US'
-
-// 基于英文版结构的日语文件：
-// - 先复用 en_US 全量 key，保证不缺字段
-// - 再按需覆盖已经有日语翻译的部分
-const base = enUS
-
 export default {
-  ...base,
-  assetManagement: {
-    totalAssets: "総資産評価額",
-    deposit: "入金",
-    withdraw: "出金",
-    bill: "明細",
-    funds: "資金",
-    earnings: "収益",
-    fo: "FO",
-    assetDistribution: "資産分布",
-    overview: "資産概要",
-    prediction: "予測",
-    predictionPlaceholder: "予測機能は近日公開予定",
-    name: "名称",
-    quantity: "数量",
-    value: "価値",
-    profitLoss: "損益",
-    rewards: "報酬",
-    winnings: "当選",
-    amountWon: "獲得金額",
-    action: "操作",
-    claim: "請求",
-    searchPlaceholder: "銘柄や市場、コードを検索",
-    // 時間周期
-    timePeriod1d: "1日",
-    timePeriod1w: "1週間",
-    timePeriod1m: "1ヶ月",
-    timePeriodAll: "すべて",
-    // ポジションリスト
-    positionEvents: "ポジションイベント",
-    entrustedPositions: "委託ポジション",
-    historyPositionEvents: "履歴ポジションイベント",
-    all: "すべて",
-    buy: "Buy",
-    sell: "Sell",
-    // ステータス
-    lost: "lost",
-    claimed: "claimed",
-    // その他
-    valueLabel: "価値",
-    search: "Search"
+  "assetManagement": {
+    "totalAssets": "総資産評価額",
+    "deposit": "入金",
+    "withdraw": "出金",
+    "bill": "明細",
+    "funds": "資金",
+    "earnings": "収益",
+    "fo": "FO",
+    "assetDistribution": "資産分布",
+    "overview": "資産概要",
+    "prediction": "予測",
+    "name": "名称",
+    "quantity": "数量",
+    "value": "価値",
+    "profitLoss": "損益",
+    "winnings": "当選",
+    "amountWon": "獲得金額",
+    "action": "操作",
+    "claim": "請求",
+    "timePeriod1d": "1日",
+    "timePeriod1w": "1週間",
+    "timePeriod1m": "1ヶ月",
+    "timePeriodAll": "すべて",
+    "positionEvents": "ポジションイベント",
+    "entrustedPositions": "委託ポジション",
+    "historyPositionEvents": "履歴ポジションイベント",
+    "all": "すべて",
+    "buy": "Buy",
+    "sell": "Sell",
+    "valueLabel": "価値",
+    "search": "Search"
   },
-  link: {
-    titel: "ウォレット接続",
-    exit: "接続解除",
-    connectFailed: "ウォレット接続に失敗しました。もう一度お試しください",
-    signatureRequired: "ウォレット接続には署名認証が必要です。再接続して署名を完了してください"
+  "link": {
+    "titel": "ウォレット接続",
+    "exit": "接続解除"
   },
-  linkWallet: {
-    welcome: "CHOOSEMEへようこそ",
-    selectLoginMethod: "ウォレットを選択してください",
-    connect: "接続",
-    userVerificationFailed: "ユーザー情報の確認に失敗しました",
-    userCancelled: "ユーザーが操作をキャンセルしました"
+  "bindEmail": {
+    "title": "メールアドレス連携",
+    "placeholder": "メールアドレス",
+    "sendCode": "認証コード送信"
   },
-  bindEmail: {
-    title: "メールアドレス連携",
-    placeholder: "メールアドレス",
-    sendCode: "認証コード送信"
+  "invite": {
+    "title": "CHOOSEMEへようこそ",
+    "placeholder": "招待コード",
+    "tip": "招待コードを入力すると、より多くの収益報酬を獲得するチャンスがあります",
+    "codeRequired": "招待コードは必須です",
+    "bindSuccess": "招待コードの連携に成功しました",
+    "bindFailed": "招待コードの連携に失敗しました",
+    "contractBindSuccess": "オンチェーンでの招待コード連携に成功しました",
+    "contractBindFailed": "オンチェーンでの招待コード連携に失敗しました",
+    "contractBindCancelled": "オンチェーン連携をキャンセルしました",
+    "invalidAddress": "無効な招待アドレス形式です",
+    "missingContract": "NodeManager コントラクトアドレスが設定されていません",
+    "inviterExists": "招待者が存在しません",
+    "bindInvitationTitle": "招待関係の連携",
+    "bindInvitationDesc": "招待関係を連携すると、あなたのアカウントが招待者と関連付けられ、ステーキングと予測に関連する報酬の計算と配布に使用されます。",
+    "myInvitationAddress": "私の招待アドレス",
+    "shareNow": "今すぐ共有",
+    "invitationCodeCopied": "招待コードをクリップボードにコピーしました",
+    "noInvitationCode": "招待コードなし"
   },
-  invite: {
-    title: "CHOOSEMEへようこそ",
-    placeholder: "招待コード",
-    tip: "招待コードを入力すると、より多くの収益報酬を獲得するチャンスがあります",
-    codeRequired: "招待コードは必須です",
-    bindSuccess: "招待コードの連携に成功しました",
-    bindFail: "招待コードの連携に失敗しました",
-    bindFailed: "招待コードの連携に失敗しました",
-    contractBindSuccess: "オンチェーンでの招待コード連携に成功しました",
-    contractBindFailed: "オンチェーンでの招待コード連携に失敗しました",
-    contractBindCancelled: "オンチェーン連携をキャンセルしました",
-    invalidAddress: "無効な招待アドレス形式です",
-    missingContract: "NodeManager コントラクトアドレスが設定されていません",
-    inviterExists: "招待者が存在しません",
-    bindInvitationTitle: "招待関係の連携",
-    bindInvitationDesc: "招待関係を連携すると、あなたのアカウントが招待者と関連付けられ、ステーキングと予測に関連する報酬の計算と配布に使用されます。",
-    myInvitationAddress: "私の招待アドレス",
-    shareNow: "今すぐ共有",
-    invitationCodeCopied: "招待コードをクリップボードにコピーしました",
-    noInvitationCode: "招待コードなし"
+  "bridge": {
+    "placeholderAmount": "at least 0.1",
+    "transferTime": "3~10mins",
+    "userCancelledAuth": "User cancelled the authorization operation",
+    "approveTokenFailed": "Failed to approve token: ",
+    "title": "Cross-chain anytime, anywhere, with ease",
+    "selIcon": "Select  Coin",
+    "selChain": "Select  Chain",
+    "Available": "Available",
+    "handlingfee": "fee",
+    "Insufficient": "Insufficient funds",
+    "approvalPending": "Approval pending...",
+    "approvalConfirmed": "Approval confirmed",
+    "approvalFailed": "Approval failed",
+    "bridgePending": "Bridge pending...",
+    "bridgeConfirmed": "Bridge confirmed",
+    "unknownError": "Unknown error",
+    "enterValidAmount": "Please enter valid amount",
+    "historyAdded": "History record added",
+    "approvalSuccess": "Approval confirmed successfully!",
+    "bridgeSuccess": "Bridge Transaction Succeeded!",
+    "userRejected": "User rejected the request!",
+    "bridgeFailed": "Bridge failed!",
+    "fundsArrive": "Funds arrive!",
+    "connectWallet": "connect wallet",
+    "insufficientBalance": "Insufficient balance",
+    "switchToCorrectNetwork": "Please switch to the correct network",
+    "minimumBridgeAmount": "Minimum bridge amount is",
+    "networkSwitchFailed": "Network switch failed, current network does not match target network",
+    "invalidAmountFormat": "Invalid amount format",
+    "record": {
+      "title": "Cross-chain records",
+      "coin": "Token",
+      "send": "Sender",
+      "receive": "Receiver",
+      "sourcehash": "Source chain hash",
+      "tosourcehash": "Target chain hash",
+      "fee": "Txn Fee",
+      "state": {
+        "name": "Status"
+      },
+      "opt": "Check"
+    },
+    "sureTitle": "Confirm information",
+    "Crosschain": "Cross-chain",
+    "get": "Receive",
+    "cross": "Via",
+    "crossName": "Native cross-chain",
+    "time": "Transfer time"
   },
-  navbar2: {
-    nav: {
-      trends: "トレンド",
-      breaking: "ホットトピック",
-      news: "最新",
-      esports: "eスポーツ",
-      sports: "スポーツ",
-      finance: "経済",
-      crypto: "暗号通貨",
-      company: "企業",
-      popularCulture: "ポップカルチャー",
-      technology: "テクノロジー",
-      ai: "人工知能"
+  "notice": {
+    "title": "Feature Under Development",
+    "subtitle": "We are working hard to build new features and bring you an even better experience",
+    "soon": "Stay tuned · Exciting things coming soon",
+    "btn": "Got it"
+  },
+  "teamTree": {
+    "pathHeader": "Me → Direct → Indirect",
+    "amount": "Amount",
+    "noMoreData": "No more data"
+  },
+  "navbar": {
+    "meun1": {
+      "title": "Network",
+      "menu": {
+        "name1": "Mainnet",
+        "name2": "Testnet"
+      }
+    },
+    "meun2": {
+      "title": "Ecosystem",
+      "menu": {
+        "name1": "DAPP Market",
+        "name2": "LaunchPool",
+        "name3": "Staking",
+        "name4": "CP Hashrate"
+      }
+    },
+    "meun3": {
+      "title": "Builders",
+      "menu": {
+        "name1": "Docs",
+        "name2": "Tutorials"
+      }
+    },
+    "meun4": {
+      "title": "Tool",
+      "menu": {
+        "name1": "Faucet",
+        "name2": "Batch transfer"
+      }
+    },
+    "meun5": {
+      "title": "Swap"
+    },
+    "language": {
+      "cn": "中文",
+      "en": "English",
+      "Korean": "한국어",
+      "Japanese": "日本語"
+    },
+    "link": "Connect",
+    "add": "Please enable this plugin!"
+  },
+  "navbar2": {
+    "nav": {
+      "trends": "トレンド",
+      "breaking": "速報",
+      "news": "ニュース",
+      "esports": "eスポーツ",
+      "sports": "スポーツ",
+      "finance": "金融",
+      "crypto": "暗号通貨",
+      "company": "企業",
+      "popularCulture": "ポップカルチャー",
+      "technology": "テクノロジー",
+      "ai": "AI"
     }
   },
-  home: {
-    ...base.home,
-    comingSoon: "予測市場 オープン間近",
-    searchPlaceholder: "検索"
+  "common": {
+    "skip": "スキップ",
+    "confirm": "確定",
+    "loading": "読み込み中...",
+    "continue": "続ける",
+    "search": "検索",
+    "more": "もっと見る",
+    "viewMore": "View More",
+    "viewAll": "View All",
+    "buy": "Buy",
+    "sell": "Sell",
+    "close": "Close",
+    "share": "共有",
+    "noData": "データがありません...",
+    "address": "アドレス",
+    "userAvatar": "User Avatar",
+    "settings": "Settings",
+    "balance": "Balance",
+    "price": "価格",
+    "time": "Time",
+    "amount": "Amount",
+    "all": "All",
+    "success": "Successful",
+    "pending": "Pending"
   },
-  footerNav: {
-    home: "ホーム",
-    breaking: "速報"
+  "header": {
+    "searchPlaceholder": "Search ChooseMe",
+    "portfolio": "Portfolio",
+    "cash": "Cash",
+    "deposit": "Deposit",
+    "profile": "Profile",
+    "settingsTitle": "Settings",
+    "logout": "Logout"
   },
-  computingPower: {
-    title: "ノード購入",
-    desc: "ノードを購入し、データノード収益、取引手数料収益、サブトークン手数料収益、二次市場収益を享受し、より多くのノード参加を促進してさらなる収益を獲得しましょう。詳細を見る",
-    learnMore: "詳細を見る",
-    buyNode: "ノードをアクティベート",
-    myNodes: "マイノード",
-    tabs: {
-      distributed: "分散ノード",
-      cluster: "クラスターノード"
+  "home": {
+    "comingSoon": "予測市場 オープン間近",
+    "comingSoonAlt": "Not available",
+    "searchPlaceholder": "検索",
+    "multiMarket": "multimarket",
+    "all": "All",
+    "opportunity": "Chance",
+    "maxLeverage": "Maximum leverage",
+    "maxReturn": "Maximum return"
+  },
+  "footerNav": {
+    "home": "ホーム",
+    "breaking": "速報"
+  },
+  "userInfo": {
+    "ecosystem": "エコシステム",
+    "others": "その他",
+    "chooseMe": "ChooseMe",
+    "stakingPool": "ノード購入",
+    "lpVault": "ステーキングプール",
+    "onChainData": "オンチェーンデータ",
+    "predictionMarket": "予測市場を作成",
+    "assets": "オンチェーン資産",
+    "eventPool": "イベントプール",
+    "audit": "監査",
+    "developerDocs": "更新ログ",
+    "developerContributions": "開発者貢献",
+    "tokenomics": "トークンエコノミクスモデル",
+    "launchpad": "タスクプラットフォーム",
+    "smartMoney": "スマートマネー",
+    "bugBounty": "バグ報奨金",
+    "github": "GitHub",
+    "technicalSupport": "技術サポート",
+    "support": "技術サポート",
+    "officialVerification": "公式検証",
+    "productFeedback": "製品フィードバック",
+    "apiManagement": "API管理",
+    "helpCenter": "ヘルプセンター",
+    "customerSupport": "オンラインサポート",
+    "disconnectWallet": "ウォレット切断",
+    "fundManagement": "資金管理",
+    "reward": "リワード",
+    "accuracy": "精度",
+    "leaderboard": "ランキング",
+    "terms": "利用規約",
+    "walletAddressCopied": "ウォレットアドレスをクリップボードにコピーしました",
+    "borrow": "借入",
+    "earn": "稼ぐ",
+    "strategyTrading": "戦略取引",
+    "copyTrading": "コピートレード",
+    "airdrop": "エアドロップ",
+    "academy": "アカデミー",
+    "nft": "NFT",
+    "underDevelopment": "開発中です"
+  },
+  "purchaseNodeRecord": {
+    "title": "ノードステーキング記録",
+    "nodeType": "ノードタイプ",
+    "nodePrice": "ノード価格",
+    "purchaseTime": "購入時間",
+    "empty": "記録はありません",
+    "informationNode": "情報ノード"
+  },
+  "settings": {
+    "title": "プロフィール",
+    "email": "メール",
+    "emailPlaceholder": "メールアドレスを入力してください",
+    "emailHelper": "ChooseMeの重要な更新情報を受け取るために使用されます",
+    "username": "ユーザー名",
+    "usernamePlaceholder": "ユーザー名を入力してください",
+    "twitter": "推特",
+    "bindTwitter": "連携",
+    "saveText": "保存"
+  },
+  "breaking": {
+    "ad": "Advertisement",
+    "avatar": "Avatar",
+    "chartAd": "Chart Advertisement",
+    "tabs": {
+      "politics": "Politics",
+      "crypto": "Cryptocurrency",
+      "finance": "Finance"
     },
-    priceLabel: "価格：",
-    buyBtn: "購入",
-    record: {
-      ...base.computingPower.record
+    "subscription": {
+      "title": "Get Daily Updates",
+      "description": "We'll send you an email every day with the latest updates from ChooseMe.",
+    "emailPlaceholder": "Please enter your email address",
+      "submit": "Get Updates"
     },
-    benefits: {
-      item1: "データノード収益を享受",
-      item2: "全ネットワーク取引手数料売買 0.5% 収益",
-      item3: "サブトークン手数料 3%",
-      item4: "二次市場利益 10% 収益",
-      item5: "分散型ハッシュパワーノードが分散型ハッシュパワーノードを推進"
-    },
-    purchaseTitle: {
-      ...base.computingPower.purchaseTitle
-    },
-    activationMsg: "アドレス {address} が[{nodeType}]を正常にアクティベートしました",
-    activateBtn: "ノードをアクティベート",
-    activating: "アクティベート中",
-    purchased: "購入済み",
-    connectWalletFirst: "まずウォレットを接続してください",
-    activatingNode: "ノードをアクティベート中...",
-    insufficientBalance: "残高不足！",
-    requestingAuth: "USDT 承認をリクエスト中...",
-    payingAndActivating: "支払いとノードアクティベート中...",
-    fetchNodeDataFailed: "ノードサービスプロバイダーデータの取得に失敗しました",
-    nodeActivationSuccess: "ノードアクティベート成功！",
-    paymentFailed: "支払い失敗",
-    paymentCancelled: "支払いをキャンセルしました",
-    products: {
-      // 分散ノード詳細紹介
-      distributedDescTemplate: "軽量な Web3 ノードサービスで、主要チェーンをサポートし、スタートアップや個人開発者が素早く参加するのに最適です。予測プラットフォームに組み込まれたライトノードは、エコシステム内アプリに安定したオンチェーンデータの読み取りとトランザクションブロードキャストを提供します。今すぐ友だちを招待して、より多くの報酬を一緒に獲得しましょう。",
-      // クラスターノード詳細紹介
-      clusterDescTemplate: "ハイグレードな Web3 ノードサービスで、主要チェーンをサポートし、予測プラットフォームのコアインフラとして機能します。高頻度・高並列のリアルタイム投資、オンチェーンオラクルの価格フィード、大規模プールの即時精算を支えます。今すぐ友だちを招待して、より多くの報酬を一緒に獲得しましょう。"
+    "live": {
+      "title": "Live on ChooseMe",
+      "followBtn": "follow on X",
+      "breakingNews": "Breaking News"
     }
   },
-  lpVault: {
-    title: "ステーキングプール",
-    desc: "世界初のオンチェーン循環参入、循環LP プール構築、循環バーン、循環エグジット、循環アプリケーションによる永久機関システム。各投資ティアは、LP構築→ プールバーンの循環モデルに従い、コントラクトが自動実行します。詳細を見る",
-    learnMore: "詳細を見る",
-    nodeStaking: "ノードをアクティベート",
-    myLPIncome: "マイ収益",
-    activationPrice: "アクティベーション価格:",
-    dailyEarnings: "日次换算収益",
-    cycleDays: "サイクル日数",
-    totalEarnings: "総収益",
-    activateComputingPower: "ノードをアクティベート",
-    activationMsg: "アドレス {address} が {nodeType} をアクティベートしました",
-    nodeTypes: {
-      T1: "インフォメーションノード",
-      T2: "データノード",
-      T3: "バリデーションノード",
-      T4: "コンセンサスノード",
-      T5: "スーパーノード",
-      T6: "ジェネシスノード"
+  "detail": {
+    "avatar": "Avatar",
+    "prediction": "Prediction",
+    "daysClose": "days to close",
+    "orderBook": "Order Book",
+    "graph": "Graph",
+    "volume": "Volume",
+    "shares": "Shares",
+    "last": "Last",
+    "spread": "Spread",
+    "rules": "Rules",
+    "winningAmount": "Winning Amount",
+    "averagePrice": "Average Price",
+    "maximumLeverage": "Maximum leverage",
+    "maximumReturn": "Maximum return",
+    "popularity": "popularity",
+    "whatDoYouPredict": "What Do You Predict?",
+    "outcome": "OUTCOME",
+    "chance": "% CHANCE",
+    "buyYes": "Buy Yes",
+    "buyNo": "Buy No",
+    "comments": "Comments",
+    "holds": "Holds",
+    "activity": "Activity",
+    "yesHolders": "Yes holders",
+    "noHolders": "No holders",
+    "bought": "Bought",
+    "timeRanges": {
+      "1D": "1D",
+      "1W": "1W",
+      "1M": "1M"
+    }
+  },
+  "payment": {
+    "cashUsed": "Cash Used",
+    "maxTradeSize": "Max trade size:",
+    "usableBonusAmount": "Usable Bonus Amount:",
+    "leverage": "Leverage",
+    "maxAvailableLeverage": "Max Available leverage",
+    "predictionOutcome": "50+ bps decrease",
+    "leveragedSize": "Leveraged Size",
+    "cashUsedLabel": "Cash used",
+    "projectedPnl": "Projected PnL(ROI)",
+    "tradedProbability": "Your traded probability",
+    "marketImpact": "Market Impact"
+  },
+  "earnings": {
+    "totalWinnings": "Total Winnings",
+    "maxWinning": "Max Winning",
+    "predictionEvents": "Prediction Events",
+    "profitLoss": "Profit/Loss",
+    "searchPositions": "Search position events",
+    "searchActivities": "Search trading activities",
+    "market": "Market",
+    "average": "Average",
+    "currentPrice": "Current Price",
+    "value": "Value",
+    "result": "Result",
+    "totalBet": "Total Bet",
+    "winningPrize": "Winning Prize",
+    "joined": "Joined",
+    "views": "Views"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "allCategories": "All Categories",
+    "category1": "Category 1",
+    "category2": "Category 2",
+    "searchByName": "Search by name",
+    "profitLoss": "Profit/Loss",
+    "quantity": "Quantity",
+    "thisMonthBiggestWin": "This Month's Biggest Win"
+  },
+  "accuracy": {
+    "overallAccuracy": "Overall Accuracy",
+    "expectedVsActual": "Expected vs Actual",
+    "title": "How accurate is ChooseMe?",
+    "accuracy4Hours": "4-Hour Accuracy",
+    "accuracy1Month": "1-Month Accuracy",
+    "brierScore": "Brier Score"
+  },
+  "linkWallet": {
+    "welcome": "CHOOSEMEへようこそ",
+    "selectLoginMethod": "ウォレットを選択してください",
+    "connect": "接続",
+    "userVerificationFailed": "ユーザー情報の確認に失敗しました",
+    "userCancelled": "ユーザーが操作をキャンセルしました"
+  },
+  "computingPower": {
+    "title": "ノード購入",
+    "desc": "ノードを購入し、データノード収益、取引手数料収益、サブトークン手数料収益、二次市場収益を享受し、より多くのノード参加を促進してさらなる収益を獲得しましょう。詳細を見る",
+    "learnMore": "詳細を見る",
+    "buyNode": "ノードをアクティベート",
+    "myNodes": "マイノード",
+    "tabs": {
+      "distributed": "分散ノード",
+      "cluster": "クラスターノード"
     },
-    days: "日",
-    nodeTypeNotFound: "対応するノードタイプが見つかりません",
-    invalidPrice: "ノード価格が無効です",
-    connectWalletFirst: "まずウォレットを接続してください",
-    activatingNode: "ノードをアクティベート中...",
-    insufficientBalance: "残高不足",
-    requestingAuth: "USDT 承認をリクエスト中...",
-    approvalSuccess: "承認成功",
-    userCancelledAuth: "承認をキャンセルしました",
-    approveTokenFailed: "承認失敗",
-    nodeActivationSuccess: "ノードアクティベート成功！",
-    paymentFailed: "支払い失敗",
-    paymentCancelled: "支払いをキャンセルしました",
-    bindInviteCodeFirst: "まず招待コードを連携してください"
-  },
-  myNode: {
-    title: "クラスターノード",
-    choIncome: "CHO収益",
-    subCoinIncome: "サブコイン収益",
-    earnPrompt: "アドレス {address} が{amount} CHOの収益を獲得",
-    earnPromptShort: "収益を獲得",
-    pendingIncome: "発行済み報酬",
-    nodeIncome: "ノード収益",
-    networkFeeIncome: "全ネットワーク手数料売買収益",
-    subCoinFeeIncome: "サブコイン手数料収益",
-    secondaryMarketIncome: "セカンダリーマーケット利益収益",
-    directReferralIncome: "直接紹介収益",
-    networkIncome: "チーム収益",
-    claimAll: "全収益の受取",
-    claim: "受取",
-    claimSuccess: "受取成功",
-    claimFailed: "受取失敗",
-    claimCancelled: "受取をキャンセルしました",
-    connectWalletFirst: "まずウォレットを接続してください",
-    missingContractAddress: "NodeManager コントラクトアドレスが不足しています",
-    myTeam: "マイチーム",
-    inviteAddressCount: "招待アドレス数",
-    directAddressCount: "直接紹介アドレス数",
-    teamTotalAddressCount: "チーム総アドレス数",
-    directAddress: "直接紹介",
-    teamAddress: "チーム",
-    activated: "がアクティベート",
-    nodeTypes: {
-      distributed: "分散ノード",
-      cluster: "クラスターノード"
+    "priceLabel": "価格：",
+    "activationMsg": "アドレス {address} が[{nodeType}]を正常にアクティベートしました",
+    "activateBtn": "ノードをアクティベート",
+    "activating": "アクティベート中",
+    "purchased": "購入済み",
+    "connectWalletFirst": "まずウォレットを接続してください",
+    "activatingNode": "ノードをアクティベート中...",
+    "insufficientBalance": "残高不足！",
+    "requestingAuth": "USDT 承認をリクエスト中...",
+    "payingAndActivating": "支払いとノードアクティベート中...",
+    "fetchNodeDataFailed": "ノードサービスプロバイダーデータの取得に失敗しました",
+    "nodeActivationSuccess": "ノードアクティベート成功！",
+    "paymentFailed": "支払い失敗",
+    "paymentCancelled": "支払いをキャンセルしました",
+    "products": {
+      "distributedDescTemplate": "軽量な Web3 ノードサービスで、主要チェーンをサポートし、スタートアップや個人開発者が素早く参加するのに最適です。予測プラットフォームに組み込まれたライトノードは、エコシステム内アプリに安定したオンチェーンデータの読み取りとトランザクションブロードキャストを提供します。今すぐ友だちを招待して、より多くの報酬を一緒に獲得しましょう。",
+      "clusterDescTemplate": "ハイグレードな Web3 ノードサービスで、主要チェーンをサポートし、予測プラットフォームのコアインフラとして機能します。高頻度・高並列のリアルタイム投資、オンチェーンオラクルの価格フィード、大規模プールの即時精算を支えます。今すぐ友だちを招待して、より多くの報酬を一緒に獲得しましょう。"
     }
   },
-  myIncome: {
-    ...base.myIncome,
-    pendingIncome: "発行済み報酬",
-    noStakingNode: "通知",
-    noStakingNodeMessage: "ステーキングノードがまだありません。収益を表示する前に、まずノードをステーキングしてください",
-    nodeNames: {
-      ...(base.myIncome?.nodeNames || {}),
-      genesisNode: "ジェネシスノード"
+  "lpVault": {
+    "title": "ステーキングプール",
+    "desc": "世界初のオンチェーン循環参入、循環LP プール構築、循環バーン、循環エグジット、循環アプリケーションによる永久機関システム。各投資ティアは、LP構築→ プールバーンの循環モデルに従い、コントラクトが自動実行します。詳細を見る",
+    "learnMore": "詳細を見る",
+    "nodeStaking": "ノードをアクティベート",
+    "myLPIncome": "マイ収益",
+    "activationPrice": "アクティベーション価格:",
+    "dailyEarnings": "日次换算収益",
+    "cycleDays": "サイクル日数",
+    "totalEarnings": "総収益",
+    "activateComputingPower": "ノードをアクティベート",
+    "activationMsg": "アドレス {address} が {nodeType} をアクティベートしました",
+    "nodeTypes": {
+      "T1": "インフォメーションノード",
+      "T2": "データノード",
+      "T3": "検証ノード",
+      "T4": "コンセンサスノード",
+      "T5": "スーパーノード",
+      "T6": "ジェネシスノード"
+    },
+    "days": "日",
+    "nodeTypeNotFound": "対応するノードタイプが見つかりません",
+    "invalidPrice": "ノード価格が無効です",
+    "connectWalletFirst": "まずウォレットを接続してください",
+    "activatingNode": "ノードをアクティベート中...",
+    "insufficientBalance": "残高不足",
+    "requestingAuth": "USDT 承認をリクエスト中...",
+    "approvalSuccess": "承認成功",
+    "userCancelledAuth": "承認をキャンセルしました",
+    "approveTokenFailed": "承認失敗",
+    "nodeActivationSuccess": "ノードアクティベート成功！",
+    "paymentFailed": "支払い失敗",
+    "paymentCancelled": "支払いをキャンセルしました",
+    "bindInviteCodeFirst": "まず招待コードを連携してください"
+  },
+  "myNode": {
+    "distributedNode": "分散ノード",
+    "clusterNode": "クラスターノード",
+    "choIncome": "CHO収益",
+    "subCoinIncome": "サブコイン収益",
+    "earnPromptShort": "収益を獲得",
+    "pendingIncome": "発行済み報酬",
+    "nodeIncome": "ノード収益",
+    "networkFeeIncome": "全ネットワーク手数料売買収益",
+    "subCoinFeeIncome": "サブコイン手数料収益",
+    "secondaryMarketIncome": "セカンダリーマーケット利益収益",
+    "directReferralIncome": "直接紹介収益",
+    "networkIncome": "チーム収益",
+    "claimRecord": "领取记录",
+    "claimAll": "全収益の受取",
+    "noIncome": "受け取れる収益がありません",
+    "claimSuccess": "受取成功",
+    "claimFailed": "受取失敗",
+    "claimCancelled": "受取をキャンセルしました",
+    "connectWalletFirst": "まずウォレットを接続してください",
+    "missingContractAddress": "NodeManager コントラクトアドレスが不足しています",
+    "directAddressCount": "直接紹介アドレス数",
+    "teamTotalAddressCount": "チーム総アドレス数",
+    "directAddress": "直接紹介",
+    "teamAddress": "チーム"
+  },
+  "myIncome": {
+    "myIncomeCMT": "My Profit (CHO)",
+    "computingPowerIncomeCMT": "Computing Profit (CHO)",
+    "networkIncomeCMT": "Network Profit (CHO)",
+    "pendingIncome": "発行済み報酬",
+    "staticIncomeCHO": "Static Profit",
+    "directReferralIncomeCHO": "Direct Referral Profit",
+    "teamIncomeCHO": "Team Profit",
+    "genesisNodeIncomeCHO": "Genesis Node 5% Profit",
+    "superNode": "スーパーノード",
+    "superNodeIncomeCHO": "Super Node Profit",
+    "equalLevelIncomeCHO": "Equal Level Profit",
+    "flowBonusIncomeCHO": "My Flow Bonus",
+    "claimRecord": "Claim Records",
+    "claimAll": "Claim All Profit",
+    "purchaseTime": "Activation Time",
+    "upline": "Upline",
+    "noStakingNode": "通知",
+    "noStakingNodeMessage": "ステーキングノードがまだありません。収益を表示する前に、まずノードをステーキングしてください",
+    "nodeNames": {
+      "infoNode": "情報ノード",
+      "dataNode": "データノード",
+      "validationNode": "検証ノード",
+      "consensusNode": "コンセンサスノード",
+      "genesisNode": "ジェネシスノード"
+    },
+    "earningsOptions": {
+      "allNodeRewards": "All Node Rewards"
     }
   },
-  dashboard: {
-    title: "ダッシュボード",
-    tabs: {
-      currentPrice: "CHO現価",
-      pledge: "LPトレジャリー",
-      computingPool: "ハッシュパワープール",
-      marketReturns: "市場収益"
+  "claimRecord": {
+    "title": "受取記録",
+    "computingPowerService": "ハッシュパワーサービス",
+    "lpVault": "ステーキングプール",
+    "distributedNode": "分散ノード",
+    "clusterNode": "クラスターノード"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "tabs": {
+      "currentPrice": "CHO現価",
+      "pledge": "LPトレジャリー",
+      "computingPool": "ハッシュパワープール",
+      "marketReturns": "市場収益"
     }
   },
-  cmtCurrentPrice: {
-    latestPrice: "最新価格",
-    high24h: "24H最高",
-    low24h: "24H最安",
-    volume24hCMT: "24H出来高CHO",
-    volume24hUSDT: "24H出来高USDT",
-    timePeriods: {
+  "cmtCurrentPrice": {
+    "latestPrice": "最新価格",
+    "high24h": "24H最高",
+    "low24h": "24H最安",
+    "volume24hCMT": "24H出来高CHO",
+    "volume24hUSDT": "24H出来高USDT",
+    "timePeriods": {
       "5m": "5分",
       "1h": "1時間",
       "4h": "4時間",
       "1d": "1日"
     },
-    tooltip: {
-      open: "始値",
-      close: "終値",
-      low: "最安",
-      high: "最高",
-      volume: "出来高"
+    "tooltip": {
+      "open": "始値",
+      "close": "終値",
+      "low": "最安",
+      "high": "最高",
+      "volume": "出来高"
     }
   },
-  cmtPledge: {
-    pledgeTotal: "ステーキング総額(USDT)",
-    lpPledgeDestroy: "LPステーキングバーン (USDT)",
-    timePeriods: {
+  "cmtPledge": {
+    "pledgeTotal": "ステーキング総額(USDT)",
+    "lpPledgeDestroy": "LPステーキングバーン (USDT)",
+    "timePeriods": {
       "7d": "7日",
       "30d": "30日",
       "90d": "90日",
@@ -273,12 +563,12 @@ export default {
       "all": "全体"
     }
   },
-  computingPool: {
-    pledgeTotal: "ステーキング総額",
-    composition: "ハッシュパワープール構成",
-    distributedNodeTotal: "分散ノード総額",
-    clusterNodeTotal: "クラスターノード総額",
-    timePeriods: {
+  "computingPool": {
+    "pledgeTotal": "ステーキング総額",
+    "composition": "ハッシュパワープール構成",
+    "distributedNodeTotal": "分散ノード総額",
+    "clusterNodeTotal": "クラスターノード総額",
+    "timePeriods": {
       "7d": "7日",
       "30d": "30日",
       "90d": "90日",
@@ -286,111 +576,54 @@ export default {
       "all": "全体"
     }
   },
-  marketReturns: {
-    secondaryMarketProfit: "二次市場収益",
-    userProfit: "ユーザー利益金額",
-    destroyedCMT: "バーンされたCMT数量",
-    myProfit: "マイ利益金額",
-    profit24hCHO: "24時間利益(CHO)",
-    profit24hUSDT: "24時間利益(USDT)",
-    fomoProfit: "FOMO利益金額",
-    fomoVolume24hCMT: "24時間FOMO量(CMT)",
-    fomoVolume24hUSDT: "24時間FOMO量(USDT)",
-    latestMarketValue: "予測市場時価総額",
-    volume24hCMT: "24時間量(CMT)",
-    volume24hUSDT: "24時間量(USDT)"
+  "marketReturns": {
+    "secondaryMarketProfit": "二次市場収益",
+    "userProfit": "ユーザー利益金額",
+    "destroyedCMT": "バーンされたCMT数量",
+    "myProfit": "マイ利益金額",
+    "profit24hCHO": "24時間利益(CHO)",
+    "profit24hUSDT": "24時間利益(USDT)",
+    "fomoProfit": "FOMO利益金額",
+    "fomoVolume24hCMT": "24時間FOMO量(CMT)",
+    "fomoVolume24hUSDT": "24時間FOMO量(USDT)",
+    "latestMarketValue": "予測市場時価総額",
+    "volume24hCMT": "24時間量(CMT)",
+    "volume24hUSDT": "24時間量(USDT)"
   },
-  userInfo: {
-    disconnect: "ウォレット切断",
-    ecosystem: "エコシステム",
-    others: "その他",
-    chooseMe: "ChooseMe",
-    stakingPool: "ノード購入",
-    lpVault: "ステーキングプール",
-    onChainData: "オンチェーンデータ",
-    predictionMarket: "予測市場を作成",
-    assets: "オンチェーン資産",
-    eventPool: "イベントプール",
-    audit: "監査",
-    developerDocs: "更新ログ",
-    alpha: "Alpha テスト",
-    developerContributions: "開発者貢献",
-    tokenomics: "トークンエコノミクスモデル",
-    launchpad: "タスクプラットフォーム",
-    smartMoney: "スマートマネー",
-    bugBounty: "バグ報奨金",
-    github: "GitHub",
-    technicalSupport: "技術サポート",
-    language: "言語切り替え",
-    support: "技術サポート",
-    officialVerification: "公式検証",
-    productFeedback: "製品フィードバック",
-    apiManagement: "API管理",
-    helpCenter: "ヘルプセンター",
-    customerSupport: "オンラインサポート",
-    selfService: "セルフサービス",
-    disconnectWallet: "ウォレット切断",
-    dashboard: "ダッシュボード",
-    createMarket: "予測市場作成",
-    fundManagement: "資金管理",
-    reward: "リワード",
-    accuracy: "精度",
-    leaderboard: "ランキング",
-    terms: "利用規約",
-    doc: "ドキュメント",
-    walletAddressCopied: "ウォレットアドレスをクリップボードにコピーしました",
-    copyFailed: "コピーに失敗しました。手動でコピーしてください",
-    linkCopied: "リンクをクリップボードにコピーしました",
-    borrow: "借入",
-    earn: "稼ぐ",
-    strategyTrading: "戦略取引",
-    copyTrading: "コピートレード",
-    airdrop: "エアドロップ",
-    academy: "アカデミー",
-    nft: "NFT",
-    rwa: "RWA",
-    underDevelopment: "開発中です"
+  "purchaseNode": {
+    "nodeType": "Node Type",
+    "estimatedTradeProfit": "Estimated Trading Profit",
+    "subCoinFeeProfit": "Sub-coin Fee Profit",
+    "secondaryProfit": "Secondary Market Profit",
+    "tipText": "* Total profit ≥ 3x triggers claim",
+    "buyBtn": "Go to Buy"
   },
-  settings: {
-    title: "プロフィール",
-    email: "メール",
-    emailPlaceholder: "メールアドレスを入力してください",
-    emailHelper: "ChooseMeの重要な更新情報を受け取るために使用されます",
-    username: "ユーザー名",
-    usernamePlaceholder: "ユーザー名を入力してください",
-    twitter: "Twitter",
-    bindTwitter: "連携",
-    saveText: "保存"
+  "tabNode": {
+    "purchaseTime": "Purchase Time"
   },
-  purchaseNodeRecord: {
-    title: "ノードステーキング記録",
-    nodeType: "ノードタイプ",
-    nodePrice: "ノード価格",
-    purchaseTime: "購入時間",
-    empty: "記録はありません",
-    informationNode: "情報ノード"
+  "myNodes": {
+    "title": "My Nodes"
   },
-  claimRecord: {
-    title: "受取記録",
-    computingPowerService: "ハッシュパワーサービス",
-    lpVault: "ステーキングプール",
-    distributedNode: "分散ノード",
-    clusterNode: "クラスターノード"
-  },
-  common: {
-    ...base.common,
-    search: "検索",
-    more: "もっと見る",
-    skip: "スキップ",
-    continue: "続ける",
-    confirm: "確定",
-    loading: "読み込み中...",
-    complete: "完了",
-    price: "価格",
-    share: "共有",
-    noData: "データがありません...",
-    address: "アドレス",
-    noData: "データがありません..."
+  "collectEarnings": {
+    "title": "Claim Method",
+    "tip": "* You can claim all node rewards, or choose to claim rewards from a single node"
+   },
+  "searchPage": {
+    "searchPlaceholder": "Search",
+    "browse": "Browse",
+    "themes": "Themes",
+    "browseItems": {
+      "latest": "Latest",
+      "trends": "Trends",
+      "popular": "Popular",
+      "liquidity": "Liquidity",
+      "endingSoon": "Ending Soon"
+    },
+    "themeItems": {
+      "crypto": "Crypto",
+      "finance": "Finance",
+      "sports": "Sports",
+      "esports": "Esports"
+    }
   }
 }
-

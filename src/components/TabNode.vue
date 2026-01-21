@@ -1,6 +1,6 @@
 <template>
     <!-- 弹窗模式 -->
-    <transition name="fade" v-if="isModal">
+    <transition name="fade" v-if="nodes && nodes.length > 0">
         <div v-if="modelValue" class="tab-node-overlay" @click.self="handleClose" key="modal">
             <div class="tab-node-card">
                 <!-- 顶部小横条 -->
@@ -22,7 +22,7 @@
                             <span v-if="node.nodeTag" class="node-tag">{{ node.nodeTag }}</span>
                         </div>
                         <div class="node-purchase-time">
-                            {{ $t('tabNode.purchaseTime') }}: {{ node.purchaseTime }}
+                            {{ $t('tabNode.purchaseTime') }}: {{ node.status === 1 ? $t('computingPower.activating') : node.purchaseTime }}
                         </div>
                     </div>
                 </div>
@@ -30,56 +30,28 @@
         </div>
     </transition>
 
-    <!-- 单卡片模式 -->
-    <div v-else class="tab-node">
-        <div class="node-name-row">
-            <span class="node-name">{{ nodeName }}</span>
-            <span v-if="nodeTag" class="node-tag">{{ nodeTag }}</span>
-        </div>
-        <div class="node-purchase-time">
-            {{ $t('tabNode.purchaseTime') }}: {{ purchaseTime }}
-        </div>
-    </div>
 </template>
 
 <script setup>
-import { defineProps, defineEmits, watch, onUnmounted, computed } from 'vue'
+import { defineProps, defineEmits, watch, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 const props = defineProps({
-    // 单卡片模式属性
-    nodeName: {
-        type: String,
-        default: ''
-    },
-    nodeTag: {
-        type: String,
-        default: ''
-    },
-    purchaseTime: {
-        type: String,
-        default: ''
-    },
     // 弹窗模式属性
     modelValue: {
         type: Boolean,
         default: false
     },
     nodes: {
-        // 期望结构：{ id, nodeName, nodeTag, purchaseTime }
+        // 期望结构：{ id, nodeName, nodeTag, purchaseTime, status }
         type: Array,
         default: () => []
     }
 })
 
 const emit = defineEmits(['update:modelValue', 'close', 'select'])
-
-// 判断是否为弹窗模式
-const isModal = computed(() => {
-    return props.nodes && props.nodes.length > 0
-})
 
 // 保存原始 body 样式
 let originalBodyOverflow = ''
@@ -128,20 +100,16 @@ const preventScroll = (e) => {
 
 // 监听 modelValue 变化（仅弹窗模式）
 watch(() => props.modelValue, (newVal) => {
-    if (isModal.value) {
-        if (newVal) {
-            lockBodyScroll()
-        } else {
-            unlockBodyScroll()
-        }
+    if (newVal) {
+        lockBodyScroll()
+    } else {
+        unlockBodyScroll()
     }
 }, { immediate: true })
 
 // 组件卸载时恢复滚动
 onUnmounted(() => {
-    if (isModal.value) {
-        unlockBodyScroll()
-    }
+    unlockBodyScroll()
 })
 
 const handleClose = () => {
@@ -215,17 +183,6 @@ const handleSelect = (node) => {
     border: 1px solid #F3F3F3;
 }
 
-// 单卡片模式样式
-.tab-node {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 15px 22px;
-    width: 100%;
-    box-sizing: border-box;
-    border-radius: 12px;
-    transition: background-color 0.3s ease;
-}
 
 .node-name-row {
     display: flex;

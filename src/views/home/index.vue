@@ -301,6 +301,7 @@ import bannerImg from '@/assets/images/banner.png'
 import banner0Img from '@/assets/images/banner0.png'
 import banner2Img from '@/assets/images/banner2.png'
 import linghua1Img from '@/assets/images/linghua1.png'
+import banner4Img from '@/assets/images/banner4.png'
 
 const { t } = useI18n()
 
@@ -312,7 +313,8 @@ const bannerList = ref([
   bannerImg,
   banner0Img,
   banner2Img,
-  linghua1Img
+  linghua1Img,
+  banner4Img
 ])
 
 // 禁止页面滚动

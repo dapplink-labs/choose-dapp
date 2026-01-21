@@ -69,8 +69,8 @@
     </div>
 
 
-    <PurchaseNode v-model="showPurchaseNode" :title="purchaseTitle" :trade-profit="purchaseTradeProfit"
-      :fee-profit="purchaseFeeProfit" :secondary-profit="purchaseSecondaryProfit" @buy="handleConfirmBuy" />
+    <PurchaseNode v-model="showPurchaseNode" :title="purchaseTitle"
+        :price="purchasePrice" @buy="handleConfirmBuy" />
   </div>
 </template>
 
@@ -92,15 +92,13 @@ const {
   displayNodes,
   showPurchaseNode,
   purchaseTitle,
-  purchaseTradeProfit,
-  purchaseFeeProfit,
-  purchaseSecondaryProfit,
+  purchasePrice,
+  isNodeButtonEnabled,
+  getButtonText,
   handleOpenMore,
   handleMyNodes,
   handleBuy,
   handleConfirmBuy,
-  getButtonText,
-  isNodeButtonEnabled,
 } = useComputingPowerServices()
 </script>
 

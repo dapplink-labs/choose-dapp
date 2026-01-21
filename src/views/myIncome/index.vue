@@ -361,6 +361,7 @@ const getNodeStakingRecordsList = async () => {
             nodeName: t(nodeTypeMap[item.type]?.nodeNameKey || ''),
             nodeTag: nodeTypeMap[item.type]?.nodeTag || '',
             purchaseTime: formatDateTime(item.created),
+            status: item.status
         }
     })
     if (myNodes.value.length > 0) {

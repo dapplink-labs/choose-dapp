@@ -15,7 +15,8 @@
                     <!-- 选项列表 -->
                     <div class="options-list">
                         <div v-if="isLoading" class="loading-text">{{ $t('common.loading') || '加载中...' }}</div>
-                        <div v-else-if="options.length === 0" class="empty-text">{{ $t('common.noData') || '暂无数据' }}</div>
+                        <div v-else-if="options.length === 0" class="empty-text">{{ $t('common.noData') || '暂无数据' }}
+                        </div>
                         <div v-else v-for="(option, index) in options" :key="index" class="option-item"
                             :class="{ 'option-selected': selectedIndex === index }" @click="selectOption(index)">
                             <div class="option-header">
@@ -24,7 +25,9 @@
                             </div>
                             <div class="option-amount-row">
                                 <span class="option-amount">{{ option.amount }} CHO</span>
-                                <span v-if="option.time" class="option-time">{{ option.time }}</span>
+                                <span v-if="option.time" class="option-time">{{ option.status === 1 ?
+                                    $t('computingPower.activating') : option.time
+                                    }}</span>
                             </div>
                         </div>
                     </div>
@@ -92,10 +95,10 @@ const formatAmount = (value) => {
     if (!value || value === '0' || value === 0) return '0'
     try {
         // 将18精度的数值转换为正常数量
-        let num = typeof value === 'bigint' || typeof value === 'string' 
+        let num = typeof value === 'bigint' || typeof value === 'string'
             ? parseFloat(formatUnits(BigInt(value.toString()), 18))
             : Number(value) / 1e18
-        
+
         if (!Number.isFinite(num)) return '0'
         const fixed = num.toFixed(4)
         const trimmed = fixed.replace(/\.?0+$/, '')
@@ -137,7 +140,8 @@ const processNodeData = (list) => {
                 earliestTime: null,
                 orderIds: [],
                 nodeTag: nodeTypeMap[nodeType]?.nodeTag || '',
-                nodeNameKey: nodeTypeMap[nodeType]?.nodeNameKey || ''
+                nodeNameKey: nodeTypeMap[nodeType]?.nodeNameKey || '',
+                status: item.status
             })
         }
 
@@ -160,7 +164,7 @@ const buildOptionList = (typeMap, totalAmount, earliestTime, allOrderIds) => {
         tag: '',
         amount: formatAmount(totalAmount),
         rawAmount: totalAmount,
-        time: earliestTime ? formatDateTime(earliestTime) : '',
+        time:  '',
         orderIds: allOrderIds.join(','),
         type: 'all'
     }]
@@ -173,7 +177,8 @@ const buildOptionList = (typeMap, totalAmount, earliestTime, allOrderIds) => {
             rawAmount: value.amount,
             time: value.earliestTime ? formatDateTime(value.earliestTime) : '',
             orderIds: value.orderIds.join(','),
-            type: key
+            type: key,
+            status: value.status
         })
     })
 
@@ -191,7 +196,7 @@ const fetchNodeStakingRecords = async () => {
     try {
         const res = await getNodeStakingRecords({ address: address.value })
         const list = res?.data?.data?.list || []
-        
+
         if (list.length === 0) {
             options.value = []
             return
@@ -234,7 +239,7 @@ let originalBodyPaddingRight = ''
 const lockBodyScroll = () => {
     originalBodyOverflow = document.body.style.overflow || ''
     originalBodyPaddingRight = document.body.style.paddingRight || ''
-    
+
     const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
     document.body.style.overflow = 'hidden'
     if (scrollbarWidth > 0) {
@@ -342,17 +347,17 @@ const handleConfirm = async () => {
     const selectedOption = options.value[selectedIndex.value]
     if (!validateSelection(selectedOption)) return
 
-    const loading = ElLoading.service({ 
-        lock: true, 
-        text: t('common.loading') || '处理中...', 
-        background: 'rgba(0, 0, 0, 0.7)' 
+    const loading = ElLoading.service({
+        lock: true,
+        text: t('common.loading') || '处理中...',
+        background: 'rgba(0, 0, 0, 0.7)'
     })
 
     try {
         await switchToBSC(loading)
         const txHash = await callClaimRewardContract(selectedOption.rawAmount || 0, loading)
         await submitRewardData(txHash, selectedOption.type !== 'all' ? selectedOption.orderIds : null, loading)
-        
+
         ElMessage.success(CONTRACT_MESSAGES.success())
         handleClose()
         emit('ReceiveSuccess')

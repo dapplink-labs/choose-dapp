@@ -4,32 +4,21 @@
       <div class="purchase-modal" @click.stop>
         <!-- 底部拖拽条 -->
         <div class="drag-handle"></div>
-        
+
         <!-- 节点类型标题 -->
-        <div class="node-type-header">
-          <span class="node-type-label">{{ $t('purchaseNode.nodeType') }}</span>
-          <span class="node-type-value">{{ title }}</span>
-        </div>
+        <div class="node-type-header">确认购买节点</div>
 
         <!-- 收益信息列表 -->
         <div class="earnings-list">
           <div class="earnings-item">
-            <span class="earnings-label">{{ $t('purchaseNode.estimatedTradeProfit') }}</span>
-            <span class="earnings-value">{{ tradeProfit }}</span>
+            <span class="earnings-label">{{ $t('purchaseNode.nodeType') }}</span>
+            <span class="earnings-value">{{ title }}</span>
           </div>
           <div class="earnings-item">
-            <span class="earnings-label">{{ $t('purchaseNode.subCoinFeeProfit') }}</span>
-            <span class="earnings-value">{{ feeProfit }}</span>
-          </div>
-          <div class="earnings-item">
-            <span class="earnings-label">{{ $t('purchaseNode.secondaryProfit') }}</span>
-            <span class="earnings-value">{{ secondaryProfit }}</span>
+            <span class="earnings-label">节点价格</span>
+            <span class="earnings-value">{{ price }} U</span>
           </div>
         </div>
-
-        <!-- 提示文字 -->
-        <p class="tip-text">{{ $t('purchaseNode.tipText') }}</p>
-
         <!-- 购买按钮 -->
         <button class="buy-btn" @click="handleBuy">{{ $t('purchaseNode.buyBtn') }}</button>
       </div>
@@ -49,9 +38,7 @@ const isDark = computed(() => themeStore.isDark)
 const props = defineProps({
   modelValue: { type: Boolean },
   title: { type: String, default: '' },
-  tradeProfit: { type: String, default: '0%' },
-  feeProfit: { type: String, default: '0%' },
-  secondaryProfit: { type: String, default: '0%' }
+  price: { type: String, default: '0' },
 })
 
 const emit = defineEmits(['update:modelValue', 'buy', 'close'])
@@ -98,18 +85,13 @@ const handleBuy = () => {
 }
 
 .node-type-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.node-type-label,
-.node-type-value {
-  font-size: 16px;
-  font-weight: 500;
+  display: block;
+  font-family: PingFang SC, PingFang SC;
+  font-weight: 600;
+  font-size: 20px;
   color: var(--text-color, #1a1a1a);
-  transition: color 0.3s ease;
+  border-bottom: 1px solid var(--border-color, #E0E0E0);
+  padding-bottom: 18px;
 }
 
 .earnings-list {
@@ -120,36 +102,21 @@ const handleBuy = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-top: 24px;
 
   &:last-child {
-    margin-bottom: 0;
+    margin-bottom: 58px;
   }
 }
 
-.earnings-label {
-  font-size: 14px;
-  color: var(--text-color, #1a1a1a);
-  flex: 1;
-  transition: color 0.3s ease;
-}
-
+.earnings-label,
 .earnings-value {
-  font-size: 14px;
-  color: var(--text-color, #1a1a1a);
+  font-family: PingFang SC, PingFang SC;
   font-weight: 400;
-  transition: color 0.3s ease;
+  font-size: 16px;
+  color: var(--text-color, #1a1a1a);
 }
 
-.tip-text {
-  margin: 0 0 24px;
-  font-size: 12px;
-  color: var(--text-dark-gray, #909090);
-  line-height: 1.5;
-  transition: color 0.3s ease;
-  border-top: 1px solid var(--bg-light, #F3F3F3);
-  padding-top: 14px;
-}
 
 .buy-btn {
   width: 100%;

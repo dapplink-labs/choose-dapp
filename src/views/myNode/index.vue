@@ -5,7 +5,7 @@
         <BackHeaderNav :show-open-btn="true" />
 
         <div class="banner1">
-            <h1 class="page-title">{{ $t('myNode.title') }}</h1>
+            <h1 class="page-title">{{ nodeType === 0 ? $t('myNode.distributedNode') : $t('myNode.clusterNode') }}</h1>
         </div>
         <div class="cps-bg"></div>
 
@@ -13,11 +13,11 @@
             <div class="box">
                 <div class="item">
                     <b>{{ $t('myNode.choIncome') }}</b>
-                    <p>{{ choIncome }}</p>
+                    <p>{{ formatAmount(choIncome) }}</p>
                 </div>
                 <div class="item">
                     <b>{{ $t('myNode.subCoinIncome') }}</b>
-                    <p>{{ subCoinIncome }}</p>
+                    <p>{{ formatAmount(subCoinIncome) }}</p>
                 </div>
             </div>
 
@@ -35,27 +35,27 @@
             <div class="pending-income-grid">
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.nodeIncome') }}</div>
-                    <div class="income-value">{{ nodeIncome }}</div>
+                    <div class="income-value">{{ formatAmount(nodeIncome) }}</div>
                 </div>
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.networkFeeIncome') }}</div>
-                    <div class="income-value">{{ networkFeeIncome }}</div>
+                    <div class="income-value">{{ formatAmount(networkFeeIncome) }}</div>
                 </div>
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.subCoinFeeIncome') }}</div>
-                    <div class="income-value">{{ subCoinFeeIncome }}</div>
+                    <div class="income-value">{{ formatAmount(subCoinFeeIncome) }}</div>
                 </div>
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.secondaryMarketIncome') }}</div>
-                    <div class="income-value">{{ secondaryMarketIncome }}</div>
+                    <div class="income-value">{{ formatAmount(secondaryMarketIncome) }}</div>
                 </div>
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.directReferralIncome') }}</div>
-                    <div class="income-value">{{ directReferralIncome }}</div>
+                    <div class="income-value">{{ formatAmount(directReferralIncome) }}</div>
                 </div>
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.networkIncome') }}</div>
-                    <div class="income-value">{{ teamIncome }}</div>
+                    <div class="income-value">{{ formatAmount(teamIncome) }}</div>
                 </div>
             </div>
 
@@ -172,15 +172,23 @@ const choIncome = ref('0')
 const subCoinIncome = ref('0') // 子币收益暂无数据，写死 0
 
 // 待领取收益数据
-const nodeIncome = ref('0')
-const networkFeeIncome = ref('0')
-const subCoinFeeIncome = ref('0')
-const secondaryMarketIncome = ref('0')
-const directReferralIncome = ref('0')
-const teamIncome = ref('0')
+const nodeIncome = ref(0)
+const networkFeeIncome = ref(0)
+const subCoinFeeIncome = ref(0)
+const secondaryMarketIncome = ref(0)
+const directReferralIncome = ref(0)
+const teamIncome = ref(0)
+const nodeType = ref(0)
 
-// 领取节点收益（incomeType: 0 节点收益，1 晋升收益）暂时写死为 0，后续有接口再替换
+// 领取收益
 const handleClaimReward = async () => {
+    // amount为所有收益之和
+    let amount = Number(nodeIncome.value) + Number(networkFeeIncome.value) + Number(subCoinFeeIncome.value) + Number(secondaryMarketIncome.value) + Number(directReferralIncome.value) + Number(teamIncome.value);
+    if (amount <= 0) {
+        ElMessage.warning(t('myNode.noIncome'))
+        return
+    }
+    // claimReward处理重复领取收益
     if (claimLoading.value) return
     if (!address.value) {
         ElMessage.error(t('myNode.connectWalletFirst'))
@@ -189,6 +197,7 @@ const handleClaimReward = async () => {
     claimLoading.value = true
     try {
         if (Number(chainId.value) !== BSC_CHAIN_ID) {
+            // 切换网络
             await switchChain(config, { chainId: BSC_CHAIN_ID })
             await new Promise(r => setTimeout(r, 500))
         }
@@ -198,20 +207,11 @@ const handleClaimReward = async () => {
             throw new Error(t('myNode.missingContractAddress'))
         }
 
-        // 预估 gas（仅做预检，实际发送时仍由 writeContractOptimized 估算并附带 buffer）
-        // await computedGas(
-        //     nodeManagerABI,
-        //     'claimReward',
-        //     [0], // 先写死 0，接口到位后替换
-        //     bscNet.proxyNodeManager,
-        //     address.value
-        // )
-
         await writeContractOptimized({
             abi: nodeManagerABI,
             address: bscNet.proxyNodeManager,
             functionName: 'claimReward',
-            args: [0], 
+            args: [BigInt(amount)], 
             userAddress: address.value,
             messages: {
                 success: t('myNode.claimSuccess'),
@@ -335,6 +335,7 @@ onMounted(() => {
     // 直推收益：direct_reward
     // 团队收益：team_reward
     // 节点收益：node_reward
+    // node_type: 0 = 分布节点, 1 = 集群节点
     getNodeServiceProvidersInfo({
         id: String(route.query.id || ''),
         address: address.value
@@ -342,7 +343,7 @@ onMounted(() => {
         const data = res?.data?.data || res?.data || res || {}
 
         choIncome.value = data.total_reward ?? '0'
-        subCoinIncome.value = '0' // 暂无子币收益数据，写死 0
+        subCoinIncome.value = 0 // 暂无子币收益数据，写死 0
 
         nodeIncome.value = data.node_reward ?? '0'
         networkFeeIncome.value = data.fee_reward ?? '0'
@@ -350,6 +351,7 @@ onMounted(() => {
         secondaryMarketIncome.value = data.market_reward ?? '0'
         directReferralIncome.value = data.direct_reward ?? '0'
         teamIncome.value = data.team_reward ?? '0'
+        nodeType.value = Number(data.node_type ?? 0)
     }).catch(err => {
         console.error('获取节点收益详情失败：', err)
     })

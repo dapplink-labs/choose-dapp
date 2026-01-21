@@ -74,38 +74,8 @@ export function useComputingPowerServices() {
       : t('computingPower.tabs.cluster')
   )
 
-  // 使用 nodeProducts 中的真实收益数据（百分比格式）
-  const purchaseTradeProfit = computed(() => {
-    // 预估交易收益 - 使用 fee_reward（百分比）
-    const currentNode = nodeProducts.value.find(node => node.type === activeNodeTab.value)
-    if (!currentNode || currentNode.fee == null) {
-      return activeNodeTab.value === 0 ? '0.5%' : '0.5%'
-    }
-    // 格式化：fee_reward 作为百分比显示
-    const percent = Number(currentNode.fee)
-    return `${percent}%`
-  })
-
-  const purchaseFeeProfit = computed(() => {
-    // 子币手续费收益 - 使用 sub_coin_reward（百分比）
-    const currentNode = nodeProducts.value.find(node => node.type === activeNodeTab.value)
-    if (!currentNode || currentNode.subFee == null) {
-      return activeNodeTab.value === 0 ? '3%' : '2%'
-    }
-    // 格式化：sub_coin_reward 作为百分比显示
-    const percent = Number(currentNode.subFee)
-    return `${percent}%`
-  })
-
-  const purchaseSecondaryProfit = computed(() => {
-    // 二级市场收益 - 使用 market_reward（百分比）
-    const currentNode = nodeProducts.value.find(node => node.type === activeNodeTab.value)
-    if (!currentNode || currentNode.marketShare == null) {
-      return activeNodeTab.value === 0 ? '10%' : '5%'
-    }
-    // 格式化：market_reward 作为百分比显示
-    const percent = Number(currentNode.marketShare)
-    return `${percent}%`
+  const purchasePrice = computed(() => {
+    return nodeProducts.value.find(node => node.type === activeNodeTab.value)?.price || '0'
   })
 
   // 打开购买节点弹窗
@@ -358,18 +328,14 @@ export function useComputingPowerServices() {
     displayNodes,
     showPurchaseNode,
     purchaseTitle,
-    purchaseTradeProfit,
-    purchaseFeeProfit,
-    purchaseSecondaryProfit,
+    purchasePrice,
     currentNodeImg,
-    // 方法
+    isNodeButtonEnabled,
+    getButtonText,
     handleOpenMore,
     handleMyNodes,
     handleBuy,
     handleConfirmBuy,
-    fetchNodeProducts,
-    getButtonText,
-    isNodeButtonEnabled,
   }
 }
 
