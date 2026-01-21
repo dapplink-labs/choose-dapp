@@ -592,6 +592,8 @@ export default {
   },
   "purchaseNode": {
     "nodeType": "节点类型",
+    "confirmPurchaseNode": "确认购买节点",
+    "nodePrice": "节点价格",
     "estimatedTradeProfit": "预计买卖交易收益约",
     "subCoinFeeProfit": "子币手续费收益约",
     "secondaryProfit": "二级盈利收益约",

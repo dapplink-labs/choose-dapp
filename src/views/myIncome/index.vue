@@ -377,6 +377,14 @@ const getNodeStakingRecordsList = async () => {
 // 总收益 = 静态收益 + 直推收益 + 团队收益 + 平级收益 + 流水分红
 // 如果当前节点是创世节点（T6），还要加上创世节点5%收益
 // 如果当前节点是超级节点（T5），还要加上超级节点收益
+// 预估收益 = forecast_income
+// 静态收益 = node_reward
+// 直推收益 = direct_reward
+// 团队收益 = team_reward
+// 平级收益 = lateral_reward
+// 流水分红 = dividend_reward
+// 创世节点5%收益 = creation_reward
+// 超级节点收益 = super_node_reward
 const progressPercent = computed(() => {
     const info = currentNodeStakingInfo.value
     // 基础收益

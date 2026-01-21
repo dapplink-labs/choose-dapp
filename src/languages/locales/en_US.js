@@ -592,6 +592,8 @@ export default {
   },
   "purchaseNode": {
     "nodeType": "Node Type",
+    "confirmPurchaseNode": "Confirm Purchase Node",
+    "nodePrice": "Node Price",
     "estimatedTradeProfit": "Estimated Trading Profit",
     "subCoinFeeProfit": "Sub-coin Fee Profit",
     "secondaryProfit": "Secondary Market Profit",
