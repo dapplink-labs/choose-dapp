@@ -591,7 +591,9 @@ export default {
     "volume24hUSDT": "24H 거래량(USDT)"
   },
   "purchaseNode": {
-    "nodeType": "Node Type",
+    "nodeType": "노드 유형",
+    "confirmPurchaseNode": "노드 구매 확인",
+    "nodePrice": "노드 가격",
     "estimatedTradeProfit": "Estimated Trading Profit",
     "subCoinFeeProfit": "Sub-coin Fee Profit",
     "secondaryProfit": "Secondary Market Profit",

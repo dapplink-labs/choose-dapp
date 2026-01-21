@@ -6,7 +6,7 @@
         <div class="drag-handle"></div>
 
         <!-- 节点类型标题 -->
-        <div class="node-type-header">确认购买节点</div>
+        <div class="node-type-header">{{ $t('purchaseNode.confirmPurchaseNode') }}</div>
 
         <!-- 收益信息列表 -->
         <div class="earnings-list">
@@ -15,7 +15,7 @@
             <span class="earnings-value">{{ title }}</span>
           </div>
           <div class="earnings-item">
-            <span class="earnings-label">节点价格</span>
+            <span class="earnings-label">{{ $t('purchaseNode.nodePrice') }}</span>
             <span class="earnings-value">{{ price }} U</span>
           </div>
         </div>

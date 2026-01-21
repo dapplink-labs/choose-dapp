@@ -183,7 +183,7 @@ const nodeType = ref(0)
 // 领取收益
 const handleClaimReward = async () => {
     // amount为所有收益之和
-    let amount = Number(nodeIncome.value) + Number(networkFeeIncome.value) + Number(subCoinFeeIncome.value) + Number(secondaryMarketIncome.value) + Number(directReferralIncome.value) + Number(teamIncome.value);
+    let amount = Number(nodeIncome.value) + Number(networkFeeIncome.value) + Number(subCoinFeeIncome.value) + Number(secondaryMarketIncome.value) + Number(directReferralIncome.value) + Number(teamIncome.value) + Number(subCoinIncome.value);
     if (amount <= 0) {
         ElMessage.warning(t('myNode.noIncome'))
         return
@@ -328,9 +328,9 @@ const goToClaimRecord = () => {
 onMounted(() => {
     themeStore.applyTheme()
     // CHO收益：total_reward
-    // 子币收益：暂无数据写死0
+    // 子币收益：son_coin_reward
     // 全网手续费买卖收益：fee_reward
-    // 子币手续费收益：son_coin_reward
+    // 子币手续费收益：sub_coin_service_reward
     // 二级市场盈利收益：market_reward
     // 直推收益：direct_reward
     // 团队收益：team_reward
@@ -343,11 +343,11 @@ onMounted(() => {
         const data = res?.data?.data || res?.data || res || {}
 
         choIncome.value = data.total_reward ?? '0'
-        subCoinIncome.value = 0 // 暂无子币收益数据，写死 0
+        subCoinIncome.value = data.son_coin_reward ?? '0'
 
         nodeIncome.value = data.node_reward ?? '0'
         networkFeeIncome.value = data.fee_reward ?? '0'
-        subCoinFeeIncome.value = data.son_coin_reward ?? '0'
+        subCoinFeeIncome.value = data.sub_coin_service_reward ?? '0'
         secondaryMarketIncome.value = data.market_reward ?? '0'
         directReferralIncome.value = data.direct_reward ?? '0'
         teamIncome.value = data.team_reward ?? '0'
