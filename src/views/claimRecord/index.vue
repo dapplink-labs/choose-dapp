@@ -2,40 +2,65 @@
     <div class="claim-record-page">
         <BackHeaderNav :title="$t('claimRecord.title')" />
 
-        <div class="filters-row">
-            <!-- 服务类型下拉框：算力服务 / 质押池 -->
-            <div class="filter-pill-wrapper" ref="serviceFilterRef">
-                <button class="filter-pill" type="button" @click="toggleServiceDropdown">
-                    <span class="filter-label">{{ currentServiceLabel }}</span>
-                    <el-icon class="filter-arrow">
-                        <ArrowDownBold />
-                    </el-icon>
-                </button>
-                <transition name="fade-dropdown">
-                    <div v-if="showServiceDropdown" class="dropdown-menu">
-                        <div
-                            class="dropdown-item"
-                            :class="{ active: currentServiceType === 'computingPower' }"
-                            @click="selectServiceType('computingPower')"
-                        >
-                            {{ $t('claimRecord.computingPowerService') }}
+        <div class="filters-container">
+            <div class="filters-row">
+                <!-- 服务类型下拉框：算力服务 / 质押池 -->
+                <div class="filter-pill-wrapper" ref="serviceFilterRef">
+                    <button class="filter-pill" type="button" @click="toggleServiceDropdown">
+                        <span class="filter-label">{{ currentServiceLabel }}</span>
+                        <el-icon class="filter-arrow">
+                            <ArrowDownBold />
+                        </el-icon>
+                    </button>
+                    <transition name="fade-dropdown">
+                        <div v-if="showServiceDropdown" class="dropdown-menu">
+                            <div
+                                class="dropdown-item"
+                                :class="{ active: currentServiceType === 'computingPower' }"
+                                @click="selectServiceType('computingPower')"
+                            >
+                                {{ $t('claimRecord.computingPowerService') }}
+                            </div>
+                            <div
+                                class="dropdown-item"
+                                :class="{ active: currentServiceType === 'lpVault' }"
+                                @click="selectServiceType('lpVault')"
+                            >
+                                {{ $t('claimRecord.lpVault') }}
+                            </div>
                         </div>
-                        <div
-                            class="dropdown-item"
-                            :class="{ active: currentServiceType === 'lpVault' }"
-                            @click="selectServiceType('lpVault')"
-                        >
-                            {{ $t('claimRecord.lpVault') }}
-                        </div>
-                    </div>
-                </transition>
+                    </transition>
+                </div>
+                <div class="filter-pill-wrapper" ref="dateFilterRef">
+                    <button class="filter-pill" type="button" @click="toggleDatePicker">
+                        <span class="filter-label">{{ currentMonthLabel }}</span>
+                        <el-icon class="filter-arrow">
+                            <ArrowDownBold />
+                        </el-icon>
+                    </button>
+                </div>
             </div>
-            <button class="filter-pill" type="button">
-                <span class="filter-label">{{ currentMonthLabel }}</span>
-                <el-icon class="filter-arrow">
-                    <ArrowDownBold />
-                </el-icon>
-            </button>
+            <!-- 日期选择器直接放在 filters-row 下方 -->
+            <transition name="fade-dropdown">
+                <div v-if="showDatePicker" class="date-picker-row">
+                    <el-date-picker
+                        v-model="dateRange"
+                        type="daterange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        format="YYYY-MM-DD"
+                        value-format="YYYY-MM-DD"
+                        :teleported="false"
+                        @change="handleDateChange"
+                        @clear="handleDateClear"
+                        :editable="false"
+                    />
+                    <div class="date-picker-actions">
+                        <button class="action-btn clear-btn" @click="handleDateClear">全部</button>
+                    </div>
+                </div>
+            </transition>
         </div>
 
         <div class="record-list" ref="recordListRef" @scroll="handleScroll">
@@ -81,13 +106,17 @@ import { formatUnits } from 'viem'
 const { t } = useI18n()
 const { address } = useAccount()
 
-// 当前筛选：服务类型 & 月份
+// 当前筛选：服务类型 & 日期范围
 const currentServiceType = ref('computingPower') // 默认：算力服务
-const currentMonth = ref('2025-09')
+const dateRange = ref(null) // 日期范围 [开始日期, 结束日期]
 
 // 服务类型下拉框状态
 const showServiceDropdown = ref(false)
 const serviceFilterRef = ref(null)
+
+// 日期选择器状态
+const showDatePicker = ref(false)
+const dateFilterRef = ref(null)
 
 // 列表相关
 const recordListRef = ref(null)
@@ -136,7 +165,14 @@ const currentServiceLabel = computed(() => {
     return t('claimRecord.lpVault')
 })
 
-const currentMonthLabel = computed(() => currentMonth.value.replace('-', '–'))
+// 当前月份标签：有选择日期时显示范围，否则显示"全部"
+const currentMonthLabel = computed(() => {
+    if (!dateRange.value || !Array.isArray(dateRange.value) || dateRange.value.length !== 2) {
+        return t('common.all') || '全部'
+    }
+    const [start, end] = dateRange.value
+    return `${start} 至 ${end}`
+})
 
 // 当前列表（根据服务类型筛选）
 const visibleRecords = computed(() => {
@@ -146,6 +182,43 @@ const visibleRecords = computed(() => {
 // 打开 / 关闭服务类型下拉框
 const toggleServiceDropdown = () => {
     showServiceDropdown.value = !showServiceDropdown.value
+    // 关闭日期选择器
+    if (showServiceDropdown.value) {
+        showDatePicker.value = false
+    }
+}
+
+// 打开 / 关闭日期选择器
+const toggleDatePicker = () => {
+    showDatePicker.value = !showDatePicker.value
+    // 关闭服务类型下拉框
+    if (showDatePicker.value) {
+        showServiceDropdown.value = false
+    }
+}
+
+// 处理日期范围变化
+const handleDateChange = (dates) => {
+    if (dates && Array.isArray(dates) && dates.length === 2) {
+        // 重置数据并重新加载
+        allRecords.value[currentServiceType.value] = []
+        page.value[currentServiceType.value] = 1
+        hasMore.value[currentServiceType.value] = true
+        fetchRecords()
+    }
+    // 选择日期后关闭选择器
+    showDatePicker.value = false
+}
+
+// 清除日期范围（显示全部）
+const handleDateClear = () => {
+    dateRange.value = null
+    showDatePicker.value = false
+    // 重置数据并重新加载
+    allRecords.value[currentServiceType.value] = []
+    page.value[currentServiceType.value] = 1
+    hasMore.value[currentServiceType.value] = true
+    fetchRecords()
 }
 
 // 选择服务类型（算力服务 / 质押池）
@@ -177,6 +250,17 @@ const fetchRecords = async (isLoadMore = false) => {
             address: address.value,
             page: currentPage,
             page_size: pageSize.value
+        }
+        
+        // 如果有选择日期范围，添加时间戳参数
+        if (dateRange.value && Array.isArray(dateRange.value) && dateRange.value.length === 2) {
+            const [startDate, endDate] = dateRange.value
+            // 开始时间：当天 00:00:00 的时间戳（秒）
+            const startTimestamp = Math.floor(new Date(startDate + ' 00:00:00').getTime() / 1000)
+            // 结束时间：当天 23:59:59 的时间戳（秒）
+            const endTimestamp = Math.floor(new Date(endDate + ' 23:59:59').getTime() / 1000)
+            params.created_from = startTimestamp
+            params.created_to = endTimestamp
         }
         
         let res
@@ -255,9 +339,21 @@ const handleScroll = () => {
 
 // 点击外部关闭下拉框
 const handleClickOutside = (event) => {
-    if (!serviceFilterRef.value) return
-    if (!serviceFilterRef.value.contains(event.target)) {
+    // 关闭服务类型下拉框
+    if (serviceFilterRef.value && !serviceFilterRef.value.contains(event.target)) {
         showServiceDropdown.value = false
+    }
+    // 关闭日期选择器
+    if (dateFilterRef.value && !dateFilterRef.value.contains(event.target)) {
+        // 检查是否点击在日期选择器行内
+        const datePickerRow = document.querySelector('.date-picker-row')
+        if (!datePickerRow || !datePickerRow.contains(event.target)) {
+            // 检查是否点击在 el-date-picker 的弹出层内（Element Plus 的日期选择器会创建独立的 popper）
+            const datePickerPopper = document.querySelector('.el-picker__popper')
+            if (!datePickerPopper || !datePickerPopper.contains(event.target)) {
+                showDatePicker.value = false
+            }
+        }
     }
 }
 
@@ -313,11 +409,15 @@ onBeforeUnmount(() => {
     box-sizing: border-box;
     transition: background-color 0.3s ease, color 0.3s ease;
 
+    .filters-container {
+        margin-top: 16px;
+        margin-bottom: 12px;
+    }
+
     .filters-row {
         display: flex;
         gap: 12px;
-        margin-top: 16px;
-        margin-bottom: 12px;
+        margin-bottom: 0;
 
         .filter-pill-wrapper {
             position: relative;
@@ -345,6 +445,55 @@ onBeforeUnmount(() => {
         .filter-arrow {
             font-size: 10px;
             color: inherit; // 继承按钮文字颜色，适配明暗主题
+        }
+    }
+
+    .date-picker-row {
+        margin-top: 12px;
+        padding: 16px;
+        border-radius: 10px;
+        background-color: var(--bg-page-h5, #FFFFFF);
+        border: 1px solid var(--border-color, #23262F);
+        box-shadow: 0 8px 20px rgba(15, 15, 15, 0.18);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+        overflow: hidden;
+
+        :deep(.el-date-editor) {
+            width: 100%;
+            
+            .el-range-input {
+                color: var(--text-color, #1a1a1a);
+            }
+            
+            .el-range-separator {
+                color: var(--text-color, #1a1a1a);
+            }
+        }
+
+        .date-picker-actions {
+            margin-top: 12px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+
+            .action-btn {
+                padding: 6px 16px;
+                border-radius: 6px;
+                border: 1px solid var(--border-color, #23262F);
+                background: transparent;
+                color: var(--text-color, #1a1a1a);
+                font-size: 13px;
+                cursor: pointer;
+                transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+                &:hover {
+                    background-color: rgba(0, 0, 0, 0.04);
+                }
+
+                &.clear-btn {
+                    color: var(--text-dark-gray, #999999);
+                }
+            }
         }
     }
 
@@ -442,6 +591,85 @@ onBeforeUnmount(() => {
     }
 }
 
+</style>
+
+<style>
+/* Element Plus 日期选择器移动端适配（日期选择器现在在 filters-row 中，popper 需要限制在容器内） */
+.claim-record-page .el-picker__popper {
+    max-width: calc(100vw - 32px) !important;
+}
+
+@media screen and (max-width: 768px) {
+    .el-date-range-picker .el-picker-panel__body {
+        min-width: 100%;
+    }
+
+    .el-date-range-picker__content {
+        width: 100% !important;
+        margin: 0px;
+        padding: 5px;
+    }
+
+    .el-date-range-picker {
+        width: 100% !important;
+        max-width: 100%;
+    }
+
+    .el-date-range-picker__content.is-left {
+        padding-bottom: 0px;
+    }
+
+    .el-date-range-picker__content.is-right {
+        padding-top: 0px;
+    }
+
+    .el-date-table th {
+        padding: 0px;
+    }
+
+    .el-date-table td {
+        padding: 0px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .claim-record-page .date-picker-row .el-date-editor{
+        box-sizing: border-box !important;
+    }
+    .claim-record-page .el-picker__popper {
+        max-width: calc(100vw - 32px) !important;
+    }
+
+    .el-picker-panel__sidebar {
+        width: 100%;
+    }
+
+    .el-picker-panel {
+        width: 100% !important;
+        max-width: calc(100vw - 32px);
+    }
+
+    .el-picker-panel__content {
+        width: 100%;
+    }
+
+    .el-picker-panel__body {
+        margin-left: 0 !important;
+        display: flex;
+        flex-direction: column;
+        min-width: auto !important;
+    }
+
+    .el-picker-panel__sidebar {
+        position: relative;
+    }
+
+    .el-picker-panel__body-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
 </style>
 
 
