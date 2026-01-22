@@ -52,9 +52,27 @@
                         format="YYYY-MM-DD"
                         value-format="YYYY-MM-DD"
                         :teleported="false"
+                        :editable="false"
+                        placement="bottom-start"
+                        :popper-options="{
+                            modifiers: [
+                                {
+                                    name: 'offset',
+                                    options: {
+                                        offset: [0, 8]
+                                    }
+                                },
+                                {
+                                    name: 'computeStyles',
+                                    options: {
+                                        adaptive: false,
+                                        gpuAcceleration: false
+                                    }
+                                }
+                            ]
+                        }"
                         @change="handleDateChange"
                         @clear="handleDateClear"
-                        :editable="false"
                     />
                     <div class="date-picker-actions">
                         <button class="action-btn clear-btn" @click="handleDateClear">全部</button>
@@ -456,7 +474,8 @@ onBeforeUnmount(() => {
         border: 1px solid var(--border-color, #23262F);
         box-shadow: 0 8px 20px rgba(15, 15, 15, 0.18);
         transition: background-color 0.3s ease, border-color 0.3s ease;
-        overflow: hidden;
+        overflow: visible;
+        position: relative;
 
         :deep(.el-date-editor) {
             width: 100%;
