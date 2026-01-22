@@ -110,15 +110,15 @@ const getNodeStakingRecordsData = async () => {
         })
     }
     if (router.query.type === '1') {
-    const nodeServiceProviderRecords = (await getNodeServiceProviderRecords({ address: address.value }))?.data?.data?.list || []
-    nodeServiceProviderRecords.forEach(item => {
-        recordList.value.push({
-            nodeName: t(nodeTypeMap[item.type]?.nodeNameKey || ''),
-            price: formatAmount(item.amount),
-            dateTime: formatDateTime(item.created),
+        const nodeServiceProviderRecords = (await getNodeServiceProviderRecords({ address: address.value }))?.data?.data?.list || []
+        nodeServiceProviderRecords.forEach(item => {
+            recordList.value.push({
+                nodeName: t(nodeTypeMap[item.type]?.nodeNameKey || ''),
+                price: formatAmount(item.amount),
+                dateTime: formatDateTime(item.created),
+            })
         })
-    })
-}
+    }
     isLoading.value = false
 }
 

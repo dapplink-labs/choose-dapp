@@ -10,7 +10,7 @@ import { formatUnits } from 'viem'
 export const formatTokenAmount = (
   value,
   {
-    decimals = 18,
+    decimals = 6,
     maxFractionDigits = 4,
     useGrouping = true,
   } = {}
@@ -50,7 +50,8 @@ export const formatTokenAmount = (
 
 // CHO：18 精度
 export const formatChoAmount = (value, opts = {}) => {
-  return formatTokenAmount(value, { decimals: 18, ...opts })
+  console.log(value)
+  return formatTokenAmount(value, { decimals: 6, ...opts })
 }
 
 

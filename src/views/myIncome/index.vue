@@ -305,6 +305,7 @@ const currentNodeStakingInfo = ref({})
 
 // 将数值格式化为带千分位的字符串（CHO为18精度，需要先转换）
 const formatAmount = (value) => {
+ 
     return formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true })
 }
 
