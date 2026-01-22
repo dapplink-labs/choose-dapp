@@ -155,7 +155,7 @@ const hasMore = ref({
 })
 const isLoading = ref(false)
 
-// 格式化金额（CHO为18精度，需要先转换）
+// 格式化金额（CHO为6精度，需要先转换）
 const formatAmount = (value) => {
     if (!value || value === '0' || value === 0) return '0'
     try {
