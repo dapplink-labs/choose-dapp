@@ -269,7 +269,8 @@ export default {
     "underDevelopment": "Under Development"
   },
   "purchaseNodeRecord": {
-    "title": "Node Staking Record",
+    "title": "Purchase History",
+    "title2": "Staking History",
     "nodeType": "Node Type",
     "nodePrice": "Node Price",
     "purchaseTime": "Purchase Time",

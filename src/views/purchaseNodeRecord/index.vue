@@ -1,6 +1,6 @@
 <template>
     <div class="purchase-node-record">
-        <BackHeaderNav :title="$t('purchaseNodeRecord.title')" />
+        <BackHeaderNav :title="title" />
 
         <div class="record-container">
             <!-- 加载状态 -->
@@ -38,8 +38,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import { getNodeStakingRecords, getNodeServiceProviderRecords } from '@/api/API'
@@ -50,7 +50,13 @@ import { formatUnits } from 'viem'
 const { t } = useI18n()
 const { address } = useAccount()
 
-
+const router = useRoute()
+const title = computed(() =>
+    router.query.type === '1'
+        ? t('purchaseNodeRecord.title')
+        : t('purchaseNodeRecord.title2')
+)
+console.log(router.query.type)
 const nodeTypeMap = {
     'T1': { nodeTag: 'T1', nodeNameKey: 'purchaseNodeRecord.informationNode' },
     'T2': { nodeTag: 'T2', nodeNameKey: 'myIncome.nodeNames.dataNode' },
@@ -72,11 +78,11 @@ const formatNumber = (num) => {
 // 格式化金额（将18精度转换为正常金额）
 const formatAmount = (value) => {
     if (!value || value === '0' || value === 0) return '0'
-        // 将18精度的数值转换为正常数量
-        let num = typeof value === 'bigint' || typeof value === 'string' 
-            ? parseFloat(formatUnits(BigInt(value.toString()), 18))
-            : Number(value) / 1e18
-        return num.toFixed(2)
+    // 将18精度的数值转换为正常数量
+    let num = typeof value === 'bigint' || typeof value === 'string'
+        ? parseFloat(formatUnits(BigInt(value.toString()), 18))
+        : Number(value) / 1e18
+    return num.toFixed(2)
 }
 
 // 记录列表
@@ -92,15 +98,18 @@ const getNodeStakingRecordsData = async () => {
 
     isLoading.value = true
     // 获取质押节点记录数据
-    const NodeStakingRecords = (await getNodeStakingRecords({ address: address.value }))?.data?.data?.list || []
-    recordList.value = NodeStakingRecords.map(item => {
-        return {
-            nodeName: t(nodeTypeMap[item.type]?.nodeNameKey || ''),
-            nodeTag: nodeTypeMap[item.type]?.nodeTag || '',
-            price: formatAmount(item.amount),
-            dateTime: formatDateTime(item.created),
-        }
-    })
+    if (router.query.type === '2') {
+        const NodeStakingRecords = (await getNodeStakingRecords({ address: address.value }))?.data?.data?.list || []
+        recordList.value = NodeStakingRecords.map(item => {
+            return {
+                nodeName: t(nodeTypeMap[item.type]?.nodeNameKey || ''),
+                nodeTag: nodeTypeMap[item.type]?.nodeTag || '',
+                price: formatAmount(item.amount),
+                dateTime: formatDateTime(item.created),
+            }
+        })
+    }
+    if (router.query.type === '1') {
     const nodeServiceProviderRecords = (await getNodeServiceProviderRecords({ address: address.value }))?.data?.data?.list || []
     nodeServiceProviderRecords.forEach(item => {
         recordList.value.push({
@@ -109,6 +118,7 @@ const getNodeStakingRecordsData = async () => {
             dateTime: formatDateTime(item.created),
         })
     })
+}
     isLoading.value = false
 }
 

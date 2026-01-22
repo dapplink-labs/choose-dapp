@@ -269,7 +269,8 @@ export default {
     "underDevelopment": "開発中です"
   },
   "purchaseNodeRecord": {
-    "title": "ノードステーキング記録",
+    "title": "購入履歴",
+    "title2": "ステーキング履歴",
     "nodeType": "ノードタイプ",
     "nodePrice": "ノード価格",
     "purchaseTime": "購入時間",

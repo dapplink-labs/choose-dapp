@@ -2,7 +2,7 @@
     <div class="LPVault">
 
         <!-- 通用返回头部导航 -->
-        <BackHeaderNav :show-record-btn="true" :show-open-btn="true" />
+        <BackHeaderNav :show-record-btn="true" :show-open-btn="true"   :type="2"/>
 
         <div class="banner1">
 

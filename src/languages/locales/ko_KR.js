@@ -269,7 +269,8 @@ export default {
     "underDevelopment": "개발 중입니다"
   },
   "purchaseNodeRecord": {
-    "title": "노드 스테이킹 기록",
+    "title": "구매 내역",
+    "title2": "스테이킹 내역",
     "nodeType": "노드 유형",
     "nodePrice": "노드 가격",
     "purchaseTime": "구매 시간",

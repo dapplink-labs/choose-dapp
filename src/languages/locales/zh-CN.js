@@ -269,7 +269,8 @@ export default {
     "underDevelopment": "正在开发中"
   },
   "purchaseNodeRecord": {
-    "title": "节点购买记录",
+    "title": "购买记录",
+    "title2": "质押记录",
     "nodeType": "节点类型",
     "nodePrice": "节点价格",
     "purchaseTime": "购买时间",

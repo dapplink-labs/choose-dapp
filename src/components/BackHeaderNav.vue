@@ -24,7 +24,7 @@
               transform="translate(326.296 68)" fill="currentColor" />
           </g>
         </svg>
-        <span class="action-text">{{ $t('purchaseNodeRecord.title') || '购买记录' }}</span>
+        <span class="action-text">{{type==1? $t('purchaseNodeRecord.title'): $t('purchaseNodeRecord.title2')}}</span>
       </button>
 
       <!-- 分享按钮 -->
@@ -57,6 +57,10 @@ const props = defineProps({
   showRecordBtn: {
     type: Boolean,
     default: false
+  },
+  type:{
+    type: Number,
+    default: 0
   },
   // 是否显示打开更多按钮
   showOpenBtn: {
@@ -174,8 +178,8 @@ const handleRecordClick = () => {
   emit('record-click')
   // 如果使用默认行为，则执行跳转
   if (props.useDefaultRecordAction) {
-    router.push(props.recordPath)
-  }
+    router.push(props.recordPath+"?type="+props.type)
+  } 
 }
 
 const handleOpenClick = () => {

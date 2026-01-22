@@ -4,7 +4,7 @@
 
     <div class="cps-content">
       <div class="cps-card">
-        <BackHeaderNav :show-open-btn="true" :show-record-btn="true" />
+        <BackHeaderNav :show-open-btn="true" :show-record-btn="true"  :type="1"/>
 
         <h1 class="cps-title">{{ t('computingPower.title') }}</h1>
 

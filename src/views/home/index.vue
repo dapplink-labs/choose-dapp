@@ -1877,7 +1877,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
   right: 0;
   bottom: 0;
   background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(1px);
+  backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(1px);
   justify-content: center;
   z-index: 90;
