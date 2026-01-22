@@ -217,7 +217,7 @@ import { useAccount } from '@wagmi/vue'
 import { ArrowRightBold } from '@element-plus/icons-vue'
 import { formatDateTime } from '@/utils/format_date.js'
 import { ElMessage } from 'element-plus'
-import { formatUnits } from 'viem'
+import { formatChoAmount } from '@/utils/format_amount'
 
 
 const router = useRouter()
@@ -305,23 +305,7 @@ const currentNodeStakingInfo = ref({})
 
 // 将数值格式化为带千分位的字符串（CHO为18精度，需要先转换）
 const formatAmount = (value) => {
-    if (!value || value === '0' || value === 0) return '0'
-    try {
-        // 将18精度的数值转换为正常数量
-        let num = typeof value === 'bigint' || typeof value === 'string'
-            ? parseFloat(formatUnits(BigInt(value.toString()), 18))
-            : Number(value) / 1e18
-
-        if (!Number.isFinite(num)) return '0'
-        const fixed = num.toFixed(4)
-        const trimmed = fixed.replace(/\.?0+$/, '')
-        const [intPart, decimalPart] = trimmed.split('.')
-        const intFormatted = Number(intPart).toLocaleString('en-US')
-        return decimalPart ? `${intFormatted}.${decimalPart}` : intFormatted
-    } catch (error) {
-        console.error('格式化金额失败:', error, value)
-        return '0'
-    }
+    return formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true })
 }
 
 // 地址截取：前6位 + ... + 后4位

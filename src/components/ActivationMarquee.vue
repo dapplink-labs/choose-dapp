@@ -45,6 +45,7 @@ import { Autoplay } from 'swiper/modules'
 import 'swiper/css'
 import { getNodeAndNodeServiceRecordNew } from '@/api/API'
 import { useI18n } from 'vue-i18n'
+import { formatChoAmount } from '@/utils/format_amount'
 import clusterNodeImg from '@/assets/icon/11.png'
 import avatarImg1 from '@/assets/icon/avatarImg1.png'
 import avatarImg2 from '@/assets/icon/avatarImg2.png'
@@ -120,7 +121,7 @@ const getNodeAndNodeServiceRecordNewData = async () => {
         : t('computingPower.tabs.cluster')
 
       if (props.type === 3 || props.type === 4) {
-        const amountText = `+${item.income || 0}CHO`
+        const amountText = `+${formatChoAmount(item.income, { useGrouping: false })} CHO`
 
         return {
           message: `${t('common.address') || '地址'} ${addressText} ${t('myNode.earnPromptShort') || '赚取收益'}`,
