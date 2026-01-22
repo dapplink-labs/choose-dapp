@@ -526,7 +526,10 @@ export default {
     "computingPowerService": "Computing Service",
     "lpVault": "LP Vault",
     "distributedNode": "Distributed Node",
-    "clusterNode": "Cluster Node"
+    "clusterNode": "Cluster Node",
+    "dateRangeSeparator": "to",
+    "startDatePlaceholder": "Start Date",
+    "endDatePlaceholder": "End Date"
   },
   "dashboard": {
     "title": "Dashboard",

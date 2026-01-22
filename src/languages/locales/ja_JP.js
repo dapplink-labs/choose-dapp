@@ -437,7 +437,7 @@ export default {
     "cycleDays": "サイクル日数",
     "totalEarnings": "総収益",
     "activateComputingPower": "ノードをアクティベート",
-    "activationMsg": "アドレス {address} が {nodeType} をアクティベートしました",
+    "activationMsg": "アドレス {address} が [ {nodeType} ] をアクティベートしました",
     "nodeTypes": {
       "T1": "インフォメーションノード",
       "T2": "データノード",
@@ -526,7 +526,10 @@ export default {
     "computingPowerService": "ハッシュパワーサービス",
     "lpVault": "ステーキングプール",
     "distributedNode": "分散ノード",
-    "clusterNode": "クラスターノード"
+    "clusterNode": "クラスターノード",
+    "dateRangeSeparator": "から",
+    "startDatePlaceholder": "開始日",
+    "endDatePlaceholder": "終了日"
   },
   "dashboard": {
     "title": "ダッシュボード",

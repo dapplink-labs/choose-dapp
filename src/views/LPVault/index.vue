@@ -50,7 +50,8 @@
                 <div class="node-item-metrics">
                     <div class="metric-item">
                         <span class="metric-label">{{ $t('lpVault.dailyEarnings') }}</span>
-                        <span class="metric-value daily-earnings">{{ node?.node_min_income }}% ~ {{ node?.node_max_income }}%</span>
+                        <span class="metric-value daily-earnings">{{ node?.node_min_income }}% ~ {{
+                            node?.node_max_income }}%</span>
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">{{ $t('lpVault.cycleDays') }}</span>
@@ -60,16 +61,12 @@
                         <span class="metric-label">{{ $t('lpVault.totalEarnings') }}</span>
                         <span class="metric-value total-earnings">
                             <img class="total-icon" src="@/assets/icon/LP1.png" alt="" />
-                            {{ node.totalEarnings }}
+                            {{ node.totalEarnings }} CHO
                         </span>
                     </div>
                 </div>
 
-                <button
-                    class="node-item-btn"
-                    :disabled="!isActivationDisabled"
-                    @click="handleActivate(node.type)"
-                >
+                <button class="node-item-btn" :disabled="!isActivationDisabled" @click="handleActivate(node.type)">
                     {{ $t('lpVault.activateComputingPower') }}
                 </button>
             </div>
@@ -96,7 +93,7 @@ const {
 <style scoped lang="scss">
 .LPVault {
     min-height: 100vh;
-    padding:80px 10px 60px 10px;
+    padding: 80px 10px 60px 10px;
     background-color: var(--bg-page-h5, #FCFCFC);
     color: var(--text-color, #1a1a1a);
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -327,12 +324,12 @@ const {
         align-items: center;
         justify-content: center;
         padding: 1px 10px;
-        background: #E6E6E6;
         border-radius: 6px;
         font-family: DingTalk JinBuTi, DingTalk JinBuTi;
         font-weight: 500;
         font-size: 13px;
-        color: #000000;
+        background: rgba(234, 171, 74, 0.1);
+        color: #EAAB4A;
         font-style: italic;
     }
 
@@ -509,10 +506,6 @@ const {
         color: #FFFFFF !important;
     }
 
-    .node-item-type-badge {
-        background: rgba(234, 171, 74, 0.1) !important;
-        color: #EAAB4A !important;
-    }
 
     .node-item-btn {
         background: var(--text-color-y, #BBFF2E) !important;
