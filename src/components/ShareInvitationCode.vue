@@ -138,7 +138,6 @@ const handleShare = async () => {
     padding: 28px 24px 32px;
     box-sizing: border-box;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--invite-card-border, #2F2F2F);
     max-height: 90vh;
     overflow-y: auto;
 }
@@ -261,7 +260,6 @@ const handleShare = async () => {
 :deep(.theme-dark) {
     .share-invite-card {
         background-color: #1a1a1a;
-        border-color: #2F2F2F;
     }
 
     .card-title {
@@ -290,7 +288,6 @@ const handleShare = async () => {
 :deep(.theme-light) {
     .share-invite-card {
         background-color: #ffffff;
-        border-color: #E0E0E0;
     }
 
     .card-title {
