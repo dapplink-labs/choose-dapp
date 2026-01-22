@@ -75,9 +75,11 @@ export const useLPVault = () => {
           nodeLevel: item.node_level,
           icon: item.icon || DistributedNode,
           price: String(formatUnits(BigInt(item.staking_amount.toString()), 18)),
-          dailyEarnings: String(item.node_income) + "%",
+          dailyEarnings: String(item.node_income || 0) + "%",
           cycleDays: item.node_period ? `${item.node_period}${t('lpVault.days')}` : `0${t('lpVault.days')}`,
-          totalEarnings: String(formatUnits(BigInt(item.forecast_income.toString()), 18) || '0')
+          totalEarnings: String(formatUnits(BigInt(item.forecast_income.toString()), 18) || '0'),
+          node_min_income: item.node_min_income,
+          node_max_income: item.node_max_income,
         }
       })
     } catch (err) {
@@ -98,7 +100,7 @@ export const useLPVault = () => {
     }
 
     const loading = ElLoading.service({ lock: true, text: t('lpVault.activatingNode'), background: 'rgba(0, 0, 0, 0.7)' })
-    
+
     try {
       // 1. 网络环境检查
       if (Number(chainId.value) !== BSC_CHAIN_ID) {
@@ -194,7 +196,7 @@ export const useLPVault = () => {
         node_id: nodeItem.id,
         hash: result.hash,
       })
-      
+
       // 激活成功后刷新列表数据
       await fetchNodeStakingList()
     } catch (e) {

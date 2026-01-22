@@ -50,7 +50,7 @@
                 <div class="node-item-metrics">
                     <div class="metric-item">
                         <span class="metric-label">{{ $t('lpVault.dailyEarnings') }}</span>
-                        <span class="metric-value daily-earnings">{{ node.dailyEarnings }}</span>
+                        <span class="metric-value daily-earnings">{{ node?.node_min_income }}% ~ {{ node?.node_max_income }}%</span>
                     </div>
                     <div class="metric-item">
                         <span class="metric-label">{{ $t('lpVault.cycleDays') }}</span>
