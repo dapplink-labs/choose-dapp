@@ -18,6 +18,7 @@
             <div class="activation-text">
               <template v-for="(part, partIndex) in item.parts" :key="partIndex">
                 <strong v-if="part.isAddress">{{ part.text }}</strong>
+                <b v-else-if="part.isNodeType"> {{ part.text }} </b>
                 <span v-else>{{ part.text }}</span>
               </template>
               <span v-if="item.amountText" class="amount-text">{{ item.amountText }}</span>
@@ -103,14 +104,14 @@ const getNodeAndNodeServiceRecordNewData = async () => {
         const rawType = Number(item.node_type ?? item.type ?? 1)
         const nodeTypeKey = `lpVault.nodeTypes.T${rawType}`
         const nodeTypeText = t(nodeTypeKey)
-
         return {
           message: t('lpVault.activationMsg', {
             address: addressText,
             nodeType: nodeTypeText
           }),
           avatar: getRandomAvatar(address),
-          amountText: ''
+          amountText: '',
+          nodeTypeText: 'T' + rawType // 保存节点类型文本，用于在模板中显示
         }
       }
 
@@ -154,6 +155,32 @@ const displayItems = computed(() => {
     // type=3 时直接整段展示
     if (props.type === 3) {
       parts.push({ text: msg, isAddress: false })
+      return { ...item, parts }
+    }
+
+    if (props.type === 1) {
+      // 在节点名称前添加 b 标签显示节点类型
+      // 消息格式：地址 xxx 已激活[ 节点类型 ]
+      // 转换为：地址 xxx 已激活<b>节点类型</b>[ 节点类型 ]
+      const nodeTypeText = item.nodeTypeText || ''
+      if (nodeTypeText) {
+        // 查找 [ 节点类型 ] 的位置
+        const bracketPattern = /\[\s*([^\]]+)\s*\]/
+        const match = msg.match(bracketPattern)
+        if (match) {
+          const beforeBracket = msg.substring(0, match.index)
+          const afterBracket = msg.substring(match.index + match[0].length)
+          // 在 [ 前面插入 <b>节点类型</b>
+          parts.push({ text: beforeBracket, isAddress: false })
+          parts.push({ text: nodeTypeText, isNodeType: true })
+          parts.push({ text: match[0], isAddress: false })
+          parts.push({ text: afterBracket, isAddress: false })
+        } else {
+          parts.push({ text: msg, isAddress: false })
+        }
+      } else {
+        parts.push({ text: msg, isAddress: false })
+      }
       return { ...item, parts }
     }
 
@@ -272,6 +299,21 @@ onMounted(() => {
     line-height: 18px;
     color: inherit;
     flex: 1;
+
+    b {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1px 10px;
+      border-radius: 6px;
+      font-family: DingTalk JinBuTi, DingTalk JinBuTi;
+      font-weight: 500;
+      font-size: 13px;
+      background: rgba(234, 171, 74, 0.1);
+      color: #EAAB4A;
+      font-style: italic;
+      margin: 0 4px;
+    }
   }
 
   .amount-text {

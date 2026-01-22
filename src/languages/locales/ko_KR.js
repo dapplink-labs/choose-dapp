@@ -436,7 +436,7 @@ export default {
     "cycleDays": "주기 일수",
     "totalEarnings": "총 수익",
     "activateComputingPower": "노드 활성화",
-    "activationMsg": "주소 {address} 가 [{nodeType}]을(를) 활성화했습니다",
+    "activationMsg": "주소 {address} 가 [{nodeType}] 을(를) 활성화했습니다",
     "nodeTypes": {
       "T1": "정보 노드",
       "T2": "데이터 노드",
@@ -525,7 +525,10 @@ export default {
     "computingPowerService": "해시파워 서비스",
     "lpVault": "스테이킹 풀",
     "distributedNode": "분산 노드",
-    "clusterNode": "클러스터 노드"
+    "clusterNode": "클러스터 노드",
+    "dateRangeSeparator": "부터",
+    "startDatePlaceholder": "시작 날짜",
+    "endDatePlaceholder": "종료 날짜"
   },
   "dashboard": {
     "title": "대시보드",

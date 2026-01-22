@@ -525,7 +525,10 @@ export default {
     "computingPowerService": "算力服务",
     "lpVault": "质押池",
     "distributedNode": "分布节点",
-    "clusterNode": "集群节点"
+    "clusterNode": "集群节点",
+    "dateRangeSeparator": "至",
+    "startDatePlaceholder": "开始日期",
+    "endDatePlaceholder": "结束日期"
   },
   "dashboard": {
     "title": "仪表盘",

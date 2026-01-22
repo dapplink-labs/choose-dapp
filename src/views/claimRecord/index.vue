@@ -46,9 +46,9 @@
                     <el-date-picker
                         v-model="dateRange"
                         type="daterange"
-                        range-separator="至"
-                        start-placeholder="开始日期"
-                        end-placeholder="结束日期"
+                        :range-separator="$t('claimRecord.dateRangeSeparator')"
+                        :start-placeholder="$t('claimRecord.startDatePlaceholder')"
+                        :end-placeholder="$t('claimRecord.endDatePlaceholder')"
                         format="YYYY-MM-DD"
                         value-format="YYYY-MM-DD"
                         :teleported="false"
@@ -75,7 +75,7 @@
                         @clear="handleDateClear"
                     />
                     <div class="date-picker-actions">
-                        <button class="action-btn clear-btn" @click="handleDateClear">全部</button>
+                        <button class="action-btn clear-btn" @click="handleDateClear">{{ $t('common.all') }}</button>
                     </div>
                 </div>
             </transition>
@@ -189,7 +189,7 @@ const currentMonthLabel = computed(() => {
         return t('common.all') || '全部'
     }
     const [start, end] = dateRange.value
-    return `${start} 至 ${end}`
+    return `${start} ${t('claimRecord.dateRangeSeparator')} ${end}`
 })
 
 // 当前列表（根据服务类型筛选）
@@ -448,7 +448,7 @@ onBeforeUnmount(() => {
             border: 1px solid var(--border-color, #23262F);
             background: transparent;
             color: var(--text-color, #1a1a1a);
-            font-size: 13px;
+            font-size: 12px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -479,13 +479,30 @@ onBeforeUnmount(() => {
 
         :deep(.el-date-editor) {
             width: 100%;
+            background-color: var(--bg-page-h5, #FFFFFF) !important;
+            border-color: var(--border-color, #23262F) !important;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
             
             .el-range-input {
                 color: var(--text-color, #1a1a1a);
+                background-color: transparent !important;
             }
             
             .el-range-separator {
                 color: var(--text-color, #1a1a1a);
+            }
+            
+            .el-input__wrapper {
+                background-color: var(--bg-page-h5, #FFFFFF) !important;
+                box-shadow: 0 0 0 1px var(--border-color, #23262F) inset !important;
+            }
+            
+            &:hover .el-input__wrapper {
+                box-shadow: 0 0 0 1px var(--border-color, #23262F) inset !important;
+            }
+            
+            &.is-focus .el-input__wrapper {
+                box-shadow: 0 0 0 1px var(--border-color, #23262F) inset !important;
             }
         }
 
@@ -507,10 +524,6 @@ onBeforeUnmount(() => {
 
                 &:hover {
                     background-color: rgba(0, 0, 0, 0.04);
-                }
-
-                &.clear-btn {
-                    color: var(--text-dark-gray, #999999);
                 }
             }
         }
@@ -618,6 +631,139 @@ onBeforeUnmount(() => {
     max-width: calc(100vw - 32px) !important;
 }
 
+/* Element Plus 日期选择器暗色主题适配 */
+.theme-dark .el-picker__popper {
+    background-color: var(--bg-page-h5, #000000) !important;
+    border-color: var(--border-color, #23262F) !important;
+    box-shadow: 0 12px 32px rgba(255, 255, 255, 0.15), 0 6px 16px rgba(255, 255, 255, 0.1), 0 2px 8px rgba(255, 255, 255, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.05) inset !important;
+}
+
+/* 暗色主题下 popper 箭头 */
+.theme-dark .el-picker__popper .el-popper__arrow::before {
+    border-color: var(--border-color, #23262F) !important;
+    background-color: var(--bg-page-h5, #000000) !important;
+}
+
+.theme-dark .el-picker-panel {
+    background-color: var(--bg-page-h5, #000000) !important;
+    border-color: var(--border-color, #23262F) !important;
+    color: var(--text-color, #f2f2f2) !important;
+}
+
+.theme-dark .el-picker-panel__header {
+    border-bottom-color: var(--border-color, #23262F) !important;
+}
+
+.theme-dark .el-picker-panel__header-label {
+    color: var(--text-color, #f2f2f2) !important;
+}
+
+.theme-dark .el-picker-panel__header-label:hover {
+    color: var(--text-color, #f2f2f2) !important;
+}
+
+.theme-dark .el-picker-panel__icon-btn {
+    color: var(--text-color, #f2f2f2) !important;
+}
+
+.theme-dark .el-picker-panel__icon-btn:hover {
+    color: var(--text-color, #f2f2f2) !important;
+}
+
+.theme-dark .el-date-table th {
+    color: var(--text-dark-gray, #909090) !important;
+    border-bottom-color: var(--border-color, #23262F) !important;
+}
+
+.theme-dark .el-date-table td {
+    color: var(--text-color, #f2f2f2) !important;
+}
+
+/* 范围内的日期文字颜色需要明确设置，不使用 inherit */
+.theme-dark .el-picker-panel .el-date-table td.in-range,
+.theme-dark .el-picker-panel .el-date-table td.in-range * {
+    color: var(--text-color, #f2f2f2) !important;
+}
+
+.theme-dark .el-date-table td.available:hover {
+    color: var(--text-color, #f2f2f2) !important;
+}
+
+.theme-dark .el-date-table td.today span {
+    color: var(--text-color, #f2f2f2) !important;
+}
+
+.theme-dark .el-date-table td.current:not(.disabled) span {
+    background-color: var(--bg-opposite, #FFFFFF) !important;
+    color: var(--bg-page-h5, #000000) !important;
+}
+
+/* 暗色主题下日期范围内文字颜色 - 使用通配符确保覆盖所有子元素 */
+.theme-dark .el-picker-panel .el-date-table td.in-range {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.theme-dark .el-picker-panel .el-date-table td.in-range *,
+.theme-dark .el-picker-panel .el-date-table td.in-range span,
+.theme-dark .el-picker-panel .el-date-table td.in-range div,
+.theme-dark .el-picker-panel .el-date-table td.in-range .el-date-table__cell {
+    color: #000000 !important;
+}
+
+
+.theme-dark .el-picker-panel .el-date-table td.start-date,
+.theme-dark .el-picker-panel .el-date-table td.end-date {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.theme-dark .el-picker-panel .el-date-table td.start-date *,
+.theme-dark .el-picker-panel .el-date-table td.end-date *,
+.theme-dark .el-picker-panel .el-date-table td.start-date span,
+.theme-dark .el-picker-panel .el-date-table td.end-date span,
+.theme-dark .el-picker-panel .el-date-table td.start-date div,
+.theme-dark .el-picker-panel .el-date-table td.end-date div {
+    background-color: var(--bg-opposite, #FFFFFF) !important;
+    color: var(--bg-page-h5, #000000) !important;
+    font-weight: 500 !important;
+}
+
+.theme-dark .el-picker-panel__link-btn {
+    color: var(--text-color, #f2f2f2) !important;
+}
+
+.theme-dark .el-picker-panel__link-btn:hover {
+    color: var(--text-color, #f2f2f2) !important;
+}
+
+/* Element Plus 日期选择器亮色主题适配（确保覆盖默认样式） */
+.theme-light .el-picker__popper {
+    background-color: var(--bg-page-h5, #FFFFFF) !important;
+    border-color: var(--border-color, #E0E0E0) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 亮色主题下 popper 箭头 */
+.theme-light .el-picker__popper .el-popper__arrow::before {
+    border-color: var(--border-color, #E0E0E0) !important;
+    background-color: var(--bg-page-h5, #FFFFFF) !important;
+}
+
+.theme-light .el-picker-panel {
+    background-color: var(--bg-page-h5, #FFFFFF) !important;
+    border-color: var(--border-color, #E0E0E0) !important;
+    color: var(--text-color, #1a1a1a) !important;
+}
+
+/* 暗色主题下日期选择器按钮悬停效果 */
+.theme-dark .date-picker-row .action-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 亮色主题下日期选择器按钮悬停效果 */
+.theme-light .date-picker-row .action-btn:hover {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
 @media screen and (max-width: 768px) {
     .el-date-range-picker .el-picker-panel__body {
         min-width: 100%;
@@ -690,5 +836,6 @@ onBeforeUnmount(() => {
     }
 }
 </style>
+
 
 
