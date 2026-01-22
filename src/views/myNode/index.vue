@@ -268,7 +268,7 @@ const getRandomAvatar = (addr) => {
     return avatarImages[index]
 }
 
-// 格式化金额（CHO为18精度，需要先转换）
+// 格式化金额（CHO为6精度，需要先转换）
 const formatAmount = (value) => formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true })
 
 // 获取邀请列表：直推为 type=1，团队为 type=2
@@ -335,8 +335,7 @@ onMounted(() => {
         id: String(route.query.id || ''),
         address: address.value
     }).then(res => {
-        const data = res?.data?.data || res?.data || res || {}
-
+        const data = res?.data?.data?.provider_info || {}
         choIncome.value = data.total_reward ?? '0'
         subCoinIncome.value = data.son_coin_reward ?? '0'
 

@@ -105,7 +105,7 @@ type PromotionNode = {
 // 随机头像数组
 const avatarImages = [avatarImg1, avatarImg2, avatarImg3, avatarImg4, avatarImg5]
 
-// 格式化金额（CHO为18精度，需要先转换）
+// 格式化金额（CHO为6精度，需要先转换）
 const formatAmount = (value: string | number | bigint | undefined): string => {
   if (!value || value === '0' || value === 0) return '0.00'
   try {

@@ -48,9 +48,8 @@ export const formatTokenAmount = (
   }
 }
 
-// CHO：18 精度
+// CHO：6 精度
 export const formatChoAmount = (value, opts = {}) => {
-  console.log(value)
   return formatTokenAmount(value, { decimals: 6, ...opts })
 }
 
