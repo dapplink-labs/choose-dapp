@@ -463,6 +463,10 @@ export default {
   "myNode": {
     "distributedNode": "分布节点",
     "clusterNode": "集群节点",
+    "nodeTypes": {
+      "distributed": "分布节点",
+      "cluster": "集群节点"
+    },
     "choIncome": "CHO收益",
     "subCoinIncome": "子币收益",
     "earnPromptShort": "赚取收益",

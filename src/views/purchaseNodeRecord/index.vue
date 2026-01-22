@@ -60,7 +60,6 @@ const nodeTypeMap = {
     'T6': { nodeTag: 'T6', nodeNameKey: 'myIncome.nodeNames.genesisNode' },
     '0': { nodeTag: '', nodeNameKey: 'myNode.nodeTypes.distributed' }, // 分布节点
     '1': { nodeTag: '', nodeNameKey: 'myNode.nodeTypes.cluster' },     // 集群节点
-    '2': { nodeTag: '', nodeNameKey: 'myNode.nodeTypes.cluster' },     // 兼容历史 2
 }
 
 

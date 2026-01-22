@@ -463,6 +463,10 @@ export default {
   "myNode": {
     "distributedNode": "분산 노드",
     "clusterNode": "클러스터 노드",
+    "nodeTypes": {
+      "distributed": "분산 노드",
+      "cluster": "클러스터 노드"
+    },
     "choIncome": "CHO 수익",
     "subCoinIncome": "하위 코인 수익",
     "earnPromptShort": "수익 획득",

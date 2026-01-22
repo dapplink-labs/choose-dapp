@@ -463,6 +463,10 @@ export default {
   "myNode": {
     "distributedNode": "分散ノード",
     "clusterNode": "クラスターノード",
+    "nodeTypes": {
+      "distributed": "分散ノード",
+      "cluster": "クラスターノード"
+    },
     "choIncome": "CHO収益",
     "subCoinIncome": "サブコイン収益",
     "earnPromptShort": "収益を獲得",

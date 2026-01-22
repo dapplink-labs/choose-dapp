@@ -463,6 +463,10 @@ export default {
   "myNode": {
     "distributedNode": "Distributed Node",
     "clusterNode": "Cluster Node",
+    "nodeTypes": {
+      "distributed": "Distributed Node",
+      "cluster": "Cluster Node"
+    },
     "choIncome": "CHO profit",
     "subCoinIncome": "Sub-coin profit",
     "earnPromptShort": "Earned",
