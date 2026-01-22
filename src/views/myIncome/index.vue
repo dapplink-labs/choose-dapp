@@ -135,7 +135,7 @@
 
                 <!-- 层级树状图占位 -->
                 <div class="team-tree-placeholder">
-                    <TeamTree :type="activeTab === 'direct' ? 1 : 2" :node_type="1" />
+                    <TeamTree :type="activeTab === 'direct' ? 1 : 2" :node_type="1" :team_network_list="teamNetworkList" :direct_network_list="directNetworkList" />
                 </div>
 
                 <div class="team-list">
@@ -232,11 +232,18 @@ const inviteCount = ref(0)
 // 邀请列表
 const inviteList = ref([])
 
+// 团队网络列表
+const teamNetworkList = ref([])
+// 直推网络列表
+const directNetworkList = ref([])
+
 // 获取邀请列表：直推为 type=1，团队为 type=2
 const getMyTeamInfoList = async () => {
     const type = activeTab.value === 'direct' ? 1 : 2
     const res = await getMyTeamInfo({ address: address.value, type, node_type: 1 })
     const data = res?.data?.data
+    teamNetworkList.value = data.team_network_list
+    directNetworkList.value = data.direct_network_list
     // data.direct_count为直推人数，data.team_count为团队人数
     inviteCount.value = activeTab.value === 'direct' ? data.direct_count : data.team_count
     const rawList = activeTab.value === 'direct' ? data.direct_team_list : data.team_list

@@ -4,19 +4,15 @@
     <div class="path-panel">
       <div class="path-header">{{ tt('teamTree.pathHeader', '本人 —> 直推 —> 间推') }}</div>
       <div class="path-list" ref="pathListRef">
-        <div
-          v-for="(node, index) in path"
-          :key="node.id"
-          class="path-item"
-          :class="{ active: node.id === currentNode.id }"
-          @click="handleClickPath(index)"
-        >
+        <div v-for="(node, index) in path" :key="node.id" class="path-item"
+          :class="{ active: node.id === currentNode.id }" @click="handleClickPath(index)">
           <div class="path-avatar-wrap">
             <img :src="getNodeAvatar(node.address, index === 0)" class="path-avatar" alt="avatar" />
           </div>
           <div class="path-info">
             <div class="path-name">{{ shortAddress(node.address) }}</div>
-            <div v-if="index !== 0" class="path-amount">{{ tt('teamTree.amount', 'Amount') }}: {{ node.amount || '0.00' }}</div>
+            <div v-if="index !== 0" class="path-amount">{{ tt('teamTree.amount', 'Amount') }}: {{ node.amount || '0.00'
+              }}</div>
           </div>
           <div v-if="index < path.length - 1" class="path-arrow">/</div>
         </div>
@@ -24,25 +20,11 @@
     </div>
 
     <!-- 下方关系图（Canvas，支持双指缩放和拖动） -->
-    <div
-      class="graph-panel"
-      @touchstart="onTouchStart"
-      @touchmove.prevent="onTouchMove"
-      @touchend="onTouchEnd"
-      @touchcancel="onTouchEnd"
-      @mousedown="onMouseDown"
-      @mousemove="onMouseMove"
-      @mouseup="onMouseUp"
-      @mouseleave="onMouseUp"
-    >
+    <div class="graph-panel" @touchstart="onTouchStart" @touchmove.prevent="onTouchMove" @touchend="onTouchEnd"
+      @touchcancel="onTouchEnd" @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp"
+      @mouseleave="onMouseUp">
       <div class="graph-inner" :style="{ transform: `translate(${translateX}px, ${translateY}px) scale(${scale})` }">
-        <canvas
-          ref="canvasRef"
-          class="graph-canvas"
-          width="1200"
-          height="1200"
-          @click.stop="onCanvasClick"
-        ></canvas>
+        <canvas ref="canvasRef" class="graph-canvas" width="1200" height="1200" @click.stop="onCanvasClick"></canvas>
 
         <div class="no-children-text" v-if="visibleChildren.length === 0">
           {{ tt('teamTree.noMoreData', '没有更多数据了') }}
@@ -70,7 +52,33 @@ import defaultAvatar from '@/assets/icon/avatar.png'
 const props = defineProps<{
   type?: number // 1: 直推, 2: 团队
   node_type?: number // 1: myIncome页面, 2: myNode页面
+  team_network_list?: any[] // 团队网络列表
+  direct_network_list?: any[] // 直推网络列表
 }>()
+
+
+// 获取邀请列表数据
+const fetchTeamInfo = async (nodeAddress: string, nodeType: number) => {
+  if (!nodeAddress || !address.value) return []
+
+  try {
+    const res = await getMyTeamInfo({
+      address: nodeAddress,
+      type: nodeType,
+      node_type: props.node_type ?? 1,
+      page: 10,
+    })
+    const data = res?.data?.data || {}
+
+    // 根据 type 获取对应的列表
+    const rawList = nodeType === 1 ? data.direct_team_list : data.team_list
+    return rawList || []
+  } catch (error) {
+    console.error('获取邀请列表失败:', error)
+    return []
+  }
+}
+
 
 // 获取当前用户地址
 const { address } = useAccount()
@@ -108,7 +116,7 @@ const formatAmount = (value: string | number | bigint | undefined): string => {
     } else {
       num = Number(value) / 1e18
     }
-    
+
     if (!Number.isFinite(num)) return '0.00'
     return num.toFixed(2)
   } catch (error) {
@@ -230,12 +238,12 @@ const onTouchMove = (e: TouchEvent) => {
     // 单指拖动
     const deltaX = e.touches[0].clientX - panStartX.value
     const deltaY = e.touches[0].clientY - panStartY.value
-    
+
     // 如果移动距离超过阈值，认为是拖动
     if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
       hasTouchMoved.value = true
     }
-    
+
     translateX.value = panStartTranslateX.value + deltaX
     translateY.value = panStartTranslateY.value + deltaY
   }
@@ -275,12 +283,12 @@ const onMouseMove = (e: MouseEvent) => {
   if (isMouseDown.value && panStartX.value !== null && panStartY.value !== null) {
     const deltaX = e.clientX - panStartX.value
     const deltaY = e.clientY - panStartY.value
-    
+
     // 如果移动距离超过阈值，认为是拖动
     if (Math.abs(deltaX) > 3 || Math.abs(deltaY) > 3) {
       hasMouseMoved.value = true
     }
-    
+
     translateX.value = panStartTranslateX.value + deltaX
     translateY.value = panStartTranslateY.value + deltaY
     e.preventDefault()
@@ -303,7 +311,7 @@ const onCanvasClick = (e: MouseEvent) => {
   if (hasMouseMoved.value || hasTouchMoved.value) {
     return
   }
-  
+
   const canvas = canvasRef.value
   if (!canvas) return
 
@@ -392,7 +400,7 @@ const drawGraph = () => {
   const centerY = height / 2
 
   ctx.textAlign = 'center'
-  
+
   // 1. 绘制连线
   const positions = childPositions.value
   const hasPoints =
@@ -406,7 +414,7 @@ const drawGraph = () => {
       const lineGradient = ctx.createLinearGradient(centerX, centerY, pos.x, pos.y)
       lineGradient.addColorStop(0, 'rgba(59, 130, 246, 0.8)')
       lineGradient.addColorStop(1, 'rgba(59, 130, 246, 0.2)')
-      
+
       ctx.beginPath()
       ctx.moveTo(centerX, centerY)
       const dx = pos.x - centerX
@@ -414,10 +422,10 @@ const drawGraph = () => {
       const dist = Math.sqrt(dx * dx + dy * dy)
       const angle = Math.atan2(dy, dx)
       const cpDist = dist / 2
-      const curveAngle = 0.15 
+      const curveAngle = 0.15
       const cpX = centerX + Math.cos(angle + curveAngle) * cpDist * 1.1
       const cpY = centerY + Math.sin(angle + curveAngle) * cpDist * 1.1
-      
+
       ctx.quadraticCurveTo(cpX, cpY, pos.x, pos.y)
       ctx.strokeStyle = lineGradient
       ctx.lineWidth = 3
@@ -426,24 +434,24 @@ const drawGraph = () => {
       // 2. 绘制子节点（放大并加渐变发光）
       ctx.shadowBlur = 15
       ctx.shadowColor = 'rgba(59, 130, 246, 0.5)'
-      
+
       const nodeGrad = ctx.createRadialGradient(pos.x, pos.y, 5, pos.x, pos.y, CHILD_RADIUS)
       nodeGrad.addColorStop(0, '#60a5fa')
       nodeGrad.addColorStop(1, '#2563eb')
-      
+
       ctx.fillStyle = nodeGrad
       ctx.beginPath()
       ctx.arc(pos.x, pos.y, CHILD_RADIUS, 0, Math.PI * 2)
       ctx.fill()
-      
-      ctx.shadowBlur = 0 
+
+      ctx.shadowBlur = 0
 
       // 节点展示：Address + Amount
       ctx.fillStyle = '#ffffff'
       ctx.font = 'bold 22px system-ui'
       ctx.textBaseline = 'top'
       ctx.fillText(shortAddress(item.address), pos.x, pos.y + CHILD_RADIUS + 12)
-      
+
       ctx.fillStyle = '#9ca3af'
       ctx.font = '20px system-ui'
       ctx.fillText(`Amount: ${item.amount}`, pos.x, pos.y + CHILD_RADIUS + 40)
@@ -453,16 +461,16 @@ const drawGraph = () => {
   // 3. 绘制中心节点（更大，更强光）
   ctx.shadowBlur = 25
   ctx.shadowColor = 'rgba(59, 130, 246, 0.6)'
-  
+
   const centerGrad = ctx.createRadialGradient(centerX, centerY, 5, centerX, centerY, CENTER_RADIUS)
   centerGrad.addColorStop(0, '#93c5fd')
   centerGrad.addColorStop(1, '#1d4ed8')
-  
+
   ctx.fillStyle = centerGrad
   ctx.beginPath()
   ctx.arc(centerX, centerY, CENTER_RADIUS, 0, Math.PI * 2)
   ctx.fill()
-  
+
   ctx.strokeStyle = 'rgba(255,255,255,0.3)'
   ctx.lineWidth = 4
   ctx.stroke()
@@ -474,27 +482,6 @@ const drawGraph = () => {
   ctx.fillText(shortAddress(currentNode.value.address), centerX, centerY + CENTER_RADIUS + 15)
 }
 
-// 获取邀请列表数据
-const fetchTeamInfo = async (nodeAddress: string, nodeType: number) => {
-  if (!nodeAddress || !address.value) return []
-  
-  try {
-    const res = await getMyTeamInfo({ 
-      address: nodeAddress, 
-      type: nodeType, 
-      node_type: props.node_type ?? 1,
-      page: 10,
-    })
-    const data = res?.data?.data || {}
-    
-    // 根据 type 获取对应的列表
-    const rawList = nodeType === 1 ? data.direct_team_list : data.team_list
-    return rawList || []
-  } catch (error) {
-    console.error('获取邀请列表失败:', error)
-    return []
-  }
-}
 
 // 根据当前节点获取其邀请列表
 const refreshChildren = async (node: PromotionNode) => {
@@ -502,44 +489,53 @@ const refreshChildren = async (node: PromotionNode) => {
   oldChildren.forEach((childId) => {
     delete nodeMap[childId]
   })
-  
+
   node.children.splice(0, node.children.length)
-  
+
   // 获取当前 type，如果没有传入则默认为 1（直推）
   const currentType = props.type ?? 1
-  
-  // 调用 API 获取邀请列表
-  const teamList = await fetchTeamInfo(node.address, currentType)
-  
+
+  // 如果是根节点（初次渲染）且父级传入了数据，优先使用父级数据
+  let teamList: any[] = []
+  if (node.id === 'me' && (props.direct_network_list || props.team_network_list)) {
+    // 使用父级传入的数据
+    teamList = currentType === 1 
+      ? (props.direct_network_list || [])
+      : (props.team_network_list || [])
+  } else {
+    // 否则调用 API 获取邀请列表
+    teamList = await fetchTeamInfo(node.address, currentType)
+  }
+
   if (teamList.length === 0) {
     return
   }
-  
+
   const newChildren: string[] = []
   teamList.forEach((item: any) => {
     // 跳过空值或无效项
     if (!item || !item.address) {
       return
     }
-    
+
     const id = item.address || `N_${++nodeCounter.value}`
-    
+
     // 如果节点已存在，更新数据；否则创建新节点
     if (!nodeMap[id]) {
-    nodeMap[id] = {
-      id,
+      nodeMap[id] = {
+        id,
         address: item.address || '',
         amount: formatAmount(item.total_reward),
-      children: [],
+        children: [],
       }
     } else {
       // 更新已存在节点的数据
       nodeMap[id].amount = formatAmount(item.total_reward)
     }
-    
+
     newChildren.push(id)
   })
-  
+
   node.children.push(...newChildren)
 }
 
@@ -556,6 +552,14 @@ watch(() => props.type, async (newType) => {
     drawGraph()
   }
 })
+
+// 监听父级传入的数据变化，如果是根节点则更新
+watch([() => props.direct_network_list, () => props.team_network_list], async () => {
+  if (currentNode.value.id === 'me') {
+    await refreshChildren(currentNode.value)
+    drawGraph()
+  }
+}, { deep: true })
 
 // 当直推列表/可见直推或中心标签、缩放变化时重绘
 watch([children, visibleChildren, centerLabel, scale], () => {
@@ -575,11 +579,11 @@ const handleClickChild = async (node: PromotionNode) => {
   if (!nodeInMap) {
     return
   }
-  
+
   path.value.push(nodeInMap)
-  
+
   await nextTick()
-  
+
   if (pathListRef.value) {
     pathListRef.value.scrollTo({
       left: pathListRef.value.scrollWidth,
@@ -588,9 +592,9 @@ const handleClickChild = async (node: PromotionNode) => {
   }
 
   await refreshChildren(nodeInMap)
-  
+
   await nextTick()
-  
+
   drawGraph()
 }
 
@@ -643,8 +647,14 @@ function shortAddress(addr: string) {
   overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: 4px;
-  &::-webkit-scrollbar { height: 2px; }
-  &::-webkit-scrollbar-thumb { background: #334155; }
+
+  &::-webkit-scrollbar {
+    height: 2px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #334155;
+  }
 }
 
 .path-item {
@@ -667,6 +677,7 @@ function shortAddress(addr: string) {
       border-color: #3b82f6;
       box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
     }
+
     .path-name {
       color: #ffffff;
       font-weight: 600;
