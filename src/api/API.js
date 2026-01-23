@@ -60,30 +60,22 @@ export const getMyTeamInfo = (data) => {
     return request.get('/api/v1/staking/myTeamInfo', { params: data })
 }
 
-// 节点收益领取接口
+// 节点服务商收益领取记录
 export const getNodeServiceProviderRewardRecords = (data) => {
     return request.get('/api/v1/staking/nodeServiceProviderRewardRecords', { params: data })
 }
 
-// 质押节点收益领取接口
+// 质押节点收益领取记录
 export const getNodeStakingRewardRecords = (data) => {
     return request.get('/api/v1/staking/nodeStakingRewardRecords', { params: data })
 }
 
-// 质押领取收益接口
-export const getNodeStakingReward = (data) => {
-    return request.post('/api/v1/staking/nodeStakingReward', data)
-}
-
-// 保存节点领取记录
-
-
+// 节点收益领取
 export const nodeclaimReward =(data)=>{
     return request.post('/api/v1/node/claimReward', data)
 }
 
-
-//保存质押节点领取记录
+//质押节点收益领取
 export const stakingclaimReward =(data)=>{
     return request.post('/api/v1/staking/claimReward', data)
 }

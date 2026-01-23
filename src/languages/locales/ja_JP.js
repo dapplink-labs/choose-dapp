@@ -481,6 +481,7 @@ export default {
     "claimRecord": "领取记录",
     "claimAll": "全収益の受取",
     "noIncome": "受け取れる収益がありません",
+    "nodeActivatingTryLater": "ノードをアクティベート中です。しばらくしてから再試行してください。",
     "claimSuccess": "受取成功",
     "claimFailed": "受取失敗",
     "claimCancelled": "受取をキャンセルしました",

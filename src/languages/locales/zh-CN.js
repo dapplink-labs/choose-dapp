@@ -481,6 +481,7 @@ export default {
     "claimRecord": "领取记录",
     "claimAll": "领取所有收益",
     "noIncome": "暂无可领取收益",
+    "nodeActivatingTryLater": "节点激活中，请稍后再试",
     "claimSuccess": "领取成功",
     "claimFailed": "领取失败",
     "claimCancelled": "你取消了领取",

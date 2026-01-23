@@ -481,6 +481,7 @@ export default {
     "claimRecord": "Claim Records",
     "claimAll": "Claim All Profit",
     "noIncome": "No claimable profit",
+    "nodeActivatingTryLater": "Node is being activated. Please try again later.",
     "claimSuccess": "Claim successful",
     "claimFailed": "Claim failed",
     "claimCancelled": "You cancelled the claim",

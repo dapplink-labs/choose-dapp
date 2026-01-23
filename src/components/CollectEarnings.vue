@@ -24,16 +24,16 @@
                                 <span v-if="option.tag" class="option-tag">{{ option.tag }}</span>
                             </div>
                             <div class="option-amount-row">
-                                <span class="option-amount">{{ option.amount }} CHO</span>
+                                <span class="option-amount">{{ formatAmount(option.amount) }} CHO</span>
                                 <span v-if="option.time" class="option-time">{{ option.status === 1 ?
                                     $t('computingPower.activating') : option.time
-                                    }}</span>
+                                }}</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- 说明文字 -->
-                    <p class="tip-text">{{ $t('collectEarnings.tip') }}</p>
+                    <!-- <p class="tip-text">{{ $t('collectEarnings.tip') }}</p> -->
 
                     <!-- 确认按钮 -->
                     <button class="confirm-btn" @click="handleConfirm">
@@ -52,7 +52,7 @@ import { useAccount, useChainId } from '@wagmi/vue'
 import { switchChain } from '@wagmi/core'
 import { config } from '@/wagmi'
 import { ElMessage, ElLoading } from 'element-plus'
-import { getNodeStakingRecords, getNodeStakingReward } from '@/api/API'
+import { getNodeStakingRecords, stakingclaimReward } from '@/api/API'
 import { formatDateTime } from '@/utils/format_date.js'
 import { writeContractOptimized } from '@/utils/requestWEB3.js'
 import { parseUnits, formatUnits } from 'viem'
@@ -111,80 +111,6 @@ const formatAmount = (value) => {
     }
 }
 
-// 工具函数：处理节点数据
-const processNodeData = (list) => {
-    const typeMap = new Map()
-    let totalAmount = 0
-    let earliestTime = null
-    const allOrderIds = []
-
-    list.forEach(item => {
-        const nodeType = item.type || ''
-        const reward = Number(item.node_reward || 0)
-        const created = item.created || 0
-        const orderId = item.id || item.order_id || ''
-
-        totalAmount += reward
-        if (orderId) allOrderIds.push(orderId)
-
-        // 更新最早时间
-        if (created && (!earliestTime || created < earliestTime)) {
-            earliestTime = created
-        }
-
-        // 初始化或更新类型数据
-        if (!typeMap.has(nodeType)) {
-            typeMap.set(nodeType, {
-                type: nodeType,
-                amount: 0,
-                earliestTime: null,
-                orderIds: [],
-                nodeTag: nodeTypeMap[nodeType]?.nodeTag || '',
-                nodeNameKey: nodeTypeMap[nodeType]?.nodeNameKey || '',
-                status: item.status
-            })
-        }
-
-        const typeData = typeMap.get(nodeType)
-        typeData.amount += reward
-        if (orderId) typeData.orderIds.push(orderId)
-
-        if (created && (!typeData.earliestTime || created < typeData.earliestTime)) {
-            typeData.earliestTime = created
-        }
-    })
-
-    return { typeMap, totalAmount, earliestTime, allOrderIds }
-}
-
-// 工具函数：构建选项列表
-const buildOptionList = (typeMap, totalAmount, earliestTime, allOrderIds) => {
-    const optionList = [{
-        name: t('myIncome.earningsOptions.allNodeRewards'),
-        tag: '',
-        amount: formatAmount(totalAmount),
-        rawAmount: totalAmount,
-        time:  '',
-        orderIds: allOrderIds.join(','),
-        type: 'all'
-    }]
-
-    typeMap.forEach((value, key) => {
-        optionList.push({
-            name: t(value.nodeNameKey || ''),
-            tag: value.nodeTag,
-            amount: formatAmount(value.amount),
-            rawAmount: value.amount,
-            time: value.earliestTime ? formatDateTime(value.earliestTime) : '',
-            orderIds: value.orderIds.join(','),
-            type: key,
-            status: value.status
-        })
-    })
-
-    return optionList
-}
-
 // 获取节点质押记录并构建选项列表
 const fetchNodeStakingRecords = async () => {
     if (!address.value) {
@@ -201,9 +127,31 @@ const fetchNodeStakingRecords = async () => {
             options.value = []
             return
         }
+        let totalAmount = 0
+        let allOrderIds = []
+        list.forEach(item => {
+            item.name = t(nodeTypeMap[item.type]?.nodeNameKey || '')
+            item.tag = nodeTypeMap[item.type]?.nodeTag || ''
+            item.time = item.created ? formatDateTime(item.created) : ''
+            item.orderIds = item.id
+            item.amount = item.node_reward
+            totalAmount += item.node_reward
+            allOrderIds.push(item.id)
+        })
 
-        const { typeMap, totalAmount, earliestTime, allOrderIds } = processNodeData(list)
-        options.value = buildOptionList(typeMap, totalAmount, earliestTime, allOrderIds)
+        const optionList = [
+            //     {
+            //     name: t('myIncome.earningsOptions.allNodeRewards'),
+            //     tag: '',
+            //     amount: totalAmount,
+            //     time: '',
+            //     orderIds: allOrderIds.join(','),
+            //     type: 'all'
+            // }
+        ]
+        optionList.push(...list)
+        options.value = optionList
+
     } catch (error) {
         console.error('获取节点质押记录失败：', error)
         options.value = []
@@ -236,12 +184,13 @@ defineExpose({ open })
 let originalBodyOverflow = ''
 let originalBodyPaddingRight = ''
 
+
 const lockBodyScroll = () => {
     originalBodyOverflow = document.body.style.overflow || ''
     originalBodyPaddingRight = document.body.style.paddingRight || ''
 
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
-    document.body.style.overflow = 'hidden'
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
     if (scrollbarWidth > 0) {
         document.body.style.paddingRight = `${scrollbarWidth}px`
     }
@@ -296,20 +245,20 @@ const switchToBSC = async (loading) => {
     }
 }
 
-// 调用合约领取收益
+// 调用合约领取质押节点收益
 const callClaimRewardContract = async (amount, loading) => {
-   
+
     const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
     if (!bscNet?.proxyStakingManager) {
         throw new Error('未找到 StakingManager 合约地址')
     }
- 
+
     loading.text = '调用合约中...'
     const result = await writeContractOptimized({
         abi: stakingManagerABI,
         address: bscNet.proxyStakingManager,
         functionName: 'liquidityProviderClaimReward',
-        args: [parseUnits(String(amount), 18)],
+        args: [BigInt(amount)],
         userAddress: address.value,
         messages: CONTRACT_MESSAGES,
         showErrorToast: false
@@ -322,16 +271,18 @@ const callClaimRewardContract = async (amount, loading) => {
 }
 
 // 提交后端数据
-const submitRewardData = async (txHash, orderIds, loading) => {
+const submitRewardData = async (txHash, selectedOption, loading) => {
     loading.text = '提交数据中...'
     const requestData = {
-        address: address.value,
-        request_tx_hash: txHash
+        user_address: address.value,
+        request_tx_hash: txHash,
+        round: selectedOption.round,
+        raw_amount_token: selectedOption.amount
     }
     if (orderIds) {
         requestData.order_id = orderIds
     }
-    await getNodeStakingReward(requestData)
+    await stakingclaimReward(requestData)
 }
 
 // 处理错误
@@ -345,10 +296,14 @@ const handleError = (error) => {
 
 // 领取收益
 const handleConfirm = async () => {
-   
+
     const selectedOption = options.value[selectedIndex.value]
-    if (selectedOption.rawAmount <= 0) {
-        // alert(1)
+
+    if (selectedOption.round === -1) {
+        ElMessage.warning(t('myNode.nodeActivatingTryLater'))
+        return
+    }
+    if (selectedOption.amount <= 0) {
         ElMessage.warning(t('myNode.noIncome'))
         return
     }
@@ -362,8 +317,8 @@ const handleConfirm = async () => {
 
     try {
         await switchToBSC(loading)
-        const txHash = await callClaimRewardContract(selectedOption.rawAmount || 0, loading)
-        await submitRewardData(txHash, selectedOption.type !== 'all' ? selectedOption.orderIds : null, loading)
+        const txHash = await callClaimRewardContract(selectedOption.amount || 0, loading)
+        await submitRewardData(txHash, selectedOption, loading)
 
         ElMessage.success(CONTRACT_MESSAGES.success())
         handleClose()
@@ -505,7 +460,6 @@ const handleConfirm = async () => {
 
     &.option-selected {
         border: 1px solid #000000;
-        box-shadow: 0 0 0 1px #000000;
     }
 }
 

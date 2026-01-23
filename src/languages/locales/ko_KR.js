@@ -481,6 +481,7 @@ export default {
     "claimRecord": "领取记录",
     "claimAll": "모든 수익 수령",
     "noIncome": "수령 가능한 수익이 없습니다",
+    "nodeActivatingTryLater": "노드가 활성화 중입니다. 잠시 후 다시 시도해주세요.",
     "claimSuccess": "수령 성공",
     "claimFailed": "수령 실패",
     "claimCancelled": "수령을 취소했습니다",
