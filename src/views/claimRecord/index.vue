@@ -120,6 +120,8 @@ import { ArrowDownBold } from '@element-plus/icons-vue'
 import { getNodeServiceProviderRewardRecords, getNodeStakingRewardRecords } from '@/api/API'
 import { formatDateTime } from '@/utils/format_date.js'
 import { formatUnits } from 'viem'
+import { formatChoAmount, formatTokenAmount } from '@/utils/format_amount'
+
 
 const { t } = useI18n()
 const { address } = useAccount()
@@ -154,27 +156,6 @@ const hasMore = ref({
     lpVault: true
 })
 const isLoading = ref(false)
-
-// 格式化金额（CHO为6精度，需要先转换）
-const formatAmount = (value) => {
-    if (!value || value === '0' || value === 0) return '0'
-    try {
-        // 将18精度的数值转换为正常数量
-        let num = typeof value === 'bigint' || typeof value === 'string' 
-            ? parseFloat(formatUnits(BigInt(value.toString()), 18))
-            : Number(value) / 1e18
-        
-        if (!Number.isFinite(num)) return '0'
-        const fixed = num.toFixed(4)
-        const trimmed = fixed.replace(/\.?0+$/, '')
-        const [intPart, decimalPart] = trimmed.split('.')
-        const intFormatted = Number(intPart).toLocaleString('en-US')
-        return decimalPart ? `${intFormatted}.${decimalPart}` : intFormatted
-    } catch (error) {
-        console.error('格式化金额失败:', error, value)
-        return '0'
-    }
-}
 
 const currentServiceLabel = computed(() => {
     if (currentServiceType.value === 'computingPower') {
@@ -314,7 +295,7 @@ const fetchRecords = async (isLoadMore = false) => {
             const title = mapNodeType(item.type, currentType)
             
             const time = formatDateTime(item.created || item.create_time || item.time || item.created_at)
-            const amount = formatAmount(item.amount || item.reward || item.total_reward || 0)
+            const amount = formatChoAmount(item.amount || 0)
             
             return {
                 title,

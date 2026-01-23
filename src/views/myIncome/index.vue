@@ -67,16 +67,17 @@
                 <div class="progress-bar-container">
                     <div class="progress-bar">
                         <div class="progress-fill"
-                            :style="{ width: (progressPercent < 4) ? 4 + '%' : progressPercent + '%' }"></div>
+                            :style="{ width: (currentNodeStakingInfo.progressPercent < 4) ? 0 + '%' : currentNodeStakingInfo.progressPercent + '%' }">
+                        </div>
                         <div class="progress-indicator"
-                            :style="{ left: (progressPercent < 4) ? 4 + '%' : progressPercent + '%' }">
-                            <span class="indicator-text">{{ progressPercent }}%</span>
+                            :style="{ left: (currentNodeStakingInfo.progressPercent < 4) ? 0 + '%' : currentNodeStakingInfo.progressPercent + '%' }">
+                            <span class="indicator-text">{{ currentNodeStakingInfo.progressPercent }}%</span>
                         </div>
                     </div>
                 </div>
                 <div class="text">
                     <span>0 USDT</span>
-                    <span>{{ formatAmount(currentNodeStakingInfo.forecast_income) }} USDT</span>
+                    <span>{{ formatUsdtAmount(parseInt(currentNodeStakingInfo.forecast_income)) }} USDT</span>
                 </div>
             </div>
 
@@ -130,12 +131,13 @@
 
                 <div class="team-header">
                     <span class="invite-count"><span>{{ inviteCountLabel }}</span> {{ inviteCount
-                    }}</span>
+                        }}</span>
                 </div>
 
                 <!-- 层级树状图占位 -->
                 <div class="team-tree-placeholder">
-                    <TeamTree :type="activeTab === 'direct' ? 1 : 2" :node_type="1" :team_network_list="teamNetworkList" :direct_network_list="directNetworkList" />
+                    <TeamTree :type="activeTab === 'direct' ? 1 : 2" :node_type="1" :team_network_list="teamNetworkList"
+                        :direct_network_list="directNetworkList" />
                 </div>
 
                 <div class="team-list">
@@ -212,12 +214,12 @@ import CollectEarnings from '@/components/CollectEarnings.vue'
 import TeamTree from '@/components/TeamTree.vue'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import ActivationMarquee from '@/components/ActivationMarquee.vue'
-import { getNodeStakingInfo, getNodeStakingRecords, getMyTeamInfo,stakingclaimReward } from '@/api/API'
+import { getNodeStakingInfo, getNodeStakingRecords, getMyTeamInfo, stakingclaimReward } from '@/api/API'
 import { useAccount } from '@wagmi/vue'
 import { ArrowRightBold } from '@element-plus/icons-vue'
 import { formatDateTime } from '@/utils/format_date.js'
 import { ElMessage } from 'element-plus'
-import { formatChoAmount } from '@/utils/format_amount'
+import { formatChoAmount, formatTokenAmount } from '@/utils/format_amount'
 
 
 const router = useRouter()
@@ -303,10 +305,14 @@ const handleCollectSuccess = () => {
 // 当前节点质押信息
 const currentNodeStakingInfo = ref({})
 
-// 将数值格式化为带千分位的字符串（CHO为18精度，需要先转换）
+// CHO 金额（默认 6 精度）
 const formatAmount = (value) => {
-      
     return formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true })
+}
+
+// USDT 金额（18 精度）
+const formatUsdtAmount = (value) => {
+    return formatTokenAmount(value, { decimals: 18, maxFractionDigits: 4, useGrouping: true })
 }
 
 // 地址截取：前6位 + ... + 后4位
@@ -335,36 +341,6 @@ const nodeTypeMap = {
 }
 
 // 获取节点质押信息
-const fetchNodeStakingInfo = async () => {
-    if (!currentNodeStakingInfo.value.id) return
-    const res = await getNodeStakingInfo({ address: address.value, id: currentNodeStakingInfo.value.id })
-    const data = res?.data?.data?.staking_info || {}
-    data.id = currentNodeStakingInfo.value.id
-    data.name = t(nodeTypeMap[data.node_level]?.nodeNameKey || '')
-    currentNodeStakingInfo.value = data
-}
-
-// 获取节点质押记录
-const getNodeStakingRecordsList = async () => {
-    const res = (await getNodeStakingRecords({ address: address.value }))?.data?.data?.list || []
-    myNodes.value = res.map(item => {
-        return {
-            id: item.id,
-            nodeName: t(nodeTypeMap[item.type]?.nodeNameKey || ''),
-            nodeTag: nodeTypeMap[item.type]?.nodeTag || '',
-            purchaseTime: formatDateTime(item.created),
-            status: item.status
-        }
-    })
-    if (myNodes.value.length > 0) {
-        currentNodeStakingInfo.value.id = myNodes.value[0].id
-        fetchNodeStakingInfo()
-    } else {
-        // 如果没有质押节点，显示确定弹窗提示用户并返回上一个页面
-        showNoNodeModal.value = true
-    }
-}
-
 // 进度条：总收益 / 预估收益
 // 总收益 = 静态收益 + 直推收益 + 团队收益 + 平级收益 + 流水分红
 // 如果当前节点是创世节点（T6），还要加上创世节点5%收益
@@ -377,30 +353,43 @@ const getNodeStakingRecordsList = async () => {
 // 流水分红 = dividend_reward
 // 创世节点5%收益 = creation_reward
 // 超级节点收益 = super_node_reward
-const progressPercent = computed(() => {
-    const info = currentNodeStakingInfo.value
-    // 基础收益
-    let total = Number(info.node_reward ?? 0) +
-        Number(info.direct_reward ?? 0) +
-        Number(info.team_reward ?? 0) +
-        Number(info.lateral_reward ?? 0) +
-        Number(info.dividend_reward ?? 0)
+const fetchNodeStakingInfo = async () => {
+    if (!currentNodeStakingInfo.value.id) return
+    const res = await getNodeStakingInfo({ address: address.value, id: currentNodeStakingInfo.value.id, round: currentNodeStakingInfo.value.round })
+    const data = res?.data?.data?.staking_info || {}
+    data.id = currentNodeStakingInfo.value.id
+    data.name = t(nodeTypeMap[data.node_level]?.nodeNameKey || '')
+    currentNodeStakingInfo.value = data
+    // 返回两个字段 已发放奖励  总奖励  计算百分比
+    currentNodeStakingInfo.progressPercent = 0;//百分比
+    // currentNodeStakingInfo.forecast_income 总奖励
+    // currentNodeStakingInfo.xxx 已发放奖励
+}
 
-    // 如果是创世节点（T6），加上创世节点5%收益
-    if (info.node_level === 'T6') {
-        total += Number(info.creation_reward ?? 0)
+// 获取节点质押记录
+const getNodeStakingRecordsList = async () => {
+    const res = (await getNodeStakingRecords({ address: address.value }))?.data?.data?.list || []
+    myNodes.value = res.map(item => {
+        return {
+            id: item.id,
+            nodeName: t(nodeTypeMap[item.type]?.nodeNameKey || ''),
+            nodeTag: nodeTypeMap[item.type]?.nodeTag || '',
+            purchaseTime: formatDateTime(item.created),
+            status: item.status,
+            round: item.round
+        }
+    })
+    if (myNodes.value.length > 0) {
+        currentNodeStakingInfo.value.id = myNodes.value[0].id
+        currentNodeStakingInfo.value.round = myNodes.value[0].round
+        fetchNodeStakingInfo()
+    } else {
+        // 如果没有质押节点，显示确定弹窗提示用户并返回上一个页面
+        showNoNodeModal.value = true
     }
+}
 
-    // 如果是超级节点（T5），加上超级节点收益
-    if (info.node_level === 'T5') {
-        total += Number(info.super_node_reward ?? 0)
-    }
 
-    const target = Number(info.forecast_income ?? 0)
-    if (!target || !Number.isFinite(total) || !Number.isFinite(target)) return 0
-    const ratio = (total / target) * 100
-    return Math.max(0, Math.min(100, Math.round(ratio)))
-})
 
 // 切换节点
 const handleNodeSelect = (id) => {
