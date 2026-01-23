@@ -53,7 +53,7 @@ export async function computedGas(abi, functionName, args, to, account, value = 
 
     // 添加 20% 缓冲来应对波动
     const gasWithBuffer = (gas * BigInt(120)) / BigInt(100)
-
+ console.log(gasWithBuffer)
     return {
       gas: gasWithBuffer,
       maxFeePerGas: feesPerGas.maxFeePerGas,

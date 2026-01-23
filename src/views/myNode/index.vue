@@ -187,8 +187,9 @@ const nodeType = ref(0)
 
 // 领取收益
 const handleClaimReward = async () => {
-    // amount为所有收益之和
+   
     let amount = Number(nodeIncome.value) + Number(networkFeeIncome.value) + Number(subCoinFeeIncome.value) + Number(secondaryMarketIncome.value) + Number(directReferralIncome.value) + Number(teamIncome.value) + Number(subCoinIncome.value);
+   console.log(amount)
     if (amount <= 0) {
         ElMessage.warning(t('myNode.noIncome'))
         return
