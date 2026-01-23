@@ -120,8 +120,10 @@ const { disconnect } = useDisconnect()
 const themeStore = useThemeStore()
 const isDark = computed(() => themeStore.isDark)
 
+// 生成一个随机数
+const randomNumber = ref(Math.floor(Math.random() * 10000))
 // 用户信息
-const username = ref('')
+const username = ref('Choose Me ' + randomNumber.value)
 const walletAddress = computed(() => {
   if (address.value) {
     return `${address.value.slice(0, 6)}....${address.value.slice(-4)}`
@@ -444,7 +446,7 @@ const handleClose = () => {
   router.push('/home')
 }
 
-// 允许访问的路径列表（除了这些路径外，其他都显示"正在开发中"）
+// 允许访问的路径列表（除了这些路径外，其他都显示"待开放"）
 const allowedPaths = [
   '/computing-power-services', // 节点购买
   '/LPVault', // 质押池
@@ -460,7 +462,7 @@ const handleMenuClick = (item) => {
     if (allowedPaths.includes(item.path)) {
       router.push(item.path)
     } else {
-      // 不在允许列表中的路径，显示"正在开发中"提示
+      // 不在允许列表中的路径，显示"待开放"提示
       ElMessage.info(t('userInfo.underDevelopment'))
     }
   }
@@ -478,7 +480,7 @@ const handleDisconnect = async () => {
     router.replace('/')
   } catch (error) {
     console.error('断开连接失败:', error)
-  
+
     // 即使断开失败，也立即返回首页
     router.replace('/')
   }

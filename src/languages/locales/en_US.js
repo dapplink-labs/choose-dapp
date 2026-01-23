@@ -266,7 +266,7 @@ export default {
     "airdrop": "Airdrop",
     "academy": "Academy",
     "nft": "NFT",
-    "underDevelopment": "Under Development"
+    "underDevelopment": "Coming Soon"
   },
   "purchaseNodeRecord": {
     "title": "Purchase History",

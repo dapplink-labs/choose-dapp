@@ -266,7 +266,7 @@ export default {
     "airdrop": "에어드롭",
     "academy": "아카데미",
     "nft": "NFT",
-    "underDevelopment": "개발 중입니다"
+    "underDevelopment": "곧 오픈 예정"
   },
   "purchaseNodeRecord": {
     "title": "구매 내역",
