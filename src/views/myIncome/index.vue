@@ -361,9 +361,10 @@ const fetchNodeStakingInfo = async () => {
     data.name = t(nodeTypeMap[data.node_level]?.nodeNameKey || '')
     currentNodeStakingInfo.value = data
     // 返回两个字段 已发放奖励  总奖励  计算百分比
-    currentNodeStakingInfo.progressPercent = 0;//百分比
+    currentNodeStakingInfo.value.progressPercent = 0;//百分比
     // currentNodeStakingInfo.forecast_income 总奖励
     // currentNodeStakingInfo.xxx 已发放奖励
+    console.log(currentNodeStakingInfo.value)
 }
 
 // 获取节点质押记录
