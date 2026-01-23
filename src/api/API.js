@@ -74,3 +74,16 @@ export const getNodeStakingRewardRecords = (data) => {
 export const getNodeStakingReward = (data) => {
     return request.post('/api/v1/staking/nodeStakingReward', data)
 }
+
+// 保存节点领取记录
+
+
+export const nodeclaimReward =(data)=>{
+    return request.post('/api/v1/node/claimReward', data)
+}
+
+
+//保存质押节点领取记录
+export const stakingclaimReward =(data)=>{
+    return request.post('/api/v1/staking/claimReward', data)
+}

@@ -81,17 +81,13 @@
 
                 <div class="team-header">
                     <span class="invite-count"><span>{{ inviteCountLabel }}</span> {{ inviteCount
-                        }}</span>
+                    }}</span>
                 </div>
 
                 <!-- 层级树状图占位 -->
                 <div class="team-tree-placeholder">
-                    <TeamTree
-                        :type="activeTab === 'direct' ? 1 : 2"
-                        :node_type="2"
-                        :team_network_list="teamNetworkList"
-                        :direct_network_list="directNetworkList"
-                    />
+                    <TeamTree :type="activeTab === 'direct' ? 1 : 2" :node_type="2" :team_network_list="teamNetworkList"
+                        :direct_network_list="directNetworkList" />
                 </div>
 
                 <div class="team-list">
@@ -152,7 +148,7 @@ import TeamTree from "@/components/TeamTree.vue"
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import ActivationMarquee from '@/components/ActivationMarquee.vue'
 import { ArrowRightBold } from '@element-plus/icons-vue'
-import { getNodeServiceProvidersInfo, getMyTeamInfo } from '@/api/API'
+import { getNodeServiceProvidersInfo, getMyTeamInfo, nodeclaimReward } from '@/api/API'
 import { formatDateTime } from '@/utils/format_date.js'
 import { formatChoAmount } from '@/utils/format_amount'
 import avatarImg1 from '@/assets/icon/avatarImg1.png'
@@ -187,9 +183,9 @@ const nodeType = ref(0)
 
 // 领取收益
 const handleClaimReward = async () => {
-   
+
     let amount = Number(nodeIncome.value) + Number(networkFeeIncome.value) + Number(subCoinFeeIncome.value) + Number(secondaryMarketIncome.value) + Number(directReferralIncome.value) + Number(teamIncome.value) + Number(subCoinIncome.value);
-   console.log(amount)
+    console.log(amount)
     if (amount <= 0) {
         ElMessage.warning(t('myNode.noIncome'))
         return
@@ -213,11 +209,11 @@ const handleClaimReward = async () => {
             throw new Error(t('myNode.missingContractAddress'))
         }
 
-        await writeContractOptimized({
+        const result = await writeContractOptimized({
             abi: nodeManagerABI,
             address: bscNet.proxyNodeManager,
             functionName: 'claimReward',
-            args: [BigInt(amount)], 
+            args: [BigInt(amount)],
             userAddress: address.value,
             messages: {
                 success: t('myNode.claimSuccess'),
@@ -226,6 +222,15 @@ const handleClaimReward = async () => {
             },
             showErrorToast: false
         })
+        if (result.success) {
+            await nodeclaimReward({
+                "raw_amount_token": String(amount),
+                "request_tx_hash": result.hash,
+                "user_address": address.value
+            })
+            // 清零操作
+            await init()
+        }
     } catch (error) {
         ElMessage.warning(t('myNode.claimFailed'))
         console.error('领取失败:', error)
@@ -300,8 +305,8 @@ const currentList = computed(() => inviteList.value || [])
 
 // 根据当前tab显示对应的标签文本
 const inviteCountLabel = computed(() => {
-    return activeTab.value === 'direct' 
-        ? t('myNode.directAddressCount') 
+    return activeTab.value === 'direct'
+        ? t('myNode.directAddressCount')
         : t('myNode.teamTotalAddressCount')
 })
 
@@ -319,20 +324,8 @@ const loadingText = computed(() => {
 const goToClaimRecord = () => {
     router.push('/claim-record')
 }
-
-// 初始化主题
-onMounted(() => {
-    themeStore.applyTheme()
-    // CHO收益：total_reward
-    // 子币收益：son_coin_reward
-    // 全网手续费买卖收益：fee_reward
-    // 子币手续费收益：sub_coin_service_reward
-    // 二级市场盈利收益：market_reward
-    // 直推收益：direct_reward
-    // 团队收益：team_reward
-    // 节点收益：node_reward
-    // node_type: 0 = 分布节点, 1 = 集群节点
-    getNodeServiceProvidersInfo({
+async function init() {
+    await getNodeServiceProvidersInfo({
         id: String(route.query.id || ''),
         address: address.value
     }).then(res => {
@@ -350,11 +343,25 @@ onMounted(() => {
     }).catch(err => {
         console.error('获取节点收益详情失败：', err)
     })
-    
+
     // 获取邀请列表
     if (address.value) {
         getMyTeamInfoList()
     }
+}
+// 初始化主题
+onMounted(async () => {
+    themeStore.applyTheme()
+    // CHO收益：total_reward
+    // 子币收益：son_coin_reward
+    // 全网手续费买卖收益：fee_reward
+    // 子币手续费收益：sub_coin_service_reward
+    // 二级市场盈利收益：market_reward
+    // 直推收益：direct_reward
+    // 团队收益：team_reward
+    // 节点收益：node_reward
+    // node_type: 0 = 分布节点, 1 = 集群节点
+    init()
 })
 </script>
 
