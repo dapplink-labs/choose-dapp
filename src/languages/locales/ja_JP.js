@@ -266,7 +266,7 @@ export default {
     "airdrop": "エアドロップ",
     "academy": "アカデミー",
     "nft": "NFT",
-    "underDevelopment": "開発中です"
+    "underDevelopment": "近日公開予定"
   },
   "purchaseNodeRecord": {
     "title": "ノードステーキング記録",

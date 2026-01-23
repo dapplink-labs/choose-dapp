@@ -266,7 +266,7 @@ export default {
     "airdrop": "空投",
     "academy": "学院",
     "nft": "NFT",
-    "underDevelopment": "正在开发中"
+    "underDevelopment": "待开放"
   },
   "purchaseNodeRecord": {
     "title": "节点购买记录",
