@@ -211,7 +211,7 @@ import { useCounterStore } from "@/stores/counter";
 import { storeToRefs } from "pinia";
 const activeIndex = ref("1");
 const isShaking = ref(false)
-import { ElMessage } from 'element-plus'
+import Message from '@/utils/message'
 // 拿到 store
 const counterStore = useCounterStore();
 const { visible, isLogin } = storeToRefs(counterStore);
@@ -554,9 +554,7 @@ async function copyToClipboard(text) {
       // console.log(error)
     } else {
 
-      ElMessage({
-        message: `copy Success! `,
-        type: 'success',
+      Message.success('copy Success!', {
         duration: 2000,
         showClose: true
       })

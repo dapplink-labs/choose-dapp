@@ -51,7 +51,8 @@ import { useI18n } from 'vue-i18n'
 import { useAccount, useChainId } from '@wagmi/vue'
 import { switchChain } from '@wagmi/core'
 import { config } from '@/wagmi'
-import { ElMessage, ElLoading } from 'element-plus'
+import { ElLoading } from 'element-plus'
+import Message from '@/utils/message'
 import { getNodeStakingRecords, stakingclaimReward } from '@/api/API'
 import { formatDateTime } from '@/utils/format_date.js'
 import { writeContractOptimized } from '@/utils/requestWEB3.js'
@@ -226,11 +227,11 @@ onUnmounted(() => {
 // 验证选择的有效性
 const validateSelection = (selectedOption) => {
     if (!address.value) {
-        ElMessage.error(t('myNode.connectWalletFirst') || '请先连接钱包')
+        Message.error(t('myNode.connectWalletFirst') || '请先连接钱包')
         return false
     }
     if (!selectedOption || !selectedOption.orderIds || (selectedOption.type !== 'all' && !selectedOption.orderIds.trim())) {
-        ElMessage.error('没有可领取的收益')
+        Message.error('没有可领取的收益')
         return false
     }
     return true
@@ -291,7 +292,7 @@ const handleError = (error) => {
     console.error('领取收益失败:', error)
     const isUserCancelled = error.message?.includes('用户取消') || error.message?.includes('User rejected')
     if (!isUserCancelled) {
-        ElMessage.error(error.message || CONTRACT_MESSAGES.failed())
+        Message.error(error.message || CONTRACT_MESSAGES.failed())
     }
 }
 
@@ -301,11 +302,11 @@ const handleConfirm = async () => {
     const selectedOption = options.value[selectedIndex.value]
 
     if (selectedOption.round === -1) {
-        ElMessage.warning(t('myNode.nodeActivatingTryLater'))
+        Message.warning(t('myNode.nodeActivatingTryLater'))
         return
     }
     if (selectedOption.amount <= 0) {
-        ElMessage.warning(t('myNode.noIncome'))
+        Message.warning(t('myNode.noIncome'))
         return
     }
     if (!validateSelection(selectedOption)) return
@@ -321,7 +322,7 @@ const handleConfirm = async () => {
         const txHash = await callClaimRewardContract(selectedOption.amount || 0, loading)
         await submitRewardData(txHash, selectedOption, loading)
 
-        ElMessage.success(CONTRACT_MESSAGES.success())
+        Message.success(CONTRACT_MESSAGES.success())
         handleClose()
         emit('ReceiveSuccess')
     } catch (error) {

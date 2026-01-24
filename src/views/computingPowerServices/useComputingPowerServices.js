@@ -8,7 +8,8 @@ import clusterNodeImg from '@/assets/icon/11.png'
 import { useThemeStore } from '@/stores/theme'
 import { useAccount, useChainId } from '@wagmi/vue'
 import { readContract, switchChain } from '@wagmi/core'
-import { ElMessage, ElLoading } from 'element-plus'
+import { ElLoading } from 'element-plus'
+import Message from '@/utils/message'
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
 import networks from '@/assets/json/networks.json'
 import { checkAllowance, approveToken, writeContractOptimized, safeBigInt, getUserTokenBalance } from '@/utils/requestWEB3.js'
@@ -53,7 +54,7 @@ export function useComputingPowerServices() {
 
     if (!activeNode) {
       // 如果没有已激活的节点，则不跳转并提示
-      ElMessage.warning(t('common.noData'))
+      Message.warning(t('common.noData'))
       return
     }
 
@@ -109,7 +110,7 @@ export function useComputingPowerServices() {
   // 确认购买节点
   const handleConfirmBuy = async () => {
     if (!address.value) {
-      ElMessage.error(t('computingPower.connectWalletFirst'))
+      Message.error(t('computingPower.connectWalletFirst'))
       return
     }
 
@@ -134,7 +135,7 @@ export function useComputingPowerServices() {
         args: [address.value]
       })
       if (inviter == '0x0000000000000000000000000000000000000000') {
-        ElMessage.warning(t('请先绑定邀请码'))
+        Message.warning(t('请先绑定邀请码'))
         eventBus.emit('showInvite', true)
         return
       }
@@ -149,9 +150,7 @@ export function useComputingPowerServices() {
       console.log('amountBigInt', amountBigInt)
       if (userBalance < amountBigInt) {
         // 如果余额不足，直接报错并停止执行
-        ElMessage({
-          message: t('computingPower.insufficientBalance'),
-          type: 'error',
+        Message.error(t('computingPower.insufficientBalance'), {
           duration: 5000,
           showClose: true
         })
@@ -208,7 +207,7 @@ export function useComputingPowerServices() {
     } catch (error) {
       // 可选：根据错误类型提示
       if (error?.code === 'ACTION_REJECTED' || error?.message?.includes('user rejected')) {
-        ElMessage.info(t('computingPower.paymentCancelled'))
+        Message.info(t('computingPower.paymentCancelled'))
       }
     } finally {
       if (loading) {
@@ -261,7 +260,7 @@ export function useComputingPowerServices() {
         }
       })
     } catch (err) {
-      ElMessage.error(t('computingPower.fetchNodeDataFailed'))
+      Message.error(t('computingPower.fetchNodeDataFailed'))
       nodeProducts.value = []
     } finally {
       isFetchingNodeProducts.value = false

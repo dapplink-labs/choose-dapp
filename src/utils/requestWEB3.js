@@ -1,5 +1,5 @@
 import { parseGwei, encodeFunctionData } from 'viem'
-import { ElMessage } from 'element-plus'
+import Message from './message'
 import { readContract, estimateFeesPerGas, estimateGas, writeContract, waitForTransactionReceipt } from '@wagmi/core'
 import { config } from '../wagmi.ts'
 import erc20ABI from "@/assets/abi/erc20ABI.json"
@@ -123,7 +123,7 @@ export async function approveToken({
     const receipt = await waitForTransactionReceipt(config, { hash })
     if (receipt.status === 'reverted') throw new Error('Approve failed.')
 
-    ElMessage.success(BRIDGE_MESSAGES.approvalSuccess)
+    Message.success(BRIDGE_MESSAGES.approvalSuccess)
     return hash
   } catch (error) {
     if (isUserRejectedError(error)) throw new Error(BRIDGE_MESSAGES.userCancelledAuth)
@@ -184,7 +184,7 @@ export async function writeContractOptimized({
     const receipt = await waitForTransactionReceipt(config, { hash })
 
     if (receipt.status === 'success') {
-      ElMessage.success(messages.success)
+      Message.success(messages.success)
       return { success: true, hash, receipt }
     } else {
       throw new Error(messages.failed)
@@ -192,9 +192,9 @@ export async function writeContractOptimized({
   } catch (error) {
     if (showErrorToast) {
       if (isUserRejectedError(error)) {
-        ElMessage.warning(messages.rejected)
+        Message.warning(messages.rejected)
       } else {
-        ElMessage.error(error.message || messages.failed)
+        Message.error(error.message || messages.failed)
       }
     }
     throw error

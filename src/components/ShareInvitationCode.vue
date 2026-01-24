@@ -33,7 +33,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage } from 'element-plus'
+import Message from '@/utils/message'
 import { useThemeStore } from '@/stores/theme'
 import { useAccount } from '@wagmi/vue'
 
@@ -97,20 +97,20 @@ const copyToClipboard = async (text) => {
 const handleShare = async () => {
     const code = displayInvitationCode.value
     if (!code) {
-        ElMessage.error(t('lpVault.connectWalletFirst') || '请先连接钱包')
+        Message.error(t('lpVault.connectWalletFirst') || '请先连接钱包')
         return
     }
 
     // 构建分享链接地址：当前网站地址?inviteCode=当前用户地址
-    const shareUrl = `${window.location.origin}?inviteCode=${code}`
+    const shareUrl = `${window.location.origin}/#/?inviteCode=${code}`
 
     const ok = await copyToClipboard(shareUrl)
     if (ok) {
-        ElMessage.success(t('invite.invitationCodeCopied'))
+        Message.success(t('invite.invitationCodeCopied'))
         // 复制成功后关闭弹窗
         handleClose()
     } else {
-        ElMessage.error(t('invite.copyFailed') || '复制失败，请手动复制链接')
+        Message.error(t('invite.copyFailed') || '复制失败，请手动复制链接')
     }
 }
 </script>

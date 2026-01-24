@@ -41,7 +41,8 @@ import { useConnect, useChainId, useAccount, useDisconnect } from '@wagmi/vue'
 import { injected } from '@wagmi/vue/connectors'
 import { useThemeStore } from '../../stores/theme'
 import { useCounterStore } from '@/stores/counter'
-import { ElMessage, ElLoading } from 'element-plus'
+import { ElLoading } from 'element-plus'
+import Message from '@/utils/message'
 import { register } from '@/api/API'
 import { eventBus } from '@/utils/eventBus'
 import { readContract } from '@wagmi/core'
@@ -122,7 +123,7 @@ const checkUserStatus = async () => {
 
   } catch (error) {
     console.error('Check user status failed:', error)
-    ElMessage.error(t('linkWallet.userVerificationFailed'))
+    Message.error(t('linkWallet.userVerificationFailed'))
   }
 }
 
@@ -152,7 +153,7 @@ async function wallconnects(id, chainId) {
     } catch (err) {
       if (err instanceof UserRejectedRequestError) {
         // ✅ 用户主动拒绝，不提示错误
-        ElMessage.error(t('linkWallet.userCancelled'))
+        Message.error(t('linkWallet.userCancelled'))
       }
 
       // ElMessage.error(err)

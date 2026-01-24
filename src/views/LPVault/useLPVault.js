@@ -5,7 +5,8 @@ import clusterNodeImg from '@/assets/icon/ClusterNode.png'
 import DistributedNode from '@/assets/icon/DistributedNode.png'
 import stakingManagerABI from '@/assets/abi/stakingManagerABI.json'
 import { switchChain, readContract } from '@wagmi/core'
-import { ElMessage, ElLoading } from 'element-plus'
+import { ElLoading } from 'element-plus'
+import Message from '@/utils/message'
 import { writeContractOptimized } from '@/utils/requestWEB3.js'
 import networks from '@/assets/json/networks.json'
 import { config } from '../../wagmi.ts'
@@ -95,7 +96,7 @@ export const useLPVault = () => {
   // 激活节点
   const handleActivate = async (type) => {
     if (!address.value) {
-      ElMessage.error(t('lpVault.connectWalletFirst'))
+      Message.error(t('lpVault.connectWalletFirst'))
       return
     }
 
@@ -126,7 +127,7 @@ export const useLPVault = () => {
         args: [address.value]
       })
       if (inviter == '0x0000000000000000000000000000000000000000') {
-        ElMessage.warning(t('lpVault.bindInviteCodeFirst'))
+        Message.warning(t('lpVault.bindInviteCodeFirst'))
         eventBus.emit('showInvite', true)
         loading.close()
         return
@@ -135,13 +136,13 @@ export const useLPVault = () => {
       // 从接口数据中获取对应节点的价格
       const nodeItem = nodeListData.value.find(item => item.type === type)
       if (!nodeItem) {
-        ElMessage.error(t('lpVault.nodeTypeNotFound'))
+        Message.error(t('lpVault.nodeTypeNotFound'))
         return
       }
 
       const price = parseFloat(nodeItem.price) || 0
       if (price <= 0) {
-        ElMessage.error(t('lpVault.invalidPrice'))
+        Message.error(t('lpVault.invalidPrice'))
         return
       }
 
@@ -150,7 +151,7 @@ export const useLPVault = () => {
       // 余额查询START
       const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value, 'balanceOf')
       if (userBalance < amountBigInt) {
-        ElMessage.error(t('lpVault.insufficientBalance'))
+        Message.error(t('lpVault.insufficientBalance'))
         return
       }
       // 余额查询END

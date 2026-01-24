@@ -1,5 +1,5 @@
 import { parseGwei, parseUnits, encodeFunctionData } from 'viem'
-import { ElMessage } from 'element-plus'
+import Message from '@/utils/message'
 import { readContract, estimateFeesPerGas, estimateGas, writeContract, waitForTransactionReceipt } from '@wagmi/core'
 import { config } from '../../wagmi.ts'
 import erc20ABI from "@/assets/abi/erc20ABI"
@@ -178,9 +178,7 @@ export async function approveToken({
     }
     
     // 显示成功消息
-    ElMessage({
-      message: BRIDGE_MESSAGES.approvalSuccess,// 使用国际化消息
-      type: 'success',
+    Message.success(BRIDGE_MESSAGES.approvalSuccess, {
       duration: 3000,
       showClose: true
     })
@@ -266,10 +264,8 @@ export async function bridgeEthOptimized({
     })
     
     if (receipt.status === 'success') {
-      ElMessage({
-        message: BRIDGE_MESSAGES.bridgeSuccess,
-        type: 'success',
-        duration: 3000,
+    Message.success(BRIDGE_MESSAGES.bridgeSuccess, {
+      duration: 3000,
         showClose: true
       })
       
@@ -288,18 +284,14 @@ export async function bridgeEthOptimized({
     
     // 处理用户拒绝错误
     if (isUserRejectedError(error)) {
-      ElMessage({
-        message: BRIDGE_MESSAGES.userRejected,
-        type: 'warning',
-        duration: 2000,
+    Message.warning(BRIDGE_MESSAGES.userRejected, {
+      duration: 2000,
         showClose: true
       })
       throw new Error(BRIDGE_MESSAGES.userRejected)
     }
     
-    ElMessage({
-      message: BRIDGE_MESSAGES.bridgeFailed,
-      type: 'error',
+    Message.error(BRIDGE_MESSAGES.bridgeFailed, {
       duration: 2000,
       showClose: true
     })
@@ -418,10 +410,8 @@ export async function bridgeErc20Optimized({
     })
     
     if (receipt.status === 'success') {
-      ElMessage({
-        message: BRIDGE_MESSAGES.bridgeSuccess,
-        type: 'success',
-        duration: 3000,
+    Message.success(BRIDGE_MESSAGES.bridgeSuccess, {
+      duration: 3000,
         showClose: true
       })
       
@@ -439,18 +429,14 @@ export async function bridgeErc20Optimized({
     console.error('❌ ERC20 bridge error:', error)
     
     if (isUserRejectedError(error)) {
-      ElMessage({
-        message: BRIDGE_MESSAGES.userRejected,
-        type: 'warning',
-        duration: 2000,
+    Message.warning(BRIDGE_MESSAGES.userRejected, {
+      duration: 2000,
         showClose: true
       })
       throw new Error(BRIDGE_MESSAGES.userRejected)
     }
     
-    ElMessage({
-      message: BRIDGE_MESSAGES.bridgeFailed,
-      type: 'error',
+    Message.error(BRIDGE_MESSAGES.bridgeFailed, {
       duration: 2000,
       showClose: true
     })

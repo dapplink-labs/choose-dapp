@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import i18n from '@/languages'
 
 export function formatMonthDay(date) {
   return dayjs(date).format("MM月DD日")
@@ -9,47 +10,41 @@ export function getDiffDays(startDate, endDate) {
 }
 
 /**
- * 格式化日期时间（按用户设备的本地时区/本地语言显示）
- *
- * - 默认：使用浏览器的 locale + 本地时区（适配全球用户）
- * - 可选：传入 locale/timeZone 覆盖默认行为（例如后端要求统一某个时区展示）
+ * 将应用的 locale（如 'zh-cn'）转换为标准格式（如 'zh-CN'）
  */
-export function formatDateTime(
-  timestamp,
-  options = {}
-) {
+function normalizeLocale(locale) {
+  if (!locale) return undefined
+  const localeMap = {
+    'zh-cn': 'zh-CN',
+    'en-us': 'en-US',
+    'ko-kr': 'ko-KR',
+    'ja-jp': 'ja-JP'
+  }
+  return localeMap[locale.toLowerCase()] || locale
+}
+
+/**
+ * 格式化日期时间（按应用当前语言显示）
+ * 
+ * @param {number|string|bigint} timestamp - UTC 时间戳（秒或毫秒）
+ * @param {string} locale - 可选，指定语言，默认使用应用当前 i18n locale
+ * @returns {string} 格式化后的本地时间字符串
+ */
+export function formatDateTime(timestamp, locale) {
   if (!timestamp || timestamp === 0) {
     return '-'
   }
-  // 判断是秒级还是毫秒级时间戳
+  
+  // 如果是秒级时间戳，需要 *1000 转成毫秒
   const ts = timestamp < 10000000000 ? timestamp * 1000 : timestamp
-
-  // 兼容传入 string/bigint 等情况
+  
+  // 创建 Date 对象
   const date = new Date(Number(ts))
   if (Number.isNaN(date.getTime())) {
     return '-'
   }
-
-  const {
-    locale,
-    timeZone,
-    // 默认显示：日期 + 时间（24小时制会由不同地区自动选择/可覆盖）
-    year = 'numeric',
-    month = '2-digit',
-    day = '2-digit',
-    hour = '2-digit',
-    minute = '2-digit',
-    hour12
-  } = options || {}
-
-  // Intl 会自动按用户所在地区格式化（例如 en-US: 01/20/2026, 8:59 AM；zh-CN: 2026/01/20 20:59）
-  return new Intl.DateTimeFormat(locale || undefined, {
-    timeZone: timeZone || undefined,
-    year,
-    month,
-    day,
-    hour,
-    minute,
-    ...(hour12 === undefined ? {} : { hour12 })
-  }).format(date)
+  
+  // 转成本地字符串，使用应用当前语言
+  const finalLocale = locale || normalizeLocale(i18n.global.locale.value)
+  return date.toLocaleString(finalLocale)
 }
