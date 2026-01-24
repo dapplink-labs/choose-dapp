@@ -464,6 +464,9 @@ export default {
   "myNode": {
     "distributedNode": "分散ノード",
     "clusterNode": "クラスターノード",
+    "tips": "収益計算方法",
+"tipsWarns": "ステーキング報酬は毎日02:00〜03:00の間に更新されます！",
+
     "nodeTypes": {
       "distributed": "分散ノード",
       "cluster": "クラスターノード"

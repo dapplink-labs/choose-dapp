@@ -464,6 +464,8 @@ export default {
   "myNode": {
     "distributedNode": "Distributed Node",
     "clusterNode": "Cluster Node",
+    "tips": "Earnings Calculation Method",
+"tipsWarns": "Staking rewards will be updated daily between 02:00-03:00!",
     "nodeTypes": {
       "distributed": "Distributed Node",
       "cluster": "Cluster Node"

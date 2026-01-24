@@ -464,6 +464,8 @@ export default {
   "myNode": {
     "distributedNode": "分布节点",
     "clusterNode": "集群节点",
+    "tips":"收益计算方式",
+    "tipsWarns":"质押收益将在每天02:00-03:00更新!",
     "nodeTypes": {
       "distributed": "分布节点",
       "cluster": "集群节点"

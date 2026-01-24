@@ -67,10 +67,10 @@
                 <div class="progress-bar-container">
                     <div class="progress-bar">
                         <div class="progress-fill"
-                            :style="{ width: (currentNodeStakingInfo.progressPercent < 4) ? 0 + '%' : currentNodeStakingInfo.progressPercent + '%' }">
+                            :style="{ width: (currentNodeStakingInfo.progressPercent < 4) ? 4 + '%' : currentNodeStakingInfo.progressPercent + '%' }">
                         </div>
                         <div class="progress-indicator"
-                            :style="{ left: (currentNodeStakingInfo.progressPercent < 4) ? 0 + '%' : currentNodeStakingInfo.progressPercent + '%' }">
+                            :style="{ left: (currentNodeStakingInfo.progressPercent < 4) ? 4 + '%' : currentNodeStakingInfo.progressPercent + '%' }">
                             <span class="indicator-text">{{ currentNodeStakingInfo.progressPercent }}%</span>
                         </div>
                     </div>
@@ -354,7 +354,9 @@ const nodeTypeMap = {
 // 创世节点5%收益 = creation_reward
 // 超级节点收益 = super_node_reward
 const fetchNodeStakingInfo = async () => {
+    
     if (!currentNodeStakingInfo.value.id) return
+    
     const res = await getNodeStakingInfo({ address: address.value, id: currentNodeStakingInfo.value.id, round: currentNodeStakingInfo.value.round })
     const data = res?.data?.data?.staking_info || {}
     data.id = currentNodeStakingInfo.value.id
@@ -626,6 +628,7 @@ watch(activeTab, () => {
             .progress-indicator {
                 position: absolute;
                 top: 50%;
+                left:4%;
                 transform: translate(-50%, -50%);
                 height: 18px;
                 padding: 0 5px;

@@ -24,7 +24,11 @@
             <ActivationMarquee :type="3" />
 
             <div class="pending-income-header">
-                <h3 class="pending-title">{{ $t('myNode.pendingIncome') }}</h3>
+                <h3 class="pending-title">
+                    <span>{{ $t('myNode.pendingIncome') }}</span>
+
+                    <el-icon size="16" style="margin-top: 5px;" @click="showInfo"  :color="'var(--text-color)'"><QuestionFilled /></el-icon>
+                </h3>
                 <button class="record-link" type="button" @click="goToClaimRecord">
                     <span class="record-text">{{ $t('myNode.claimRecord') }}</span>
                     <el-icon class="record-arrow">
@@ -127,7 +131,7 @@
             </div>
 
         </div>
-
+        <detailsinfo  ref="detailsRef" />
     </div>
 </template>
 
@@ -145,6 +149,7 @@ import networks from '@/assets/json/networks.json'
 import { writeContractOptimized, computedGas } from '@/utils/requestWEB3.js'
 import avatarImg from '@/assets/icon/avatar.png'
 import TeamTree from "@/components/TeamTree.vue"
+import detailsinfo from "./detailsinfo.vue"
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import ActivationMarquee from '@/components/ActivationMarquee.vue'
 import { ArrowRightBold } from '@element-plus/icons-vue'
@@ -157,7 +162,7 @@ import avatarImg3 from '@/assets/icon/avatarImg3.png'
 import avatarImg4 from '@/assets/icon/avatarImg4.png'
 import avatarImg5 from '@/assets/icon/avatarImg5.png'
 
-
+const detailsRef = ref(null)
 
 const themeStore = useThemeStore()
 const router = useRouter()
@@ -180,6 +185,11 @@ const secondaryMarketIncome = ref(0)
 const directReferralIncome = ref(0)
 const teamIncome = ref(0)
 const nodeType = ref(0)
+
+
+function  showInfo(){
+    detailsRef.value?.refresh()
+}
 
 // 领取收益
 const handleClaimReward = async () => {
@@ -516,6 +526,9 @@ onMounted(async () => {
                 font-family: PingFang SC, PingFang SC;
                 font-weight: 600;
                 font-size: 20px;
+                display: flex;
+                align-items: center;
+                gap:5px;
                 color: var(--text-color, #1a1a1a);
                 transition: color 0.3s ease;
             }

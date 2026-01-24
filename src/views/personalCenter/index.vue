@@ -449,7 +449,7 @@ const handleClose = () => {
 // 允许访问的路径列表（除了这些路径外，其他都显示"待开放"）
 const allowedPaths = [
   '/computing-power-services', // 节点购买
-  '/LPVault', // 质押池
+  
   // '/dashboard', // 链上数据
   // '/asset-management' // 链上资产
 ]

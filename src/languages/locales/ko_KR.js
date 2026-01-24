@@ -464,6 +464,9 @@ export default {
   "myNode": {
     "distributedNode": "분산 노드",
     "clusterNode": "클러스터 노드",
+    "tips": "수익 계산 방식",
+"tipsWarns": "스테이킹 보상은 매일 02:00~03:00 사이에 업데이트됩니다!",
+
     "nodeTypes": {
       "distributed": "분산 노드",
       "cluster": "클러스터 노드"
