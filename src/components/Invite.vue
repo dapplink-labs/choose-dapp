@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAccount, useChainId } from '@wagmi/vue'
 import Message from '@/utils/message'
@@ -59,6 +59,38 @@ const visible = computed(() => showInvite.value)
 
 const localCode = ref('')
 
+// 保存原始样式值
+let originalBodyOverflow = ''
+let originalBodyPosition = ''
+let originalBodyTop = ''
+let scrollTop = 0
+
+// 阻止触摸滚动的事件处理函数
+const preventTouchMove = (e) => {
+  // 如果触摸事件发生在弹窗卡片内部，检查是否需要滚动
+  const target = e.target
+  const card = target.closest('.invite-card')
+  if (card) {
+    // 检查是否在输入框内（输入框可能需要滚动来查看内容）
+    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+      return
+    }
+    // 检查卡片是否可滚动且触摸点在卡片边缘
+    const isScrollable = card.scrollHeight > card.clientHeight
+    const touch = e.touches?.[0] || e.changedTouches?.[0]
+    if (isScrollable && touch) {
+      const cardRect = card.getBoundingClientRect()
+      const touchY = touch.clientY
+      // 如果触摸点在卡片内部，允许滚动
+      if (touchY >= cardRect.top && touchY <= cardRect.bottom) {
+        return
+      }
+    }
+  }
+  // 阻止其他所有触摸滚动
+  e.preventDefault()
+}
+
 watch(
   () => props.modelValue,
   (val) => {
@@ -71,6 +103,43 @@ watch(
 watch(visible, (newVal) => {
   if (newVal) {
     localCode.value = inviteCode.value || ''
+    // 禁止页面滚动 - 移动端兼容处理
+    scrollTop = window.pageYOffset || document.documentElement.scrollTop
+    originalBodyOverflow = document.body.style.overflow
+    originalBodyPosition = document.body.style.position
+    originalBodyTop = document.body.style.top
+    
+    document.body.style.overflow = 'hidden'
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollTop}px`
+    document.body.style.width = '100%'
+    
+    // 阻止触摸滚动
+    document.addEventListener('touchmove', preventTouchMove, { passive: false })
+  } else {
+    // 恢复页面滚动
+    document.body.style.overflow = originalBodyOverflow
+    document.body.style.position = originalBodyPosition
+    document.body.style.top = originalBodyTop
+    document.body.style.width = ''
+    
+    // 恢复滚动位置
+    window.scrollTo(0, scrollTop)
+    
+    // 移除触摸事件监听
+    document.removeEventListener('touchmove', preventTouchMove)
+  }
+})
+
+// 组件卸载时确保恢复页面滚动
+onUnmounted(() => {
+  document.body.style.overflow = originalBodyOverflow || ''
+  document.body.style.position = originalBodyPosition || ''
+  document.body.style.top = originalBodyTop || ''
+  document.body.style.width = ''
+  document.removeEventListener('touchmove', preventTouchMove)
+  if (scrollTop) {
+    window.scrollTo(0, scrollTop)
   }
 })
 
@@ -157,6 +226,7 @@ const handleConfirm = async () => {
   justify-content: center;
   background-color: var(--invite-overlay-bg);
   backdrop-filter: blur(6px);
+  overflow: hidden;
 }
 
 .invite-card {
