@@ -26,7 +26,7 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAccount, useChainId } from '@wagmi/vue'
-import { ElMessage } from 'element-plus'
+import Message from '@/utils/message'
 import { switchChain, readContract } from '@wagmi/core'
 import { bindInviteCode } from '@/api/API'
 import { useCounterStore } from '@/stores/counter'
@@ -82,11 +82,11 @@ const handleClose = () => {
 const handleConfirm = async () => {
   if (loading.value) return
   if (!address.value) {
-    ElMessage.error(t('computingPower.connectWalletFirst') || '请先连接钱包')
+    Message.error(t('computingPower.connectWalletFirst') || '请先连接钱包')
     return
   }
   if (!localCode.value) {
-    ElMessage.error(t('invite.codeRequired') || '邀请码不能为空')
+    Message.error(t('invite.codeRequired') || '邀请码不能为空')
     return
   }
 
@@ -96,7 +96,7 @@ const handleConfirm = async () => {
     console.log('localCode.value', localCode.value)
 
     if (!localCode.value || !localCode.value.startsWith('0x') || localCode.value.length !== 42) {
-      ElMessage.error(t('invite.invalidAddress') || '无效的邀请码地址格式')
+      Message.error(t('invite.invalidAddress') || '无效的邀请码地址格式')
       loading.value = false
       return
     }
@@ -108,7 +108,7 @@ const handleConfirm = async () => {
 
     const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
     if (!bscNet?.proxyNodeManager) {
-      ElMessage.error(t('invite.missingContract') || '未找到 nodeManager 合约地址')
+      Message.error(t('invite.missingContract') || '未找到 nodeManager 合约地址')
       return
     }
     // 读取合约中邀请人是否存在
@@ -119,7 +119,7 @@ const handleConfirm = async () => {
       args: [localCode.value]
     })
     if (inviter == '0x0000000000000000000000000000000000000000') {
-      ElMessage.error(t('invite.inviterExists') || '邀请人不存在')
+      Message.error(t('invite.inviterExists') || '邀请人不存在')
       loading.value = false
       return
     }
@@ -138,10 +138,10 @@ const handleConfirm = async () => {
       showErrorToast: true
     })
 
-    ElMessage.success(t('invite.bindSuccess') || '绑定邀请码成功')
+    Message.success(t('invite.bindSuccess') || '绑定邀请码成功')
     handleClose()
   } catch (error) {
-    ElMessage.error(t('invite.bindFailed') || '绑定邀请码失败')
+    Message.error(t('invite.bindFailed') || '绑定邀请码失败')
   }
   loading.value = false
 }

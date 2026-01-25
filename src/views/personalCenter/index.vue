@@ -98,7 +98,7 @@ import { useRouter } from 'vue-router'
 import { useAccount, useDisconnect } from '@wagmi/vue'
 import { useThemeStore } from '@/stores/theme'
 import { useI18n } from 'vue-i18n'
-import { ElMessage } from 'element-plus'
+import Message from '@/utils/message'
 import ShareInvitationCode from '@/components/ShareInvitationCode.vue'
 
 const { locale, t } = useI18n()
@@ -147,7 +147,7 @@ const copyWalletAddress = async () => {
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
     await navigator.clipboard.writeText(fullAddress)
-    ElMessage.success(t('userInfo.walletAddressCopied'))
+    Message.success(t('userInfo.walletAddressCopied'))
   }
 }
 
@@ -463,7 +463,7 @@ const handleMenuClick = (item) => {
       router.push(item.path)
     } else {
       // 不在允许列表中的路径，显示"待开放"提示
-      ElMessage.info(t('userInfo.underDevelopment'))
+      Message.info(t('userInfo.underDevelopment'))
     }
   }
 }

@@ -218,7 +218,6 @@ import { getNodeStakingInfo, getNodeStakingRecords, getMyTeamInfo, stakingclaimR
 import { useAccount } from '@wagmi/vue'
 import { ArrowRightBold } from '@element-plus/icons-vue'
 import { formatDateTime } from '@/utils/format_date.js'
-import { ElMessage } from 'element-plus'
 import { formatChoAmount, formatTokenAmount } from '@/utils/format_amount'
 
 

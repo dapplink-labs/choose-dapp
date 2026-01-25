@@ -140,7 +140,7 @@ import { ref, onMounted, computed, watch } from "vue"
 import { useRoute, useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
 import { useI18n } from 'vue-i18n'
-import { ElMessage } from 'element-plus'
+import Message from '@/utils/message'
 import { useAccount, useChainId } from '@wagmi/vue'
 import { switchChain } from '@wagmi/core'
 import { config } from '../../wagmi.ts'
@@ -197,13 +197,13 @@ const handleClaimReward = async () => {
     let amount = Number(nodeIncome.value) + Number(networkFeeIncome.value) + Number(subCoinFeeIncome.value) + Number(secondaryMarketIncome.value) + Number(directReferralIncome.value) + Number(teamIncome.value) + Number(subCoinIncome.value);
     console.log(amount)
     if (amount <= 0) {
-        ElMessage.warning(t('myNode.noIncome'))
+        Message.warning(t('myNode.noIncome'))
         return
     }
     // claimReward处理重复领取收益
     if (claimLoading.value) return
     if (!address.value) {
-        ElMessage.error(t('myNode.connectWalletFirst'))
+        Message.error(t('myNode.connectWalletFirst'))
         return
     }
     claimLoading.value = true
@@ -242,7 +242,7 @@ const handleClaimReward = async () => {
             await init()
         }
     } catch (error) {
-        ElMessage.warning(t('myNode.claimFailed'))
+        Message.warning(t('myNode.claimFailed'))
         console.error('领取失败:', error)
     } finally {
         claimLoading.value = false

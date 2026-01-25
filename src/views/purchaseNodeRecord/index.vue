@@ -171,7 +171,7 @@ onMounted(() => {
 
             .col {
                 &.col-type {
-                    flex: 1.4;
+                    flex: 1.2;
                 }
 
                 &.col-price {
@@ -180,7 +180,7 @@ onMounted(() => {
                 }
 
                 &.col-time {
-                    flex: 1.4;
+                    flex: 2;
                     text-align: right;
                 }
             }
@@ -195,7 +195,7 @@ onMounted(() => {
                 font-size: 14px;
 
                 .col-type {
-                    flex: 1.4;
+                    flex: 1.2;
                     display: flex;
                     align-items: center;
                     gap: 6px;
@@ -230,7 +230,7 @@ onMounted(() => {
                 }
 
                 .col-time {
-                    flex: 1.4;
+                    flex: 2;
                     text-align: right;
 
                     .record-time {
@@ -239,6 +239,7 @@ onMounted(() => {
                         font-size: 14px;
                         color: var(--text-color, #999999);
                         transition: color 0.3s ease;
+                        white-space: nowrap;
                     }
                 }
             }

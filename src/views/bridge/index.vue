@@ -331,8 +331,7 @@ import BigNumber from 'bignumber.js';
 import networks from "../../assets/json/networks.json"
 import { getbridgeFees } from "@/api/bridgePrice"
 import { getBridgeRecords } from "@/api/records.js"
-// 在 <script setup> 部分的导入区域添加
-import { ElMessage } from 'element-plus'
+import Message from '@/utils/message'
 console.log(networks)
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
@@ -565,9 +564,7 @@ function handleSubmitClick() {
 
     // 1. 验证钱包连接
     if (!address.value) {
-      ElMessage({
-        message: UI_MESSAGES.value.connectWallet,
-        type: 'warning',
+      Message.warning(UI_MESSAGES.value.connectWallet, {
         duration: 2000,
         showClose: true
       })
@@ -576,9 +573,7 @@ function handleSubmitClick() {
 
     // 2. 验证金额
     if (!amount.value || Number(amount.value) <= 0) {
-      ElMessage({
-        message: UI_MESSAGES.value.enterValidAmount,
-        type: 'warning',
+      Message.warning(UI_MESSAGES.value.enterValidAmount, {
         duration: 2000,
         showClose: true
       })
@@ -587,9 +582,7 @@ function handleSubmitClick() {
 
     // 3. 检查最小桥接金额
     if (Number(amount.value) < coinChoose.value.minBridgeAmount) {
-      ElMessage({
-        message: `${UI_MESSAGES.value.minimumAmount} ${coinChoose.value.minBridgeAmount} ${coinChoose.value.name}`,
-        type: 'warning',
+      Message.warning(`${UI_MESSAGES.value.minimumAmount} ${coinChoose.value.minBridgeAmount} ${coinChoose.value.name}`, {
         duration: 2000,
         showClose: true
       })
@@ -598,9 +591,7 @@ function handleSubmitClick() {
 
     // 4. 检查余额
     if (Number(fromBalance.value) < Number(amount.value)) {
-      ElMessage({
-        message: UI_MESSAGES.value.insufficientBalance,
-        type: 'warning',
+      Message.warning(UI_MESSAGES.value.insufficientBalance, {
         duration: 2000,
         showClose: true
       })
@@ -650,9 +641,7 @@ async function Realtimerefresh() {
     console.log(result)
     if (result.status == 0) {
       await sleep(500)
-      ElMessage({
-        message: UI_MESSAGES.value.fundsArrived,
-        type: 'success',
+      Message.success(UI_MESSAGES.value.fundsArrived, {
         duration: 3000,
         showClose: true
       })
@@ -950,9 +939,7 @@ const bridgeMethod = async () => {
       console.log('网络切换验证成功')
     } catch (error) {
       console.error('网络切换失败:', error)
-      ElMessage({
-        message: UI_MESSAGES.value.switchNetwork,
-        type: 'error',
+      Message.error(UI_MESSAGES.value.switchNetwork, {
         duration: 2000,
         showClose: true
       })
