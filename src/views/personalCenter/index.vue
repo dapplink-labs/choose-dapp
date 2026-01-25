@@ -75,8 +75,8 @@
 
     <!-- Social links -->
     <div class="social-links">
-      <a v-for="(link, idx) in friendLinks" :key="idx" href="javascript:void(0)" class="social-link"
-        :aria-label="link.label">
+      <a v-for="(link, idx) in friendLinks" :key="idx"   href="javascript:void(0)"   class="social-link"
+        :aria-label="link.label" @click="go(link)">
         <img :src="link.icon" :alt="link.label" />
       </a>
     </div>
@@ -405,7 +405,9 @@ const baseChooseMeItems = computed(() => [
     path: '/terms'
   }
 ])
-
+function  go(link) {
+  window.open(link.href, '_blank')
+}
 const chooseMeItems = computed(() =>
   baseChooseMeItems.value.map(item => ({
     ...item,
@@ -415,18 +417,21 @@ const chooseMeItems = computed(() =>
 
 // 友链图标（使用 assets/icon 中的图片，随主题切换）
 const baseFriendLinks = [
-  { label: 'Facebook', icon: getIcon('Facebook'), iconDark: getIcon('FacebookDark') },
-  { label: 'Instagram', icon: getIcon('ins'), iconDark: getIcon('insDark') },
-  { label: 'LinkedIn', icon: getIcon('in'), iconDark: getIcon('inDark') },
-  { label: 'TikTok', icon: getIcon('dy'), iconDark: getIcon('dyDark') },
-  { label: 'Twitter', icon: getIcon('Twitter'), iconDark: getIcon('TwitterDark') },
-  { label: 'YouTube', icon: getIcon('YouTube'), iconDark: getIcon('YouTubeDark') }
+  { label: 'Facebook', icon: getIcon('Facebook'), iconDark: getIcon('FacebookDark'),href:"https://x.com/ChooseMe" },
+  { label: 'Telegram', icon: getIcon('tgDark'), iconDark: getIcon('tg'),href:"https://t.me/ChooseMeGlobal" },
+  // { label: 'Instagram', icon: getIcon('ins'), iconDark: getIcon('insDark') ,href:""},
+  // { label: 'LinkedIn', icon: getIcon('in'), iconDark: getIcon('inDark') },
+  // { label: 'TikTok', icon: getIcon('dy'), iconDark: getIcon('dyDark') },
+  // { label: 'Twitter', icon: getIcon('Twitter'), iconDark: getIcon('TwitterDark') },
+  { label: 'YouTube', icon: getIcon('YouTube'), iconDark: getIcon('YouTubeDark') ,href:"https://www.youtube.com/@ChooseMeGlobal"},
+  { label: 'media', icon: getIcon('mediaDark'), iconDark: getIcon('media') ,href:"https://medium.com/@ChooseMeGlobal"}
 ]
 
 const friendLinks = computed(() =>
   baseFriendLinks.map(link => ({
     ...link,
-    icon: isDark.value ? link.iconDark : link.icon
+    icon: isDark.value ? link.iconDark : link.icon ,
+    href:link.href
   }))
 )
 
