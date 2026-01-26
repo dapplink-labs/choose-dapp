@@ -403,7 +403,7 @@ export default {
     "desc": "노드를 구매하여 데이터 노드 수익, 거래 수수료 수익, 서브 토큰 수수료 수익, 2차 시장 수익을 누리고, 더 많은 노드 참여를 유도하여 더 많은 수익을 얻으세요.",
     "learnMore": "자세히 보기",
     "buyNode": "노드 활성화",
-    "myNodes": "내 노드",
+    "myNodes": "노드 수익",
     "tabs": {
       "distributed": "분산 노드",
       "cluster": "클러스터 노드"
@@ -619,7 +619,7 @@ export default {
     "purchaseTime": "Purchase Time"
   },
   "myNodes": {
-    "title": "내 노드"
+    "title": "노드 수익"
   },
   "collectEarnings": {
     "title": "Claim Method",

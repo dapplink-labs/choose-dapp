@@ -403,7 +403,7 @@ export default {
     "desc": "购买节点，享受数据节点收益，交易手续费收益，子币手续费收益，二级市场收益，推动更多的节点加入获取更多收益。",
     "learnMore": "了解更多",
     "buyNode": "激活节点",
-    "myNodes": "我的节点",
+    "myNodes": "节点收益",
     "tabs": {
       "distributed": "分布节点",
       "cluster": "集群节点"
@@ -618,7 +618,7 @@ export default {
     "purchaseTime": "购买时间"
   },
   "myNodes": {
-    "title": "我的节点"
+    "title": "节点收益"
   },
   "collectEarnings": {
     "title": "领取方式",

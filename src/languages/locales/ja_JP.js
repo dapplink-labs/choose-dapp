@@ -403,7 +403,7 @@ export default {
     "desc": "ノードを購入し、データノード収益、取引手数料収益、サブトークン手数料収益、二次市場収益を享受し、より多くのノード参加を促進してさらなる収益を獲得しましょう。詳細を見る",
     "learnMore": "詳細を見る",
     "buyNode": "ノードをアクティベート",
-    "myNodes": "マイノード",
+    "myNodes": "ノード収益",
     "tabs": {
       "distributed": "分散ノード",
       "cluster": "クラスターノード"
@@ -619,7 +619,7 @@ export default {
     "purchaseTime": "Purchase Time"
   },
   "myNodes": {
-    "title": "My Nodes"
+    "title": "ノード収益"
   },
   "collectEarnings": {
     "title": "Claim Method",

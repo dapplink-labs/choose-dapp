@@ -403,7 +403,7 @@ export default {
     "desc": "Purchase nodes, enjoy node revenue, transaction fee revenue, sub-coin fee revenue, and secondary market revenue, and promote more nodes to join and obtain more revenue. Learn more ",
     "learnMore": "Learn more",
     "buyNode": "Acquire Nodes",
-    "myNodes": "My Nodes",
+    "myNodes": "Node Earnings",
     "tabs": {
       "distributed": "Distributed Node",
       "cluster": "Cluster Node"
@@ -618,7 +618,7 @@ export default {
     "purchaseTime": "Purchase Time"
   },
   "myNodes": {
-    "title": "My Nodes"
+    "title": "Node Earnings"
   },
   "collectEarnings": {
     "title": "Claim Method",
