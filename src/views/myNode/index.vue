@@ -87,11 +87,11 @@
 
                 <div class="team-header">
                     <span class="invite-count"><span>{{ $t('myNode.directEffectiveCount') }}</span> {{
-                        directEffectiveCount
-                        }}</span>
+                        effectiveCount
+                    }}</span>
                     <span class="invite-count"><span>{{ $t('myNode.directIneffectiveCount') }}</span> {{
-                        directIneffectiveCount
-                        }}</span>
+                        ineffectiveCount
+                    }}</span>
                 </div>
 
                 <!-- 层级树状图占位 -->
@@ -264,9 +264,9 @@ const teamNetworkList = ref([])
 const directNetworkList = ref([])
 
 // 有效直推数
-const directEffectiveCount = ref(0)
+const effectiveCount = ref(0)
 // 无效直推数
-const directIneffectiveCount = ref(0)
+const ineffectiveCount = ref(0)
 // 邀请列表
 const inviteList = ref([])
 
@@ -303,9 +303,10 @@ const getMyTeamInfoList = async () => {
     // 给 TeamTree 使用的网络列表（接口原始字段）
     teamNetworkList.value = data?.team_network_list || []
     directNetworkList.value = data?.direct_network_list || []
-    // data.direct_effective_count为有效直推数，data.direct_ineffective_count为无效直推数
-    directEffectiveCount.value = data.direct_effective_count || 0
-    directIneffectiveCount.value = data.direct_ineffective_count || 0
+    // data.direct_effective_count为直推有效数，data.direct_ineffective_count为直推无效数
+    // data.team_effective_count为团队有效数，data.team_ineffective_count为团队无效数
+    effectiveCount.value = (activeTab.value === 'direct' ? data.direct_effective_count : data.team_effective_count) ?? 0
+    ineffectiveCount.value = (activeTab.value === 'direct' ? data.direct_ineffective_count : data.team_ineffective_count) ?? 0
     const rawList = activeTab.value === 'direct' ? data.direct_team_list : data.team_list
     // 映射接口数据到模板需要的格式：
     // address(截取), created(时间戳) -> activationTime, total_reward -> reward, parent_address -> 上级地址
