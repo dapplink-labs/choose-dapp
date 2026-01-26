@@ -2,8 +2,9 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
 export const useThemeStore = defineStore('theme', () => {
-  // 从 localStorage 读取主题设置，默认为 light
-  const isDark = ref(localStorage.getItem('theme') === 'dark' || false)
+  // 从 localStorage 读取主题设置，默认为 dark（关灯）
+  const theme = localStorage.getItem('theme')
+  const isDark = ref(theme === null || theme === 'dark')
 
   // 应用主题到 document
   const applyTheme = () => {

@@ -72,6 +72,7 @@ watch(
   () => route.query.inviteCode,
   (inviteCode) => {
     if (inviteCode) {
+      localStorage.setItem('inviteCode', String(inviteCode))
       counterStore.inviteCode = String(inviteCode)
       console.log('App.vue: 从 URL 获取邀请码并保存到 store:', inviteCode)
     }

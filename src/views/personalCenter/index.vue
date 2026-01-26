@@ -417,8 +417,8 @@ const chooseMeItems = computed(() =>
 
 // 友链图标（使用 assets/icon 中的图片，随主题切换）
 const baseFriendLinks = [
-  { label: 'Facebook', icon: getIcon('Facebook'), iconDark: getIcon('FacebookDark'),href:"https://x.com/ChooseMe" },
-  { label: 'Telegram', icon: getIcon('tgDark'), iconDark: getIcon('tg'),href:"https://t.me/ChooseMeGlobal" },
+  { label: 'Twitter', icon: getIcon('Twitter'), iconDark: getIcon('TwitterDark'),href:"https://x.com/chooseme_global?s=21" },
+  { label: 'Telegram', icon: getIcon('tgDark'), iconDark: getIcon('tg'),href:"https://t.me/Choosme_Global" },
   // { label: 'Instagram', icon: getIcon('ins'), iconDark: getIcon('insDark') ,href:""},
   // { label: 'LinkedIn', icon: getIcon('in'), iconDark: getIcon('inDark') },
   // { label: 'TikTok', icon: getIcon('dy'), iconDark: getIcon('dyDark') },

@@ -26,6 +26,7 @@
 import { computed, ref, watch, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAccount, useChainId } from '@wagmi/vue'
+import { useRoute } from 'vue-router'
 import Message from '@/utils/message'
 import { switchChain, readContract } from '@wagmi/core'
 import { bindInviteCode } from '@/api/API'
@@ -39,6 +40,7 @@ import { config } from '@/wagmi.ts'
 const { t } = useI18n()
 const { address } = useAccount()
 const chainId = useChainId()
+const route = useRoute()
 const counterStore = useCounterStore()
 const { showInvite, inviteCode } = storeToRefs(counterStore)
 const BSC_CHAIN_ID = 56
@@ -102,7 +104,23 @@ watch(
 
 watch(visible, (newVal) => {
   if (newVal) {
-    localCode.value = inviteCode.value || ''
+    // 优先使用 store 中的 inviteCode，如果为空则尝试从 URL 参数中获取
+    let code = inviteCode.value || ''
+    if (!code && route.query.inviteCode) {
+      code = String(route.query.inviteCode)
+      // 如果从 URL 获取到邀请码，更新 store
+      if (code) {
+        counterStore.inviteCode = code
+      }
+    }
+    if (!code && localStorage.getItem('inviteCode')) {
+      code = String(localStorage.getItem('inviteCode'))
+      // 如果从 localStorage 获取到邀请码，更新 store
+      if (code) {
+        counterStore.inviteCode = code
+      }
+    }
+    localCode.value = code
     // 禁止页面滚动 - 移动端兼容处理
     scrollTop = window.pageYOffset || document.documentElement.scrollTop
     originalBodyOverflow = document.body.style.overflow
@@ -189,6 +207,13 @@ const handleConfirm = async () => {
     })
     if (inviter == '0x0000000000000000000000000000000000000000') {
       Message.error(t('invite.inviterExists') || '邀请人不存在')
+      loading.value = false
+      return
+    }
+
+    // 确保地址存在且有效
+    if (!address.value || typeof address.value !== 'string') {
+      Message.error(t('computingPower.connectWalletFirst') || '请先连接钱包')
       loading.value = false
       return
     }
