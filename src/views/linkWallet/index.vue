@@ -36,8 +36,8 @@
 import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref, watch, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { reconnect } from '@wagmi/core'
-import { useConnect, useChainId, useAccount, useDisconnect } from '@wagmi/vue'
+import { reconnect, signMessage } from '@wagmi/core'
+import { useConnect, useChainId, useAccount, useDisconnect, } from '@wagmi/vue'
 import { injected } from '@wagmi/vue/connectors'
 import { useThemeStore } from '../../stores/theme'
 import { useCounterStore } from '@/stores/counter'
@@ -67,10 +67,25 @@ const { status, address } = useAccount()
 const { disconnect } = useDisconnect()
 const themeStore = useThemeStore()
 const counterStore = useCounterStore()
-
+const signstr = computed(() => {
+  return `${t('invite.title') + "!"}`
+})
 // 响应式状态
 
 
+// 顶级用户
+const superUser = [
+  '0xC3C7a50501B57CdC5932275F1f63235a7cc08966',
+  '0xC474443D7c0D2cbD941B92018dDFc115ca8F80F8',
+  '0x5102B3702BcAE206ed1cC452fB5D66b818855d88',
+  '0x997A586a05FF4efa20660155459cfe9D929E28c6',
+].map(addr => addr.toLowerCase())
+
+let   isvaildSuperUser=  window.sessionStorage.setItem("isvaildSuperUser",false)
+const isSuperUser = (addr) => {
+  if (!addr) return false
+  return superUser.includes(addr.toLowerCase())
+}
 
 
 // 获取可用的连接器列表
@@ -132,39 +147,50 @@ const checkUserStatus = async () => {
 // }
 
 async function wallconnects(id, chainId) {
-  // 切断重连 
-  const result = await reconnect(config, { connectors: [injected()] })
-
+  await reconnect(config, { connectors: [injected()] })
 
   const connectMetaMask = async () => {
-    const connector = connectors.find(c => c.id === id)
+    const connector = connectors.find(c => c.id === id) || injected()
+
     try {
-      if (connector) {
+      // 1️⃣ 连接钱包
+      await connectAsync({ connector, chainId })
 
+      const addr = address.value
+      if (!addr) return
 
-        await connectAsync({ connector, chainId })
-
-      } else {
-
-        const connector = injected(); // ✅
-        await connectAsync({ connector, chainId })
+      // 2️⃣ 非顶级用户 → 直接进首页 ✅
+      if (!isSuperUser(addr)) {
+        router.push('/home')
+        await checkUserStatus()
+        return
       }
-      router.push("/home")
+
+      // 3️⃣ 顶级用户 → 必须签名
+
+      const signature = await signMessageAsync(config, {
+        message: signstr.value,
+      })
+
+      if (!signature) return
+      let   isvaildSuperUser=  window.sessionStorage.setItem("isvaildSuperUser",true)
+      // 4️⃣ 签名成功 → 进首页 ✅
+      router.push('/home')
+      await checkUserStatus()
+
     } catch (err) {
+      // ❌ 顶级用户拒绝签名 / 用户拒绝连接
       if (err instanceof UserRejectedRequestError) {
-        // ✅ 用户主动拒绝，不提示错误
         Message.error(t('linkWallet.userCancelled'))
+        return
       }
-
-      // ElMessage.error(err)
+      console.error(err)
     }
-
-    checkUserStatus()
-
   }
-  connectMetaMask()
 
+  connectMetaMask()
 }
+
 
 
 onMounted(async () => {

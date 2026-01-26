@@ -135,7 +135,7 @@ export function useComputingPowerServices() {
         args: [address.value]
       })
       if (inviter == '0x0000000000000000000000000000000000000000') {
-        Message.warning(t('请先绑定邀请码'))
+        Message.error(t('invite.codeRequired') )
         eventBus.emit('showInvite', true)
         return
       }

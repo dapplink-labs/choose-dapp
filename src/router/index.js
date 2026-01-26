@@ -185,21 +185,22 @@ function isWalletConnected() {
   return !!localStorage.getItem('address')
 }
 
-// router.beforeEach((to) => {
-//   const connected = isWalletConnected()
-//   console.log(to)
-//   // 未连接钱包
-//   if (!connected) {
-//     // 只允许进入连接钱包页
-//     if (to.name === 'linkWallet') {
-//       return true
-//     }
-//     return '/' || `/?inviteCode=${to?.fullPath}`
-//   }
+
+router.beforeEach((to) => {
+  const connected = isWalletConnected()
+  console.log(to)
+  // 未连接钱包
+  if (!connected) {
+    // 只允许进入连接钱包页
+    if (to.name === 'linkWallet') {
+      return true
+    }
+    return '/' || `/?inviteCode=${to?.fullPath}`
+  }
    
 
 
-//   return true
-// })
+  return true
+})
 
 export default router

@@ -1,6 +1,7 @@
 <template>
   <transition name="fade">
-    <div v-if="visible" class="invite-overlay" @click="handleClose">
+    <!-- <div v-if="visible" class="invite-overlay" @click="handleClose"> -->
+      <div v-if="visible" class="invite-overlay" @click="handleClose">
       <div class="invite-card" @click.stop>
         <div class="card-handle"></div>
 
