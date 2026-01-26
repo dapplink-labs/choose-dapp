@@ -19,7 +19,7 @@ const savedLocale = getSavedLocale()
 
 const i18n = createI18n({
   legacy: false,
-  locale: 'en-us', // 使用保存的语言或默认语言
+  locale: savedLocale, // 使用保存的语言或默认语言
   messages: {
     'zh-cn': zhCN,
     'en-us': enUS,

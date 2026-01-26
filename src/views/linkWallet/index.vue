@@ -81,7 +81,7 @@ const superUser = [
   '0x997A586a05FF4efa20660155459cfe9D929E28c6',
 ].map(addr => addr.toLowerCase())
 
-let   isvaildSuperUser=  window.sessionStorage.setItem("isvaildSuperUser",false)
+let isvaildSuperUser = window.sessionStorage.setItem("isvaildSuperUser", false)
 const isSuperUser = (addr) => {
   if (!addr) return false
   return superUser.includes(addr.toLowerCase())
@@ -173,7 +173,7 @@ async function wallconnects(id, chainId) {
       })
 
       if (!signature) return
-      let   isvaildSuperUser=  window.sessionStorage.setItem("isvaildSuperUser",true)
+      let isvaildSuperUser = window.sessionStorage.setItem("isvaildSuperUser", true)
       // 4️⃣ 签名成功 → 进首页 ✅
       router.push('/home')
       await checkUserStatus()
@@ -196,11 +196,12 @@ async function wallconnects(id, chainId) {
 onMounted(async () => {
   setTimeout(async () => {
     disconnect()
-
+    window.sessionStorage.clear()
+   window.localStorage.removeItem("inviteCode")
     console.log("--------------------------------------------------")
   }, 500)
 
-  // window.sessionStorage.clear()
+ 
 
 })
 </script>
