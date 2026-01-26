@@ -24,7 +24,8 @@
               transform="translate(326.296 68)" fill="currentColor" />
           </g>
         </svg>
-        <span class="action-text">{{type==1? $t('purchaseNodeRecord.title'): $t('purchaseNodeRecord.title2')}}</span>
+        <span class="action-text">{{ type == 1 ? $t('purchaseNodeRecord.title') : $t('purchaseNodeRecord.title2')
+          }}</span>
       </button>
 
       <!-- 分享按钮 -->
@@ -51,14 +52,23 @@ import { defineEmits, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
 import ShareInvitationCode from '@/components/ShareInvitationCode.vue'
-
+import { readContract } from '@wagmi/core'
+import { config } from '@/wagmi.ts'
+import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
+import networks from '@/assets/json/networks.json'
+import Message from '@/utils/message'
+import { useAccount } from '@wagmi/vue'
+import { useI18n } from 'vue-i18n'
+const { t } = useI18n()
+const BSC_CHAIN_ID = 56
+const { address } = useAccount()
 const props = defineProps({
   // 是否显示记录按钮
   showRecordBtn: {
     type: Boolean,
     default: false
   },
-  type:{
+  type: {
     type: Number,
     default: 0
   },
@@ -178,11 +188,22 @@ const handleRecordClick = () => {
   emit('record-click')
   // 如果使用默认行为，则执行跳转
   if (props.useDefaultRecordAction) {
-    router.push(props.recordPath+"?type="+props.type)
-  } 
+    router.push(props.recordPath + "?type=" + props.type)
+  }
 }
 
-const handleOpenClick = () => {
+const handleOpenClick = async () => {
+  // 合约读取是否绑定邀请人
+  const inviter = await readContract(config, {
+    address: networks.find(n => Number(n.chainId) === BSC_CHAIN_ID).proxyNodeManager,
+    abi: nodeManagerABI,
+    functionName: 'inviters',
+    args: [address.value]
+  })
+  if (inviter == '0x0000000000000000000000000000000000000000') {
+    Message.warning(t('userInfo.bindInviterFirst'))
+    return
+  }
   // 打开分享弹窗
   showShareModal.value = true
 }

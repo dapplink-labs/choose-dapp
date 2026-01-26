@@ -100,6 +100,11 @@ import { useThemeStore } from '@/stores/theme'
 import { useI18n } from 'vue-i18n'
 import Message from '@/utils/message'
 import ShareInvitationCode from '@/components/ShareInvitationCode.vue'
+import { readContract } from '@wagmi/core'
+import { config } from '@/wagmi.ts'
+import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
+import networks from '@/assets/json/networks.json'
+const BSC_CHAIN_ID = 56
 
 const { locale, t } = useI18n()
 
@@ -436,7 +441,18 @@ const friendLinks = computed(() =>
 )
 
 // 处理分享点击
-const handleShare = () => {
+const handleShare = async () => {
+  // 合约读取是否绑定邀请人
+  const inviter = await readContract(config, {
+    address: networks.find(n => Number(n.chainId) === BSC_CHAIN_ID).proxyNodeManager,
+    abi: nodeManagerABI,
+    functionName: 'inviters',
+    args: [address.value]
+  })
+  if (inviter == '0x0000000000000000000000000000000000000000') {
+    Message.warning(t('userInfo.bindInviterFirst'))
+    return
+  }
   // 打开分享邀请码弹窗
   showShareModal.value = true
 }

@@ -266,7 +266,8 @@ export default {
     "airdrop": "エアドロップ",
     "academy": "アカデミー",
     "nft": "NFT",
-    "underDevelopment": "近日公開予定"
+    "underDevelopment": "近日公開予定",
+    "bindInviterFirst": "まず招待者をバインドしてください"
   },
   "purchaseNodeRecord": {
     "title": "購入履歴",

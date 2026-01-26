@@ -266,7 +266,8 @@ export default {
     "airdrop": "空投",
     "academy": "学院",
     "nft": "NFT",
-    "underDevelopment": "待开放"
+    "underDevelopment": "待开放",
+    "bindInviterFirst": "请先绑定邀请人"
   },
   "purchaseNodeRecord": {
     "title": "购买记录",

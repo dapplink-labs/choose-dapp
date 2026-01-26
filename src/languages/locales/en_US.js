@@ -266,7 +266,8 @@ export default {
     "airdrop": "Airdrop",
     "academy": "Academy",
     "nft": "NFT",
-    "underDevelopment": "Coming Soon"
+    "underDevelopment": "Coming Soon",
+    "bindInviterFirst": "Please bind inviter first"
   },
   "purchaseNodeRecord": {
     "title": "Purchase History",
