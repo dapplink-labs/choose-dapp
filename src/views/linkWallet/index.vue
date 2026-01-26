@@ -131,6 +131,7 @@ const checkUserStatus = async () => {
     if (inviter === ZERO_ADDRESS) {
       eventBus.emit('showInvite', true)
     } else {
+      localStorage.removeItem('inviteCode')
       counterStore.inviteCode = '' // 已绑定则清空本地暂存的邀请码
     }
     // router.push("/home")
