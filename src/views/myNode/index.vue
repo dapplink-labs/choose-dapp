@@ -27,7 +27,9 @@
                 <h3 class="pending-title">
                     <span>{{ $t('myNode.pendingIncome') }}</span>
 
-                    <el-icon size="16" style="margin-top: 5px;" @click="showInfo"  :color="'var(--text-color)'"><QuestionFilled /></el-icon>
+                    <el-icon size="16" style="margin-top: 5px;" @click="showInfo" :color="'var(--text-color)'">
+                        <QuestionFilled />
+                    </el-icon>
                 </h3>
                 <button class="record-link" type="button" @click="goToClaimRecord">
                     <span class="record-text">{{ $t('myNode.claimRecord') }}</span>
@@ -84,12 +86,12 @@
                 </div>
 
                 <div class="team-header">
-                    <span class="invite-count" v-if="activeTab === 'team'"><span>{{ inviteCountLabel }}</span> {{ inviteCount
-                    }}</span>
-                    <span class="invite-count" v-if="activeTab === 'direct'"><span>{{ $t('myNode.directEffectiveCount') }}</span> {{ directEffectiveCount
-                    }}</span>
-                    <span class="invite-count" v-if="activeTab === 'direct'"><span>{{ $t('myNode.directIneffectiveCount') }}</span> {{ directIneffectiveCount
-                    }}</span>
+                    <span class="invite-count"><span>{{ $t('myNode.directEffectiveCount') }}</span> {{
+                        directEffectiveCount
+                        }}</span>
+                    <span class="invite-count"><span>{{ $t('myNode.directIneffectiveCount') }}</span> {{
+                        directIneffectiveCount
+                        }}</span>
                 </div>
 
                 <!-- 层级树状图占位 -->
@@ -135,7 +137,7 @@
             </div>
 
         </div>
-        <detailsinfo  ref="detailsRef" />
+        <detailsinfo ref="detailsRef" />
     </div>
 </template>
 
@@ -191,7 +193,7 @@ const teamIncome = ref(0)
 const nodeType = ref(0)
 
 
-function  showInfo(){
+function showInfo() {
     detailsRef.value?.refresh()
 }
 
@@ -261,8 +263,6 @@ const teamNetworkList = ref([])
 // 直推网络列表（给 TeamTree 初次渲染使用）
 const directNetworkList = ref([])
 
-// 邀请人数
-const inviteCount = ref(0)
 // 有效直推数
 const directEffectiveCount = ref(0)
 // 无效直推数
@@ -303,8 +303,7 @@ const getMyTeamInfoList = async () => {
     // 给 TeamTree 使用的网络列表（接口原始字段）
     teamNetworkList.value = data?.team_network_list || []
     directNetworkList.value = data?.direct_network_list || []
-    // data.direct_count为直推人数，data.team_count为团队人数
-    inviteCount.value = activeTab.value === 'direct' ? data.direct_count : data.team_count
+    // data.direct_effective_count为有效直推数，data.direct_ineffective_count为无效直推数
     directEffectiveCount.value = data.direct_effective_count || 0
     directIneffectiveCount.value = data.direct_ineffective_count || 0
     const rawList = activeTab.value === 'direct' ? data.direct_team_list : data.team_list
@@ -323,12 +322,6 @@ const getMyTeamInfoList = async () => {
 // 根据当前tab显示对应的列表
 const currentList = computed(() => inviteList.value || [])
 
-// 根据当前tab显示对应的标签文本
-const inviteCountLabel = computed(() => {
-    return activeTab.value === 'direct'
-        ? t('myNode.directAddressCount')
-        : t('myNode.teamTotalAddressCount')
-})
 
 // 监听 tab 切换，重新请求对应的邀请列表（直推/团队）
 watch(activeTab, () => {
@@ -538,7 +531,7 @@ onMounted(async () => {
                 font-size: 20px;
                 display: flex;
                 align-items: center;
-                gap:5px;
+                gap: 5px;
                 color: var(--text-color, #1a1a1a);
                 transition: color 0.3s ease;
             }
