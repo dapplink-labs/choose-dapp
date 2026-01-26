@@ -84,7 +84,11 @@
                 </div>
 
                 <div class="team-header">
-                    <span class="invite-count"><span>{{ inviteCountLabel }}</span> {{ inviteCount
+                    <span class="invite-count" v-if="activeTab === 'team'"><span>{{ inviteCountLabel }}</span> {{ inviteCount
+                    }}</span>
+                    <span class="invite-count" v-if="activeTab === 'direct'"><span>{{ $t('myNode.directEffectiveCount') }}</span> {{ directEffectiveCount
+                    }}</span>
+                    <span class="invite-count" v-if="activeTab === 'direct'"><span>{{ $t('myNode.directIneffectiveCount') }}</span> {{ directIneffectiveCount
                     }}</span>
                 </div>
 
@@ -259,6 +263,10 @@ const directNetworkList = ref([])
 
 // 邀请人数
 const inviteCount = ref(0)
+// 有效直推数
+const directEffectiveCount = ref(0)
+// 无效直推数
+const directIneffectiveCount = ref(0)
 // 邀请列表
 const inviteList = ref([])
 
@@ -297,6 +305,8 @@ const getMyTeamInfoList = async () => {
     directNetworkList.value = data?.direct_network_list || []
     // data.direct_count为直推人数，data.team_count为团队人数
     inviteCount.value = activeTab.value === 'direct' ? data.direct_count : data.team_count
+    directEffectiveCount.value = data.direct_effective_count || 0
+    directIneffectiveCount.value = data.direct_ineffective_count || 0
     const rawList = activeTab.value === 'direct' ? data.direct_team_list : data.team_list
     // 映射接口数据到模板需要的格式：
     // address(截取), created(时间戳) -> activationTime, total_reward -> reward, parent_address -> 上级地址
@@ -604,7 +614,8 @@ onMounted(async () => {
         .team-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 10px;
             margin-bottom: 16px;
 
             .invite-count {
@@ -613,6 +624,7 @@ onMounted(async () => {
                 font-size: 14px;
                 color: var(--text-color, #1a1a1a);
                 transition: color 0.3s ease;
+                margin-right: 15px;
 
                 span {
                     font-family: PingFang SC, PingFang SC;

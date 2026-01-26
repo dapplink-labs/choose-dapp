@@ -494,7 +494,9 @@ export default {
     "directAddressCount": "직접 추천 주소 수",
     "teamTotalAddressCount": "팀 총 주소 수",
     "directAddress": "직접 추천",
-    "teamAddress": "팀"
+    "teamAddress": "팀",
+    "directEffectiveCount": "유효 직접 추천 수",
+    "directIneffectiveCount": "무효 직접 추천 수"
   },
   "myIncome": {
     "myIncomeCMT": "나의 수익(CHO)",

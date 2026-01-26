@@ -494,7 +494,9 @@ export default {
     "directAddressCount": "直接紹介アドレス数",
     "teamTotalAddressCount": "チーム総アドレス数",
     "directAddress": "直接紹介",
-    "teamAddress": "チーム"
+    "teamAddress": "チーム",
+    "directEffectiveCount": "有効直接紹介数",
+    "directIneffectiveCount": "無効直接紹介数"
   },
   "myIncome": {
     "myIncomeCMT": "My Profit (CHO)",

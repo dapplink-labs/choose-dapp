@@ -493,7 +493,9 @@ export default {
     "directAddressCount": "直推地址数",
     "teamTotalAddressCount": "团队总地址数",
     "directAddress": "直推",
-    "teamAddress": "团队"
+    "teamAddress": "团队",
+    "directEffectiveCount": "有效直推数",
+    "directIneffectiveCount": "无效直推数"
   },
   "myIncome": {
     "myIncomeCMT": "我的收益(CHO)",
