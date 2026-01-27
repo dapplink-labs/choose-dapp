@@ -305,8 +305,8 @@ const handleConfirm = async () => {
 }
 
 .code-input:focus {
-  border-color: #b3ff1a;
-  box-shadow: 0 0 0 3px rgba(179, 255, 26, 0.12);
+  border-color: var(--invite-accent);
+  box-shadow: 0 0 0 3px var(--invite-accent-shadow);
 }
 
 .tip-text {
@@ -334,7 +334,7 @@ const handleConfirm = async () => {
 }
 
 .primary-btn {
-  background: linear-gradient(90deg, #c8ff2d 0%, #b3ff1a 100%);
+  background: var(--text-color-y);
   color: #0a0a0a;
   box-shadow: 0 12px 30px rgba(180, 255, 40, 0.28);
 }
@@ -349,34 +349,37 @@ const handleConfirm = async () => {
   box-shadow: none;
 }
 
-:global(:root) {
+:global(:root),
+:global(.theme-light) {
+  --invite-overlay-bg: rgba(0, 0, 0, 0.35);
+  --invite-card-bg: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+  --invite-card-shadow: 0 16px 50px rgba(0, 0, 0, 0.12);
+  --invite-card-border: var(--border-color);
+  --invite-handle: var(--border-color);
+  --invite-title: var(--text-color);
+  --invite-input-border: var(--border-color);
+  --invite-input-bg: var(--bg-card);
+  --invite-input-text: var(--text-color);
+  --invite-placeholder: var(--text-dark-gray);
+  --invite-tip: var(--text-gray);
+  --invite-accent: var(--text-color-y);
+  --invite-accent-shadow: rgba(46, 190, 105, 0.16);
+}
+
+:global(.theme-dark) {
   --invite-overlay-bg: rgba(0, 0, 0, 0.6);
   --invite-card-bg: linear-gradient(180deg, #111111 0%, #0b0b0b 100%);
   --invite-card-shadow: 0 16px 70px rgba(0, 0, 0, 0.55);
-  --invite-card-border: #1d1d1d;
-  --invite-handle: #2a2a2a;
-  --invite-title: #f6f6f6;
-  --invite-input-border: #2b2b2b;
+  --invite-card-border: var(--border-color);
+  --invite-handle: var(--border-color);
+  --invite-title: var(--text-color);
+  --invite-input-border: var(--border-color);
   --invite-input-bg: #111111;
-  --invite-input-text: #f1f1f1;
-  --invite-placeholder: #5f5f5f;
-  --invite-tip: #8a8a8a;
-}
-
-@media (prefers-color-scheme: light) {
-  :global(:root) {
-    --invite-overlay-bg: rgba(0, 0, 0, 0.35);
-    --invite-card-bg: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
-    --invite-card-shadow: 0 16px 50px rgba(0, 0, 0, 0.12);
-    --invite-card-border: #e6e6e6;
-    --invite-handle: #d2d2d2;
-    --invite-title: #1f1f1f;
-    --invite-input-border: #d9d9d9;
-    --invite-input-bg: #ffffff;
-    --invite-input-text: #1f1f1f;
-    --invite-placeholder: #9b9b9b;
-    --invite-tip: #666666;
-  }
+  --invite-input-text: var(--text-color);
+  --invite-placeholder: var(--text-dark-gray);
+  --invite-tip: var(--text-gray);
+  --invite-accent: var(--text-color-y);
+  --invite-accent-shadow: rgba(187, 255, 46, 0.12);
 }
 
 .fade-enter-active,

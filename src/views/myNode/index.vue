@@ -446,9 +446,10 @@ onMounted(async () => {
         font-family: Noto Sans SC, Noto Sans SC;
         font-weight: bold;
         font-size: 28px;
-        color: var(--text-color, #1a1a1a);
+        color: var(--bg-opposite, #1a1a1a);
         margin-bottom: 22px;
         transition: color 0.3s ease;
+        z-index: 999;
     }
 
 

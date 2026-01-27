@@ -4,7 +4,7 @@
 
     <div class="cps-content">
       <div class="cps-card">
-        <BackHeaderNav :show-open-btn="true" :show-record-btn="true"  :type="1"/>
+        <BackHeaderNav :show-open-btn="true" :show-record-btn="true" :type="1" />
 
         <h1 class="cps-title">{{ t('computingPower.title') }}</h1>
 
@@ -22,7 +22,7 @@
             <h2 class="node-section-title">{{ t('computingPower.buyNode') }}</h2>
           </div>
           <div class="my-node-btn" @click="handleMyNodes">
-            {{ t('computingPower.myNodes') }}
+            <span>{{ t('computingPower.myNodes') }}</span>
             <svg t="1766063981785" class="icon-next" viewBox="0 0 1024 1024" version="1.1"
               xmlns="http://www.w3.org/2000/svg" p-id="1589" width="18" height="18">
               <path
@@ -57,9 +57,8 @@
               <p>{{ node.descText }}</p>
             </div>
 
-            <button class="node-item-btn"
-              :class="{ 'disabled': !isNodeButtonEnabled(node.type) }" :disabled="!isNodeButtonEnabled(node.type)"
-              @click="handleBuy(node.type)">
+            <button class="node-item-btn" :class="{ 'disabled': !isNodeButtonEnabled(node.type) }"
+              :disabled="!isNodeButtonEnabled(node.type)" @click="handleBuy(node.type)">
               {{ getButtonText(node.type) }}
             </button>
           </div>
@@ -69,8 +68,7 @@
     </div>
 
 
-    <PurchaseNode v-model="showPurchaseNode" :title="purchaseTitle"
-        :price="purchasePrice" @buy="handleConfirmBuy" />
+    <PurchaseNode v-model="showPurchaseNode" :title="purchaseTitle" :price="purchasePrice" @buy="handleConfirmBuy" />
   </div>
 </template>
 
@@ -372,7 +370,6 @@ const {
   font-family: Noto Sans SC, Noto Sans SC;
   font-weight: bold;
   font-size: 20px;
-  line-height: 16px;
   text-align: left;
   color: var(--text-color, #000000);
 }
@@ -389,9 +386,10 @@ const {
   font-family: PingFang SC, PingFang SC;
   font-weight: 400;
   font-size: 16px;
-  text-align: right;
-  font-style: normal;
-  text-transform: none;
+
+  .icon-next {
+    margin-bottom: -2px;
+  }
 }
 
 .node-card {
