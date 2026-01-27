@@ -188,7 +188,7 @@ function isWalletConnected() {
 
 router.beforeEach((to) => {
   const connected = isWalletConnected()
-  console.log(to)
+  // console.log(to)
   // 未连接钱包
   if (!connected) {
     // 只允许进入连接钱包页

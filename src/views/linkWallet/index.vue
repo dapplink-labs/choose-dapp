@@ -198,11 +198,10 @@ onMounted(async () => {
   setTimeout(async () => {
     disconnect()
     window.sessionStorage.clear()
-   window.localStorage.removeItem("inviteCode")
     console.log("--------------------------------------------------")
   }, 500)
 
- 
+
 
 })
 </script>

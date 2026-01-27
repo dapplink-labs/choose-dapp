@@ -54,9 +54,7 @@ const initVConsole = () => {
     })
   }
 }
-
-// 初始化 VConsole
-initVConsole()
+// initVConsole()
 
 // import "./utils/font.js"
 

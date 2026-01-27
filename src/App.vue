@@ -36,8 +36,6 @@ watch(
       return
     }
 
-    console.log('newAddress', newAddress)
-    console.log('oldAddress', oldAddress)
 
     if (!oldAddress && newAddress) {
       // 用户首次连接钱包操作

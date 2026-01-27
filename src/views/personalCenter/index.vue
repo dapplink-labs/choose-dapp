@@ -491,6 +491,7 @@ const handleMenuClick = (item) => {
 
 // 处理断开链接
 const handleDisconnect = async () => {
+  localStorage.removeItem('inviteCode')
   window.sessionStorage.clear()
   try {
     console.log('开始断开钱包连接...')

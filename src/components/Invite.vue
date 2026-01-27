@@ -121,6 +121,7 @@ watch(visible, (newVal) => {
         counterStore.inviteCode = code
       }
     }
+    console.log('code', code)
     localCode.value = code
     // 禁止页面滚动 - 移动端兼容处理
     scrollTop = window.pageYOffset || document.documentElement.scrollTop
