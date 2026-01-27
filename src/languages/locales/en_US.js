@@ -494,8 +494,10 @@ export default {
     "teamTotalAddressCount": "Total Team Address Count",
     "directAddress": "Direct",
     "teamAddress": "Team",
-    "directEffectiveCount": "Effective Direct Referrals",
-    "directIneffectiveCount": "Ineffective Direct Referrals"
+    "directEffectiveCount": "Effective Direct Referral Members",
+    "directIneffectiveCount": "Ineffective Direct Referral Members",
+    "teamEffectiveCount": "Effective Team Members",
+    "teamIneffectiveCount": "Ineffective Team Members"
   },
   "myIncome": {
     "myIncomeCMT": "My Profit (CHO)",

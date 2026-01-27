@@ -86,12 +86,14 @@
                 </div>
 
                 <div class="team-header">
-                    <span class="invite-count"><span>{{ $t('myNode.directEffectiveCount') }}</span> {{
-                        effectiveCount
-                    }}</span>
-                    <span class="invite-count"><span>{{ $t('myNode.directIneffectiveCount') }}</span> {{
-                        ineffectiveCount
-                    }}</span>
+                    <span class="invite-count">
+                        <span>{{activeTab === 'direct' ? $t('myNode.directEffectiveCount') : $t('myNode.teamEffectiveCount') }}</span>
+                        {{ effectiveCount }}
+                    </span>
+                    <span class="invite-count">
+                        <span>{{ activeTab === 'direct' ? $t('myNode.directIneffectiveCount') : $t('myNode.teamIneffectiveCount') }}</span>
+                        {{ ineffectiveCount }}
+                    </span>
                 </div>
 
                 <!-- 层级树状图占位 -->
@@ -100,7 +102,7 @@
                         :direct_network_list="directNetworkList" />
                 </div>
 
-                <div class="team-list">
+                <div class="team-list" v-if="currentList.length > 0">
                     <div v-for="item in currentList" :key="item.address" class="team-item">
                         <div class="team-avatar">
                             <div class="avatar-content">
