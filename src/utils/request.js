@@ -18,16 +18,17 @@ import axios from "axios"
 
 // create an axios instance
 const serive = axios.create({
-  baseURL: 'https://api.roothashpay.com',
+  baseURL: 'https://choapi.roothashpay.com',
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 30000  // request timeout (30 seconds)
 })
 // 添加请求头
-// serive.interceptors.request.use((config) => {
-//   config.headers = config.headers || {}
-//   config.headers.address = localStorage.getItem('address') || ''
-//   return config
-// })
+serive.interceptors.request.use((config) => {
+  config.headers = config.headers || {}
+  config.headers["X-Signature-Message"] = JSON.parse(window.sessionStorage.getItem('signatureInfo')).timestamp || ''
+  config.headers["X-Signature"] = JSON.parse(window.sessionStorage.getItem('signatureInfo')).signature || ''
+  return config
+})
 // serive.interceptors.request.use((config) => {
 //   config.headers = config.headers || {}
 

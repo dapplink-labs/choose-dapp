@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useAccount, useDisconnect } from '@wagmi/vue'
+import { useAccount, useDisconnect, useChainId } from '@wagmi/vue'
 import navBar from "./components/navBar.vue"
 import navBar2 from "./components/navBar2.vue"
 import Header from "./components/header.vue"

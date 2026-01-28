@@ -72,22 +72,6 @@ const signstr = computed(() => {
 })
 // 响应式状态
 
-
-// 顶级用户
-const superUser = [
-  '0xC3C7a50501B57CdC5932275F1f63235a7cc08966',
-  '0xC474443D7c0D2cbD941B92018dDFc115ca8F80F8',
-  '0x5102B3702BcAE206ed1cC452fB5D66b818855d88',
-  '0x997A586a05FF4efa20660155459cfe9D929E28c6',
-].map(addr => addr.toLowerCase())
-
-let isvaildSuperUser = window.sessionStorage.setItem("isvaildSuperUser", false)
-const isSuperUser = (addr) => {
-  if (!addr) return false
-  return superUser.includes(addr.toLowerCase())
-}
-
-
 // 获取可用的连接器列表
 // const safeConnectors = computed(() => connectors.value || [])
 const wallets = [
@@ -147,7 +131,16 @@ const checkUserStatus = async () => {
 
 // }
 
+
+//顶级用户
+// const superUser = [
+//   '0xC3C7a50501B57CdC5932275F1f63235a7cc08966',
+//   '0xC474443D7c0D2cbD941B92018dDFc115ca8F80F8',
+//   '0x5102B3702BcAE206ed1cC452fB5D66b818855d88',
+//   '0x997A586a05FF4efa20660155459cfe9D929E28c6',
+// ]
 async function wallconnects(id, chainId) {
+  // 重新连接钱包
   await reconnect(config, { connectors: [injected()] })
 
   const connectMetaMask = async () => {
@@ -160,27 +153,24 @@ async function wallconnects(id, chainId) {
       const addr = address.value
       if (!addr) return
 
-      // 2️⃣ 非顶级用户 → 直接进首页 ✅
-      if (!isSuperUser(addr)) {
-        router.push('/home')
-        await checkUserStatus()
-        return
-      }
-
-      // 3️⃣ 顶级用户 → 必须签名
-
-      const signature = await signMessageAsync(config, {
-        message: signstr.value,
+      // 2️⃣ 所有用户 → 必须签名
+      const timestamp = (new Date()).getTime()
+      const signature = await signMessage(config, {
+        message: timestamp.toString()
       })
+      window.sessionStorage.setItem('signatureInfo', JSON.stringify({
+        signature: signature,
+        timestamp: timestamp.toString(),
+      }))
 
       if (!signature) return
-      let isvaildSuperUser = window.sessionStorage.setItem("isvaildSuperUser", true)
-      // 4️⃣ 签名成功 → 进首页 ✅
+
+      // 3️⃣ 签名成功 → 进首页 ✅
       router.push('/home')
       await checkUserStatus()
 
     } catch (err) {
-      // ❌ 顶级用户拒绝签名 / 用户拒绝连接
+      // ❌ 用户拒绝签名 / 用户拒绝连接
       if (err instanceof UserRejectedRequestError) {
         Message.error(t('linkWallet.userCancelled'))
         return
