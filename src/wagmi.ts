@@ -9,7 +9,7 @@ const bsc = defineChain({
   rpcUrls: {
     default: {
       http: [
-        'https://bsc-dataseed.binance.org'
+        'https://go.getblock.asia/8e87ac495a5941ae9dfb9ea6ed9ae7d2'
       ]
     }
   },
@@ -36,7 +36,7 @@ export const config = createConfig({
   // storage: createStorage({ storage: localStorage, key: 'vite-vue' }),
   transports: {
     [bsc.id]: fallback([
-      http('https://bsc-dataseed.binance.org')
+      http('https://go.getblock.asia/8e87ac495a5941ae9dfb9ea6ed9ae7d2')
     ])
   },
 })

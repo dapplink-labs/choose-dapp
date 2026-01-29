@@ -17,8 +17,7 @@
             <div class="browse-section">
                 <h3 class="section-title">{{ $t('searchPage.browse') }}</h3>
                 <div class="browse-buttons">
-                    <button v-for="item in browseItems" :key="item.key" class="browse-btn"
-                        :class="{ active: activeBrowse === item.key }" @click="handleBrowseClick(item.key)">
+                    <button v-for="item in browseItems" :key="item.key" class="browse-btn">
                         <el-icon class="browse-icon">
                             <component :is="item.icon" />
                         </el-icon>
@@ -31,8 +30,7 @@
             <div class="themes-section">
                 <h3 class="section-title">{{ $t('searchPage.themes') }}</h3>
                 <div class="themes-grid">
-                    <button v-for="theme in themeItems" :key="theme.key" class="theme-btn"
-                        :class="{ active: activeTheme === theme.key }" @click="handleThemeClick(theme.key)">
+                    <button v-for="theme in themeItems" :key="theme.key" class="theme-btn">
                         <div class="theme-thumbnail">
                             <img :src="theme.thumbnail" :alt="theme.label" />
                         </div>
@@ -109,11 +107,6 @@ const themeItems = computed(() => [
     }
 ])
 
-// 当前激活的浏览项
-const activeBrowse = ref('')
-
-// 当前激活的主题
-const activeTheme = ref('')
 
 // 处理搜索
 const handleSearch = () => {
@@ -127,20 +120,6 @@ const handleSearch = () => {
 // 处理搜索输入
 const handleSearchInput = () => {
     // 可以在这里实现实时搜索建议
-}
-
-// 处理浏览项点击
-const handleBrowseClick = (key) => {
-    activeBrowse.value = key
-    // TODO: 实现浏览筛选逻辑
-    console.log('浏览:', key)
-}
-
-// 处理主题点击
-const handleThemeClick = (key) => {
-    activeTheme.value = key
-    // TODO: 实现主题筛选逻辑
-    console.log('主题:', key)
 }
 </script>
 
@@ -169,7 +148,7 @@ const handleThemeClick = (key) => {
 .search-bar {
     display: flex;
     align-items: center;
-    background-color: var(--bg-card, #ffffff);
+    background-color: transparent;
     border-radius: 12px;
     padding: 12px 16px;
     border: 1px solid var(--border-color, #E0E0E0);
@@ -218,58 +197,33 @@ const handleThemeClick = (key) => {
 }
 
 .browse-buttons {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    width: 100%;
 }
 
 .browse-btn {
-    display: flex;
-    flex-direction: column;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    padding: 16px 12px;
-    background-color: var(--bg-card, #1e1e1e);
+    padding: 6px 13px;
+    background-color: transparent;
     border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-    border-radius: 12px;
+    border-radius: 99px;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-height: 80px;
-
-    &:hover {
-        background-color: var(--bg-light, #2a2a2a);
-        border-color: var(--border-color, rgba(255, 255, 255, 0.2));
-    }
-
-    &:active {
-        transform: scale(0.98);
-    }
-
-    &.active {
-        background-color: var(--button-bg-y, rgba(46, 190, 105, 0.2));
-        border-color: var(--text-color-y, #2EBE69);
-    }
+    margin-right: 10px;
+    margin-bottom: 15px;
 
     .browse-icon {
-        font-size: 24px;
-        color: #FFFFFF;
-        margin-bottom: 8px;
+        font-size: 14px;
+        color: var(--bg-opposite);
         transition: color 0.3s ease;
     }
 
     .browse-text {
         font-family: PingFang SC, PingFang SC;
-        font-weight: 400;
+        font-weight: 500;
         font-size: 14px;
-        color: #FFFFFF;
-        transition: color 0.3s ease;
-    }
-
-    &.active {
-        .browse-icon,
-        .browse-text {
-            color: var(--text-color-y, #2EBE69);
-        }
+        color: var(--bg-opposite);
+        margin-left: 3px;
     }
 }
 
@@ -285,33 +239,19 @@ const handleThemeClick = (key) => {
 }
 
 .theme-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     padding: 12px;
-    background-color: var(--bg-card, #1e1e1e);
+    background-color: transparent;
     border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: left;
 
-    &:hover {
-        background-color: var(--bg-light, #2a2a2a);
-        border-color: var(--border-color, rgba(255, 255, 255, 0.2));
-    }
-
-    &:active {
-        transform: scale(0.98);
-    }
-
-    &.active {
-        background-color: var(--button-bg-y, rgba(46, 190, 105, 0.2));
-        border-color: var(--text-color-y, #2EBE69);
-    }
-
     .theme-thumbnail {
-        width: 48px;
-        height: 48px;
+        width: 30px;
+        height: 30px;
         border-radius: 8px;
         overflow: hidden;
         margin-right: 12px;
@@ -327,96 +267,11 @@ const handleThemeClick = (key) => {
 
     .theme-text {
         font-family: PingFang SC, PingFang SC;
-        font-weight: 400;
-        font-size: 15px;
-        color: #FFFFFF;
-        transition: color 0.3s ease;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--bg-opposite);
         flex: 1;
     }
-
-    &.active {
-        .theme-text {
-            color: var(--text-color-y, #2EBE69);
-            font-weight: 500;
-        }
-    }
 }
 
-// 亮色主题适配
-.theme-light {
-    .section-title {
-        color: var(--text-gray, #666666);
-    }
-
-    .browse-btn {
-        background-color: var(--bg-card, #ffffff);
-        border-color: var(--border-color, #E0E0E0);
-
-        .browse-icon,
-        .browse-text {
-            color: var(--text-color, #1a1a1a);
-        }
-
-        &:hover {
-            background-color: var(--bg-light, #F5F5F5);
-        }
-
-        &.active {
-            .browse-icon,
-            .browse-text {
-                color: var(--text-color-y, #2EBE69);
-            }
-        }
-    }
-
-    .theme-btn {
-        background-color: var(--bg-card, #ffffff);
-        border-color: var(--border-color, #E0E0E0);
-
-        .theme-text {
-            color: var(--text-color, #1a1a1a);
-        }
-
-        &:hover {
-            background-color: var(--bg-light, #F5F5F5);
-        }
-
-        &.active {
-            .theme-text {
-                color: var(--text-color-y, #2EBE69);
-            }
-        }
-    }
-}
-
-// 暗色主题适配
-.theme-dark {
-    .search-page {
-        background-color: var(--bg-page-h5, #000000);
-    }
-
-    .search-bar {
-        background-color: var(--bg-card, #1e1e1e);
-        border-color: var(--border-color, #23262F);
-    }
-
-    .section-title {
-        color: var(--text-gray, #909090);
-    }
-}
-
-// 响应式设计
-@media (min-width: 768px) {
-    .search-content {
-        max-width: 600px;
-    }
-
-    .browse-buttons {
-        grid-template-columns: repeat(5, 1fr);
-    }
-
-    .themes-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
 </style>
