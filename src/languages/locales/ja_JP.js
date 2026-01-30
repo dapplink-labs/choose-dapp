@@ -29,7 +29,10 @@ export default {
     "buy": "Buy",
     "sell": "Sell",
     "valueLabel": "価値",
-    "search": "Search"
+    "search": "Search",
+    "claimSuccessTitle": "おめでとうございます",
+    "withdrawFee": "出金手数料(1%)",
+    "winnerFee": "勝者手数料(3%)"
   },
   "link": {
     "titel": "ウォレット接続",
@@ -267,7 +270,19 @@ export default {
     "academy": "アカデミー",
     "nft": "NFT",
     "underDevelopment": "近日公開予定",
-    "bindInviterFirst": "まず招待者をバインドしてください"
+    "bindInviterFirst": "まず招待者をバインドしてください",
+
+    "profileTitle": "プロフィール",
+    "email": "メール",
+    "emailPlaceholder": "メールアドレスを入力してください",
+    "emailHelper": "ChooseMeの重要な更新情報を受け取るために使用されます",
+    "username": "ユーザー名",
+    "usernamePlaceholder": "ユーザー名を入力してください",
+    "bio": "自己紹介",
+    "bioPlaceholder": "自己紹介を入力してください",
+    "save": "変更を保存",
+    "twitterComingSoon": "Twitter 連携は近日公開予定です",
+    "saveSuccess": "保存しました"
   },
   "purchaseNodeRecord": {
     "title": "購入履歴",
@@ -375,6 +390,13 @@ export default {
   },
   "leaderboard": {
     "title": "Leaderboard",
+    "periodToday": "本日",
+    "periodWeekly": "今週",
+    "periodMonthly": "月間",
+    "categoryAll": "すべて",
+    "categoryFinance": "金融",
+    "categoryCrypto": "暗号資産",
+    "categorySports": "スポーツ",
     "allCategories": "All Categories",
     "category1": "Category 1",
     "category2": "Category 2",
@@ -502,8 +524,9 @@ export default {
   },
   "myIncome": {
     "myIncomeCMT": "My Profit (CHO)",
-    "computingPowerIncomeCMT": "Computing Profit (CHO)",
-    "networkIncomeCMT": "Network Profit (CHO)",
+    "communityIncomeCHO": "コミュニティ収益(CHO)",
+    "computingPowerIncomeCMT": "直接紹介収益(CHO)",
+    "networkIncomeCMT": "チーム収益(CHO)",
     "pendingIncome": "発行済み報酬",
     "staticIncomeCHO": "Static Profit",
     "directReferralIncomeCHO": "Direct Referral Profit",
@@ -539,6 +562,29 @@ export default {
     "dateRangeSeparator": "から",
     "startDatePlaceholder": "開始日",
     "endDatePlaceholder": "終了日"
+  },
+  "dateRangePicker": {
+    "title": "日付範囲で絞り込み",
+    "description": "過去90日間の注文記録を確認できます",
+    "confirm": "確定",
+    "quick7": "7日",
+    "quick30": "30日",
+    "quick90": "90日"
+  },
+  "bill": {
+    "title": "明細",
+    "filterType": "タイプ",
+    "filterAsset": "資産",
+    "filterDate": "日付",
+    "typeAll": "すべて",
+    "typeRecharge": "入金",
+    "typeWithdraw": "出金",
+    "typePurchase": "購入イベント",
+    "typeSell": "売却イベント",
+    "assetAll": "すべて",
+    "date7": "過去7日",
+    "date30": "過去30日",
+    "date90": "過去90日"
   },
   "dashboard": {
     "title": "ダッシュボード",
@@ -644,5 +690,17 @@ export default {
       "sports": "Sports",
       "esports": "Esports"
     }
+  },
+  "eventPool": {
+    "title": "イベントプール",
+    "heroTitle": "オンラインイベントに投票しよう",
+    "heroSub": "あなたたちが最も注目しているイベントを選んでください",
+    "heroTip": "* CHOトークンを保有している場合のみイベント投票に参加できます。各イベントは1ウォレット1日1回のみ投票できます。",
+    "participateCount": "人が投票に参加しました",
+    "yes": "Yes",
+    "no": "No",
+    "vote": "投票",
+    "votedToday": "本日はすでに投票済みです",
+    "currentVotes": "現在の票数："
   }
 }

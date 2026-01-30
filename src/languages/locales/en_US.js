@@ -29,7 +29,10 @@ export default {
     "buy": "Buy",
     "sell": "Sell",
     "valueLabel": "Value",
-    "search": "Search"
+    "search": "Search",
+    "claimSuccessTitle": "Congratulations",
+    "withdrawFee": "Withdrawal fee (1%)",
+    "winnerFee": "Winner rake (3%)"
   },
   "link": {
     "titel": "Connect Wallet",
@@ -267,7 +270,19 @@ export default {
     "academy": "Academy",
     "nft": "NFT",
     "underDevelopment": "Coming Soon",
-    "bindInviterFirst": "Please bind inviter first"
+    "bindInviterFirst": "Please bind inviter first",
+
+    "profileTitle": "Profile",
+    "email": "Email",
+    "emailPlaceholder": "Enter your email address",
+    "emailHelper": "Used to receive important updates from ChooseMe",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "bio": "Bio",
+    "bioPlaceholder": "Enter your bio",
+    "save": "Save changes",
+    "twitterComingSoon": "Twitter linking is coming soon",
+    "saveSuccess": "Saved"
   },
   "purchaseNodeRecord": {
     "title": "Purchase History",
@@ -375,6 +390,13 @@ export default {
   },
   "leaderboard": {
     "title": "Leaderboard",
+    "periodToday": "Today",
+    "periodWeekly": "Weekly",
+    "periodMonthly": "Monthly",
+    "categoryAll": "All",
+    "categoryFinance": "Finance",
+    "categoryCrypto": "Crypto",
+    "categorySports": "Sports",
     "allCategories": "All Categories",
     "category1": "Category 1",
     "category2": "Category 2",
@@ -501,8 +523,9 @@ export default {
   },
   "myIncome": {
     "myIncomeCMT": "My Profit (CHO)",
-    "computingPowerIncomeCMT": "Computing Profit (CHO)",
-    "networkIncomeCMT": "Network Profit (CHO)",
+    "communityIncomeCHO": "Community Profit (CHO)",
+    "computingPowerIncomeCMT": "Direct Referral Profit (CHO)",
+    "networkIncomeCMT": "Team Profit (CHO)",
     "pendingIncome": "Issued Rewards",
     "staticIncomeCHO": "Static Profit",
     "directReferralIncomeCHO": "Direct Referral Profit",
@@ -538,6 +561,29 @@ export default {
     "dateRangeSeparator": "to",
     "startDatePlaceholder": "Start Date",
     "endDatePlaceholder": "End Date"
+  },
+  "dateRangePicker": {
+    "title": "Filter by Date Range",
+    "description": "You can view order records from the past 90 days",
+    "confirm": "Confirm",
+    "quick7": "7 days",
+    "quick30": "30 days",
+    "quick90": "90 days"
+  },
+  "bill": {
+    "title": "Bill",
+    "filterType": "Type",
+    "filterAsset": "Asset",
+    "filterDate": "Date",
+    "typeAll": "All",
+    "typeRecharge": "Recharge",
+    "typeWithdraw": "Withdraw",
+    "typePurchase": "Purchase Event",
+    "typeSell": "Sell Event",
+    "assetAll": "All",
+    "date7": "Last 7 days",
+    "date30": "Last 30 days",
+    "date90": "Last 90 days"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -643,5 +689,17 @@ export default {
       "sports": "Sports",
       "esports": "Esports"
     }
+  },
+  "eventPool": {
+    "title": "Event Pool",
+    "heroTitle": "Vote on live events",
+    "heroSub": "Pick the hottest event in your mind",
+    "heroTip": "* Holding CHO tokens is required to participate in event voting. Each event can only be voted once per wallet per day.",
+    "participateCount": " people have voted",
+    "yes": "Yes",
+    "no": "No",
+    "vote": "Vote",
+    "votedToday": "Voted today",
+    "currentVotes": "Current votes: "
   }
 }

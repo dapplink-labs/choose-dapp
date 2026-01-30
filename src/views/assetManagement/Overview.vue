@@ -152,7 +152,9 @@ import { useI18n } from 'vue-i18n'
 import { useAccount } from '@wagmi/vue'
 import { useThemeStore } from '@/stores/theme'
 import { View, Hide } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const { t } = useI18n()
 const { address } = useAccount()
 const themeStore = useThemeStore()
@@ -225,8 +227,7 @@ const handleWithdraw = () => {
 }
 
 const handleBill = () => {
-  console.log('账单')
-  // TODO: 实现账单逻辑
+  router.push('/bill')
 }
 
 // 获取资产数据

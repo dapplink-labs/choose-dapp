@@ -41,12 +41,16 @@
                     <p>+{{ formatAmount(currentNodeStakingInfo.total_reward) }}</p>
                 </div>
                 <div class="item">
-                    <b>{{ $t('myIncome.computingPowerIncomeCMT') }}</b>
-                    <p>+{{ formatAmount(currentNodeStakingInfo.hashrate_reward) }}</p>
+                    <b>{{ $t('myIncome.communityIncomeCHO') }}</b>
+                    <p>+{{ formatAmount(currentNodeStakingInfo.community_income) }}</p>
                 </div>
                 <div class="item">
                     <b>{{ $t('myIncome.networkIncomeCMT') }}</b>
                     <p>+{{ formatAmount(currentNodeStakingInfo.network_reward) }}</p>
+                </div>
+                <div class="item">
+                    <b>{{ $t('myIncome.computingPowerIncomeCMT') }}</b>
+                    <p>+{{ formatAmount(currentNodeStakingInfo.hashrate_reward) }}</p>
                 </div>
             </div>
 
@@ -130,8 +134,14 @@
                 </div>
 
                 <div class="team-header">
-                    <span class="invite-count"><span>{{ inviteCountLabel }}</span> {{ inviteCount
-                        }}</span>
+                    <span class="invite-count">
+                        <span>{{ activeTab === 'direct' ? $t('myNode.directEffectiveCount') : $t('myNode.teamEffectiveCount') }}</span>
+                        {{ effectiveCount }}
+                    </span>
+                    <span class="invite-count">
+                        <span>{{ activeTab === 'direct' ? $t('myNode.directIneffectiveCount') : $t('myNode.teamIneffectiveCount') }}</span>
+                        {{ ineffectiveCount }}
+                    </span>
                 </div>
 
                 <!-- 层级树状图占位 -->
@@ -228,8 +238,10 @@ const { address } = useAccount()
 // 我的团队相关数据（直推=direct，团队=team）
 const activeTab = ref('direct')
 
-// 邀请人数
-const inviteCount = ref(0)
+// 有效人数（直推/团队）
+const effectiveCount = ref(0)
+// 无效人数（直推/团队）
+const ineffectiveCount = ref(0)
 // 邀请列表
 const inviteList = ref([])
 
@@ -245,8 +257,8 @@ const getMyTeamInfoList = async () => {
     const data = res?.data?.data
     teamNetworkList.value = data.team_network_list
     directNetworkList.value = data.direct_network_list
-    // data.direct_count为直推人数，data.team_count为团队人数
-    inviteCount.value = activeTab.value === 'direct' ? data.direct_count : data.team_count
+    effectiveCount.value = (activeTab.value === 'direct' ? data.direct_effective_count : data.team_effective_count) ?? 0
+    ineffectiveCount.value = (activeTab.value === 'direct' ? data.direct_ineffective_count : data.team_ineffective_count) ?? 0
     const rawList = activeTab.value === 'direct' ? data.direct_team_list : data.team_list
     // 映射接口数据到模板需要的格式：
     // address(截取), created(时间戳) -> activationTime, total_reward -> reward, parent_address -> 上级地址
@@ -262,12 +274,6 @@ const getMyTeamInfoList = async () => {
 
 // 根据当前tab显示对应的列表
 const currentList = computed(() => inviteList.value || [])
-// 根据当前tab显示对应的标签文本
-const inviteCountLabel = computed(() => {
-    return activeTab.value === 'direct'
-        ? t('myNode.directAddressCount')
-        : t('myNode.teamTotalAddressCount')
-})
 
 // 我的节点弹窗控制
 const showNodesModal = ref(false)
@@ -353,9 +359,9 @@ const nodeTypeMap = {
 // 创世节点5%收益 = creation_reward
 // 超级节点收益 = super_node_reward
 const fetchNodeStakingInfo = async () => {
-    
+
     if (!currentNodeStakingInfo.value.id) return
-    
+
     const res = await getNodeStakingInfo({ address: address.value, id: currentNodeStakingInfo.value.id, round: currentNodeStakingInfo.value.round })
     const data = res?.data?.data?.staking_info || {}
     data.id = currentNodeStakingInfo.value.id
@@ -627,7 +633,7 @@ watch(activeTab, () => {
             .progress-indicator {
                 position: absolute;
                 top: 50%;
-                left:4%;
+                left: 4%;
                 transform: translate(-50%, -50%);
                 height: 18px;
                 padding: 0 5px;
@@ -735,37 +741,36 @@ watch(activeTab, () => {
         }
 
         .box {
-            margin-top: 0px;
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
+            margin-top: 0;
             margin-bottom: 26px;
-
-            .item {
-                border-radius: 8px;
-                display: flex;
-                flex-direction: column;
-                transition: background-color 0.3s ease, transform 0.2s ease;
-
-                b {
-                    font-family: PingFang SC, PingFang SC;
-                    font-weight: 400;
-                    font-size: 14px;
-                    color: var(--text-dark-gray, #999999);
-                    transition: color 0.3s ease;
-                    margin-bottom: 10px;
-                }
-
-                p {
-                    font-family: DIN, DIN;
-                    font-weight: bold;
-                    font-size: 24px;
-                    color: #2FBC87;
-                    text-align: center;
-                }
-            }
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
+        .box .item {
+            border-radius: 12px;
+            padding: 14px 12px;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-page);
+            transition: background-color 0.3s ease;
+            border: 1px solid var(--border-color);
+
+            b {
+                font-family: PingFang SC, PingFang SC;
+                font-weight: 400;
+                font-size: 16px;
+                color: var(--bg-opposite);
+            }
+
+            p {
+                font-family: DIN, DIN;
+                font-weight: bold;
+                font-size: 24px;
+                color: #2FBC87;
+            }
+        }
     }
 
     .my-team {
@@ -777,7 +782,8 @@ watch(activeTab, () => {
         .team-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 10px;
             margin-bottom: 16px;
 
             .invite-count {
@@ -786,6 +792,7 @@ watch(activeTab, () => {
                 font-size: 14px;
                 color: var(--text-color, #1a1a1a);
                 transition: color 0.3s ease;
+                margin-right: 15px;
 
                 span {
                     font-family: PingFang SC, PingFang SC;

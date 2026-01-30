@@ -16,6 +16,12 @@ import axios from "axios"
 //   return ''
 // }
 
+
+// 合约地址
+/* main usdtTokenAddress: 0x55d398326f99059fF775485246999027B3197955 */
+/* main proxyMarketManager: 0xd9992884b363B3ceBc1Ac4BE327223111648932f */
+/* main proxyNodeManager: 0x9527e8Fce047226Cf666289d9C93E5C334Ca0B79 */
+/* main proxySubTokenFundingManager: 0x6502a0C304869321b2c37CCa27f6F2585c39A6A1 */
 // create an axios instance
 const serive = axios.create({
   baseURL: 'https://choapi.roothashpay.com',

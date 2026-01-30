@@ -29,7 +29,10 @@ export default {
     "buy": "Buy",
     "sell": "Sell",
     "valueLabel": "价值",
-    "search": "Search"
+    "search": "Search",
+    "claimSuccessTitle": "恭喜获得",
+    "withdrawFee": "提现手续费(1%)",
+    "winnerFee": "赢家抽水(3%)"
   },
   "link": {
     "titel": "链接钱包",
@@ -267,7 +270,19 @@ export default {
     "academy": "学院",
     "nft": "NFT",
     "underDevelopment": "待开放",
-    "bindInviterFirst": "请先绑定邀请人"
+    "bindInviterFirst": "请先绑定邀请人",
+
+    "profileTitle": "个人信息",
+    "email": "邮箱",
+    "emailPlaceholder": "请输入邮箱地址",
+    "emailHelper": "用来接收ChooseMe重要更新信息",
+    "username": "用户名",
+    "usernamePlaceholder": "请输入用户名",
+    "bio": "简介",
+    "bioPlaceholder": "请输入简介",
+    "save": "保存修改",
+    "twitterComingSoon": "Twitter 绑定功能即将开放",
+    "saveSuccess": "保存成功"
   },
   "purchaseNodeRecord": {
     "title": "购买记录",
@@ -375,6 +390,13 @@ export default {
   },
   "leaderboard": {
     "title": "排行榜",
+    "periodToday": "今日",
+    "periodWeekly": "本周",
+    "periodMonthly": "月度",
+    "categoryAll": "全部",
+    "categoryFinance": "金融",
+    "categoryCrypto": "加密",
+    "categorySports": "体育",
     "allCategories": "所有类别",
     "category1": "类别1",
     "category2": "类别2",
@@ -501,8 +523,9 @@ export default {
   },
   "myIncome": {
     "myIncomeCMT": "我的收益(CHO)",
-    "computingPowerIncomeCMT": "算力收益(CHO)",
-    "networkIncomeCMT": "网络收益(CHO)",
+    "communityIncomeCHO": "小区收益(CHO)",
+    "computingPowerIncomeCMT": "直推收益(CHO)",
+    "networkIncomeCMT": "团队收益(CHO)",
     "pendingIncome": "已发放奖励",
     "staticIncomeCHO": "静态收益(CHO)",
     "directReferralIncomeCHO": "直推收益(CHO)",
@@ -538,6 +561,29 @@ export default {
     "dateRangeSeparator": "至",
     "startDatePlaceholder": "开始日期",
     "endDatePlaceholder": "结束日期"
+  },
+  "dateRangePicker": {
+    "title": "按日期范围筛选",
+    "description": "你可以查看过去的90天的订单记录",
+    "confirm": "确定",
+    "quick7": "7天",
+    "quick30": "30天",
+    "quick90": "90天"
+  },
+  "bill": {
+    "title": "账单",
+    "filterType": "类型",
+    "filterAsset": "资产",
+    "filterDate": "日期",
+    "typeAll": "全部",
+    "typeRecharge": "充值",
+    "typeWithdraw": "提现",
+    "typePurchase": "购买事件",
+    "typeSell": "卖出事件",
+    "assetAll": "全部",
+    "date7": "近7天",
+    "date30": "近30天",
+    "date90": "近90天"
   },
   "dashboard": {
     "title": "仪表盘",
@@ -643,5 +689,17 @@ export default {
       "sports": "体育",
       "esports": "电子竞技"
     }
+  },
+  "eventPool": {
+    "title": "事件池",
+    "heroTitle": "对在线事件进行投票",
+    "heroSub": "选出你们心中最热门事件",
+    "heroTip": "* 持有CHO代币才可以参与事件投票,每个事件只能一个钱包投一次/天",
+    "participateCount": "人参与投票",
+    "yes": "Yes",
+    "no": "No",
+    "vote": "投票",
+    "votedToday": "今日已投票",
+    "currentVotes": "当前票数："
   }
 }

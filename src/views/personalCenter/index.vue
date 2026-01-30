@@ -198,7 +198,7 @@ const baseEcosystemItems = computed(() => [
     label: t('userInfo.eventPool'),
     icon: getIcon('6'),
     iconDark: getIcon("6Dark"),
-    path: '/'
+    path: '/event-pool'
   },
   {
     key: 'launchpad',
@@ -382,11 +382,11 @@ const supportItems = computed(() =>
 // choose me菜单配置
 const baseChooseMeItems = computed(() => [
   {
-    key: 'leaderboard',
+    key: 'leaderboardH5',
     label: t('userInfo.leaderboard'),
     icon: getIcon('38'),
     iconDark: getIcon('38Dark'),
-    path: '/leaderboard'
+    path: '/leaderboardH5'
   },
   {
     key: 'reward',
@@ -459,7 +459,7 @@ const handleShare = async () => {
 
 // 处理设置点击
 const handleSettings = () => {
-  // router.push('/settings')
+  router.push('/userInfo')
 }
 
 // 处理关闭点击
@@ -470,9 +470,11 @@ const handleClose = () => {
 // 允许访问的路径列表（除了这些路径外，其他都显示"待开放"）
 const allowedPaths = [
   '/computing-power-services', // 节点购买
-  // '/LPVault', // LPVault
+  '/LPVault', // LPVault
   // '/dashboard', // 链上数据
-  // '/asset-management' // 链上资产
+  '/asset-management', // 链上资产
+  '/leaderboardH5', // 排行榜
+  '/event-pool' // 事件池
 ]
 
 // 处理菜单项点击

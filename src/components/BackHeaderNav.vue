@@ -25,7 +25,7 @@
           </g>
         </svg>
         <span class="action-text">{{ type == 1 ? $t('purchaseNodeRecord.title') : $t('purchaseNodeRecord.title2')
-          }}</span>
+        }}</span>
       </button>
 
       <!-- 分享按钮 -->
@@ -267,7 +267,7 @@ const handleOpenClick = async () => {
   .page-title {
     font-family: PingFang SC, PingFang SC;
     font-weight: 600;
-    font-size: 20px;
+    font-size: 16px;
     color: var(--text-color, #FFFFFF);
     text-align: center;
     margin: 0;

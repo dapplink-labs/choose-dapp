@@ -67,6 +67,13 @@
 
     <!-- 仓位列表 -->
     <PositionList />
+
+    <!-- 领取成功弹窗 -->
+    <ClaimSuccess
+      v-model="showClaimSuccess"
+      :amount="rewardData.amount"
+      token-symbol="USDT"
+    />
   </div>
 </template>
 
@@ -77,6 +84,7 @@ import { useThemeStore } from '@/stores/theme'
 import { View, Hide } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import PositionList from './PositionList.vue'
+import ClaimSuccess from './ClaimSuccess.vue'
 
 const { t } = useI18n()
 const themeStore = useThemeStore()
@@ -123,8 +131,11 @@ const profitAmount = ref(329263.23)
 // 奖励数据
 const rewardData = ref({
   winnings: 2,
-  amount: 3.27
+  amount: 1000.26
 })
+
+// 领取成功弹窗
+const showClaimSuccess = ref(false)
 
 // 图表相关
 const chartRef = ref(null)
@@ -271,8 +282,8 @@ const updateChart = () => {
 // 处理领取奖励
 const handleClaim = () => {
   if (rewardData.value.winnings === 0) return
-  // TODO: 实现领取奖励逻辑
-  console.log('领取奖励')
+  // 实际项目中这里应该先调领取接口，成功后再弹窗
+  showClaimSuccess.value = true
 }
 
 // 窗口大小改变时调整图表

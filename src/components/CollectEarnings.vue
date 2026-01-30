@@ -24,7 +24,7 @@
                                 <span v-if="option.tag" class="option-tag">{{ option.tag }}</span>
                             </div>
                             <div class="option-amount-row">
-                                <span class="option-amount">{{ formatAmount(option.amount) }} CHO</span>
+                                <span class="option-amount">{{ formatAmount(option.node_reward) }} CHO</span>
                                 <span v-if="option.time" class="option-time">{{ option.status === 1 ?
                                     $t('computingPower.activating') : option.time
                                 }}</span>
@@ -56,7 +56,7 @@ import Message from '@/utils/message'
 import { getNodeStakingRecords, stakingclaimReward } from '@/api/API'
 import { formatDateTime } from '@/utils/format_date.js'
 import { writeContractOptimized } from '@/utils/requestWEB3.js'
-import { parseUnits, formatUnits } from 'viem'
+import { formatChoAmount } from '@/utils/format_amount.js'
 import stakingManagerABI from '@/assets/abi/stakingManagerABI.json'
 import networks from '@/assets/json/networks.json'
 
@@ -91,25 +91,9 @@ const isLoading = ref(false)
 const showModal = ref(false)
 const selectedIndex = ref(0)
 
-// 工具函数：格式化金额（CHO为6精度，需要先转换）
+// CHO 金额（默认 6 精度）
 const formatAmount = (value) => {
-    if (!value || value === '0' || value === 0) return '0'
-    try {
-        // 将18精度的数值转换为正常数量
-        let num = typeof value === 'bigint' || typeof value === 'string'
-            ? parseFloat(formatUnits(BigInt(value.toString()), 18))
-            : Number(value) / 1e18
-
-        if (!Number.isFinite(num)) return '0'
-        const fixed = num.toFixed(4)
-        const trimmed = fixed.replace(/\.?0+$/, '')
-        const [intPart, decimalPart] = trimmed.split('.')
-        const intFormatted = Number(intPart).toLocaleString('en-US')
-        return decimalPart ? `${intFormatted}.${decimalPart}` : intFormatted
-    } catch (error) {
-        console.error('格式化金额失败:', error, value)
-        return '0'
-    }
+    return formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true })
 }
 
 // 获取节点质押记录并构建选项列表
@@ -135,7 +119,8 @@ const fetchNodeStakingRecords = async () => {
             item.tag = nodeTypeMap[item.type]?.nodeTag || ''
             item.time = item.created ? formatDateTime(item.created) : ''
             item.orderIds = item.id
-            item.amount = item.node_reward
+            item.amount = item.amount
+            item.node_reward = item.node_reward
             totalAmount += item.node_reward
             allOrderIds.push(item.id)
         })
@@ -255,6 +240,7 @@ const callClaimRewardContract = async (amount, loading) => {
     }
 
     loading.text = '调用合约中...'
+    console.log(amount)
     const result = await writeContractOptimized({
         abi: stakingManagerABI,
         address: bscNet.proxyStakingManager,
@@ -277,14 +263,11 @@ const submitRewardData = async (txHash, selectedOption, loading) => {
     const requestData = {
         user_address: address.value,
         request_tx_hash: txHash,
-        round: selectedOption.round,
-        raw_amount_token: selectedOption.amount
+        round: String(selectedOption.round),
+        raw_amount_token: String(selectedOption.node_reward)
     }
-    console.log(requestData)
-    if (orderIds) {
-        requestData.order_id = orderIds
-    }
-    await stakingclaimReward(requestData)
+    const res = await stakingclaimReward(requestData)
+    console.log(res)
 }
 
 // 处理错误
@@ -305,10 +288,12 @@ const handleConfirm = async () => {
         Message.warning(t('myNode.nodeActivatingTryLater'))
         return
     }
-    if (selectedOption.amount <= 0) {
+    selectedOption.node_reward = Number(selectedOption.node_reward)
+    if (selectedOption.node_reward && selectedOption.node_reward <= 0) {
         Message.warning(t('myNode.noIncome'))
         return
     }
+    // 验证选择的有效性
     if (!validateSelection(selectedOption)) return
 
     const loading = ElLoading.service({
@@ -316,10 +301,10 @@ const handleConfirm = async () => {
         text: t('common.loading') || '处理中...',
         background: 'rgba(0, 0, 0, 0.7)'
     })
-
     try {
         await switchToBSC(loading)
-        const txHash = await callClaimRewardContract(selectedOption.amount || 0, loading)
+        const txHash = await callClaimRewardContract(selectedOption.node_reward || 0, loading)
+        // const txHash = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
         await submitRewardData(txHash, selectedOption, loading)
 
         Message.success(CONTRACT_MESSAGES.success())

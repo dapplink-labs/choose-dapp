@@ -4,6 +4,7 @@ import bridge from "../views/bridge/index.vue"
 import home from "../views/home/index.vue"
 import earnings from "../views/earnings/index.vue"
 import leaderboard from "../views/leaderboard/index.vue"
+import leaderboardH5 from "../views/leaderboardH5/index.vue"
 import detail from "../views/detail/index.vue"
 import breaking from "../views/breaking/index.vue"
 import accuracy from "../views/accuracy/index.vue"
@@ -20,6 +21,9 @@ import purchaseNodeRecord from "../views/purchaseNodeRecord/index.vue"
 import assetManagement from "../views/assetManagement/index.vue"
 import claimRecord from "../views/claimRecord/index.vue"
 import searchPage from "../views/searchPage/index.vue"
+import userInfo from "../views/userInfo/index.vue"
+import eventPool from "../views/eventPool/index.vue"
+import bill from "../views/bill/index.vue"
 
 const router = createRouter({
   history:  createWebHashHistory(),
@@ -28,6 +32,15 @@ const router = createRouter({
       path: '/',
       name: 'linkWallet',
       component: linkWallet,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/event-pool',
+      name: 'eventPool',
+      component: eventPool,
       meta: {
         hideHeader: true,
         hideFooterNav: true
@@ -55,6 +68,15 @@ const router = createRouter({
     {
       path: '/leaderboard',
       name: 'leaderboard',
+      component: leaderboardH5,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/leaderboard-pc',
+      name: 'leaderboardPC',
       component: leaderboard,
     },
     {
@@ -81,6 +103,24 @@ const router = createRouter({
       path: '/settings',
       name: 'settings',
       component: settings,
+    },
+    {
+      path: '/userInfo',
+      name: 'userInfo',
+      component: userInfo,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/leaderboardH5',
+      name: 'leaderboardH5',
+      component: leaderboardH5,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
     },
     {
       path: '/computing-power-services',
@@ -158,6 +198,15 @@ const router = createRouter({
       path: '/claim-record',
       name: 'claimRecord',
       component: claimRecord,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/bill',
+      name: 'bill',
+      component: bill,
       meta: {
         hideHeader: true,
         hideFooterNav: true

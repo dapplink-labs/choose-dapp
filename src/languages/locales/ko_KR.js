@@ -29,7 +29,10 @@ export default {
     "buy": "Buy",
     "sell": "Sell",
     "valueLabel": "가치",
-    "search": "Search"
+    "search": "Search",
+    "claimSuccessTitle": "축하합니다",
+    "withdrawFee": "출금 수수료(1%)",
+    "winnerFee": "승자 수수료(3%)"
   },
   "link": {
     "titel": "지갑 연결",
@@ -267,7 +270,19 @@ export default {
     "academy": "아카데미",
     "nft": "NFT",
     "underDevelopment": "곧 오픈 예정",
-    "bindInviterFirst": "먼저 초대인을 바인딩하세요"
+    "bindInviterFirst": "먼저 초대인을 바인딩하세요",
+
+    "profileTitle": "프로필",
+    "email": "이메일",
+    "emailPlaceholder": "이메일 주소를 입력해 주세요",
+    "emailHelper": "ChooseMe의 중요한 업데이트 정보를 수신하는 데 사용됩니다",
+    "username": "사용자명",
+    "usernamePlaceholder": "사용자명을 입력해 주세요",
+    "bio": "소개",
+    "bioPlaceholder": "소개를 입력해 주세요",
+    "save": "변경사항 저장",
+    "twitterComingSoon": "Twitter 연동 기능은 곧 제공됩니다",
+    "saveSuccess": "저장되었습니다"
   },
   "purchaseNodeRecord": {
     "title": "구매 내역",
@@ -375,6 +390,13 @@ export default {
   },
   "leaderboard": {
     "title": "Leaderboard",
+    "periodToday": "오늘",
+    "periodWeekly": "이번 주",
+    "periodMonthly": "월간",
+    "categoryAll": "전체",
+    "categoryFinance": "금융",
+    "categoryCrypto": "암호화폐",
+    "categorySports": "스포츠",
     "allCategories": "All Categories",
     "category1": "Category 1",
     "category2": "Category 2",
@@ -502,8 +524,9 @@ export default {
   },
   "myIncome": {
     "myIncomeCMT": "나의 수익(CHO)",
-    "computingPowerIncomeCMT": "해시 파워(Mining) 수익 (CHO)",
-    "networkIncomeCMT": "네트워크 수익 (CHO)",
+    "communityIncomeCHO": "커뮤니티 수익(CHO)",
+    "computingPowerIncomeCMT": "직접 추천 수익 (CHO)",
+    "networkIncomeCMT": "팀 수익 (CHO)",
     "pendingIncome": "지급된 보상",
     "staticIncomeCHO": "스테이킹(Static) 수익 (CHO)",
     "directReferralIncomeCHO": "직접 추천 수익 (CHO)",
@@ -539,6 +562,29 @@ export default {
     "dateRangeSeparator": "부터",
     "startDatePlaceholder": "시작 날짜",
     "endDatePlaceholder": "종료 날짜"
+  },
+  "dateRangePicker": {
+    "title": "날짜 범위로 필터",
+    "description": "과거 90일간의 주문 기록을 확인할 수 있습니다",
+    "confirm": "확인",
+    "quick7": "7일",
+    "quick30": "30일",
+    "quick90": "90일"
+  },
+  "bill": {
+    "title": "청구서",
+    "filterType": "유형",
+    "filterAsset": "자산",
+    "filterDate": "날짜",
+    "typeAll": "전체",
+    "typeRecharge": "충전",
+    "typeWithdraw": "출금",
+    "typePurchase": "구매 이벤트",
+    "typeSell": "판매 이벤트",
+    "assetAll": "전체",
+    "date7": "최근 7일",
+    "date30": "최근 30일",
+    "date90": "최근 90일"
   },
   "dashboard": {
     "title": "대시보드",
@@ -644,5 +690,17 @@ export default {
       "sports": "Sports",
       "esports": "Esports"
     }
+  },
+  "eventPool": {
+    "title": "이벤트 풀",
+    "heroTitle": "진행 중인 이벤트에 투표하세요",
+    "heroSub": "여러분이 생각하는 가장 핫한 이벤트를 선택하세요",
+    "heroTip": "* CHO 토큰을 보유한 경우에만 이벤트 투표에 참여할 수 있습니다. 각 이벤트는 지갑당 하루에 한 번만 투표할 수 있습니다.",
+    "participateCount": "명이 투표에 참여했습니다",
+    "yes": "Yes",
+    "no": "No",
+    "vote": "투표",
+    "votedToday": "오늘 이미 투표했습니다",
+    "currentVotes": "현재 표 수: "
   }
 }
