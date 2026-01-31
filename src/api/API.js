@@ -42,7 +42,7 @@ export const getNodeServiceProvidersInfo = (data) => {
 
 // 获取质押信息
 export const getNodeStakingInfo = (data) => {
-    return request.get('/api/v1/staking/nodeStakingInfo', { params: data })
+    return request.get('/api/v2/staking/stakingIncome', { params: data })
 }
 
 // 购买节点

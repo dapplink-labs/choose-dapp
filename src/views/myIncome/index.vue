@@ -80,7 +80,7 @@
                     </div>
                 </div>
                 <div class="text">
-                    <span>0 USDT</span>
+                    <span>{{ formatUsdtAmount(parseInt(currentNodeStakingInfo.total_reward_usdt)) }} USDT</span>
                     <span>{{ formatUsdtAmount(parseInt(currentNodeStakingInfo.forecast_income)) }} USDT</span>
                 </div>
             </div>
@@ -88,7 +88,7 @@
             <div class="earnings-grid">
                 <div class="earnings-item">
                     <div class="earnings-label">{{ $t('myIncome.staticIncomeCHO') }}</div>
-                    <div class="earnings-value">{{ formatAmount(currentNodeStakingInfo.node_reward) }}</div>
+                    <div class="earnings-value">{{ formatAmount(currentNodeStakingInfo.static_reward) }}</div>
                 </div>
                 <div class="earnings-item">
                     <div class="earnings-label">{{ $t('myIncome.directReferralIncomeCHO') }}</div>
@@ -361,16 +361,17 @@ const nodeTypeMap = {
 const fetchNodeStakingInfo = async () => {
 
     if (!currentNodeStakingInfo.value.id) return
-
-    const res = await getNodeStakingInfo({ address: address.value, id: currentNodeStakingInfo.value.id, round: currentNodeStakingInfo.value.round })
-    const data = res?.data?.data?.staking_info || {}
+console.log(currentNodeStakingInfo.value,'-------------------')
+    const res = await getNodeStakingInfo({ address: address.value, staking_order_id: currentNodeStakingInfo.value.id, round: currentNodeStakingInfo.value.round })
+    console.log(res)
+    const data = res?.data?.data || {}
     data.id = currentNodeStakingInfo.value.id
     data.name = t(nodeTypeMap[data.node_level]?.nodeNameKey || '')
     currentNodeStakingInfo.value = data
     // 返回两个字段 已发放奖励  总奖励  计算百分比
-    currentNodeStakingInfo.value.progressPercent = 0;//百分比
+    currentNodeStakingInfo.value.progressPercent = (currentNodeStakingInfo.value.total_reward_usdt / currentNodeStakingInfo.value.forecast_income) * 100
     // currentNodeStakingInfo.forecast_income 总奖励
-    // currentNodeStakingInfo.xxx 已发放奖励
+    // currentNodeStakingInfo.total_reward_usdt 已发放奖励USDT
     console.log(currentNodeStakingInfo.value)
 }
 
@@ -388,8 +389,7 @@ const getNodeStakingRecordsList = async () => {
         }
     })
     if (myNodes.value.length > 0) {
-        currentNodeStakingInfo.value.id = myNodes.value[0].id
-        currentNodeStakingInfo.value.round = myNodes.value[0].round
+        currentNodeStakingInfo.value = myNodes.value[0]
         fetchNodeStakingInfo()
     } else {
         // 如果没有质押节点，显示确定弹窗提示用户并返回上一个页面
@@ -403,6 +403,7 @@ const getNodeStakingRecordsList = async () => {
 const handleNodeSelect = (id) => {
     if (!id) return
     currentNodeStakingInfo.value.id = id
+    currentNodeStakingInfo.value.round = myNodes.value.find(item => item.id === id)?.round
     fetchNodeStakingInfo()
 }
 

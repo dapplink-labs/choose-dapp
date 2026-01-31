@@ -303,7 +303,7 @@ const handleConfirm = async () => {
     })
     try {
         await switchToBSC(loading)
-        const txHash = await callClaimRewardContract(selectedOption.node_reward || 0, loading)
+        const txHash = await callClaimRewardContract(selectedOption.round || 0, loading)
         // const txHash = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
         await submitRewardData(txHash, selectedOption, loading)
 
