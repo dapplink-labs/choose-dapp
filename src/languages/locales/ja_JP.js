@@ -553,6 +553,7 @@ export default {
     "flowBonusIncomeCHO": "My Flow Bonus",
     "claimRecord": "Claim Records",
     "claimAll": "Claim All Profit",
+    "calculating": "利益計算中",
     "purchaseTime": "Activation Time",
     "upline": "Upline",
     "noStakingNode": "通知",
@@ -576,7 +577,8 @@ export default {
     "clusterNode": "クラスターノード",
     "dateRangeSeparator": "から",
     "startDatePlaceholder": "開始日",
-    "endDatePlaceholder": "終了日"
+    "endDatePlaceholder": "終了日",
+    "purchaseTimePrefix": "購入日"
   },
   "dateRangePicker": {
     "title": "日付範囲で絞り込み",

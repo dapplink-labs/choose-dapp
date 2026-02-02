@@ -256,8 +256,6 @@ const scrollToBottom = () => {
   justify-content: space-between;
   align-items: center;
   background: #000;
-  border: 1px solid #333;
-  padding: 16px;
   border-radius: 12px;
   font-size: 16px;
   font-weight: 500;

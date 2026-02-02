@@ -1,5 +1,5 @@
 <template>
-    <div class="info" v-if="visible" >
+    <div class="info" v-if="visible" @click.self="close">
         <div class="content marquee-background">
             <div class="header" style="display: flex; justify-content: center;">
                 <el-icon :color="'var(--text-color)'" size="40" @click="close()">

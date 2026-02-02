@@ -552,6 +552,7 @@ export default {
     "flowBonusIncomeCHO": "My Flow Bonus",
     "claimRecord": "Claim Records",
     "claimAll": "Claim All Profit",
+    "calculating": "Calculating rewards",
     "purchaseTime": "Activation Time",
     "upline": "Upline",
     "noStakingNode": "Notice",
@@ -575,7 +576,8 @@ export default {
     "clusterNode": "Cluster Node",
     "dateRangeSeparator": "to",
     "startDatePlaceholder": "Start Date",
-    "endDatePlaceholder": "End Date"
+    "endDatePlaceholder": "End Date",
+    "purchaseTimePrefix": "Purchased on"
   },
   "dateRangePicker": {
     "title": "Filter by Date Range",

@@ -553,6 +553,7 @@ export default {
     "flowBonusIncomeCHO": "我的流水分红(CHO)",
     "claimRecord": "领取记录",
     "claimAll": "수익 수령",
+    "calculating": "수익 계산 중",
     "purchaseTime": "활성화 시간 %s",
     "upline": "직접 추천",
     "noStakingNode": "알림",
@@ -576,7 +577,8 @@ export default {
     "clusterNode": "클러스터 노드",
     "dateRangeSeparator": "부터",
     "startDatePlaceholder": "시작 날짜",
-    "endDatePlaceholder": "종료 날짜"
+    "endDatePlaceholder": "종료 날짜",
+    "purchaseTimePrefix": "구매"
   },
   "dateRangePicker": {
     "title": "날짜 범위로 필터",

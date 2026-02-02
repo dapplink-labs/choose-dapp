@@ -65,9 +65,17 @@
                 </div>
             </div>
 
-            <!-- 一键领取按钮 -->
-            <button class="claim-all-btn" :disabled="claimLoading" @click="handleClaimReward">
-                {{ claimLoading ? loadingText : $t('myNode.claimAll') }}
+            <!-- 一键领取按钮：凌晨 2-3 点禁止领取，显示“收益计算中” -->
+            <button
+                class="claim-all-btn"
+                :disabled="claimLoading || isClaimDisabledByTime"
+                @click="handleClaimReward"
+            >
+                {{
+                    isClaimDisabledByTime
+                        ? $t('myIncome.calculating')
+                        : (claimLoading ? loadingText : $t('myNode.claimAll'))
+                }}
             </button>
 
         </div>
@@ -87,11 +95,13 @@
 
                 <div class="team-header">
                     <span class="invite-count">
-                        <span>{{activeTab === 'direct' ? $t('myNode.directEffectiveCount') : $t('myNode.teamEffectiveCount') }}</span>
+                        <span>{{ activeTab === 'direct' ? $t('myNode.directEffectiveCount') :
+                            $t('myNode.teamEffectiveCount') }}</span>
                         {{ effectiveCount }}
                     </span>
                     <span class="invite-count">
-                        <span>{{ activeTab === 'direct' ? $t('myNode.directIneffectiveCount') : $t('myNode.teamIneffectiveCount') }}</span>
+                        <span>{{ activeTab === 'direct' ? $t('myNode.directIneffectiveCount') :
+                            $t('myNode.teamIneffectiveCount') }}</span>
                         {{ ineffectiveCount }}
                     </span>
                 </div>
@@ -181,6 +191,15 @@ const chainId = useChainId()
 const BSC_CHAIN_ID = 56
 const claimLoading = ref(false)
 
+// 是否处于每日 02:00-03:00 收益计算时间段内
+const isClaimDisabledByTime = computed(() => {
+    const now = new Date()
+    const totalMinutes = now.getHours() * 60 + now.getMinutes()
+    const start = 2 * 60 // 02:00
+    const end = 3 * 60   // 03:00
+    return totalMinutes >= start && totalMinutes < end
+})
+
 // 顶部收益数据
 const choIncome = ref('0')
 const subCoinIncome = ref('0') // 子币收益暂无数据，写死 0
@@ -201,6 +220,9 @@ function showInfo() {
 
 // 领取收益
 const handleClaimReward = async () => {
+
+    // 凌晨 2-3 点不允许领取
+    if (isClaimDisabledByTime.value) return
 
     let amount = Number(nodeIncome.value) + Number(networkFeeIncome.value) + Number(subCoinFeeIncome.value) + Number(secondaryMarketIncome.value) + Number(directReferralIncome.value) + Number(teamIncome.value) + Number(subCoinIncome.value);
     console.log(amount)
@@ -338,7 +360,12 @@ const loadingText = computed(() => {
 })
 
 const goToClaimRecord = () => {
-    router.push('/claim-record')
+    router.push({
+        path: '/claim-record',
+        query: {
+            type: 2
+        }
+    })
 }
 async function init() {
     await getNodeServiceProvidersInfo({
@@ -385,11 +412,13 @@ onMounted(async () => {
 .theme-light {
     .claim-all-btn {
         background-color: #2B6C18 !important;
-        transition: opacity 0.2s ease;
+        transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
     }
 
     .claim-all-btn:disabled {
-        opacity: 0.6;
+        opacity: 0.9;
+        background-color: #6b6b6b !important;
+        color: #d0d0d0 !important;
         cursor: not-allowed;
     }
 
@@ -405,11 +434,13 @@ onMounted(async () => {
 
 .theme-dark {
     .claim-all-btn {
-        transition: opacity 0.2s ease;
+        transition: opacity 0.2s ease, background-color 0.2s ease, color 0.2s ease;
     }
 
     .claim-all-btn:disabled {
-        opacity: 0.6;
+        opacity: 0.9;
+        background-color: #6b6b6b !important;
+        color: #d0d0d0 !important;
         cursor: not-allowed;
     }
 }

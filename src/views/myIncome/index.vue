@@ -75,7 +75,8 @@
                         </div>
                         <div class="progress-indicator"
                             :style="{ left: (currentNodeStakingInfo.progressPercent < 4) ? 4 + '%' : currentNodeStakingInfo.progressPercent + '%' }">
-                            <span class="indicator-text">{{ currentNodeStakingInfo.progressPercent }}%</span>
+                            <span class="indicator-text">{{
+                                formatProgressPercent(currentNodeStakingInfo.progressPercent) }}%</span>
                         </div>
                     </div>
                 </div>
@@ -118,7 +119,14 @@
                 </div>
             </div>
 
-            <button class="claim-all-btn" @click="openCollectEarnings">{{ $t('myIncome.claimAll') }}</button>
+            <button
+                class="claim-all-btn"
+                :class="{ 'claim-all-btn--disabled': isClaimDisabledByTime }"
+                :disabled="isClaimDisabledByTime"
+                @click="openCollectEarnings"
+            >
+                {{ claimButtonText }}
+            </button>
         </div>
 
         <!-- 我的团队模块 -->
@@ -135,11 +143,13 @@
 
                 <div class="team-header">
                     <span class="invite-count">
-                        <span>{{ activeTab === 'direct' ? $t('myNode.directEffectiveCount') : $t('myNode.teamEffectiveCount') }}</span>
+                        <span>{{ activeTab === 'direct' ? $t('myNode.directEffectiveCount') :
+                            $t('myNode.teamEffectiveCount') }}</span>
                         {{ effectiveCount }}
                     </span>
                     <span class="invite-count">
-                        <span>{{ activeTab === 'direct' ? $t('myNode.directIneffectiveCount') : $t('myNode.teamIneffectiveCount') }}</span>
+                        <span>{{ activeTab === 'direct' ? $t('myNode.directIneffectiveCount') :
+                            $t('myNode.teamIneffectiveCount') }}</span>
                         {{ ineffectiveCount }}
                     </span>
                 </div>
@@ -293,11 +303,26 @@ const handleCloseNoNodeModal = () => {
     router.back()
 }
 
+// 当前时间是否在每日 02:00-03:00 之间（收益计算中，禁止领取）
+const isClaimDisabledByTime = computed(() => {
+    const now = new Date()
+    const totalMinutes = now.getHours() * 60 + now.getMinutes()
+    const start = 2 * 60 // 02:00
+    const end = 3 * 60   // 03:00
+    return totalMinutes >= start && totalMinutes < end
+})
+
+// 领取按钮文案：正常为“领取收益”，02:00-03:00 为“收益计算中”
+const claimButtonText = computed(() => {
+    return isClaimDisabledByTime.value ? t('myIncome.calculating') : t('myIncome.claimAll')
+})
+
 // 领取收益弹窗引用
 const collectEarningsRef = ref(null)
 
 // 打开领取收益弹窗
 const openCollectEarnings = () => {
+    if (isClaimDisabledByTime.value) return
     collectEarningsRef.value?.open()
 }
 
@@ -312,12 +337,20 @@ const currentNodeStakingInfo = ref({})
 
 // CHO 金额（默认 6 精度）
 const formatAmount = (value) => {
-    return formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true })
+    return formatChoAmount(value, { maxFractionDigits: 2, useGrouping: true })
 }
 
 // USDT 金额（18 精度）
 const formatUsdtAmount = (value) => {
-    return formatTokenAmount(value, { decimals: 18, maxFractionDigits: 4, useGrouping: true })
+    return formatTokenAmount(value, { decimals: 18, maxFractionDigits: 2, useGrouping: true })
+}
+
+// 进度百分比：最多保留一位小数
+const formatProgressPercent = (value) => {
+    const num = Number(value) || 0
+    const rounded = Math.round(num * 10) / 10
+    // 如果是整数，不带小数；否则保留一位
+    return rounded % 1 === 0 ? String(rounded) : rounded.toFixed(1)
 }
 
 // 地址截取：前6位 + ... + 后4位
@@ -361,7 +394,7 @@ const nodeTypeMap = {
 const fetchNodeStakingInfo = async () => {
 
     if (!currentNodeStakingInfo.value.id) return
-console.log(currentNodeStakingInfo.value,'-------------------')
+    console.log(currentNodeStakingInfo.value, '-------------------')
     const res = await getNodeStakingInfo({ address: address.value, staking_order_id: currentNodeStakingInfo.value.id, round: currentNodeStakingInfo.value.round })
     console.log(res)
     const data = res?.data?.data || {}
@@ -408,7 +441,10 @@ const handleNodeSelect = (id) => {
 }
 
 const goToClaimRecord = () => {
-    router.push('/claim-record')
+    router.push({
+        path: '/claim-record',
+        query: { type: 1 }
+    })
 }
 // 初始化主题
 onMounted(() => {
@@ -704,6 +740,17 @@ watch(activeTab, () => {
             cursor: pointer;
             transition: all 0.2s ease;
             margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &--disabled,
+            &:disabled {
+                background: #6b6b6b;
+                color: #d0d0d0;
+                cursor: not-allowed;
+                opacity: 0.85;
+            }
         }
 
 
@@ -754,6 +801,7 @@ watch(activeTab, () => {
             padding: 14px 12px;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
             background: var(--bg-page);
             transition: background-color 0.3s ease;
             border: 1px solid var(--border-color);
@@ -763,6 +811,7 @@ watch(activeTab, () => {
                 font-weight: 400;
                 font-size: 16px;
                 color: var(--bg-opposite);
+                line-height: 1.4;
             }
 
             p {
@@ -770,6 +819,12 @@ watch(activeTab, () => {
                 font-weight: bold;
                 font-size: 24px;
                 color: #2FBC87;
+                line-height: 1.2;
+                margin-top: 6px;
+                /* 允许长金额在小屏幕上换行显示 */
+                white-space: normal;
+                word-break: break-all;
+                overflow-wrap: anywhere;
             }
         }
     }

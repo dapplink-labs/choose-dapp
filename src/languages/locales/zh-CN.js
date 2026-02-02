@@ -552,6 +552,7 @@ export default {
     "flowBonusIncomeCHO": "我的流水分红(CHO)",
     "claimRecord": "领取记录",
     "claimAll": "领取收益",
+    "calculating": "收益计算中",
     "purchaseTime": "激活时间",
     "upline": "上线",
     "noStakingNode": "提示",
@@ -575,7 +576,8 @@ export default {
     "clusterNode": "集群节点",
     "dateRangeSeparator": "至",
     "startDatePlaceholder": "开始日期",
-    "endDatePlaceholder": "结束日期"
+    "endDatePlaceholder": "结束日期",
+    "purchaseTimePrefix": "购于"
   },
   "dateRangePicker": {
     "title": "按日期范围筛选",

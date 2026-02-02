@@ -14,18 +14,12 @@
                     </button>
                     <transition name="fade-dropdown">
                         <div v-if="showServiceDropdown" class="dropdown-menu">
-                            <div
-                                class="dropdown-item"
-                                :class="{ active: currentServiceType === 'computingPower' }"
-                                @click="selectServiceType('computingPower')"
-                            >
+                            <div class="dropdown-item" :class="{ active: currentServiceType === 'computingPower' }"
+                                @click="selectServiceType('computingPower')">
                                 {{ $t('claimRecord.computingPowerService') }}
                             </div>
-                            <div
-                                class="dropdown-item"
-                                :class="{ active: currentServiceType === 'lpVault' }"
-                                @click="selectServiceType('lpVault')"
-                            >
+                            <div class="dropdown-item" :class="{ active: currentServiceType === 'lpVault' }"
+                                @click="selectServiceType('lpVault')">
                                 {{ $t('claimRecord.lpVault') }}
                             </div>
                         </div>
@@ -43,17 +37,11 @@
             <!-- 日期选择器直接放在 filters-row 下方 -->
             <transition name="fade-dropdown">
                 <div v-if="showDatePicker" class="date-picker-row">
-                    <el-date-picker
-                        v-model="dateRange"
-                        type="daterange"
+                    <el-date-picker v-model="dateRange" type="daterange"
                         :range-separator="$t('claimRecord.dateRangeSeparator')"
                         :start-placeholder="$t('claimRecord.startDatePlaceholder')"
-                        :end-placeholder="$t('claimRecord.endDatePlaceholder')"
-                        format="YYYY-MM-DD"
-                        value-format="YYYY-MM-DD"
-                        :teleported="false"
-                        :editable="false"
-                        placement="bottom-start"
+                        :end-placeholder="$t('claimRecord.endDatePlaceholder')" format="YYYY-MM-DD"
+                        value-format="YYYY-MM-DD" :teleported="false" :editable="false" placement="bottom-start"
                         :popper-options="{
                             modifiers: [
                                 {
@@ -70,10 +58,7 @@
                                     }
                                 }
                             ]
-                        }"
-                        @change="handleDateChange"
-                        @clear="handleDateClear"
-                    />
+                        }" @change="handleDateChange" @clear="handleDateClear" />
                     <div class="date-picker-actions">
                         <button class="action-btn clear-btn" @click="handleDateClear">{{ $t('common.all') }}</button>
                     </div>
@@ -82,17 +67,16 @@
         </div>
 
         <div class="record-list" ref="recordListRef" @scroll="handleScroll">
-            <div
-                v-for="(item, index) in visibleRecords"
-                :key="index"
-                class="record-item"
-            >
+            <div v-for="(item, index) in visibleRecords" :key="index" class="record-item">
                 <div class="record-left">
                     <div class="record-title">{{ item.title }}</div>
                     <div class="record-time">{{ item.time }}</div>
                 </div>
                 <div class="record-amount">
-                    +{{ item.amount }} CHO
+                    <div class="amount-text">+{{ item.amount }} CHO</div>
+                    <div v-if="item.purchaseTime" class="purchase-time">
+                        {{ $t('claimRecord.purchaseTimePrefix') || '购于' }} {{ item.purchaseTime }}
+                    </div>
                 </div>
             </div>
             <!-- 加载状态 -->
@@ -121,13 +105,17 @@ import { getNodeServiceProviderRewardRecords, getNodeStakingRewardRecords } from
 import { formatDateTime } from '@/utils/format_date.js'
 import { formatUnits } from 'viem'
 import { formatChoAmount, formatTokenAmount } from '@/utils/format_amount'
+import { useRoute } from 'vue-router'
 
 
 const { t } = useI18n()
 const { address } = useAccount()
+const route = useRoute()
+const serviceType = route.query.type === '1' ? 'lpVault' : 'computingPower'
+console.log(route.query.type)
 
 // 当前筛选：服务类型 & 日期范围
-const currentServiceType = ref('computingPower') // 默认：算力服务
+const currentServiceType = ref(serviceType) // 默认：算力服务
 const dateRange = ref(null) // 日期范围 [开始日期, 结束日期]
 
 // 服务类型下拉框状态
@@ -235,22 +223,22 @@ const selectServiceType = (type) => {
 // 获取记录列表
 const fetchRecords = async (isLoadMore = false) => {
     if (!address.value || isLoading.value) return
-    
+
     const currentType = currentServiceType.value
     const currentPage = isLoadMore ? page.value[currentType] + 1 : 1
-    
+
     // 如果没有更多数据，不继续请求
     if (!hasMore.value[currentType] && isLoadMore) return
-    
+
     isLoading.value = true
-    
+
     try {
         const params = {
             address: address.value,
             page: currentPage,
             page_size: pageSize.value
         }
-        
+
         // 如果有选择日期范围，添加时间戳参数
         if (dateRange.value && Array.isArray(dateRange.value) && dateRange.value.length === 2) {
             const [startDate, endDate] = dateRange.value
@@ -261,7 +249,7 @@ const fetchRecords = async (isLoadMore = false) => {
             params.created_from = startTimestamp
             params.created_to = endTimestamp
         }
-        
+
         let res
         if (currentType === 'computingPower') {
             // 算力服务
@@ -270,11 +258,11 @@ const fetchRecords = async (isLoadMore = false) => {
             // 质押池
             res = await getNodeStakingRewardRecords(params)
         }
-        
+
         const data = res?.data?.data || {}
         const list = data.list || []
         const total = data.total || 0
-        
+
         // 映射 type 字段（仅针对算力服务）
         const mapNodeType = (type, serviceType) => {
             if (serviceType === 'computingPower') {
@@ -288,22 +276,24 @@ const fetchRecords = async (isLoadMore = false) => {
             // 其他情况直接返回原始值
             return type
         }
-        
+
         // 映射数据格式
         const mappedList = list.map(item => {
             // 根据接口返回的字段映射，可能需要根据实际接口调整
             const title = mapNodeType(item.type, currentType)
-            
+
             const time = formatDateTime(item.created || item.create_time || item.time || item.created_at)
             const amount = formatChoAmount(item.amount || 0)
-            
+            const purchaseTime = item.purchase_time ? formatDateTime(item.purchase_time) : ''
+
             return {
                 title,
                 time,
-                amount
+                amount,
+                purchaseTime
             }
         })
-        
+
         if (isLoadMore) {
             // 加载更多：追加数据
             allRecords.value[currentType].push(...mappedList)
@@ -313,11 +303,11 @@ const fetchRecords = async (isLoadMore = false) => {
             allRecords.value[currentType] = mappedList
             page.value[currentType] = 1
         }
-        
+
         // 判断是否还有更多数据
         const currentTotal = allRecords.value[currentType].length
         hasMore.value[currentType] = currentTotal < total && mappedList.length === pageSize.value
-        
+
     } catch (error) {
         console.error('获取记录列表失败：', error)
     } finally {
@@ -328,7 +318,7 @@ const fetchRecords = async (isLoadMore = false) => {
 // 上拉加载
 const handleScroll = () => {
     if (!recordListRef.value || isLoading.value || !hasMore.value[currentServiceType.value]) return
-    
+
     const { scrollTop, scrollHeight, clientHeight } = recordListRef.value
     // 距离底部 50px 时触发加载
     if (scrollHeight - scrollTop - clientHeight < 50) {
@@ -463,25 +453,25 @@ onBeforeUnmount(() => {
             background-color: var(--bg-page-h5, #FFFFFF) !important;
             border-color: var(--border-color, #23262F) !important;
             transition: background-color 0.3s ease, border-color 0.3s ease;
-            
+
             .el-range-input {
                 color: var(--text-color, #1a1a1a);
                 background-color: transparent !important;
             }
-            
+
             .el-range-separator {
                 color: var(--text-color, #1a1a1a);
             }
-            
+
             .el-input__wrapper {
                 background-color: var(--bg-page-h5, #FFFFFF) !important;
                 box-shadow: 0 0 0 1px var(--border-color, #23262F) inset !important;
             }
-            
+
             &:hover .el-input__wrapper {
                 box-shadow: 0 0 0 1px var(--border-color, #23262F) inset !important;
             }
-            
+
             &.is-focus .el-input__wrapper {
                 box-shadow: 0 0 0 1px var(--border-color, #23262F) inset !important;
             }
@@ -513,7 +503,7 @@ onBeforeUnmount(() => {
     .record-list {
         max-height: calc(100vh - 200px);
         overflow-y: auto;
-        
+
         .record-item {
             display: flex;
             align-items: center;
@@ -540,12 +530,24 @@ onBeforeUnmount(() => {
             }
 
             .record-amount {
-                font-size: 14px;
-                font-weight: 500;
-                color: #3DD077;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 4px;
+
+                .amount-text {
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #3DD077;
+                }
+
+                .purchase-time {
+                    font-size: 12px;
+                    color: var(--text-dark-gray, #999999);
+                }
             }
         }
-        
+
         .loading-more,
         .no-more {
             text-align: center;
@@ -553,7 +555,7 @@ onBeforeUnmount(() => {
             font-size: 14px;
             color: var(--text-dark-gray, #999999);
         }
-        
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -603,7 +605,6 @@ onBeforeUnmount(() => {
         background-color: rgba(0, 0, 0, 0.04);
     }
 }
-
 </style>
 
 <style>
@@ -779,9 +780,10 @@ onBeforeUnmount(() => {
 }
 
 @media screen and (max-width: 500px) {
-    .claim-record-page .date-picker-row .el-date-editor{
+    .claim-record-page .date-picker-row .el-date-editor {
         box-sizing: border-box !important;
     }
+
     .claim-record-page .el-picker__popper {
         max-width: calc(100vw - 32px) !important;
     }
@@ -817,6 +819,3 @@ onBeforeUnmount(() => {
     }
 }
 </style>
-
-
-
