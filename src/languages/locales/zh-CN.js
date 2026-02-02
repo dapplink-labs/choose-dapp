@@ -304,6 +304,21 @@ export default {
     "bindTwitter": "绑定",
     "saveText": "保存"
   },
+  "helpCenter": {
+    "pageTitle": "ChooseMe客服",
+    "greeting": "您好,需要什么帮助?",
+    "topicDeposit": "如何存入和提币",
+    "topicLogin": "登录注册问题",
+    "topicTrade": "进行交易",
+    "depositWithdrawFlow": "如何存入/提币操作流程",
+    "disclaimer": "ChooseMe智能客服由AI技术提供支持,回复内容可能存在不准确、不完整或时效性问题,请勿将其当作投资建议.",
+    "inputPlaceholder": "请输入内容",
+    "replySelectType": "小C 帮您找到了存入/提币流程的相关指南,请选择类型:",
+    "optionDeposit": "存入教程",
+    "optionWithdraw": "提币教程",
+    "replyDepositGuides": "以下是小C为您找到的相关存入教程:",
+    "replyDefault": "小C 正在为您查找相关帮助内容,请稍候或尝试其他问题。"
+  },
   "breaking": {
     "ad": "广告",
     "avatar": "头像",

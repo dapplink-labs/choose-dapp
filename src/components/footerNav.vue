@@ -58,7 +58,7 @@ const { t } = useI18n()
 const navItems = computed(() => [
   { key: 'home', label: t('footerNav.home') || '首页', path: '/home' },
   { key: 'search', label: t('common.search') || '搜索', path: '/home' },
-  { key: 'breaking', label: t('footerNav.breaking') || '突发', path: '/home' },
+  { key: 'breaking', label: t('footerNav.breaking') || '突发', path: '/breaking' },
   { key: 'more', label: t('common.more') || '更多', path: '/personal-center' }
 ])
 

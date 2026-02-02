@@ -304,6 +304,21 @@ export default {
     "bindTwitter": "連携",
     "saveText": "保存"
   },
+  "helpCenter": {
+    "pageTitle": "ChooseMeサポート",
+    "greeting": "こんにちは、何かお手伝いしましょうか？",
+    "topicDeposit": "入金・出金",
+    "topicLogin": "ログイン・登録",
+    "topicTrade": "取引",
+    "depositWithdrawFlow": "入金/出金の手順",
+    "disclaimer": "ChooseMe AIサポートはAI技術により提供されています。回答は不正確・不完全・期限切れの可能性があります。投資助言として扱わないでください。",
+    "inputPlaceholder": "内容を入力してください",
+    "replySelectType": "入金/出金ガイドが見つかりました。種類を選択してください：",
+    "optionDeposit": "入金チュートリアル",
+    "optionWithdraw": "出金チュートリアル",
+    "replyDepositGuides": "以下は入金チュートリアルです：",
+    "replyDefault": "関連するヘルプを検索中です。少々お待ちください。"
+  },
   "breaking": {
     "ad": "Advertisement",
     "avatar": "Avatar",

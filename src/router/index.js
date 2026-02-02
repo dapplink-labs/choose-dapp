@@ -24,6 +24,7 @@ import searchPage from "../views/searchPage/index.vue"
 import userInfo from "../views/userInfo/index.vue"
 import eventPool from "../views/eventPool/index.vue"
 import bill from "../views/bill/index.vue"
+import helpCenter from "../views/helpCenter/index.vue"
 
 const router = createRouter({
   history:  createWebHashHistory(),
@@ -219,6 +220,15 @@ const router = createRouter({
       meta: {
         hideHeader: true,
         hideFooterNav: false
+      }
+    },
+    {
+      path: '/help-center',
+      name: 'helpCenter',
+      component: helpCenter,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
       }
     }
   ],

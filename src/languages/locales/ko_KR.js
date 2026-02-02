@@ -304,6 +304,21 @@ export default {
     "bindTwitter": "연동",
     "saveText": "저장"
   },
+  "helpCenter": {
+    "pageTitle": "ChooseMe 고객지원",
+    "greeting": "안녕하세요, 무엇을 도와드릴까요?",
+    "topicDeposit": "입금 및 출금",
+    "topicLogin": "로그인·회원가입",
+    "topicTrade": "거래",
+    "depositWithdrawFlow": "입금/출금 방법",
+    "disclaimer": "ChooseMe AI 고객지원은 AI 기술로 제공됩니다. 답변이 부정확하거나 불완전할 수 있으니 투자 조언으로 활용하지 마세요.",
+    "inputPlaceholder": "내용을 입력하세요",
+    "replySelectType": "입금/출금 가이드를 찾았습니다. 유형을 선택하세요:",
+    "optionDeposit": "입금 튜토리얼",
+    "optionWithdraw": "출금 튜토리얼",
+    "replyDepositGuides": "입금 튜토리얼입니다:",
+    "replyDefault": "관련 도움말을 찾고 있습니다. 잠시만 기다려 주세요."
+  },
   "breaking": {
     "ad": "Advertisement",
     "avatar": "Avatar",

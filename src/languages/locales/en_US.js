@@ -304,6 +304,21 @@ export default {
     "bindTwitter": "Bind",
     "saveText": "Save"
   },
+  "helpCenter": {
+    "pageTitle": "ChooseMe Support",
+    "greeting": "Hello, how can we help?",
+    "topicDeposit": "Deposit & Withdraw",
+    "topicLogin": "Login & Registration",
+    "topicTrade": "Trading",
+    "depositWithdrawFlow": "Deposit/Withdraw guide",
+    "disclaimer": "ChooseMe AI support is powered by AI. Replies may be inaccurate, incomplete or outdated. Do not treat them as investment advice.",
+    "inputPlaceholder": "Please enter content",
+    "replySelectType": "Xiao C found deposit/withdraw guides for you. Please select:",
+    "optionDeposit": "Deposit tutorial",
+    "optionWithdraw": "Withdraw tutorial",
+    "replyDepositGuides": "Here are the deposit tutorials found for you:",
+    "replyDefault": "Xiao C is looking up relevant help. Please wait or try another question."
+  },
   "breaking": {
     "ad": "Advertisement",
     "avatar": "Avatar",

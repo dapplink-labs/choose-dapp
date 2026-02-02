@@ -2,16 +2,11 @@
   <transition name="sheet-slide">
     <div v-if="modelValue" class="claim-overlay" @click.self="handleClose">
       <!-- 动态布局：is-full(初始满屏) / is-compact(点击后卡片) -->
-      <div 
-        class="claim-container" 
-        :class="[isClaimed ? 'is-compact' : 'is-full']"
-      >
+      <div class="claim-container" :class="[isClaimed ? 'is-compact' : 'is-full']">
         <!-- 顶部装饰拉条 -->
         <div class="sheet-handle" />
 
-        <!-- 核心内容 -->
         <div class="sheet-content">
-          
           <!-- 1. 顶部 Banner 区域 (带碎纸屑背景) -->
           <div class="banner-area">
             <div class="confetti-bg">
@@ -24,10 +19,10 @@
             </div>
           </div>
 
-          <!-- 2. 状态切换区 -->
+          <!-- 2. 详情内容与按钮区 -->
           <div class="action-area">
-            <!-- 初始状态：显示详情列表 (图2) -->
             <div v-if="!isClaimed" class="details-view">
+              <!-- 费用列表 -->
               <div class="fee-list">
                 <div class="fee-row">
                   <span class="label">提现手续费(1%)</span>
@@ -41,22 +36,23 @@
 
               <div class="divider" />
 
-              <!-- 底部推广/问题部分 -->
-              <div class="question-row">
-                <div class="avatar-box">
-                  <!-- 这里替换为 Elon 图标 -->
-                  <img src="https://pbs.twimg.com/profile_images/1780044483886211072/0_v9vEB6_400x400.jpg" alt="avatar" />
+              <!-- 问题/推广卡片 (还原图片中的深灰卡片感) -->
+              <div class="question-card">
+                <div class="avatar-wrap">
+                  <img src="https://picsum.photos/seed/user24/400/400" alt="avatar" />
                 </div>
-                <div class="q-text">
+                <div class="q-content">
                   <div class="q-title">以太坊在12月28日的价格—？</div>
-                  <div class="q-sub">投$1.00赢得 <span class="green-text">$2.87</span></div>
+                  <div class="q-bet">
+                    投$1.00赢得 <span class="green-text">$2.87</span>
+                  </div>
                 </div>
               </div>
 
               <button class="main-btn" @click="handleClaim">Claim</button>
             </div>
 
-            <!-- 领取后状态：仅显示 Done 按钮 (图1) -->
+            <!-- 领取后的状态 -->
             <div v-else class="done-view">
               <button class="main-btn is-white" @click="handleDone">Done</button>
             </div>
@@ -81,7 +77,6 @@ const emit = defineEmits(['update:modelValue', 'success'])
 
 const isClaimed = ref(false)
 
-// 每次打开弹窗重置状态
 watch(() => props.modelValue, (val) => {
   if (val) isClaimed.value = false
 })
@@ -101,7 +96,6 @@ const handleClose = () => {
 </script>
 
 <style scoped lang="scss">
-/* 遮罩层 */
 .claim-overlay {
   position: fixed;
   inset: 0;
@@ -110,148 +104,226 @@ const handleClose = () => {
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* 靠底部对齐 */
+  justify-content: flex-end;
   align-items: center;
 }
 
-/* 容器基础样式 */
 .claim-container {
-  background: #000000;
+  background: var(--bg-card); // 极深灰，比纯黑更有质感
   color: #ffffff;
   transition: all 0.4s cubic-bezier(0.3, 1.4, 0.6, 1);
   overflow: hidden;
   position: relative;
+}
+
+.claim-container.is-full {
+  width: 100%;
+  border-radius: 28px 28px 0 0;
+  padding: 0 10px;
   box-sizing: border-box;
 }
 
-/* 状态 1：初始满屏显示在底部 */
-.claim-container.is-full {
-  width: 100%;
-  height: 80vh; /* 覆盖大部分屏幕高度 */
-  border-radius: 24px 24px 0 0;
-  padding: 12px 20px 40px;
-}
-
-/* 状态 2：点击后变精致小卡片 */
 .claim-container.is-compact {
-  width: calc(100% - 40px); /* 左右留空 */
-  max-width: 380px;
-  height: auto;
-  border-radius: 32px;
-  margin-bottom: 40px; /* 向上悬浮 */
-  padding: 12px 16px 24px;
-  background: #111111; /* 稍微浅一点的黑色增强卡片感 */
+  // 屏幕居中显示
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% - 20px);
+  border-radius: 12px;
+  padding: 12px 16px 7px;
+  background: var(--bg-card);
+  box-sizing: border-box;
 }
 
-/* 顶部把手 */
 .sheet-handle {
   width: 36px;
   height: 4px;
-  background: #333;
+  background: var(--bg-page);
   border-radius: 10px;
-  margin: 0 auto 16px;
+  margin: 0 auto;
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
 }
 
-/* 带有碎纸屑特效的顶部区域 */
+
+/* 亮色主题：浅色遮罩（:deep 使变量能应用到 body 上的 .theme-light） */
+.theme-light .claim-overlay {
+  --claim-mask-radial-start: rgba(255, 255, 255, 0);
+  --claim-mask-radial-mid: rgba(255, 255, 255, 0.4);
+  --claim-mask-radial-end: rgba(252, 252, 252, 0.92);
+  --claim-mask-linear-start: rgba(255, 255, 255, 0);
+  --claim-mask-linear-mid: rgba(248, 248, 248, 0.7);
+  --claim-mask-linear-end: var(--bg-page, #fcfcfc);
+}
+
+/* 暗色主题：深色遮罩 */
+.theme-dark .claim-overlay {
+  --claim-mask-radial-start: rgba(17, 17, 17, 0);
+  --claim-mask-radial-mid: rgba(17, 17, 17, 0.45);
+  --claim-mask-radial-end: rgba(17, 17, 17, 0.9);
+  --claim-mask-linear-start: rgba(17, 17, 17, 0);
+  --claim-mask-linear-mid: rgba(17, 17, 17, 0.69);
+  --claim-mask-linear-end: var(--bg-page, #111111);
+  --bg-card: #111111;
+}
+
 .banner-area {
   width: 100%;
-  height: 180px;
-  background-color: #000;
-  /* 碎纸屑背景图 */
-  background-image: url('@/assets/icon/SuccessfullyClaimedBg.png'); 
-  background-size: cover;
-  background-position: center;
-  border-radius: 20px;
+  padding-top: 20px;
+  /* var() 带 fallback，避免未定义时整条 background-image 失效导致背景图不显示 */
+  background-image: radial-gradient(ellipse 85% 75% at 50% 42%,
+      var(--claim-mask-radial-start) 0%,
+      var(--claim-mask-radial-mid) 55%,
+      var(--claim-mask-radial-end) 100%),
+    linear-gradient(180deg,
+      var(--claim-mask-linear-start) 0%,
+      var(--claim-mask-linear-mid) 31.53%,
+      var(--claim-mask-linear-end) 100%),
+    url('@/assets/icon/SuccessfullyClaimedBg.png');
+  background-size: 100% 100%, 100% 100%, contain;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-position: top center, top center, top center;
   display: flex;
-  align-items: center;
   justify-content: center;
 }
 
 .confetti-bg {
   text-align: center;
-  .coin-icon { width: 70px; height: 70px; margin-bottom: 12px; }
-  .amount-title {
-    font-size: 34px; font-weight: 800; line-height: 1.1;
-    .unit { font-size: 24px; margin-left: 8px; }
+
+  .coin-icon {
+    width: 110px;
+    height: auto;
+    margin: 30px 0 10px;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
   }
-  .status-text { font-size: 14px; color: #888; margin-top: 6px; }
+
+  .amount-title {
+    font-family: DIN, DIN;
+    font-weight: bold;
+    font-size: 24px;
+    color: var(--bg-opposite);
+
+    .unit {
+      font-size: 22px;
+      margin-left: 6px;
+      font-weight: 700;
+    }
+  }
+
+  .status-text {
+    font-size: 14px;
+    color: var(--bg-opposite);
+    margin-top: 8px;
+  }
 }
 
-/* 详情列表 */
-.details-view {
-  padding: 10px 4px 0;
+.action-area {
+  margin-top: 24px;
 }
 
 .fee-list {
-  margin-top: 20px;
+  padding: 0 4px;
+
   .fee-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     font-size: 15px;
-    .label { color: #888; }
-    .val { font-weight: 600; }
-    .positive { color: #ffffff; }
+
+    .label {
+      font-family: PingFang SC, PingFang SC;
+      font-weight: 400;
+      font-size: 14px;
+      color: var(--text-dark-gray);
+    }
+
+    .val,
+    .positive {
+      font-weight: bold;
+      font-size: 16px;
+      color: var(--bg-opposite);
+    }
+
   }
 }
 
 .divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 12px 0 20px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 20px 0;
 }
 
-/* 底部问题区块 */
-.question-row {
+.question-card {
+  border-radius: 16px;
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 30px;
-  
-  .avatar-box img {
-    width: 50px; height: 50px;
+  margin-bottom: 24px;
+
+  .avatar-wrap img {
+    width: 48px;
+    height: 48px;
     border-radius: 12px;
     object-fit: cover;
   }
-  
-  .q-text {
-    .q-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-    .q-sub { 
-      font-size: 13px; color: #888;
-      .green-text { color: #3aff6a; font-weight: bold; }
+
+  .q-content {
+    .q-title {
+      font-family: PingFang SC, PingFang SC;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--bg-opposite);
+      margin-bottom: 8px;
+    }
+
+    .q-bet {
+      font-family: PingFang SC, PingFang SC;
+      font-weight: 400;
+      font-size: 14px;
+      color: var(--text-dark-gray);
+
+      .green-text {
+        color: #32B764;
+        font-weight: 700;
+        margin-left: 2px;
+      }
     }
   }
 }
 
-/* 按钮样式：纯白背景黑字 */
 .main-btn {
   width: 100%;
-  height: 54px;
-  border-radius: 16px;
+  height: 56px;
+  border-radius: 8px;
   border: none;
   font-size: 18px;
   font-weight: 700;
   cursor: pointer;
-  background: #ffffff; 
-  color: #000000;
-  transition: all 0.2s;
-  
-  &:active { transform: scale(0.97); opacity: 0.9; }
+  background: var(--bg-opposite);
+  color: var(--bg-page);
+  transition: all 0.2s ease;
+  margin: 26px 0;
+}
 
-  &.is-white {
-    background: #ffffff;
-    color: #000000;
-    margin-top: 10px;
+/* 进场与切换动画 */
+.sheet-slide-enter-active,
+.sheet-slide-leave-active {
+  transition: opacity 0.3s;
+
+  .claim-container {
+    transition: transform 0.4s cubic-bezier(0.3, 1.4, 0.6, 1);
   }
 }
 
-/* 进场动画：从底部滑入 */
-.sheet-slide-enter-active, .sheet-slide-leave-active {
-  transition: opacity 0.3s ease;
-  .claim-container { transition: transform 0.4s ease; }
-}
-.sheet-slide-enter-from, .sheet-slide-leave-to {
+.sheet-slide-enter-from,
+.sheet-slide-leave-to {
   opacity: 0;
-  .claim-container { transform: translateY(100%); }
+
+  .claim-container {
+    transform: translateY(100%);
+  }
 }
 </style>

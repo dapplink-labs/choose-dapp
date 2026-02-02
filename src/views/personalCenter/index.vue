@@ -353,14 +353,14 @@ const baseSupportItems = computed(() => [
     label: t('userInfo.helpCenter'),
     icon: getIcon('22'),
     iconDark: getIcon("22Dark"),
-    path: '/'
+    path: '/help-center'
   },
   {
     key: 'customer-support',
     label: t('userInfo.customerSupport'),
     icon: getIcon('23'),
     iconDark: getIcon("23Dark"),
-    path: '/'
+    path: '/help-center'
   },
   {
     key: 'developer-docs',
@@ -474,7 +474,8 @@ const allowedPaths = [
   // '/dashboard', // 链上数据
   '/asset-management', // 链上资产
   '/leaderboardH5', // 排行榜
-  '/event-pool' // 事件池
+  '/event-pool', // 事件池
+  '/help-center' // 帮助中心
 ]
 
 // 处理菜单项点击
