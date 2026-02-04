@@ -34,7 +34,7 @@ import { bindInviteCode } from '@/api/API'
 import { useCounterStore } from '@/stores/counter'
 import { storeToRefs } from 'pinia'
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
-import networks from '@/assets/json/networks.json'
+import networks from '@/assets/json/networks.js'
 import { writeContractOptimized } from '@/utils/requestWEB3.js'
 import { config } from '@/wagmi.ts'
 

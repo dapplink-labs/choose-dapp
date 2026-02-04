@@ -163,7 +163,7 @@ import { useAccount, useChainId } from '@wagmi/vue'
 import { switchChain } from '@wagmi/core'
 import { config } from '../../wagmi.ts'
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
-import networks from '@/assets/json/networks.json'
+import networks from '@/assets/json/networks.js'
 import { writeContractOptimized, computedGas } from '@/utils/requestWEB3.js'
 import avatarImg from '@/assets/icon/avatar.png'
 import TeamTree from "@/components/TeamTree.vue"

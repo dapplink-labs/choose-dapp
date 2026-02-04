@@ -103,7 +103,7 @@ import ShareInvitationCode from '@/components/ShareInvitationCode.vue'
 import { readContract } from '@wagmi/core'
 import { config } from '@/wagmi.ts'
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
-import networks from '@/assets/json/networks.json'
+import networks from '@/assets/json/networks.js'
 const BSC_CHAIN_ID = 56
 
 const { locale, t } = useI18n()
@@ -479,10 +479,10 @@ const allowedPaths = [
   '/computing-power-services', // 节点购买
   '/LPVault', // LPVault
   // '/dashboard', // 链上数据
-  '/asset-management', // 链上资产
-  '/leaderboardH5', // 排行榜
-  '/event-pool', // 事件池
-  '/help-center' // 帮助中心
+  // '/asset-management', // 链上资产
+  // '/leaderboardH5', // 排行榜
+  // '/event-pool', // 事件池
+  // '/help-center' // 帮助中心
 ]
 
 // 处理菜单项点击
