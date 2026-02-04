@@ -12,8 +12,8 @@
         </div>
       </div>
       <div class="action-icons">
-        <img :src="isDark ? getIcon('29Dark') : getIcon('29')" :alt="$t('common.share')" class="icon-img"
-          @click="handleShare" />
+        <!-- <img :src="isDark ? getIcon('29Dark') : getIcon('29')" :alt="$t('common.share')" class="icon-img"
+          @click="handleShare" /> -->
         <img :src="isDark ? getIcon('settingDark') : getIcon('setting')" :alt="$t('common.settings')" class="icon-img"
           @click="handleSettings" />
         <img :src="isDark ? getIcon('closeDark') : getIcon('close')" :alt="$t('common.close')" class="icon-img"
@@ -75,8 +75,8 @@
 
     <!-- Social links -->
     <div class="social-links">
-      <a v-for="(link, idx) in friendLinks" :key="idx"   href="javascript:void(0)"   class="social-link"
-        :aria-label="link.label" @click="go(link)">
+      <a v-for="(link, idx) in friendLinks" :key="idx" href="javascript:void(0)" class="social-link"
+        :aria-label="link.label" @click="goHref(link)">
         <img :src="link.icon" :alt="link.label" />
       </a>
     </div>
@@ -263,6 +263,13 @@ const baseEcosystemItems = computed(() => [
     iconDark: getIcon("36Dark"),
     path: '/'
   },
+  {
+    key: 'inviteShare',
+    label: t('userInfo.inviteShare'),
+    icon: getIcon('25'),
+    iconDark: getIcon("25Dark"),
+    path: '/'
+  },
 ])
 
 const ecosystemItems = computed(() =>
@@ -410,7 +417,7 @@ const baseChooseMeItems = computed(() => [
     path: '/terms'
   }
 ])
-function  go(link) {
+function goHref(link) {
   window.open(link.href, '_blank')
 }
 const chooseMeItems = computed(() =>
@@ -422,21 +429,21 @@ const chooseMeItems = computed(() =>
 
 // 友链图标（使用 assets/icon 中的图片，随主题切换）
 const baseFriendLinks = [
-  { label: 'Twitter', icon: getIcon('Twitter'), iconDark: getIcon('TwitterDark'),href:"https://x.com/chooseme_global?s=21" },
-  { label: 'Telegram', icon: getIcon('tgDark'), iconDark: getIcon('tg'),href:"https://t.me/Choosme_Global" },
+  { label: 'Twitter', icon: getIcon('Twitter'), iconDark: getIcon('TwitterDark'), href: "https://x.com/chooseme_global?s=21" },
+  { label: 'Telegram', icon: getIcon('tgDark'), iconDark: getIcon('tg'), href: "https://t.me/Choosme_Global" },
   // { label: 'Instagram', icon: getIcon('ins'), iconDark: getIcon('insDark') ,href:""},
   // { label: 'LinkedIn', icon: getIcon('in'), iconDark: getIcon('inDark') },
   // { label: 'TikTok', icon: getIcon('dy'), iconDark: getIcon('dyDark') },
   // { label: 'Twitter', icon: getIcon('Twitter'), iconDark: getIcon('TwitterDark') },
-  { label: 'YouTube', icon: getIcon('YouTube'), iconDark: getIcon('YouTubeDark') ,href:"https://www.youtube.com/@ChooseMeGlobal"},
-  { label: 'media', icon: getIcon('mediaDark'), iconDark: getIcon('media') ,href:"https://medium.com/@ChooseMeGlobal"}
+  { label: 'YouTube', icon: getIcon('YouTube'), iconDark: getIcon('YouTubeDark'), href: "https://www.youtube.com/@ChooseMeGlobal" },
+  { label: 'media', icon: getIcon('mediaDark'), iconDark: getIcon('media'), href: "https://medium.com/@ChooseMeGlobal" }
 ]
 
 const friendLinks = computed(() =>
   baseFriendLinks.map(link => ({
     ...link,
-    icon: isDark.value ? link.iconDark : link.icon ,
-    href:link.href
+    icon: isDark.value ? link.iconDark : link.icon,
+    href: link.href
   }))
 )
 
@@ -480,6 +487,10 @@ const allowedPaths = [
 
 // 处理菜单项点击
 const handleMenuClick = (item) => {
+  if (item.key === 'inviteShare') {
+    showShareModal.value = true
+    return
+  }
   // 菜单项的路由跳转
   if (item.path) {
     // 检查路径是否在允许列表中
@@ -666,15 +677,13 @@ onMounted(() => {
       width: 42px;
       height: 42px;
       border-radius: 8px;
-      background: var(--bg-light, #F5F5F5);
       display: flex;
       align-items: center;
       justify-content: center;
       transition: background-color 0.3s ease;
 
       img {
-        width: 18px;
-        height: 18px;
+        max-width: 24px;
         filter: grayscale(100%) brightness(1.1);
       }
     }

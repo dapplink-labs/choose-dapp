@@ -2,7 +2,7 @@
     <div class="LPVault">
 
         <!-- 通用返回头部导航 -->
-        <BackHeaderNav :show-record-btn="true" :show-open-btn="true"   :type="2"/>
+        <BackHeaderNav :show-record-btn="true" :show-open-btn="true" :type="2" />
 
         <div class="banner1">
 
@@ -66,7 +66,9 @@
                     </div>
                 </div>
 
-                <button class="node-item-btn" :disabled="!isActivationDisabled" @click="handleActivate(node.type)">
+                <!-- 为T6节点时，不显示激活按钮 -->
+                <button :disabled="node.nodeLevel === 'T6' ? true : false" class="node-item-btn"
+                    @click="handleActivate(node.type)">
                     {{ $t('lpVault.activateComputingPower') }}
                 </button>
             </div>
@@ -86,11 +88,30 @@ const {
     handleOpenMyIncome,
     nodeList,
     handleActivate,
-    isActivationDisabled
 } = useLPVault()
 </script>
 
 <style scoped lang="scss">
+.theme-dark {
+    .activation-banner {
+        background: #2F2F2F !important;
+    }
+
+    .node-card-item {
+        background: #1D1D1D !important;
+    }
+
+    .node-item-name {
+        color: #FFFFFF !important;
+    }
+
+
+    .node-item-btn {
+        background: var(--text-color-y, #BBFF2E) !important;
+        color: #000000 !important;
+    }
+}
+
 .LPVault {
     min-height: 100vh;
     padding: 80px 10px 60px 10px;
@@ -443,11 +464,11 @@ const {
         }
 
         &:disabled {
-            background: #c5c5c5;
-            color: #f5f5f5;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
+            background: #c5c5c5!important;
+            color: #999!important;
+            cursor: not-allowed!important;
+            box-shadow: none!important;
+            transform: none!important;
         }
     }
 
@@ -491,25 +512,5 @@ const {
         }
     }
 
-}
-
-.theme-dark {
-    .activation-banner {
-        background: #2F2F2F !important;
-    }
-
-    .node-card-item {
-        background: #1D1D1D !important;
-    }
-
-    .node-item-name {
-        color: #FFFFFF !important;
-    }
-
-
-    .node-item-btn {
-        background: var(--text-color-y, #BBFF2E) !important;
-        color: #000000 !important;
-    }
 }
 </style>

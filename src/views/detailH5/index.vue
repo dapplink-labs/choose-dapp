@@ -8,9 +8,24 @@
                 <div class="event-title-section">
                     <img :src="detailData.avatar" :alt="$t('detail.avatar')" class="event-avatar" />
                     <h1 class="event-title">{{ detailData.title }}</h1>
+                    <div class="event-countdown">
+                        <div class="countdown-block">
+                            <span class="countdown-num">{{ countdownDisplay.hours }}</span>
+                            <span class="countdown-label">{{ $t('detail.hour') }}</span>
+                        </div>
+                        <div class="countdown-block">
+                            <span class="countdown-num">{{ countdownDisplay.minutes }}</span>
+                            <span class="countdown-label">{{ $t('detail.minute') }}</span>
+                        </div>
+                        <div class="countdown-block">
+                            <span class="countdown-num">{{ countdownDisplay.seconds }}</span>
+                            <span class="countdown-label">{{ $t('detail.second') }}</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="event-info-section">
-                    <div class="event-info-row">
+                    <!-- 第一行：交易量、截止日期、书签 -->
+                    <div class="event-info-row event-info-row-top">
                         <div class="info-item">
                             <el-icon class="info-icon trophy-icon">
                                 <Trophy />
@@ -31,6 +46,9 @@
                                     stroke-linejoin="round" />
                             </svg>
                         </div>
+                    </div>
+                    <!-- 第二行：最大杠杆、最大回报 -->
+                    <div class="event-info-row event-info-row-bottom">
                         <div class="leverage-info">
                             <span class="leverage-label">{{ $t('detail.maximumLeverage') }}:</span>
                             <span class="leverage-value">{{ detailData.maxLeverage }}</span>
@@ -102,6 +120,85 @@
                                 {{ $t('detail.buyNo') }} {{ outcome.noPrice }} ¢
                             </button>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 查看结果模块 -->
+            <div class="view-results-section">
+                <div class="view-results-header">
+                    <h3 class="view-results-title">{{ $t('detail.viewResults') }}</h3>
+                    <span class="view-results-caret" @click="showViewResultsExpanded = !showViewResultsExpanded">
+                        <el-icon v-if="showViewResultsExpanded">
+                            <ArrowUpBold />
+                        </el-icon>
+                        <el-icon v-else>
+                            <ArrowDownBold />
+                        </el-icon>
+                    </span>
+                </div>
+                <transition name="view-results-collapse">
+                    <div v-show="showViewResultsExpanded" class="view-results-list">
+                        <div v-for="(item, index) in viewResults" :key="index" class="view-results-item">
+                            <div class="view-results-content">
+                                <div class="view-results-desc">{{ item.title }}</div>
+                                <div class="view-results-volume">{{ item.volume }}</div>
+                            </div>
+                            <span class="view-results-status">{{ item.result === 'yes' ? $t('detail.resultYes') :
+                                $t('detail.resultNo') }}</span>
+                        </div>
+                    </div>
+                </transition>
+            </div>
+
+            <!-- 关于模块 -->
+            <div class="about-section">
+                <h3 class="about-title">{{ $t('detail.about') }}</h3>
+                <div class="about-rows">
+                    <div class="about-row">
+                        <div class="about-left">
+                            <span class="about-icon about-icon-volume">
+                                <svg class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+                                    <path
+                                        d="M246.471 843.016c42.934 0 611.339-0.027 654.282 0 17.869 0 25.146 7.283 25.146 25.049 0 11.431 0.074 22.86-0.018 34.292-0.127 13.875-8.199 22.29-21.989 22.319-88.059 0.085-701.571 0.085-789.622 0-13.617-0.025-21.538-8.044-21.806-21.865-0.241-12.395-0.171-24.818-0.027-37.22 0.171-14.813 7.903-22.518 22.83-22.544 43.73-0.086 87.462-0.029 131.201-0.029v0z"
+                                        fill="currentColor" />
+                                    <path
+                                        d="M152.764 628.864c0-28.132-0.085-114.977 0-143.111 0.081-23.847 11.021-34.747 34.767-34.805 17.239-0.045 34.474-0.124 51.712 0.037 20.761 0.19 32.491 11.854 32.528 32.782 0.164 57.698 0.123 174.105 0.039 231.81-0.081 21.278-12.016 33.063-33.19 33.185-17.771 0.108-35.589 0.131-53.411 0-20.26-0.164-32.195-11.745-32.359-32.048-0.29-29.299-0.081-58.576-0.081-87.846v0z"
+                                        fill="currentColor" />
+                                    <path
+                                        d="M449.223 581.8c0-42.811 0-231.937 0.039-274.753 0-24.080 11.283-35.381 35.301-35.444 17.255-0.037 34.513-0.142 51.727 0.023 20.287 0.206 32.526 11.799 32.607 32.083 0.206 88.214 0.206 322.748 0 410.978-0.039 20.596-12.485 32.423-33.142 32.566-16.637 0.131-33.31 0.023-49.988 0.023-25.102-0.023-36.502-11.287-36.502-36.132-0.045-43.122-0.045-86.223-0.045-129.347v0z"
+                                        fill="currentColor" />
+                                    <path
+                                        d="M866.475 523.858c0 62.559 0.045 125.133 0 187.703 0 26.038-10.606 36.645-36.498 36.645-16.654 0-33.308 0.098-49.961-0.023-20.218-0.183-32.48-11.95-32.522-32.041-0.124-128.302-0.124-463.469 0-591.767 0.039-19.843 11.724-31.381 31.858-31.774 18.066-0.351 36.169-0.251 54.231-0.039 21.585 0.251 32.809 11.518 32.851 33.263 0.127 63.715 0.045 334.303 0.045 398.033v0z"
+                                        fill="currentColor" />
+                                </svg>
+                            </span>
+                            <span class="about-label">{{ $t('detail.volume') }}</span>
+                        </div>
+                        <span class="about-value">{{ detailData.volume }}</span>
+                    </div>
+                    <div class="about-row">
+                        <div class="about-left">
+                            <el-icon class="about-icon">
+                                <Clock />
+                            </el-icon>
+                            <span class="about-label">{{ $t('detail.endDate') }}</span>
+                        </div>
+                        <span class="about-value">{{ detailData.closeDate }}</span>
+                    </div>
+                    <div class="about-row">
+                        <div class="about-left">
+                            <span class="about-icon about-icon-calendar">
+                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"
+                                        fill="currentColor" />
+                                </svg>
+                            </span>
+                            <span class="about-label">{{ $t('detail.createDate') }}</span>
+                        </div>
+                        <span class="about-value">{{ detailData.createDate }}</span>
                     </div>
                 </div>
             </div>
@@ -212,14 +309,7 @@
             </div>
 
             <!-- Payment 弹窗 -->
-            <transition name="slide-up">
-                <div v-if="showPayment" class="payment-overlay" @click.self="closePayment">
-                    <div class="payment-modal">
-                        <div class="payment-header"></div>
-                        <Payment />
-                    </div>
-                </div>
-            </transition>
+            <PaymentModal v-model="showPayment" />
 
         </div>
     </div>
@@ -229,9 +319,9 @@
 import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Trophy, Clock } from '@element-plus/icons-vue'
+import { Trophy, Clock, ArrowUpBold } from '@element-plus/icons-vue'
 import LineChartDetail from '@/components/LineChartDetail.vue'
-import Payment from '@/components/Payment.vue'
+import PaymentModal from '@/components/PaymentModal.vue'
 import NavBar2 from '@/components/navBar2.vue'
 
 const router = useRouter()
@@ -244,11 +334,39 @@ const detailData = ref({
     title: 'U.S. forces seize anotherVenezuela- linked oil ship by...?',
     volume: '$153,642,644 Vol.',
     closeDate: 'Dec 10, 2025',
+    createDate: 'Jan 1, 2026, 23:22 UTC+8',
     predictionDate: '11月14日',
     daysLeft: 44,
     maxLeverage: '10X',
     maxReturn: '182%'
 })
+
+// 倒计时：时/分/秒（使用传入时间戳）
+const countdown = ref({ hours: 0, minutes: 0, seconds: 0 })
+let countdownTimer = null
+const countdownTarget = ref(1770178797000)
+
+const countdownDisplay = computed(() => ({
+    hours: String(countdown.value.hours).padStart(2, '0'),
+    minutes: String(countdown.value.minutes).padStart(2, '0'),
+    seconds: String(countdown.value.seconds).padStart(2, '0')
+}))
+
+function updateCountdown() {
+    const end = Number(countdownTarget.value)
+    const now = Date.now()
+    let diff = Math.max(0, Math.floor((end - now) / 1000))
+    if (diff <= 0) {
+        countdown.value = { hours: 0, minutes: 0, seconds: 0 }
+        if (countdownTimer) clearInterval(countdownTimer)
+        return
+    }
+    const hours = Math.floor(diff / 3600)
+    diff -= hours * 3600
+    const minutes = Math.floor(diff / 60)
+    const seconds = diff % 60
+    countdown.value = { hours, minutes, seconds }
+}
 
 // 图表选项数据
 const chartOptions = ref([
@@ -308,6 +426,13 @@ const outcomes = ref([
     }
 ])
 
+// 查看结果模块（可折叠）
+const showViewResultsExpanded = ref(true)
+const viewResults = ref([
+    { title: '下降50个基点以上', volume: '$37,755,917 Vol.', result: 'no' },
+    { title: '下降25个基点', volume: '$37,755,917 Vol.', result: 'yes' }
+])
+
 // 规则相关
 const rulesText = ref('The FED interest rates are defined in this market by the upper bound of the target federal funds range. The decisions on the target')
 
@@ -322,17 +447,22 @@ const selectedOutcomeType = ref(null) // 'yes' or 'no'
 // 监听弹窗状态，控制父级页面滚动
 watch(showPayment, (newVal) => {
     if (newVal) {
-        // 打开弹窗时禁止父级页面滚动
         document.body.style.overflow = 'hidden'
     } else {
-        // 关闭弹窗时恢复父级页面滚动
         document.body.style.overflow = ''
+        selectedOutcomeIndex.value = null
+        selectedOutcomeType.value = null
     }
 })
 
-// 组件卸载时确保恢复滚动
+// 倒计时：挂载时启动、卸载时清除
+onMounted(() => {
+    updateCountdown()
+    countdownTimer = setInterval(updateCountdown, 1000)
+})
 onUnmounted(() => {
     document.body.style.overflow = ''
+    if (countdownTimer) clearInterval(countdownTimer)
 })
 
 // Comments 数据
@@ -628,12 +758,6 @@ const selectOutcome = (index, choice) => {
     }
 }
 
-// 关闭 Payment 弹窗
-const closePayment = () => {
-    showPayment.value = false
-    selectedOutcomeIndex.value = null
-    selectedOutcomeType.value = null
-}
 
 const formatNumber = (num) => {
     if (num >= 1000000) {
@@ -692,33 +816,68 @@ const formatNumber = (num) => {
             transition: color 0.3s ease;
             min-width: 0;
         }
+
+        .event-countdown {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .countdown-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 32px;
+        }
+
+        .countdown-num {
+            font-size: 20px;
+            font-weight: 700;
+            color: #E44096;
+            line-height: 1.2;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .countdown-label {
+            font-size: 11px;
+            font-weight: 400;
+            color: var(--text-color, #ffffff);
+            margin-top: 2px;
+            line-height: 1.2;
+        }
+    }
+
+    .event-info-section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
     }
 
     .event-info-row {
         display: flex;
         align-items: center;
-        gap: 16px;
         font-size: 12px;
-        color: var(--text-dark-gray, #909090);
+        color: var(--text-dark-gray, #AAAAAA);
         transition: color 0.3s ease;
-        flex-wrap: wrap;
 
         .info-item {
             display: flex;
             align-items: center;
             gap: 6px;
             flex-shrink: 0;
-            color: var(--text-dark-gray, #909090);
+            color: var(--text-dark-gray, #AAAAAA);
 
             .info-icon {
-                color: var(--text-dark-gray, #909090);
+                color: var(--text-dark-gray, #AAAAAA);
                 font-size: 14px;
             }
 
             .info-text {
                 font-size: 12px;
                 white-space: nowrap;
-                color: var(--text-dark-gray, #909090);
+                color: var(--text-dark-gray, #AAAAAA);
+                font-weight: 400;
             }
         }
 
@@ -727,7 +886,7 @@ const formatNumber = (num) => {
             display: flex;
             align-items: center;
             cursor: pointer;
-            color: var(--text-dark-gray, #909090);
+            color: var(--text-dark-gray, #AAAAAA);
             transition: color 0.3s ease;
             flex-shrink: 0;
 
@@ -741,26 +900,33 @@ const formatNumber = (num) => {
             }
         }
 
-        .leverage-info,
-        .return-info {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            color: var(--text-dark-gray, #909090);
-            white-space: nowrap;
-            flex-shrink: 0;
+        &.event-info-row-top {
+            gap: 16px;
+        }
 
-            .leverage-label,
-            .return-label {
-                color: var(--text-dark-gray, #909090);
-                font-weight: 400;
-            }
+        &.event-info-row-bottom {
+            gap: 24px;
 
-            .leverage-value,
-            .return-value {
-                font-weight: 700;
-                color: var(--text-color, #FFFFFF);
+            .leverage-info,
+            .return-info {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                font-size: 12px;
+                white-space: nowrap;
+                flex-shrink: 0;
+
+                .leverage-label,
+                .return-label {
+                    color: var(--text-dark-gray, #AAAAAA);
+                    font-weight: 400;
+                }
+
+                .leverage-value,
+                .return-value {
+                    font-weight: 700;
+                    color: #FFFFFF;
+                }
             }
         }
     }
@@ -947,6 +1113,165 @@ const formatNumber = (num) => {
                     }
                 }
             }
+        }
+    }
+}
+
+// 查看结果模块
+.view-results-section {
+    margin-bottom: 24px;
+    padding: 20px 0;
+    transition: background-color 0.3s ease;
+
+    .view-results-header {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .view-results-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--bg-opposite, #000000);
+        font-family: sans-serif;
+        transition: color 0.3s ease;
+    }
+
+    .view-results-caret {
+        margin-left: 7px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.3s ease, color 0.3s ease;
+
+        .el-icon {
+            font-size: 16px;
+            color: var(--text-color, #1a1a1a);
+        }
+    }
+
+    .view-results-list {
+        margin-top: 16px;
+    }
+
+    .view-results-item {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+
+    .view-results-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .view-results-desc {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--bg-opposite, #000000);
+        line-height: 1.4;
+        margin-bottom: 4px;
+    }
+
+    .view-results-volume {
+        font-size: 13px;
+        color: var(--text-dark-gray, #909090);
+        line-height: 1.4;
+    }
+
+    .view-results-status {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--bg-opposite, #000000);
+        flex-shrink: 0;
+        line-height: 1.4;
+    }
+}
+
+.view-results-collapse-enter-active,
+.view-results-collapse-leave-active {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.view-results-collapse-enter-from,
+.view-results-collapse-leave-to {
+    opacity: 0;
+}
+
+// 关于模块
+.about-section {
+    margin-bottom: 24px;
+    padding: 20px 0;
+    transition: background-color 0.3s ease;
+
+    .about-title {
+        margin: 0 0 20px 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--bg-opposite, #000000);
+        font-family: sans-serif;
+        transition: color 0.3s ease;
+    }
+
+    .about-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .about-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 15px;
+
+        .about-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+            min-width: 0;
+        }
+
+        .about-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bg-opposite, #000000);
+            flex-shrink: 0;
+
+            &.about-icon-volume svg,
+            &.about-icon-calendar svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        :deep(.el-icon.about-icon) {
+            font-size: 20px;
+            color: var(--bg-opposite, #000000);
+        }
+
+        .about-label {
+            color: var(--bg-opposite, #000000);
+            font-weight: 400;
+        }
+
+        .about-value {
+            color: var(--text-dark-gray, #000000);
+            font-weight: 400;
+            text-align: right;
+            white-space: nowrap;
         }
     }
 }
@@ -1248,103 +1573,16 @@ const formatNumber = (num) => {
     }
 }
 
-// Payment 弹窗
-.payment-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-    z-index: 1001;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-
-    .payment-modal {
-        width: 100%;
-        max-height: 80vh;
-        background-color: var(--bg-page, #000000);
-        border-radius: 20px 20px 0 0;
-        overflow-y: auto;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
-        position: relative;
-        display: flex;
-        z-index: 1002;
-        flex-direction: column;
-    }
-
-    .payment-header {
-        width: 100%;
-        height: 20px;
-        position: sticky;
-        top: -1px;
-        left: 0;
-        right: 0;
-        background-color: var(--bg-page, #000000);
-        flex-shrink: 0;
-        padding-top: 10px;
-        padding-bottom: 10px;
-
-        &::before {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 3px;
-            background: #383838;
-            border-radius: 2px;
-        }
-    }
-}
-
-
-
-// 弹窗动画
-.slide-up-enter-active,
-.slide-up-leave-active {
-    transition: all 0.3s ease;
-}
-
-.slide-up-enter-from {
-    opacity: 0;
-    transform: translateY(100%);
-}
-
-.slide-up-leave-to {
-    opacity: 0;
-    transform: translateY(100%);
-}
-
-.slide-up-enter-active .payment-modal,
-.slide-up-leave-active .payment-modal {
-    transition: transform 0.3s ease;
-}
-
 // 主题适配
 :deep(.theme-dark) {
     .detail-h5-page {
         background-color: #000000;
     }
-
-    .payment-modal {
-        background-color: #000000;
-    }
-
 }
 
 :deep(.theme-light) {
     .detail-h5-page {
         background-color: #FFFFFF;
     }
-
-    .payment-modal {
-        background-color: #FFFFFF;
-    }
-
 }
 </style>

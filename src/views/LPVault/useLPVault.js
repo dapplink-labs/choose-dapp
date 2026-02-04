@@ -23,8 +23,6 @@ export const useLPVault = () => {
   const chainId = useChainId()
   const BSC_CHAIN_ID = 56
   const { address } = useAccount()
-  // 临时禁用激活按钮开关，后续开放时改为 false 即可
-  const isActivationDisabled = true
 
   const activationAvatar = clusterNodeImg
   const activationAddress = ref('')
@@ -146,6 +144,7 @@ export const useLPVault = () => {
         return
       }
 
+      // USDT金额转换为BigInt 18位小数
       const amountBigInt = parseUnits(String(price), 18)
       console.log(amountBigInt)
       // 余额查询START
@@ -179,12 +178,14 @@ export const useLPVault = () => {
         }
       }
 
+      // 调用合约质押
       const result = await writeContractOptimized({
         abi: stakingManagerABI,
         address: proxyStakingManager,
         functionName: 'liquidityProviderDeposit',
         args: [amountBigInt],
         userAddress: address.value,
+        value: parseUnits('0.003', 18),
         messages: {
           success: t('lpVault.nodeActivationSuccess'),
           failed: t('lpVault.paymentFailed'),
@@ -221,7 +222,6 @@ export const useLPVault = () => {
     handleOpenMyIncome,
     nodeList,
     handleActivate,
-    isActivationDisabled
   }
 }
 

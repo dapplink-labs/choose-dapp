@@ -10,12 +10,12 @@
           disableOnInteraction: false,
           pauseOnMouseEnter: false
         }" :pagination="{
-  clickable: true,
-  bulletClass: 'swiper-pagination-bullet',
-  bulletActiveClass: 'swiper-pagination-bullet-active'
-}" :navigation="false" class="banner-swiper">
-          <swiper-slide v-for="(banner, index) in bannerList" :key="index" >
-            <div class="banner-item"  @click="goPath(banner)">
+          clickable: true,
+          bulletClass: 'swiper-pagination-bullet',
+          bulletActiveClass: 'swiper-pagination-bullet-active'
+        }" :navigation="false" class="banner-swiper">
+          <swiper-slide v-for="(banner, index) in bannerList" :key="index">
+            <div class="banner-item" @click="goHref(banner)">
               <img :src="banner.img" class="banner-image" />
             </div>
           </swiper-slide>
@@ -312,29 +312,26 @@ const swiperModules = [Autoplay, Pagination]
 const bannerList = ref([
   {
     img: bannerImg,
-    path: ""
+    // 跳转至外部链接官网
+    href: "https://web.chooseme.vip/"
   }, {
     img: banner0Img,
-    path: "/computing-power-services"
+    href: "https://web.chooseme.vip/"
   }, {
     img: banner2Img,
-    path: ""
+    href: "https://web.chooseme.vip/"
   }, {
     img: linghua1Img,
-    path: ""
+    href: "https://web.chooseme.vip/"
   }
   , {
     img: banner4Img,
-    path: ""
+    href: "https://web.chooseme.vip/"
   }
 
 ])
-function  goPath(item) {
-
-  if(item.path) {
-    
-    router.push(item.path)
-  }
+function goHref(item) {
+  window.open(item.href, '_blank')
 }
 // 禁止页面滚动
 onMounted(() => {
@@ -560,22 +557,26 @@ const toggleFavorite = (item) => {
 </script>
 
 <style scoped lang="scss">
-// 公共样式变量（使用CSS变量以支持主题切换）
+// 公共变量
 $yes-color: #BBFF2E;
 $no-color: #CA4064;
 $yes-bg-light: rgba(37, 167, 80, 0.2);
 $no-bg-light: rgba(202, 64, 100, 0.2);
+$radius-sm: 6px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$transition-fast: 0.2s;
+$transition-ease: 0.3s ease;
 
-// 公共按钮样式 mixin
 @mixin yes-no-button($color, $bg-light) {
   background: $bg-light;
   color: $color;
   border: none;
-  border-radius: 6px;
+  border-radius: $radius-sm;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all $transition-fast;
   padding: 10px 16px;
 
   &.active {
@@ -616,7 +617,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
           width: 100%;
           overflow: hidden;
           cursor: pointer;
-          transition: transform 0.2s ease;
+          transition: transform $transition-fast ease;
 
           &:hover {
             transform: scale(1.02);
@@ -675,17 +676,15 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
 
 
-    // 筛选模块样式
     .filter-section {
       margin-bottom: 24px;
 
       .filter-container {
         display: flex;
-        flex-direction: row;
         align-items: center;
         gap: 12px;
         padding: 12px 0;
-        border-radius: 8px;
+        border-radius: $radius-md;
         position: relative;
 
         // 标签滚动容器
@@ -718,7 +717,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
               backdrop-filter: blur(10px);
               -webkit-backdrop-filter: blur(10px);
               cursor: pointer;
-              transition: all 0.2s;
+              transition: all $transition-fast;
               white-space: nowrap;
               background: var(--bg-page, #F5F5F5);
               font-weight: 400;
@@ -755,7 +754,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
             width: 32px;
             height: 32px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all $transition-fast;
             border: none;
             background: transparent;
             color: var(--text-color, #ffffff);
@@ -801,52 +800,38 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
           }
 
           .filter-select-btn {
-            margin-right: 10px;
-            border-radius: 16px;
-            border: 1px solid #2F2F2F;
-            background: transparent;
-            color: #ffffff;
-            padding: 6px 15px;
-
-            .filter-label {
-              display: inline-block;
-            }
-          }
-
-          .filter-select-btn {
             width: 100%;
             padding: 10px 16px;
             border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
+            border-radius: $radius-md;
             font-size: 14px;
-            color: #ffffff;
+            font-weight: 400;
+            color: #fff;
             background: rgba(26, 26, 26, 0.6);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all $transition-fast;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-weight: 400;
             min-height: 40px;
             box-sizing: border-box;
 
             .filter-label {
               flex: 1;
               text-align: left;
-              color: #ffffff;
+              color: #fff;
               white-space: nowrap;
-              display: inline-block;
 
               span {
-                color: #999999;
+                color: #999;
               }
             }
 
             .filter-arrow {
               margin-left: 12px;
               font-size: 14px;
-              color: #ffffff;
-              transition: transform 0.2s;
+              color: #fff;
+              transition: transform $transition-fast;
               flex-shrink: 0;
             }
 
@@ -859,7 +844,6 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
               background: rgba(26, 26, 26, 0.7);
             }
           }
-
         }
       }
     }
@@ -881,7 +865,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         align-items: center;
         gap: 8px;
         padding: 10px 14px;
-        border-radius: 8px;
+        border-radius: $radius-md;
         background: #F4F4F4;
         border: 1px solid #F1F1F1;
         min-width: 260px;
@@ -921,8 +905,8 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         justify-content: center;
         color: rgba(0, 0, 0, 0.62);
         cursor: pointer;
-        border-radius: 8px;
-        transition: background 0.2s, color 0.2s;
+        border-radius: $radius-md;
+        transition: background $transition-fast, color $transition-fast;
 
         &.active {
           background: rgba(0, 0, 0, 0.05);
@@ -965,7 +949,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         font-size: 12px;
         color: var(--text-color, #1a1a1a);
         background: transparent;
-        transition: background 0.2s, color 0.2s;
+        transition: background $transition-fast, color $transition-fast;
 
         &.active {
           background: #000;
@@ -1011,13 +995,12 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         }
       }
 
-      // 列表项基础样式
       .list-item {
         overflow: hidden;
         background: var(--bg-card, #ffffff);
-        border-radius: 8px;
+        border-radius: $radius-md;
         border: 1px solid #F4F4F4;
-        transition: all 0.2s;
+        transition: all $transition-fast;
         box-sizing: border-box;
       }
 
@@ -1067,82 +1050,50 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         overflow: hidden;
       }
 
-      // 列表项百分比样式
       .item-percentage {
         font-size: 12px;
         color: var(--text-gray, #666);
       }
 
-      // 百分比半圆线样式
+      // 半圆进度：容器 + 图表 + 文本
       .percentage-semicircle {
         position: relative;
-      }
-
-      // 半圆线图表样式
-      .semicircle-chart {
-        width: 40px;
-        height: 25px;
-      }
-
-      // 半圆线文本样式
-      .percentage-text {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -20%);
-      }
-
-      // 百分比数值样式
-      .percentage-value {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--text-color, #333);
-      }
-
-      // 百分比标签样式
-      .percentage-label {
-        font-size: 10px;
-        color: var(--text-dark-gray, #999);
-      }
-
-      // 百分比半圆样式
-      .percentage-semicircle {
         display: flex;
         flex-direction: column;
         align-items: center;
-      }
 
-      // 半圆图表样式
-      .semicircle-chart {
-        width: 60px;
-        height: 30px;
-      }
-
-      // 半圆进度条样式
-      .semicircle-progress {
-        stroke-linecap: round;
-      }
-
-      // 半圆背景样式
-      .semicircle-background {
-        stroke: var(--border-color, #E5E5E5);
-        transition: stroke 0.3s ease;
-      }
-
-      // 半圆百分比文本样式
-      .semicircle-percentage {
-        font-size: 30px;
-        font-weight: 600;
-        // 跟随主题：亮色黑字，暗色白字
-        fill: var(--text-color, #333);
-        transition: fill 0.3s ease;
-
-        @media (max-width: 768px) {
-          font-size: 24px;
+        .semicircle-chart {
+          width: 60px;
+          height: 30px;
         }
 
-        @media (max-width: 480px) {
-          font-size: 20px;
+        .semicircle-progress {
+          stroke-linecap: round;
+        }
+
+        .semicircle-background {
+          stroke: var(--border-color, #E5E5E5);
+          transition: stroke $transition-ease;
+        }
+
+        .semicircle-percentage {
+          font-size: 30px;
+          font-weight: 600;
+          fill: var(--text-color, #333);
+          transition: fill $transition-ease;
+
+          @media (max-width: 768px) {
+            font-size: 24px;
+          }
+
+          @media (max-width: 480px) {
+            font-size: 20px;
+          }
+        }
+
+        .percentage-label {
+          font-size: 10px;
+          color: var(--text-dark-gray, #999);
         }
       }
 
@@ -1182,16 +1133,15 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         box-sizing: border-box;
       }
 
-      // 操作按钮基础样式
       .action-btn {
         flex: 1;
         padding: 10px 16px;
         border: none;
-        border-radius: 6px;
+        border-radius: $radius-sm;
         font-size: 14px;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all $transition-fast;
       }
 
       // Yes/No按钮样式
@@ -1203,7 +1153,6 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         @include yes-no-button($no-color, $no-bg-light);
       }
 
-      // 列表项金额样式
       .item-amount {
         font-size: 12px;
         color: var(--text-dark-gray, #999);
@@ -1213,7 +1162,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         padding: 7px 16px;
         box-sizing: border-box;
         background: var(--bg-page, #F5F5F5);
-        border-radius: 0 0 8px 8px;
+        border-radius: 0 0 $radius-md $radius-md;
         gap: 8px;
 
         .amount-left {
@@ -1273,7 +1222,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
           width: 14px;
           height: 14px;
           cursor: pointer;
-          transition: all 0.2s;
+          transition: all $transition-fast;
           flex-shrink: 0;
 
           &.active {
@@ -1324,7 +1273,6 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         gap: 8px;
       }
 
-      // 选项按钮基础样式
       .option-btn {
         padding: 4px 12px;
         border: none;
@@ -1332,7 +1280,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         font-size: 12px;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all $transition-fast;
 
         &.yes-btn {
           @include yes-no-button($yes-color, $yes-bg-light);
@@ -1361,7 +1309,6 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
       .filter-section {
         .filter-container {
           gap: 10px;
-          flex-direction: row;
           align-items: center;
 
           .tag-scroll-wrapper {
@@ -1428,7 +1375,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
           width: 100%;
 
           .banner-item {
-            border-radius: 8px;
+            border-radius: $radius-md;
             width: 100%;
 
             .banner-image {
@@ -1452,13 +1399,13 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
         .filter-container {
           gap: 6px;
           padding: 0;
-          flex-direction: row;
           align-items: center;
 
           .tag-scroll-wrapper {
             width: 80%;
 
             .tag-scroll-container {
+            padding-right: 20px;
               gap: 5px;
 
               .tag-btn {
@@ -1492,60 +1439,88 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
       .main-list-section {
         gap: 10px;
 
+        // 移动端列表项公共样式
+        .list-item {
+          border-radius: $radius-lg;
+          background: var(--bg-card, #ffffff);
+          border: 1px solid #F4F4F4;
+
+          .item-header {
+            margin-bottom: 10px;
+            align-items: center;
+            gap: 10px;
+
+            .user-avatar {
+              width: 44px;
+              height: 44px;
+              border-radius: $radius-md;
+              object-fit: cover;
+              flex-shrink: 0;
+            }
+
+            .item-meta {
+              padding-left: 0;
+              flex: 1;
+              min-width: 0;
+
+              .item-title {
+                font-size: 13px;
+                line-height: 1.5;
+                color: var(--text-color, #333);
+                font-weight: 500;
+              }
+            }
+          }
+
+          .item-amount {
+            font-size: 11px;
+            color: var(--text-dark-gray, #999);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+
+            .icon-sc {
+              width: 16px;
+              height: 16px;
+              cursor: pointer;
+              transition: all $transition-fast;
+              flex-shrink: 0;
+
+              &:hover {
+                transform: scale(1.1);
+              }
+
+              &.active {
+                fill: #CA4064;
+              }
+            }
+          }
+        }
+
         .left-vertical-list {
           gap: 12px;
 
-          .list-item {
-            border-radius: 12px;
-            background: var(--bg-card, #ffffff);
-            border: 1px solid #F4F4F4;
+          .list-item .item-header .percentage-semicircle {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
 
-            .item-header {
-              margin-bottom: 10px;
-              align-items: center;
-              gap: 10px;
-
-              .user-avatar {
-                width: 44px;
-                height: 44px;
-                border-radius: 8px;
-                object-fit: cover;
-                flex-shrink: 0;
-              }
-
-              .item-meta {
-                padding-left: 0;
-                flex: 1;
-                min-width: 0;
-
-                .item-title {
-                  font-size: 13px;
-                  line-height: 1.5;
-                  color: var(--text-color, #333);
-                  font-weight: 500;
-                }
-              }
-
-              .percentage-semicircle {
-                flex-shrink: 0;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 4px;
-
-                .semicircle-chart {
-                  width: 55px;
-                  height: 28px;
-                }
-
-                .percentage-label {
-                  font-size: 9px;
-                  color: var(--text-dark-gray, #999);
-                  margin-top: 0;
-                }
-              }
+            .semicircle-chart {
+              width: 55px;
+              height: 28px;
             }
 
+            .percentage-label {
+              font-size: 9px;
+              color: var(--text-dark-gray, #999);
+              margin-top: 0;
+            }
+          }
+
+          .list-item {
             .item-leverage-info {
               margin-bottom: 10px;
             }
@@ -1560,10 +1535,10 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
                 font-size: 13px;
                 font-weight: 600;
                 min-height: 40px;
-                border-radius: 8px;
+                border-radius: $radius-md;
                 border: none;
                 cursor: pointer;
-                transition: all 0.2s;
+                transition: all $transition-fast;
 
                 &.yes-btn {
                   background: var(--button-bg-y, #2EBE69);
@@ -1585,36 +1560,10 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
               }
             }
 
-            // 当存在 .item-options 时，.item-actions 的样式需要调整
             &:has(.item-options) .item-actions .action-btn {
               padding: 8px 10px;
               font-size: 12px;
-              min-height: 38px; // 触摸友好的最小高度
-            }
-
-            .item-amount {
-              font-size: 11px;
-              color: var(--text-dark-gray, #999);
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              gap: 6px;
-
-              .icon-sc {
-                width: 16px;
-                height: 16px;
-                cursor: pointer;
-                transition: all 0.2s;
-                flex-shrink: 0;
-
-                &:hover {
-                  transform: scale(1.1);
-                }
-
-                &.active {
-                  fill: #CA4064;
-                }
-              }
+              min-height: 38px;
             }
 
             .item-options {
@@ -1623,7 +1572,6 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
               .option-item {
                 margin-bottom: 8px;
                 display: flex;
-                flex-direction: row;
                 align-items: center;
                 justify-content: space-between;
                 gap: 10px;
@@ -1631,7 +1579,6 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
                 .option-text {
                   flex: 1;
                   font-size: 11px;
-                  margin-bottom: 0;
                   margin-right: auto;
                   display: flex;
                   align-items: center;
@@ -1641,7 +1588,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
                   }
 
                   span:last-child {
-                    display: none; // 移动端隐藏百分比
+                    display: none;
                   }
                 }
 
@@ -1654,7 +1601,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
                     padding: 5px 10px;
                     font-size: 11px;
                     min-height: 30px;
-                    border-radius: 6px;
+                    border-radius: $radius-sm;
                     white-space: nowrap;
                   }
                 }
@@ -1665,39 +1612,13 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
         .right-horizontal-list {
           gap: 12px;
-          grid-template-columns: 1fr; // 移动端每行 1 个
+          grid-template-columns: 1fr;
 
           .list-item {
             width: 100%;
-            border-radius: 12px;
-            background: var(--bg-card, #ffffff);
-            border: 1px solid #F4F4F4;
 
-            .item-header {
-              margin-bottom: 10px;
-              align-items: center;
-              gap: 10px;
-
-              .user-avatar {
-                width: 44px;
-                height: 44px;
-                border-radius: 8px;
-                object-fit: cover;
-                flex-shrink: 0;
-              }
-
-              .item-meta {
-                padding-left: 0;
-                flex: 1;
-                min-width: 0;
-
-                .item-title {
-                  font-size: 13px;
-                  line-height: 1.5;
-                  color: var(--text-color, #333);
-                  font-weight: 500;
-                }
-              }
+            .item-amount {
+              margin-top: 8px;
             }
 
             .item-options {
@@ -1706,7 +1627,6 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
               .option-item {
                 margin-bottom: 6px;
                 display: flex;
-                flex-direction: row;
                 align-items: center;
                 justify-content: space-between;
                 gap: 12px;
@@ -1728,7 +1648,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
                   }
 
                   span:last-child {
-                    display: none; // 移动端隐藏百分比
+                    display: none;
                   }
                 }
 
@@ -1742,10 +1662,10 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
                     font-size: 12px;
                     font-weight: 600;
                     min-height: 32px;
-                    border-radius: 6px;
+                    border-radius: $radius-sm;
                     border: none;
                     cursor: pointer;
-                    transition: all 0.2s;
+                    transition: all $transition-fast;
                     white-space: nowrap;
 
                     &.yes-btn {
@@ -1758,7 +1678,7 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
                       &.active {
                         background: #25A750;
-                        color: #ffffff;
+                        color: #fff;
                       }
                     }
 
@@ -1772,37 +1692,10 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
                       &.active {
                         background: #CA4064;
-                        color: #ffffff;
+                        color: #fff;
                       }
                     }
                   }
-                }
-              }
-            }
-
-            .item-amount {
-              font-size: 11px;
-              color: var(--text-dark-gray, #999);
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              margin-top: 8px;
-              gap: 6px;
-
-
-              .icon-sc {
-                width: 16px;
-                height: 16px;
-                cursor: pointer;
-                transition: all 0.2s;
-                flex-shrink: 0;
-
-                &:hover {
-                  transform: scale(1.1);
-                }
-
-                &.active {
-                  fill: #CA4064;
                 }
               }
             }
@@ -1889,19 +1782,16 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
 
 /* 功能暂不开放覆盖层 */
 .coming-soon-overlay {
-  display: block;
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  padding-top: 100px;
+  box-sizing: border-box;
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(1px);
-  justify-content: center;
   z-index: 90;
-  padding-top: 100px;
-  box-sizing: border-box;
 }
 
 .theme-dark .coming-soon-overlay {
@@ -1932,21 +1822,14 @@ $no-bg-light: rgba(202, 64, 100, 0.2);
   height: 100vh;
 }
 
-// 筛选面板过渡动画
 .filter-panel-enter-active,
 .filter-panel-leave-active {
-  transition: all 0.3s ease;
+  transition: all $transition-ease;
 }
 
-.filter-panel-enter-from {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
+.filter-panel-enter-from,
 .filter-panel-leave-to {
   opacity: 0;
   transform: translateY(-10px);
 }
-
-// 下拉菜单过渡动画
 </style>

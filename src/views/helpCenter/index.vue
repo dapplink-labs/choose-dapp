@@ -43,7 +43,11 @@
         <!-- AI 推荐卡片 -->
         <div class="ai-recommend-card" @click="sendQuery('如何存入/提币操作流程')">
           <span>如何存入/提币操作流程</span>
-          <span class="card-arrow">›</span>
+          <span class="card-arrow">
+            <svg xmlns="http://www.w3.org/2000/svg" width="9.146" height="15.999" viewBox="0 0 9.146 15.999">
+              <path fill="currentColor" d="M17.64,14.191,11.586,8.142a1.143,1.143,0,0,1,1.619-1.615l6.858,6.854a1.141,1.141,0,0,1,.033,1.576l-6.887,6.9a1.143,1.143,0,0,1-1.619-1.615Z" transform="translate(-11.251 -6.194)" />
+            </svg>
+          </span>
         </div>
 
         <!-- 免责声明 -->
@@ -58,24 +62,34 @@
             <div v-if="msg.role === 'user'" class="msg-row user">
               <div class="bubble user-bubble">{{ msg.text }}</div>
             </div>
-            <!-- AI 消息 -->
-            <div v-else class="msg-row ai">
-              <div class="bubble ai-bubble">
-                <!-- 纯文本回复 -->
-                <div v-if="!msg.options" class="ai-text">{{ msg.text }}</div>
-
-                <!-- 带选项列表的回复 -->
-                <div v-else class="ai-options-card">
-                  <div class="ai-options-header">{{ msg.text }}</div>
-                  <div class="ai-options-list">
-                    <div v-for="(opt, i) in msg.options" :key="i" class="ai-option-item" @click="sendQuery(opt.text)">
-                      <span>{{ opt.text }}</span>
-                      <span class="option-arrow">›</span>
+            <!-- AI 消息：纯文本为单条气泡 -->
+            <template v-else-if="msg.role === 'ai'">
+              <div v-if="!msg.options" class="msg-row ai">
+                <div class="bubble ai-bubble ai-bubble-text">
+                  <div class="ai-text">{{ msg.text }}</div>
+                </div>
+              </div>
+              <!-- 带选项时拆成两条独立会话：上块标题 + 下块选项列表（同宽容器保证宽度一致） -->
+              <template v-else>
+                <div class="ai-message-group">
+                  <div class="msg-row ai">
+                    <div class="bubble ai-bubble ai-bubble-header">{{ msg.text }}</div>
+                  </div>
+                  <div class="msg-row ai">
+                    <div class="bubble ai-bubble ai-bubble-options">
+                      <div v-for="(opt, i) in msg.options" :key="i" class="ai-option-item" @click="sendQuery(opt.text)">
+                        <span>{{ opt.text }}</span>
+                        <span class="option-arrow">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="9.146" height="15.999" viewBox="0 0 9.146 15.999">
+                            <path fill="currentColor" d="M17.64,14.191,11.586,8.142a1.143,1.143,0,0,1,1.619-1.615l6.858,6.854a1.141,1.141,0,0,1,.033,1.576l-6.887,6.9a1.143,1.143,0,0,1-1.619-1.615Z" transform="translate(-11.251 -6.194)" />
+                          </svg>
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </template>
+            </template>
           </template>
         </div>
       </div>
@@ -113,7 +127,10 @@ const messages = ref([
     options: [{ text: '存入教程' }, { text: '提币教程' }]
   },
   { role: 'user', text: '存入教程' },
-  { role: 'ai', text: '以下是小 C 为您找到的相关存入教程:' }
+  { role: 'ai', text: '以下是小 C 为您找到的相关存入教程:' },
+  { role: 'user', text: '存入教程' },
+  { role: 'ai', text: '以下是小 C 为您找到的相关存入教程:' },
+  { role: 'user', text: '存入教程' },
 ])
 
 const inputText = ref('')
@@ -263,8 +280,12 @@ const scrollToBottom = () => {
   cursor: pointer;
 
   .card-arrow {
-    font-size: 20px;
-    color: #666;
+    display: inline-flex;
+    align-items: center;
+    color: #909090;
+  }
+  .card-arrow svg {
+    display: block;
   }
 }
 
@@ -273,6 +294,32 @@ const scrollToBottom = () => {
   line-height: 1.6;
   color: #444;
   margin-bottom: 30px;
+}
+
+/* 上块+下块同宽：flex 列容器，宽度取两行中较大值，两行拉伸一致 */
+.ai-message-group {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 85%;
+  width: max-content;
+  margin-bottom: 0;
+}
+
+.ai-message-group .msg-row {
+  margin-bottom: 12px;
+  min-width: 0;
+}
+
+.ai-message-group .msg-row:last-child {
+  margin-bottom: 20px;
+}
+
+.ai-message-group .bubble.ai-bubble-header,
+.ai-message-group .bubble.ai-bubble-options {
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 /* 聊天气泡区域 */
@@ -298,49 +345,64 @@ const scrollToBottom = () => {
   }
 
   .ai-bubble {
-    background: #1a1a1a;
     color: #fff;
-    padding: 0; // 让选项列表占满气泡
+  }
+
+  /* 纯文本 AI 气泡 */
+  .ai-bubble-text {
+    background: #1a1a1a;
+    padding: 0;
+  }
+
+  /* 上块：标题会话（单独气泡） */
+  .ai-bubble-header {
+    background: #2F2F2F;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* 下块：选项列表会话（单独气泡，如图：深底 + 浅灰描边 + 圆角） */
+  .ai-bubble-options {
+    background: #000;
+    padding: 0;
     overflow: hidden;
+    border-radius: 12px;
+    border: 1px solid #444;
   }
 }
 
-/* AI 特殊选项卡片 */
 .ai-text {
   padding: 14px 16px;
 }
 
-.ai-options-card {
-  .ai-options-header {
-    padding: 14px 16px;
-    color: #fff;
+/* 下块：选项列表气泡内的选项项（白字 + 灰箭头 + 项间灰线分隔） */
+.ai-bubble-options .ai-option-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid #333;
+  cursor: pointer;
+  color: #fff;
+  font-size: 15px;
+
+  &:last-child {
+    border-bottom: none;
   }
 
-  .ai-options-list {
-    background: #000; // 内部列表深色背景
-    border-top: 1px solid #222;
+  &:active {
+    background: #111;
   }
 
-  .ai-option-item {
-    display: flex;
-    justify-content: space-between;
+  .option-arrow {
+    display: inline-flex;
     align-items: center;
-    padding: 14px 16px;
-    border-bottom: 1px solid #222;
-    cursor: pointer;
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    &:active {
-      background: #111;
-    }
-
-    .option-arrow {
-      color: #555;
-      font-size: 18px;
-    }
+    color: #909090;
+  }
+  .option-arrow svg {
+    display: block;
   }
 }
 

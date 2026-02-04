@@ -52,6 +52,10 @@
                     <b>{{ $t('myIncome.computingPowerIncomeCMT') }}</b>
                     <p>+{{ formatAmount(currentNodeStakingInfo.hashrate_reward) }}</p>
                 </div>
+                <div class="item">
+                    <b>{{ $t('myIncome.forecastFlowBonusUSDT') }}</b>
+                    <p>+{{ formatUsdtAmount(currentNodeStakingInfo.predict_trading_reward) }}</p>
+                </div>
             </div>
 
             <!-- 赚取收益提示模块：使用通用跑马灯组件（type=3 展示收益样式） -->
@@ -115,7 +119,7 @@
                 </div>
                 <div class="earnings-item">
                     <div class="earnings-label">{{ $t('myIncome.flowBonusIncomeCHO') }}</div>
-                    <div class="earnings-value">{{ formatAmount(currentNodeStakingInfo.dividend_reward) }}</div>
+                    <div class="earnings-value">{{ formatUsdtAmount(currentNodeStakingInfo.dividend_reward) }}</div>
                 </div>
             </div>
 
@@ -160,7 +164,7 @@
                         :direct_network_list="directNetworkList" />
                 </div>
 
-                <div class="team-list">
+                <div class="team-list" v-if="currentList.length > 0">
                     <div v-for="item in currentList" :key="item.address" class="team-item">
                         <div class="team-avatar">
                             <div class="avatar-content">
@@ -345,12 +349,12 @@ const formatUsdtAmount = (value) => {
     return formatTokenAmount(value, { decimals: 18, maxFractionDigits: 2, useGrouping: true })
 }
 
-// 进度百分比：最多保留一位小数
+// 进度百分比：保留两位小数（截断，不四舍五入）
 const formatProgressPercent = (value) => {
     const num = Number(value) || 0
-    const rounded = Math.round(num * 10) / 10
-    // 如果是整数，不带小数；否则保留一位
-    return rounded % 1 === 0 ? String(rounded) : rounded.toFixed(1)
+    // 先放大 100 倍取整，再缩小，达到“截断两位小数”的效果
+    const truncated = Math.trunc(num * 100) / 100
+    return String(truncated)
 }
 
 // 地址截取：前6位 + ... + 后4位

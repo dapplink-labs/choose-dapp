@@ -234,13 +234,14 @@ const switchToBSC = async (loading) => {
 // 调用合约领取质押节点收益
 const callClaimRewardContract = async (amount, loading) => {
 
+    // 获取合约地址
     const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
     if (!bscNet?.proxyStakingManager) {
         throw new Error('未找到 StakingManager 合约地址')
     }
 
     loading.text = '调用合约中...'
-    console.log(amount)
+    // 调用合约领取收益
     const result = await writeContractOptimized({
         abi: stakingManagerABI,
         address: bscNet.proxyStakingManager,
@@ -262,10 +263,11 @@ const submitRewardData = async (txHash, selectedOption, loading) => {
     loading.text = '提交数据中...'
     const requestData = {
         user_address: address.value,
-        request_tx_hash: txHash,
-        round: String(selectedOption.round),
-        raw_amount_token: String(selectedOption.node_reward)
+        request_tx_hash: txHash,// 交易哈希
+        round: String(selectedOption.round),// 节点类型
+        raw_amount_token: String(selectedOption.node_reward)// 节点收益
     }
+    // 提交后端数据
     const res = await stakingclaimReward(requestData)
     console.log(res)
 }
@@ -284,6 +286,7 @@ const handleConfirm = async () => {
 
     const selectedOption = options.value[selectedIndex.value]
 
+    // 节点激活中，无法领取收益
     if (selectedOption.round === -1) {
         Message.warning(t('myNode.nodeActivatingTryLater'))
         return
@@ -302,9 +305,11 @@ const handleConfirm = async () => {
         background: 'rgba(0, 0, 0, 0.7)'
     })
     try {
+        // 切换网络
         await switchToBSC(loading)
+        // 调用合约领取收益
         const txHash = await callClaimRewardContract(selectedOption.round || 0, loading)
-        // const txHash = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
+        // 提交后端数据
         await submitRewardData(txHash, selectedOption, loading)
 
         Message.success(CONTRACT_MESSAGES.success())
