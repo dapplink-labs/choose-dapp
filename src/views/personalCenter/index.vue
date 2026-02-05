@@ -14,19 +14,32 @@
       <div class="action-icons">
         <!-- <img :src="isDark ? getIcon('29Dark') : getIcon('29')" :alt="$t('common.share')" class="icon-img"
           @click="handleShare" /> -->
-        <img :src="isDark ? getIcon('settingDark') : getIcon('setting')" :alt="$t('common.settings')" class="icon-img"
-          @click="handleSettings" />
-        <img :src="isDark ? getIcon('closeDark') : getIcon('close')" :alt="$t('common.close')" class="icon-img"
-          @click="handleClose" />
+        <img
+          :src="isDark ? getIcon('settingDark') : getIcon('setting')"
+          :alt="$t('common.settings')"
+          class="icon-img"
+          @click="handleSettings"
+        />
+        <img
+          :src="isDark ? getIcon('closeDark') : getIcon('close')"
+          :alt="$t('common.close')"
+          class="icon-img"
+          @click="handleClose"
+        />
       </div>
     </div>
 
     <!-- Ecosystem 标题 -->
-    <div class="section-title">{{ $t('userInfo.ecosystem') }}</div>
+    <div class="section-title">{{ $t("userInfo.ecosystem") }}</div>
 
     <!-- Ecosystem 网格布局 -->
     <div class="section-grid">
-      <div v-for="item in ecosystemItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
+      <div
+        v-for="item in ecosystemItems"
+        :key="item.key"
+        class="section-item"
+        @click="handleMenuClick(item)"
+      >
         <div class="section-icon-wrapper">
           <img :src="item.icon" :alt="item.label" class="section-icon" />
         </div>
@@ -35,11 +48,18 @@
     </div>
 
     <!-- Support 标题 -->
-    <div class="section-title section-title-with-margin">{{ $t('userInfo.support') }}</div>
+    <div class="section-title section-title-with-margin">
+      {{ $t("userInfo.support") }}
+    </div>
 
     <!-- Support 网格布局 -->
     <div class="section-grid">
-      <div v-for="item in supportItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
+      <div
+        v-for="item in supportItems"
+        :key="item.key"
+        class="section-item"
+        @click="handleMenuClick(item)"
+      >
         <div class="section-icon-wrapper">
           <img :src="item.icon" :alt="item.label" class="section-icon" />
         </div>
@@ -48,11 +68,16 @@
     </div>
 
     <!-- Others 标题 -->
-    <div class="section-title">{{ $t('userInfo.others') }}</div>
+    <div class="section-title">{{ $t("userInfo.others") }}</div>
 
     <!-- Others 网格布局 -->
     <div class="section-grid">
-      <div v-for="item in othersItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
+      <div
+        v-for="item in othersItems"
+        :key="item.key"
+        class="section-item"
+        @click="handleMenuClick(item)"
+      >
         <div class="section-icon-wrapper">
           <img :src="item.icon" :alt="item.label" class="section-icon" />
         </div>
@@ -61,11 +86,16 @@
     </div>
 
     <!-- Choose Me 标题 -->
-    <div class="section-title">{{ $t('userInfo.chooseMe') }}</div>
+    <div class="section-title">{{ $t("userInfo.chooseMe") }}</div>
 
     <!-- Choose Me 网格布局 -->
     <div class="section-grid">
-      <div v-for="item in chooseMeItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
+      <div
+        v-for="item in chooseMeItems"
+        :key="item.key"
+        class="section-item"
+        @click="handleMenuClick(item)"
+      >
         <div class="section-icon-wrapper">
           <img :src="item.icon" :alt="item.label" class="section-icon" />
         </div>
@@ -75,463 +105,492 @@
 
     <!-- Social links -->
     <div class="social-links">
-      <a v-for="(link, idx) in friendLinks" :key="idx" href="javascript:void(0)" class="social-link"
-        :aria-label="link.label" @click="goHref(link)">
+      <a
+        v-for="(link, idx) in friendLinks"
+        :key="idx"
+        href="javascript:void(0)"
+        class="social-link"
+        :aria-label="link.label"
+        @click="goHref(link)"
+      >
         <img :src="link.icon" :alt="link.label" />
       </a>
     </div>
 
     <!-- Disconnect button -->
     <div class="disconnect-section">
-      <button class="disconnect-btn" @click="handleDisconnect">{{ $t('userInfo.disconnectWallet') }}</button>
+      <button class="disconnect-btn" @click="handleDisconnect">
+        {{ $t("userInfo.disconnectWallet") }}
+      </button>
     </div>
 
     <!-- 分享邀请码弹窗 -->
     <ShareInvitationCode v-model="showShareModal" />
-
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAccount, useDisconnect } from '@wagmi/vue'
-import { useThemeStore } from '@/stores/theme'
-import { useI18n } from 'vue-i18n'
-import Message from '@/utils/message'
-import ShareInvitationCode from '@/components/ShareInvitationCode.vue'
-import { readContract } from '@wagmi/core'
-import { config } from '@/wagmi.ts'
-import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
-import networks from '@/assets/json/networks.js'
-const BSC_CHAIN_ID = 56
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { useAccount, useDisconnect } from "@wagmi/vue";
+import { useThemeStore } from "@/stores/theme";
+import { useI18n } from "vue-i18n";
+import Message from "@/utils/message";
+import ShareInvitationCode from "@/components/ShareInvitationCode.vue";
+import { readContract } from "@wagmi/core";
+import { config } from "@/wagmi.ts";
+import nodeManagerABI from "@/assets/abi/nodeManagerABI.json";
+import networks from "@/assets/json/networks.js";
+const BSC_CHAIN_ID = 56;
 
-const { locale, t } = useI18n()
+const { locale, t } = useI18n();
 
 // 批量导入 icon 资源，减少单独 import
-const iconModules = import.meta.glob('@/assets/icon/*.{png,svg}', { eager: true })
+const iconModules = import.meta.glob("@/assets/icon/*.{png,svg}", {
+  eager: true,
+});
 const iconMap = Object.fromEntries(
   Object.entries(iconModules).map(([path, mod]) => {
-    const fileName = path.split('/').pop() || path
-    const name = fileName.replace(/\.(png|svg)$/i, '')
-    return [name, mod.default]
-  })
-)
-const getIcon = (name) => iconMap[name]
+    const fileName = path.split("/").pop() || path;
+    const name = fileName.replace(/\.(png|svg)$/i, "");
+    return [name, mod.default];
+  }),
+);
+const getIcon = (name) => iconMap[name];
 
-const router = useRouter()
-const { address, status } = useAccount()
-const { disconnect } = useDisconnect()
-const themeStore = useThemeStore()
-const isDark = computed(() => themeStore.isDark)
+const router = useRouter();
+const { address, status } = useAccount();
+const { disconnect } = useDisconnect();
+const themeStore = useThemeStore();
+const isDark = computed(() => themeStore.isDark);
 
 // 生成一个随机数
-const randomNumber = ref(Math.floor(Math.random() * 10000))
+const randomNumber = ref(Math.floor(Math.random() * 10000));
 // 用户信息
-const username = ref('Choose Me ' + randomNumber.value)
+const username = ref("Choose Me " + randomNumber.value);
 const walletAddress = computed(() => {
   if (address.value) {
-    return `${address.value.slice(0, 6)}....${address.value.slice(-4)}`
+    return `${address.value.slice(0, 6)}....${address.value.slice(-4)}`;
   }
-  return ''
-})
+  return "";
+});
 
 // 分享邀请码弹窗状态
-const showShareModal = ref(false)
+const showShareModal = ref(false);
 
 const userAvatar = computed(() => {
   return address.value
     ? `https://effigy.im/a/${address.value}.svg`
-    : '/src/assets/icon/noperson.png'
-})
+    : "/src/assets/icon/noperson.png";
+});
 
 // 点击钱包地址复制
 const copyWalletAddress = async () => {
-  if (!address.value) return
-  const fullAddress = address.value
+  if (!address.value) return;
+  const fullAddress = address.value;
 
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    await navigator.clipboard.writeText(fullAddress)
-    Message.success(t('userInfo.walletAddressCopied'))
+    await navigator.clipboard.writeText(fullAddress);
+    Message.success(t("userInfo.walletAddressCopied"));
   }
-}
+};
 
 // 生态系统菜单配置
 const baseEcosystemItems = computed(() => [
   {
-    key: 'computing-power-services',
-    label: t('userInfo.stakingPool'),
-    icon: getIcon('1'),
+    key: "computing-power-services",
+    label: t("userInfo.stakingPool"),
+    icon: getIcon("1"),
     iconDark: getIcon("1Dark"),
-    path: '/computing-power-services'
+    path: "/computing-power-services",
   },
   {
-    key: 'LPVault',
-    label: t('userInfo.lpVault'),
-    icon: getIcon('2'),
+    key: "LPVault",
+    label: t("userInfo.lpVault"),
+    icon: getIcon("2"),
     iconDark: getIcon("2Dark"),
-    path: '/LPVault'
+    path: "/LPVault",
   },
   {
-    key: 'dashboard',
-    label: t('userInfo.onChainData'),
-    icon: getIcon('3'),
+    key: "dashboard",
+    label: t("userInfo.onChainData"),
+    icon: getIcon("3"),
     iconDark: getIcon("3Dark"),
-    path: '/dashboard'
+    path: "/dashboard",
   },
   {
-    key: 'create',
-    label: t('userInfo.predictionMarket'),
-    icon: getIcon('4'),
+    key: "create",
+    label: t("userInfo.predictionMarket"),
+    icon: getIcon("4"),
     iconDark: getIcon("4Dark"),
-    path: '/create'
+    path: "/create",
   },
   {
-    key: 'fund',
-    label: t('userInfo.assets'),
-    icon: getIcon('5'),
+    key: "fund",
+    label: t("userInfo.assets"),
+    icon: getIcon("5"),
     iconDark: getIcon("5Dark"),
-    path: '/asset-management'
+    path: "/asset-management",
   },
   {
-    key: 'event-pool',
-    label: t('userInfo.eventPool'),
-    icon: getIcon('6'),
+    key: "event-pool",
+    label: t("userInfo.eventPool"),
+    icon: getIcon("6"),
     iconDark: getIcon("6Dark"),
-    path: '/event-pool'
+    path: "/event-pool",
   },
   {
-    key: 'launchpad',
-    label: t('userInfo.launchpad'),
-    icon: getIcon('14'),
+    key: "launchpad",
+    label: t("userInfo.launchpad"),
+    icon: getIcon("14"),
     iconDark: getIcon("14Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'smart-money',
-    label: t('userInfo.smartMoney'),
-    icon: getIcon('15'),
+    key: "smart-money",
+    label: t("userInfo.smartMoney"),
+    icon: getIcon("15"),
     iconDark: getIcon("15Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'borrow',
-    label: t('userInfo.borrow'),
-    icon: getIcon('30'),
+    key: "borrow",
+    label: t("userInfo.borrow"),
+    icon: getIcon("30"),
     iconDark: getIcon("30Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'earn',
-    label: t('userInfo.earn'),
-    icon: getIcon('31'),
+    key: "earn",
+    label: t("userInfo.earn"),
+    icon: getIcon("31"),
     iconDark: getIcon("31Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'strategyTrading',
-    label: t('userInfo.strategyTrading'),
-    icon: getIcon('32'),
+    key: "strategyTrading",
+    label: t("userInfo.strategyTrading"),
+    icon: getIcon("32"),
     iconDark: getIcon("32Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'copyTrading',
-    label: t('userInfo.copyTrading'),
-    icon: getIcon('33'),
+    key: "copyTrading",
+    label: t("userInfo.copyTrading"),
+    icon: getIcon("33"),
     iconDark: getIcon("33Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'airdrop',
-    label: t('userInfo.airdrop'),
-    icon: getIcon('34'),
+    key: "airdrop",
+    label: t("userInfo.airdrop"),
+    icon: getIcon("34"),
     iconDark: getIcon("34Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'academy',
-    label: t('userInfo.academy'),
-    icon: getIcon('35'),
+    key: "academy",
+    label: t("userInfo.academy"),
+    icon: getIcon("35"),
     iconDark: getIcon("35Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'nft',
-    label: t('userInfo.nft'),
-    icon: getIcon('36'),
+    key: "nft",
+    label: t("userInfo.nft"),
+    icon: getIcon("36"),
     iconDark: getIcon("36Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'inviteShare',
-    label: t('userInfo.inviteShare'),
-    icon: getIcon('25'),
+    key: "inviteShare",
+    label: t("userInfo.inviteShare"),
+    icon: getIcon("25"),
     iconDark: getIcon("25Dark"),
-    path: '/'
+    path: "/",
   },
-])
+]);
 
 const ecosystemItems = computed(() =>
-  baseEcosystemItems.value.map(item => ({
+  baseEcosystemItems.value.map((item) => ({
     ...item,
-    icon: isDark.value ? item.iconDark : item.icon
-  }))
-)
+    icon: isDark.value ? item.iconDark : item.icon,
+  })),
+);
 
 // 其他菜单配置
 const baseOthersItems = computed(() => [
   {
-    key: 'audit',
-    label: t('userInfo.audit'),
-    icon: getIcon('7'),
+    key: "audit",
+    label: t("userInfo.audit"),
+    icon: getIcon("7"),
     iconDark: getIcon("7Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'github',
-    label: t('userInfo.github'),
-    icon: getIcon('17'),
+    key: "github",
+    label: t("userInfo.github"),
+    icon: getIcon("17"),
     iconDark: getIcon("17Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'technical-support',
-    label: t('userInfo.technicalSupport'),
-    icon: getIcon('18'),
+    key: "technical-support",
+    label: t("userInfo.technicalSupport"),
+    icon: getIcon("18"),
     iconDark: getIcon("18Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'developer-contributions',
-    label: t('userInfo.developerContributions'),
-    icon: getIcon('12'),
+    key: "developer-contributions",
+    label: t("userInfo.developerContributions"),
+    icon: getIcon("12"),
     iconDark: getIcon("12Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'tokenomics',
-    label: t('userInfo.tokenomics'),
-    icon: getIcon('13'),
+    key: "tokenomics",
+    label: t("userInfo.tokenomics"),
+    icon: getIcon("13"),
     iconDark: getIcon("13Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'bug-bounty',
-    label: t('userInfo.bugBounty'),
-    icon: getIcon('16'),
+    key: "bug-bounty",
+    label: t("userInfo.bugBounty"),
+    icon: getIcon("16"),
     iconDark: getIcon("16Dark"),
-    path: '/'
+    path: "/",
   },
-])
+]);
 
 const othersItems = computed(() =>
-  baseOthersItems.value.map(item => ({
+  baseOthersItems.value.map((item) => ({
     ...item,
-    icon: isDark.value ? item.iconDark : item.icon
-  }))
-)
+    icon: isDark.value ? item.iconDark : item.icon,
+  })),
+);
 
 // 支持菜单配置
 const baseSupportItems = computed(() => [
   {
-    key: 'official-verification',
-    label: t('userInfo.officialVerification'),
-    icon: getIcon('19'),
+    key: "official-verification",
+    label: t("userInfo.officialVerification"),
+    icon: getIcon("19"),
     iconDark: getIcon("19Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'product-feedback',
-    label: t('userInfo.productFeedback'),
-    icon: getIcon('20'),
+    key: "product-feedback",
+    label: t("userInfo.productFeedback"),
+    icon: getIcon("20"),
     iconDark: getIcon("20Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'api-management',
-    label: t('userInfo.apiManagement'),
-    icon: getIcon('21'),
+    key: "api-management",
+    label: t("userInfo.apiManagement"),
+    icon: getIcon("21"),
     iconDark: getIcon("21Dark"),
-    path: '/'
+    path: "/",
   },
   {
-    key: 'help-center',
-    label: t('userInfo.helpCenter'),
-    icon: getIcon('22'),
+    key: "help-center",
+    label: t("userInfo.helpCenter"),
+    icon: getIcon("22"),
     iconDark: getIcon("22Dark"),
-    path: '/help-center'
+    path: "/help-center",
   },
   {
-    key: 'customer-support',
-    label: t('userInfo.customerSupport'),
-    icon: getIcon('23'),
+    key: "customer-support",
+    label: t("userInfo.customerSupport"),
+    icon: getIcon("23"),
     iconDark: getIcon("23Dark"),
-    path: '/help-center'
+    path: "/help-center",
   },
   {
-    key: 'developer-docs',
-    label: t('userInfo.developerDocs'),
-    icon: getIcon('8'),
+    key: "developer-docs",
+    label: t("userInfo.developerDocs"),
+    icon: getIcon("8"),
     iconDark: getIcon("8Dark"),
-    path: '/doc'
-  }
-])
+    path: "/doc",
+  },
+]);
 
 const supportItems = computed(() =>
-  baseSupportItems.value.map(item => ({
+  baseSupportItems.value.map((item) => ({
     ...item,
-    icon: isDark.value ? item.iconDark : item.icon
-  }))
-)
-
+    icon: isDark.value ? item.iconDark : item.icon,
+  })),
+);
 
 // choose me菜单配置
 const baseChooseMeItems = computed(() => [
   {
-    key: 'leaderboardH5',
-    label: t('userInfo.leaderboard'),
-    icon: getIcon('38'),
-    iconDark: getIcon('38Dark'),
-    path: '/leaderboardH5'
+    key: "leaderboardH5",
+    label: t("userInfo.leaderboard"),
+    icon: getIcon("38"),
+    iconDark: getIcon("38Dark"),
+    path: "/leaderboardH5",
   },
   {
-    key: 'reward',
-    label: t('userInfo.reward'),
-    icon: getIcon('25'),
-    iconDark: getIcon('25Dark'),
-    path: '/reward'
+    key: "reward",
+    label: t("userInfo.reward"),
+    icon: getIcon("25"),
+    iconDark: getIcon("25Dark"),
+    path: "/reward",
   },
   {
-    key: 'accuracy',
-    label: t('userInfo.accuracy'),
-    icon: getIcon('26'),
-    iconDark: getIcon('26Dark'),
-    path: '/accuracy'
+    key: "accuracy",
+    label: t("userInfo.accuracy"),
+    icon: getIcon("26"),
+    iconDark: getIcon("26Dark"),
+    path: "/accuracy",
   },
   {
-    key: 'terms',
-    label: t('userInfo.terms'),
-    icon: getIcon('27'),
-    iconDark: getIcon('27Dark'),
-    path: '/terms'
-  }
-])
+    key: "terms",
+    label: t("userInfo.terms"),
+    icon: getIcon("27"),
+    iconDark: getIcon("27Dark"),
+    path: "/terms",
+  },
+]);
 function goHref(link) {
-  window.open(link.href, '_blank')
+  window.open(link.href, "_blank");
 }
 const chooseMeItems = computed(() =>
-  baseChooseMeItems.value.map(item => ({
+  baseChooseMeItems.value.map((item) => ({
     ...item,
-    icon: isDark.value ? item.iconDark : item.icon
-  }))
-)
+    icon: isDark.value ? item.iconDark : item.icon,
+  })),
+);
 
 // 友链图标（使用 assets/icon 中的图片，随主题切换）
 const baseFriendLinks = [
-  { label: 'Twitter', icon: getIcon('Twitter'), iconDark: getIcon('TwitterDark'), href: "https://x.com/chooseme_global?s=21" },
-  { label: 'Telegram', icon: getIcon('tgDark'), iconDark: getIcon('tg'), href: "https://t.me/Choosme_Global" },
+  {
+    label: "Twitter",
+    icon: getIcon("Twitter"),
+    iconDark: getIcon("TwitterDark"),
+    href: "https://x.com/chooseme_global?s=21",
+  },
+  {
+    label: "Telegram",
+    icon: getIcon("tgDark"),
+    iconDark: getIcon("tg"),
+    href: "https://t.me/Choosme_Global",
+  },
   // { label: 'Instagram', icon: getIcon('ins'), iconDark: getIcon('insDark') ,href:""},
   // { label: 'LinkedIn', icon: getIcon('in'), iconDark: getIcon('inDark') },
   // { label: 'TikTok', icon: getIcon('dy'), iconDark: getIcon('dyDark') },
   // { label: 'Twitter', icon: getIcon('Twitter'), iconDark: getIcon('TwitterDark') },
-  { label: 'YouTube', icon: getIcon('YouTube'), iconDark: getIcon('YouTubeDark'), href: "https://www.youtube.com/@ChooseMeGlobal" },
-  { label: 'media', icon: getIcon('mediaDark'), iconDark: getIcon('media'), href: "https://medium.com/@ChooseMeGlobal" }
-]
+  {
+    label: "YouTube",
+    icon: getIcon("YouTube"),
+    iconDark: getIcon("YouTubeDark"),
+    href: "https://www.youtube.com/@ChooseMeGlobal",
+  },
+  {
+    label: "media",
+    icon: getIcon("mediaDark"),
+    iconDark: getIcon("media"),
+    href: "https://medium.com/@ChooseMeGlobal",
+  },
+];
 
 const friendLinks = computed(() =>
-  baseFriendLinks.map(link => ({
+  baseFriendLinks.map((link) => ({
     ...link,
     icon: isDark.value ? link.iconDark : link.icon,
-    href: link.href
-  }))
-)
+    href: link.href,
+  })),
+);
 
 // 处理分享点击
 const handleShare = async () => {
   // 合约读取是否绑定邀请人
   const inviter = await readContract(config, {
-    address: networks.find(n => Number(n.chainId) === BSC_CHAIN_ID).proxyNodeManager,
+    address: networks.find((n) => Number(n.chainId) === BSC_CHAIN_ID)
+      .proxyNodeManager,
     abi: nodeManagerABI,
-    functionName: 'inviters',
-    args: [address.value]
-  })
-  if (inviter == '0x0000000000000000000000000000000000000000') {
-    Message.warning(t('userInfo.bindInviterFirst'))
-    return
+    functionName: "inviters",
+    args: [address.value],
+  });
+  if (inviter == "0x0000000000000000000000000000000000000000") {
+    Message.warning(t("userInfo.bindInviterFirst"));
+    return;
   }
   // 打开分享邀请码弹窗
-  showShareModal.value = true
-}
+  showShareModal.value = true;
+};
 
 // 处理设置点击
 const handleSettings = () => {
-  router.push('/userInfo')
-}
+  router.push("/userInfo");
+};
 
 // 处理关闭点击
 const handleClose = () => {
-  router.push('/home')
-}
+  router.push("/home");
+};
 
 // 允许访问的路径列表（除了这些路径外，其他都显示"待开放"）
 const allowedPaths = [
-  '/computing-power-services', // 节点购买
-  // '/LPVault', // LPVault
+  "/computing-power-services", // 节点购买
+  "/LPVault", // LPVault
   // '/dashboard', // 链上数据
   // '/asset-management', // 链上资产
   // '/leaderboardH5', // 排行榜
   // '/event-pool', // 事件池
   // '/help-center' // 帮助中心
-]
+];
 
 // 处理菜单项点击
 const handleMenuClick = (item) => {
-  if (item.key === 'inviteShare') {
-    showShareModal.value = true
-    return
+  if (item.key === "inviteShare") {
+    showShareModal.value = true;
+    return;
   }
   // 菜单项的路由跳转
   if (item.path) {
     // 检查路径是否在允许列表中
     if (allowedPaths.includes(item.path)) {
-      router.push(item.path)
+      router.push(item.path);
     } else {
       // 不在允许列表中的路径，显示"待开放"提示
-      Message.info(t('userInfo.underDevelopment'))
+      Message.info(t("userInfo.underDevelopment"));
     }
   }
-}
+};
 
 // 处理断开链接
 const handleDisconnect = async () => {
-  localStorage.removeItem('inviteCode')
-  window.sessionStorage.clear()
+  localStorage.removeItem("inviteCode");
+  window.sessionStorage.clear();
   try {
-    console.log('开始断开钱包连接...')
+    console.log("开始断开钱包连接...");
     // 调用 wagmi 断开钱包连接（异步操作）
-    await disconnect()
+    await disconnect();
 
     // 立即跳转到首页，不等待状态更新
-    router.replace('/')
+    router.replace("/");
   } catch (error) {
-    console.error('断开连接失败:', error)
+    console.error("断开连接失败:", error);
 
     // 即使断开失败，也立即返回首页
-    router.replace('/')
+    router.replace("/");
   }
-}
+};
 
 // 初始化主题
 onMounted(() => {
-  themeStore.applyTheme()
-})
+  themeStore.applyTheme();
+});
 </script>
 
 <style scoped lang="scss">
 .user-info-page {
   min-height: 100vh;
-  background-color: var(--bg-page-h5, #FFFFFF);
+  background-color: var(--bg-page-h5, #ffffff);
   padding: 16px;
   padding-top: 16px;
   padding-bottom: 16px;
@@ -622,7 +681,7 @@ onMounted(() => {
     grid-template-columns: repeat(4, 1fr);
     gap: 40px 0px;
     padding-bottom: 36px;
-    border-bottom: 1px solid var(--border-color, #F3F3F3);
+    border-bottom: 1px solid var(--border-color, #f3f3f3);
     margin-bottom: 32px;
 
     // 统一的网格项样式
@@ -699,7 +758,7 @@ onMounted(() => {
       border: none;
       background: #ffffff;
       color: #1a1a1a;
-      border: 1px solid var(--border-color, #E0E0E0);
+      border: 1px solid var(--border-color, #e0e0e0);
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
@@ -711,6 +770,5 @@ onMounted(() => {
       }
     }
   }
-
 }
 </style>

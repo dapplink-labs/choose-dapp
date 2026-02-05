@@ -549,7 +549,7 @@ export default {
   },
   "myIncome": {
     "myIncomeCMT": "我的收益(CHO)",
-    "communityIncomeCHO": "小区业绩(CHO)",
+    "communityIncomeUSDT": "小区业绩(USDT)",
     "computingPowerIncomeCMT": "直推收益(CHO)",
     "networkIncomeCMT": "团队收益(CHO)",
     "pendingIncome": "已发放奖励",

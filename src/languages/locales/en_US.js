@@ -549,7 +549,7 @@ export default {
   },
   "myIncome": {
     "myIncomeCMT": "My Profit (CHO)",
-    "communityIncomeCHO": "Community Performance (CHO)",
+    "communityIncomeUSDT": "Community Performance (USDT)",
     "computingPowerIncomeCMT": "Direct Referral Profit (CHO)",
     "networkIncomeCMT": "Team Profit (CHO)",
     "pendingIncome": "Issued Rewards",

@@ -550,7 +550,7 @@ export default {
   },
   "myIncome": {
     "myIncomeCMT": "나의 수익(CHO)",
-    "communityIncomeCHO": "커뮤니티 실적(CHO)",
+    "communityIncomeUSDT": "커뮤니티 실적(USDT)",
     "computingPowerIncomeCMT": "직접 추천 수익 (CHO)",
     "networkIncomeCMT": "팀 수익 (CHO)",
     "pendingIncome": "지급된 보상",

@@ -550,7 +550,7 @@ export default {
   },
   "myIncome": {
     "myIncomeCMT": "My Profit (CHO)",
-    "communityIncomeCHO": "コミュニティ実績(CHO)",
+    "communityIncomeUSDT": "コミュニティ実績(USDT)",
     "computingPowerIncomeCMT": "直接紹介収益(CHO)",
     "networkIncomeCMT": "チーム収益(CHO)",
     "pendingIncome": "発行済み報酬",
