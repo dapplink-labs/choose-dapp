@@ -5,47 +5,29 @@
     <div class="banner1">
       <div class="intro">
         <div class="intro-header">
-          <h1 class="intro-title">{{ currentNodeStakingInfo.name }}</h1>
-          <div class="intro-tag">{{ currentNodeStakingInfo.node_level }}</div>
+          <h1 class="intro-title">{{ currentNodeStakingInfo?.name }}</h1>
+          <div class="intro-tag">{{ currentNodeStakingInfo?.node_level }}</div>
           <div class="intro-action-icon" @click="handleSwap">
-            <svg
-              t="1766805327912"
-              class="icon"
-              viewBox="0 0 1024 1024"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              p-id="1596"
-              width="20"
-              height="20"
-            >
+            <svg t="1766805327912" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+              p-id="1596" width="20" height="20">
               <path
                 d="M618.688 149.312l0 213.376L64 362.688 64 448l896 0L618.688 149.312zM405.312 874.688l0-213.376L960 661.312 960 576 64 576 405.312 874.688z"
-                fill="currentColor"
-                p-id="1597"
-              ></path>
+                fill="currentColor" p-id="1597"></path>
             </svg>
           </div>
         </div>
         <div class="intro-time">
-          <svg
-            class="time-icon"
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-          >
+          <svg class="time-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12">
             <path
               d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
-              transform="translate(-69.818 -69.818)"
-              fill="currentColor"
-            />
+              transform="translate(-69.818 -69.818)" fill="currentColor" />
           </svg>
           <span class="time-text">
             {{ $t("myIncome.purchaseTime") }}:
             {{
-              Number(currentNodeStakingInfo.status) === 1
+              Number(currentNodeStakingInfo?.status) === 1
                 ? $t("computingPower.activating")
-                : formatDateTime(currentNodeStakingInfo.created)
+                : formatDateTime(currentNodeStakingInfo?.created)
             }}
           </span>
         </div>
@@ -55,27 +37,27 @@
       <div class="box">
         <div class="item">
           <b>{{ $t("myIncome.myIncomeCMT") }}</b>
-          <p>+{{ formatAmount(currentNodeStakingInfo.total_reward) }}</p>
+          <p>+{{ formatAmount(currentNodeStakingInfo?.total_reward) }}</p>
         </div>
         <!-- <div class="item">
           <b>{{ $t("myIncome.communityIncomeUSDT") }}</b>
           <p>
-            +{{ formatUsdtAmount(currentNodeStakingInfo.community_income) }}
+            +{{ formatUsdtAmount(currentNodeStakingInfo?.community_income) }}
           </p>
         </div> -->
         <div class="item">
           <b>{{ $t("myIncome.networkIncomeCMT") }}</b>
-          <p>+{{ formatAmount(currentNodeStakingInfo.network_reward) }}</p>
+          <p>+{{ formatAmount(currentNodeStakingInfo?.network_reward) }}</p>
         </div>
         <div class="item">
           <b>{{ $t("myIncome.computingPowerIncomeCMT") }}</b>
-          <p>+{{ formatAmount(currentNodeStakingInfo.hashrate_reward) }}</p>
+          <p>+{{ formatAmount(currentNodeStakingInfo?.hashrate_reward) }}</p>
         </div>
         <div class="item">
           <b>{{ $t("myIncome.forecastFlowBonusUSDT") }}</b>
           <p>
             +{{
-              formatUsdtAmount(currentNodeStakingInfo.predict_trading_reward)
+              formatUsdtAmount(currentNodeStakingInfo?.predict_trading_reward)
             }}
           </p>
         </div>
@@ -97,47 +79,35 @@
       <div class="processDiv">
         <div class="progress-bar-container">
           <div class="progress-bar">
-            <div
-              class="progress-fill"
-              :style="{
-                width:
-                  currentNodeStakingInfo.progressPercent < 4
-                    ? 4 + '%'
-                    : currentNodeStakingInfo.progressPercent + '%',
-              }"
-            ></div>
-            <div
-              class="progress-indicator"
-              :style="{
-                left:
-                  currentNodeStakingInfo.progressPercent < 4
-                    ? 4 + '%'
-                    : currentNodeStakingInfo.progressPercent + '%',
-              }"
-            >
-              <span class="indicator-text"
-                >{{
-                  formatProgressPercent(currentNodeStakingInfo.progressPercent)
-                }}%</span
-              >
+            <div class="progress-fill" :style="{
+              width:
+                currentNodeStakingInfo?.progressPercent < 4
+                  ? 4 + '%'
+                  : currentNodeStakingInfo?.progressPercent + '%',
+            }"></div>
+            <div class="progress-indicator" :style="{
+              left:
+                currentNodeStakingInfo?.progressPercent < 4
+                  ? 4 + '%'
+                  : currentNodeStakingInfo?.progressPercent + '%',
+            }">
+              <span class="indicator-text">{{
+                formatProgressPercent(currentNodeStakingInfo?.progressPercent)
+              }}%</span>
             </div>
           </div>
         </div>
         <div class="text">
-          <span
-            >{{
-              formatUsdtAmount(
-                parseInt(currentNodeStakingInfo.total_reward_usdt),
-              )
-            }}
-            USDT</span
-          >
-          <span
-            >{{
-              formatUsdtAmount(parseInt(currentNodeStakingInfo.forecast_income))
-            }}
-            USDT</span
-          >
+          <span>{{
+            formatUsdtAmount(
+              parseInt(currentNodeStakingInfo?.total_reward_usdt),
+            )
+          }}
+            USDT</span>
+          <span>{{
+            formatUsdtAmount(parseInt(currentNodeStakingInfo?.forecast_income))
+          }}
+            USDT</span>
         </div>
       </div>
 
@@ -145,7 +115,7 @@
         <div class="earnings-item">
           <div class="earnings-label">{{ $t("myIncome.staticIncomeCHO") }}</div>
           <div class="earnings-value">
-            {{ formatAmount(currentNodeStakingInfo.static_reward) }}
+            {{ formatAmount(currentNodeStakingInfo?.static_reward) }}
           </div>
         </div>
         <div class="earnings-item">
@@ -153,37 +123,31 @@
             {{ $t("myIncome.directReferralIncomeCHO") }}
           </div>
           <div class="earnings-value">
-            {{ formatAmount(currentNodeStakingInfo.direct_reward) }}
+            {{ formatAmount(currentNodeStakingInfo?.direct_reward) }}
           </div>
         </div>
         <div class="earnings-item">
           <div class="earnings-label">{{ $t("myIncome.teamIncomeCHO") }}</div>
           <div class="earnings-value">
-            {{ formatAmount(currentNodeStakingInfo.team_reward) }}
+            {{ formatAmount(currentNodeStakingInfo?.team_reward) }}
           </div>
         </div>
         <!-- 创世节点 5% 收益：仅当当前节点为创世节点（例如 T6）时显示 -->
-        <div
-          class="earnings-item"
-          v-if="currentNodeStakingInfo.node_level === 'T6'"
-        >
+        <div class="earnings-item" v-if="currentNodeStakingInfo?.node_level === 'T6'">
           <div class="earnings-label">
             {{ $t("myIncome.genesisNodeIncomeCHO") }}
           </div>
           <div class="earnings-value">
-            {{ formatAmount(currentNodeStakingInfo.creation_reward) }}
+            {{ formatAmount(currentNodeStakingInfo?.creation_reward) }}
           </div>
         </div>
         <!-- 超级节点收益：仅当当前节点为超级节点（例如 T5）时显示 -->
-        <div
-          class="earnings-item"
-          v-if="currentNodeStakingInfo.node_level === 'T5'"
-        >
+        <div class="earnings-item" v-if="currentNodeStakingInfo?.node_level === 'T5'">
           <div class="earnings-label">
             {{ $t("myIncome.superNodeIncomeCHO") }}
           </div>
           <div class="earnings-value">
-            {{ formatAmount(currentNodeStakingInfo.super_node_reward) }}
+            {{ formatAmount(currentNodeStakingInfo?.super_node_reward) }}
           </div>
         </div>
         <div class="earnings-item">
@@ -191,7 +155,7 @@
             {{ $t("myIncome.equalLevelIncomeCHO") }}
           </div>
           <div class="earnings-value">
-            {{ formatAmount(currentNodeStakingInfo.lateral_reward) }}
+            {{ formatAmount(currentNodeStakingInfo?.lateral_reward) }}
           </div>
         </div>
         <div class="earnings-item">
@@ -199,17 +163,13 @@
             {{ $t("myIncome.flowBonusIncomeCHO") }}
           </div>
           <div class="earnings-value">
-            {{ formatUsdtAmount(currentNodeStakingInfo.dividend_reward) }}
+            {{ formatUsdtAmount(currentNodeStakingInfo?.dividend_reward) }}
           </div>
         </div>
       </div>
 
-      <button
-        class="claim-all-btn"
-        :class="{ 'claim-all-btn--disabled': isClaimDisabledByTime }"
-        :disabled="isClaimDisabledByTime"
-        @click="openCollectEarnings"
-      >
+      <button class="claim-all-btn" :class="{ 'claim-all-btn--disabled': isClaimDisabledByTime }"
+        :disabled="isClaimDisabledByTime" @click="openCollectEarnings">
         {{ claimButtonText }}
       </button>
     </div>
@@ -218,16 +178,10 @@
     <div class="my-team">
       <div class="team-content">
         <div class="team-tabs">
-          <div
-            :class="['tab-btn', { active: activeTab === 'direct' }]"
-            @click="activeTab = 'direct'"
-          >
+          <div :class="['tab-btn', { active: activeTab === 'direct' }]" @click="activeTab = 'direct'">
             {{ $t("myNode.directAddress") }}
           </div>
-          <div
-            :class="['tab-btn', { active: activeTab === 'team' }]"
-            @click="activeTab = 'team'"
-          >
+          <div :class="['tab-btn', { active: activeTab === 'team' }]" @click="activeTab = 'team'">
             {{ $t("myNode.teamAddress") }}
           </div>
         </div>
@@ -253,27 +207,15 @@
 
         <!-- 层级树状图占位 -->
         <div class="team-tree-placeholder">
-          <TeamTree
-            :type="activeTab === 'direct' ? 1 : 2"
-            :node_type="1"
-            :team_network_list="teamNetworkList"
-            :direct_network_list="directNetworkList"
-          />
+          <TeamTree :type="activeTab === 'direct' ? 1 : 2" :node_type="1" :team_network_list="teamNetworkList"
+            :direct_network_list="directNetworkList" />
         </div>
 
         <div class="team-list" v-if="currentList.length > 0">
-          <div
-            v-for="item in currentList"
-            :key="item.address"
-            class="team-item"
-          >
+          <div v-for="item in currentList" :key="item.address" class="team-item">
             <div class="team-avatar">
               <div class="avatar-content">
-                <img
-                  :src="item.avatar || avatarImg"
-                  alt="avatar"
-                  class="avatar-img"
-                />
+                <img :src="item.avatar || avatarImg" alt="avatar" class="avatar-img" />
               </div>
             </div>
             <div class="team-info-content">
@@ -291,17 +233,13 @@
                   </div>
                 </div>
                 <div class="team-right-info">
-                  <span class="team-reward"
-                    >+ {{ item.reward || "0" }} CHO</span
-                  >
+                  <span class="team-reward">+ {{ item.reward || "0" }} CHO</span>
                 </div>
               </div>
               <!-- 团队地址列表：显示Upline和时间 -->
               <div v-if="activeTab === 'team'" class="team-upline-row">
                 <div class="team-upline-left">
-                  <span class="team-upline-label"
-                    >{{ $t("myIncome.upline") }}:</span
-                  >
+                  <span class="team-upline-label">{{ $t("myIncome.upline") }}:</span>
                   <span class="team-upline-address">{{
                     item.upline || item.address
                   }}</span>
@@ -315,25 +253,14 @@
     </div>
 
     <!-- 我的节点弹窗 -->
-    <TabNode
-      v-model="showNodesModal"
-      :nodes="myNodes"
-      @select="handleNodeSelect"
-    />
+    <TabNode v-model="showNodesModal" :nodes="myNodes" @select="handleNodeSelect" />
 
     <!-- 领取收益弹窗 -->
-    <CollectEarnings
-      ref="collectEarningsRef"
-      @ReceiveSuccess="handleCollectSuccess"
-    />
+    <CollectEarnings ref="collectEarningsRef" @ReceiveSuccess="handleCollectSuccess" />
 
     <!-- 无节点提示弹窗 -->
     <transition name="fade">
-      <div
-        v-if="showNoNodeModal"
-        class="no-node-overlay"
-        @click.self="handleCloseNoNodeModal"
-      >
+      <div v-if="showNoNodeModal" class="no-node-overlay" @click.self="handleCloseNoNodeModal">
         <div class="no-node-card">
           <h2 class="card-title">
             {{ $t("myIncome.noStakingNode") || "提示" }}
@@ -554,7 +481,7 @@ const nodeTypeMap = {
 // 创世节点5%收益 = creation_reward
 // 超级节点收益 = super_node_reward
 const fetchNodeStakingInfo = async () => {
-  if (!currentNodeStakingInfo.value.id) return;
+  if (!currentNodeStakingInfo.value?.id) return;
   console.log(currentNodeStakingInfo.value, "-------------------");
   const res = await getNodeStakingInfo({
     address: address.value,
@@ -591,13 +518,15 @@ const getNodeStakingRecordsList = async () => {
       round: item.round,
     };
   });
-  if (myNodes.value.length > 0) {
-    currentNodeStakingInfo.value = myNodes.value[0];
-    fetchNodeStakingInfo();
-  } else {
-    // 如果没有质押节点，显示确定弹窗提示用户并返回上一个页面
-    showNoNodeModal.value = true;
-  }
+  currentNodeStakingInfo.value = myNodes.value[0] ? myNodes.value[0] : {};
+  fetchNodeStakingInfo();
+  // if (myNodes.value.length > 0) {
+  //   currentNodeStakingInfo.value = myNodes.value[0];
+  //   fetchNodeStakingInfo();
+  // } else {
+  //   // 如果没有质押节点，显示确定弹窗提示用户并返回上一个页面
+  //   showNoNodeModal.value = true;
+  // }
 };
 
 // 切换节点
@@ -1259,6 +1188,7 @@ watch(activeTab, () => {
 
 .theme-dark .myIncome {
   .cps-card-header {
+
     .back-btn,
     .record-btn,
     .open-btn {
@@ -1318,6 +1248,7 @@ watch(activeTab, () => {
 
         .team-upline-row {
           .team-upline-left {
+
             .team-upline-label,
             .team-upline-address {
               color: #999999 !important;
