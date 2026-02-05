@@ -25,8 +25,8 @@ const serive = axios.create({
 // 添加请求头
 serive.interceptors.request.use((config) => {
   config.headers = config.headers || {}
-  config.headers["X-Signature-Message"] = JSON.parse(window.sessionStorage.getItem('signatureInfo')).timestamp || ''
-  config.headers["X-Signature"] = JSON.parse(window.sessionStorage.getItem('signatureInfo')).signature || ''
+  // config.headers["X-Signature-Message"] = JSON.parse(window.sessionStorage.getItem('signatureInfo')).timestamp || ''
+  // config.headers["X-Signature"] = JSON.parse(window.sessionStorage.getItem('signatureInfo')).signature || ''
   return config
 })
 // serive.interceptors.request.use((config) => {
