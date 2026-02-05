@@ -168,7 +168,12 @@
                     <div v-for="item in currentList" :key="item.address" class="team-item">
                         <div class="team-avatar">
                             <div class="avatar-content">
-                                <img :src="item.avatar || avatarImg" alt="avatar" class="avatar-img" />
+                                <img
+                                    :src="item.avatar || avatarImg"
+                                    alt="avatar"
+                                    class="avatar-img"
+                                    @error="handleInviterAvatarError"
+                                />
                             </div>
                         </div>
                         <div class="team-info-content">
@@ -228,6 +233,7 @@ import { useThemeStore } from '@/stores/theme'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import avatarImg from '@/assets/icon/avatar.png'
+import lp1Img from '@/assets/icon/LP1.png'
 import avatarImg1 from '@/assets/icon/avatarImg1.png'
 import avatarImg2 from '@/assets/icon/avatarImg2.png'
 import avatarImg3 from '@/assets/icon/avatarImg3.png'
@@ -371,6 +377,14 @@ const avatarImages = [avatarImg1, avatarImg2, avatarImg3, avatarImg4, avatarImg5
 const getRandomAvatar = () => {
     const randomIndex = Math.floor(Math.random() * avatarImages.length)
     return avatarImages[randomIndex]
+}
+
+// 邀请人列表头像加载失败兜底
+const handleInviterAvatarError = (e) => {
+    const imgEl = e?.target
+    if (!imgEl) return
+    imgEl.onerror = null
+    imgEl.src = lp1Img
 }
 const nodeTypeMap = {
     'T1': { nodeTag: 'T1', nodeNameKey: 'purchaseNodeRecord.informationNode' },

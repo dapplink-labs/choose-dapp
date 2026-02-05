@@ -17,6 +17,7 @@ import myIncome from "../views/myIncome/index.vue"
 import LPVault from "../views/LPVault/index.vue"
 import dashboard from "../views/dashboard/index.vue"
 import detailH5 from "../views/detailH5/index.vue"
+import predictionDetailH5 from "../views/predictionDetailH5/index.vue"
 import purchaseNodeRecord from "../views/purchaseNodeRecord/index.vue"
 import assetManagement from "../views/assetManagement/index.vue"
 import claimRecord from "../views/claimRecord/index.vue"
@@ -25,6 +26,8 @@ import userInfo from "../views/userInfo/index.vue"
 import eventPool from "../views/eventPool/index.vue"
 import bill from "../views/bill/index.vue"
 import helpCenter from "../views/helpCenter/index.vue"
+import sportsEventsH5 from "../views/sportsEventsH5/index.vue"
+import sportsDetailH5 from "../views/sportsDetailH5/index.vue"
 
 const router = createRouter({
   history:  createWebHashHistory(),
@@ -89,6 +92,15 @@ const router = createRouter({
       path: '/detail-h5',
       name: 'detailH5',
       component: detailH5,
+    },
+    {
+      path: '/prediction-detail-h5',
+      name: 'predictionDetailH5',
+      component: predictionDetailH5,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
     },
     {
       path: '/breaking',
@@ -226,6 +238,23 @@ const router = createRouter({
       path: '/help-center',
       name: 'helpCenter',
       component: helpCenter,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/sports-events-h5',
+      name: 'sportsEventsH5',
+      component: sportsEventsH5,
+      meta: {
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/sports-detail-h5',
+      name: 'sportsDetailH5',
+      component: sportsDetailH5,
       meta: {
         hideHeader: true,
         hideFooterNav: true

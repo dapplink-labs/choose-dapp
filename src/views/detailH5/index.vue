@@ -103,7 +103,7 @@
 
                 <div class="outcome-list">
                     <div v-for="(outcome, index) in outcomes" :key="index" class="outcome-row">
-                        <div class="outcome-content">
+                        <div class="outcome-content" @click="openPredictionDetailH5(outcome)">
                             <div class="outcome-left">
                                 <div class="outcome-title">{{ outcome.title }}</div>
                                 <div class="outcome-volume">{{ outcome.volume }}</div>
@@ -738,6 +738,16 @@ const chartData = computed(() => {
 // 方法
 const handleTimeRangeChange = (value) => {
     selectedTimeRange.value = value
+}
+
+// 打开预测详情页
+const openPredictionDetailH5 = (outcome) => {
+    router.push({
+        path: '/prediction-detail-h5',
+        query: {
+            id: outcome.id
+        }
+    })
 }
 
 // 处理Y轴值变化

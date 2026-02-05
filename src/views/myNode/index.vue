@@ -116,7 +116,12 @@
                     <div v-for="item in currentList" :key="item.address" class="team-item">
                         <div class="team-avatar">
                             <div class="avatar-content">
-                                <img :src="item.avatar || avatarImg" alt="avatar" class="avatar-img" />
+                                <img
+                                    :src="item.avatar || avatarImg"
+                                    alt="avatar"
+                                    class="avatar-img"
+                                    @error="handleInviterAvatarError"
+                                />
                             </div>
                         </div>
                         <div class="team-info-content">
@@ -166,6 +171,7 @@ import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
 import networks from '@/assets/json/networks.json'
 import { writeContractOptimized, computedGas } from '@/utils/requestWEB3.js'
 import avatarImg from '@/assets/icon/avatar.png'
+import lp1Img from '@/assets/icon/LP1.png'
 import TeamTree from "@/components/TeamTree.vue"
 import detailsinfo from "./detailsinfo.vue"
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
@@ -314,6 +320,14 @@ const getRandomAvatar = (addr) => {
     }
     const index = Math.abs(hash) % avatarImages.length
     return avatarImages[index]
+}
+
+// 邀请人列表头像加载失败兜底
+const handleInviterAvatarError = (e) => {
+    const imgEl = e?.target
+    if (!imgEl) return
+    imgEl.onerror = null
+    imgEl.src = lp1Img
 }
 
 // 格式化金额（CHO为6精度，需要先转换）

@@ -26,7 +26,16 @@
                     <div class="target-info">
                         <h3 class="target-title">尼克斯队对阵湖人队</h3>
                         <div class="target-row">
-                            <div class="outcome-badge">尼克斯队 | No <span class="icon">🔄</span></div>
+                            <div class="outcome-badge">尼克斯队 | No
+                                <span class="icon" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="11.997"
+                                        viewBox="0 0 12 11.997">
+                                        <path fill="#e44096"
+                                            d="M12.028,5.674h-.994a.126.126,0,0,0-.125.125V9.787H2.652V8.654a.128.128,0,0,0-.028-.081.131.131,0,0,0-.183-.022L.2,10.307a.137.137,0,0,0,0,.206l2.239,1.756a.128.128,0,0,0,.081.028.133.133,0,0,0,.131-.131V11.032h8.383a1.122,1.122,0,0,0,1.12-1.122V5.8a.129.129,0,0,0-.128-.125ZM.28,6.923h.994A.126.126,0,0,0,1.4,6.8V2.81H9.657V3.943a.128.128,0,0,0,.028.081.131.131,0,0,0,.183.022l2.239-1.757a.137.137,0,0,0,0-.206L9.867.328A.128.128,0,0,0,9.786.3a.133.133,0,0,0-.131.131V1.565H1.275A1.122,1.122,0,0,0,.156,2.687V6.8A.125.125,0,0,0,.28,6.923Z"
+                                            transform="translate(-0.155 -0.3)" />
+                                    </svg>
+                                </span>
+                            </div>
                             <div class="balance-info">
                                 <el-icon>
                                     <Wallet />
@@ -38,20 +47,19 @@
                     <div class="divider" />
 
                     <!-- 3. 限价输入 -->
-                    <div class="input-section">
+                    <div class="input-section" v-if="orderType === 'limit'">
                         <label class="input-label">限价</label>
                         <div class="stepper-box">
                             <button class="step-btn" @click="price > 1 && price--">-</button>
                             <div class="step-center">
                                 <div class="step-value">{{ price }}¢</div>
-                                <div class="step-sub">{{ price }}美分</div>
                             </div>
                             <button class="step-btn" @click="price < 99 && price++">+</button>
                         </div>
                     </div>
 
                     <!-- 4. 股数输入 -->
-                    <div class="input-section"  style="margin-bottom: 10px;">
+                    <div class="input-section" style="margin-bottom: 10px;">
                         <label class="input-label">股数</label>
                         <div class="stepper-box">
                             <div class="input-box">
@@ -161,20 +169,25 @@ function handleConfirm() { console.log('Trade Confirmed') }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
 
     .side-tabs {
         display: flex;
         gap: 20px;
 
+
         .nav-tab {
             background: none;
             border: none;
-            color: #666;
+            font-family: PingFang SC, PingFang SC;
+            font-weight: 600;
             font-size: 18px;
-            font-weight: bold;
             padding: 4px 0;
             cursor: pointer;
+            padding-bottom: 12px;
+            color: #909090;
+
 
             &.active {
                 color: #ccff33;
@@ -186,16 +199,18 @@ function handleConfirm() { console.log('Trade Confirmed') }
     .type-pills {
         background: #1a1a1a;
         padding: 4px;
-        border-radius: 10px;
+        border-radius: 6px;
         display: flex;
 
         .pill {
             border: none;
             background: none;
-            color: #888;
-            font-size: 12px;
-            padding: 6px 12px;
-            border-radius: 8px;
+            font-family: PingFang SC, PingFang SC;
+            font-weight: 400;
+            font-size: 14px;
+            color: #909090;
+            padding: 4px 6px;
+            border-radius: 4px;
             cursor: pointer;
 
             &.active {
@@ -209,7 +224,10 @@ function handleConfirm() { console.log('Trade Confirmed') }
 /* 目标信息 */
 .target-info {
     .target-title {
-        font-size: 18px;
+        font-family: PingFang SC, PingFang SC;
+        font-weight: 600;
+        font-size: 16px;
+        color: var(--bg-opposite);
         margin: 0 0 12px;
     }
 
@@ -251,6 +269,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
     display: flex;
     align-items: center;
     margin-top: 20px;
+    justify-content: space-between;
     gap: 10px;
     flex-wrap: wrap; // 方便提示文字换行
 
@@ -263,7 +282,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
 }
 
 .stepper-box {
-    flex: 1;
+    flex: 0.8;
     background: #151515;
     border: 1px solid #222;
     border-radius: 12px;
@@ -345,7 +364,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
         background: #222;
         border: none;
         color: #ccc;
-        padding: 6px 12px;
+        padding: 6px 15px;
         border-radius: 6px;
         font-size: 12px;
         font-weight: bold;
@@ -354,7 +373,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
 
 /* 杠杆 */
 .leverage-group {
-    flex: 1;
+    flex: 0.8;
     display: flex;
     gap: 8px;
     justify-content: flex-end; // 杠杆按钮靠右
@@ -366,8 +385,8 @@ function handleConfirm() { console.log('Trade Confirmed') }
         color: #888;
         padding: 10px 0;
         border-radius: 10px;
-        font-size: 13px;
-        font-weight: bold;
+        font-size: 12px;
+        font-weight: 600;
 
         // &.active {
         //     background: #eee;
@@ -421,9 +440,10 @@ function handleConfirm() { console.log('Trade Confirmed') }
     background: #ccff33;
     border: none;
     border-radius: 14px;
-    color: #000;
-    font-size: 18px;
-    font-weight: 900;
+    font-family: PingFang SC, PingFang SC;
+    font-weight: 500;
+    font-size: 16px;
+    color: #000000;
     cursor: pointer;
     transition: transform 0.1s;
 

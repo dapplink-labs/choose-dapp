@@ -60,7 +60,7 @@ const navItems = [
   { key: 'breaking', label: '热点', path: '/home' }, // 使用自定义 SVG  breaking
   { key: 'news', label: '最新', path: '/home' }, // 使用自定义 SVG
   { key: 'esports', label: '电子竞技', path: null },
-  { key: 'sports', label: '体育', path: null }, 
+  { key: 'sports', label: '体育', path: '/sports-events-h5' }, 
   { key: 'finance', label: '经济', path: null }, 
   { key: 'crypto', label: '加密货币', path: null },
   { key: 'company', label: '公司', path: null },
@@ -74,6 +74,7 @@ const routeToNavKey = {
   '/home': 'trends',
   '/breaking': 'breaking',
   '/news': 'news',
+  '/sports-events-h5': 'sports',
 }
 
 // 当前激活的导航项
