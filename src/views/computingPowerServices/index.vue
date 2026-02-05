@@ -59,7 +59,8 @@
 
             <button class="node-item-btn" :class="{ 'disabled': !isNodeButtonEnabled(node.type) }"
               :disabled="!isNodeButtonEnabled(node.type)" @click="handleBuy(node.type)">
-              {{ getButtonText(node.type) }}
+              {{ getButtonText(node.type) }}&nbsp;
+              <span v-if="countdown">{{ countdown }}</span>
             </button>
           </div>
         </div>
@@ -73,6 +74,7 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import TIcon from '@/assets/icon/TIcon.png'
 // @ts-ignore
@@ -98,6 +100,37 @@ const {
   handleBuy,
   handleConfirmBuy,
 } = useComputingPowerServices()
+
+const countdown = ref('')
+let timer = null
+
+const updateCountdown = () => {
+  const now = new Date()
+  const target = new Date()
+  target.setHours(11, 0, 0, 0)
+
+  const diff = target.getTime() - now.getTime()
+
+  if (diff <= 0) {
+    countdown.value = ''
+    return
+  }
+
+  const h = Math.floor(diff / (1000 * 60 * 60))
+  const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  const s = Math.floor((diff % (1000 * 60)) / 1000)
+
+  countdown.value = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+}
+
+onMounted(() => {
+  updateCountdown()
+  timer = setInterval(updateCountdown, 1000)
+})
+
+onUnmounted(() => {
+  if (timer) clearInterval(timer)
+})
 </script>
 
 <style scoped lang="scss">

@@ -472,7 +472,8 @@ export default {
     "products": {
       "distributedDescTemplate": "A lightweight Web3 node service that supports major blockchains, ideal for startups and individual developers to join quickly. The prediction platform integrates lightweight nodes to provide stable on-chain data reads and transaction broadcasting for ecosystem dApps. Invite your friends now and earn more rewards together.",
       "clusterDescTemplate": "An advanced Web3 node service that supports major blockchains and serves as the core infrastructure of the prediction platform, powering high-concurrency real-time investing, on-chain oracle price feeds, and instant settlement of large prize pools. Invite your friends now and earn more rewards together."
-    }
+    },
+    "sellEnd": "Node sales have ended."
   },
   "lpVault": {
     "title": "Staking Pool",
