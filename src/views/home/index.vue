@@ -530,10 +530,10 @@ const bannerList = ref([
     // 跳转至外部链接官网
     href: "https://web.chooseme.vip/",
   },
-  // {
-  //   img: banner0Img,
-  //   href: "https://web.chooseme.vip/"
-  // },
+  {
+    img: banner0Img,
+    href: "/LPVault",
+  },
   {
     img: banner2Img,
     href: "https://web.chooseme.vip/",
@@ -548,7 +548,11 @@ const bannerList = ref([
   },
 ]);
 function goHref(item) {
-  window.open(item.href, "_blank");
+  if (item.href.includes("https")) {
+    window.open(item.href, "_blank");
+  } else {
+    router.push(item.href);
+  }
 }
 // 禁止页面滚动
 onMounted(() => {
