@@ -61,13 +61,15 @@
                 <div v-for="(event, idx) in eventsList" :key="idx" class="event-wrapper">
                     <div v-if="event.date" class="date-label">{{ event.date }}</div>
 
-                    <div class="event-card" @click="handleEventClick(event)">
+                    <div class="event-card">
                         <div class="card-meta">
                             <div class="meta-left">
                                 <span class="time-tag">{{ event.time }}</span>
                                 <span class="vol-text">{{ event.volume }} 交易量</span>
                             </div>
-                            <div class="view-btn">游戏视角 <span class="arrow">›</span></div>
+                            <button class="view-btn" type="button" @click.stop="handleGameView(event)">
+                                游戏视角 <span class="arrow">›</span>
+                            </button>
                         </div>
 
                         <div class="teams-box">
@@ -84,14 +86,21 @@
                         </div>
 
                         <div class="bet-row">
-                            <button class="odds-btn knicks">{{ event.team1.shortName }} {{ event.team1.odds }}¢</button>
-                            <button class="odds-btn lakers">{{ event.team2.shortName }} {{ event.team2.odds }}¢</button>
+                            <button class="odds-btn knicks" type="button" @click.stop="openPayment(event, 'team1')">
+                                {{ event.team1.shortName }} {{ event.team1.odds }}¢
+                            </button>
+                            <button class="odds-btn lakers" type="button" @click.stop="openPayment(event, 'team2')">
+                                {{ event.team2.shortName }} {{ event.team2.odds }}¢
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- 购买弹窗 -->
+    <PaymentModal v-model="showPayment" />
 </template>
 
 <script setup>
@@ -101,13 +110,24 @@ import { ArrowDown } from '@element-plus/icons-vue'
 import tyIcon01 from '@/assets/icon/tyIcon01.png'
 import tyIcon02 from '@/assets/icon/tyIcon02.png'
 import NavBar2 from '@/components/navBar2.vue'
+import PaymentModal from '@/components/PaymentModal.vue'
 
 const router = useRouter()
 const activeCategory = ref('nba')
 const selectedMatchday = ref(9)
 
-const handleEventClick = (event) => {
+const showPayment = ref(false)
+const selectedEvent = ref(null)
+const selectedSide = ref(null)
+
+const handleGameView = (event) => {
     router.push('/sports-detail-h5')
+}
+
+const openPayment = (event, side) => {
+    selectedEvent.value = event
+    selectedSide.value = side
+    showPayment.value = true
 }
 
 const sportsCategories = ref([
@@ -385,6 +405,16 @@ const eventsList = ref([
                 border-radius: 6px;
                 color: #888;
                 font-size: 13px;
+                border: none;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                line-height: 1;
+
+                &:active {
+                    opacity: 0.8;
+                }
             }
         }
 

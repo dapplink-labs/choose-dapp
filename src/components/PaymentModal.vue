@@ -149,19 +149,38 @@ function handleConfirm() { console.log('Trade Confirmed') }
 
 .trade-modal {
     width: 100%;
-    background: #0b0b0b;
+    background: var(--bg-page);
     border-radius: 20px 20px 0 0;
-    padding: 8px 16px calc(24px + env(safe-area-inset-bottom));
+    padding: 0 16px 24px;
     color: #fff;
     font-family: sans-serif;
+    overflow-y: auto;
+    max-height: 70vh;
+    position: relative;
 }
 
 .grabber {
-    width: 40px;
-    height: 4px;
-    background: #333;
-    border-radius: 2px;
-    margin: 0 auto 16px;
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1;
+    height: 30px;
+    background: var(--bg-page);
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 10px;
+        left: 0;
+        right: 0;
+        width: 40px;
+        height: 4px;
+        background: #333;
+        border-radius: 2px;
+        margin: 0 auto 16px;
+    }
 }
 
 /* 导航切换 */
