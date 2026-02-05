@@ -3,22 +3,22 @@ import axios from "axios"
 // 根据环境变量设置 baseURL
 // 开发环境：使用相对路径，由 vite proxy 处理
 // 生产环境：如果配置了 VITE_API_BASE_URL，使用该值；否则使用相对路径（需要 nginx 代理）
-// const getBaseURL = () => {
-//   // 如果配置了环境变量，优先使用环境变量
-//   if (import.meta.env.VITE_API_BASE_URL) {
-//     return import.meta.env.VITE_API_BASE_URL
-//   }
-//   // 生产环境且没有配置 baseURL，使用相对路径（需要 nginx 代理）
-//   if (import.meta.env.PROD) {
-//     return '' // 使用相对路径，依赖 nginx 反向代理
-//   }
-//   // 开发环境使用相对路径，由 vite proxy 处理
-//   return ''
-// }
+const getBaseURL = () => {
+  // 如果配置了环境变量，优先使用环境变量
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL
+  }
+  // 生产环境且没有配置 baseURL，使用相对路径（需要 nginx 代理）
+  if (import.meta.env.PROD) {
+    return '' // 使用相对路径，依赖 nginx 反向代理
+  }
+  // 开发环境使用相对路径，由 vite proxy 处理
+  return ''
+}
 
 // create an axios instance
 const serive = axios.create({
-  baseURL: 'https://choapi.roothashpay.com',
+  baseURL: getBaseURL(),
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 30000  // request timeout (30 seconds)
 })

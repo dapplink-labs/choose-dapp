@@ -472,7 +472,8 @@ export default {
     "products": {
       "distributedDescTemplate": "가벼운 Web3 노드 서비스로, 주요 체인을 지원하며 초기 프로젝트와 개인 개발자가 빠르게 참여하기에 적합합니다. 예측 플랫폼에 내장된 라이트 노드는 생태계 dApp 에 안정적인 온체인 데이터 조회와 트랜잭션 브로드캐스트를 제공합니다. 지금 친구들을 초대해서 더 많은 보상을 함께 받아 보세요.",
       "clusterDescTemplate": "고급 Web3 노드 서비스로, 주요 체인을 지원하며 예측 플랫폼의 핵심 인프라 역할을 합니다. 초고병렬 실시간 투자, 온체인 오라클 가격 피드 및 대형 상금 풀의 즉시 정산을 지원합니다. 지금 친구들을 초대해서 더 많은 보상을 함께 받아 보세요."
-    }
+    },
+    "sellEnd": "노드 판매가 종료되었습니다"
   },
   "lpVault": {
     "title": "스테이킹 풀",
@@ -549,7 +550,7 @@ export default {
   },
   "myIncome": {
     "myIncomeCMT": "나의 수익(CHO)",
-    "communityIncomeCHO": "커뮤니티 실적(CHO)",
+    "communityIncomeUSDT": "커뮤니티 실적(USDT)",
     "computingPowerIncomeCMT": "직접 추천 수익 (CHO)",
     "networkIncomeCMT": "팀 수익 (CHO)",
     "pendingIncome": "지급된 보상",

@@ -472,7 +472,8 @@ export default {
     "products": {
       "distributedDescTemplate": "轻量级 Web3 节点服务，支持主流链，适合初创项目与个人开发者快速加入。预测平台内置轻量节点，为生态内应用提供稳定链上数据读取与交易广播。赶快邀请你的好友来参与赢取更多的收益奖励。",
       "clusterDescTemplate": "高阶级 Web3 节点服务，支持主流链，是预测平台的核心基础设施，支撑高并发实时投资、链上预言机喂价及大型奖池即时结算。赶快邀请你的好友来参与赢取更多的收益奖励。"
-    }
+    },
+    "sellEnd":"节点售卖结束"
   },
   "lpVault": {
     "title": "质押池",
@@ -548,7 +549,7 @@ export default {
   },
   "myIncome": {
     "myIncomeCMT": "我的收益(CHO)",
-    "communityIncomeCHO": "小区业绩(CHO)",
+    "communityIncomeUSDT": "小区业绩(USDT)",
     "computingPowerIncomeCMT": "直推收益(CHO)",
     "networkIncomeCMT": "团队收益(CHO)",
     "pendingIncome": "已发放奖励",

@@ -8,7 +8,7 @@ import { switchChain, readContract } from '@wagmi/core'
 import { ElLoading } from 'element-plus'
 import Message from '@/utils/message'
 import { writeContractOptimized } from '@/utils/requestWEB3.js'
-import networks from '@/assets/json/networks.json'
+import networks from '@/assets/json/networks.js'
 import { config } from '../../wagmi.ts'
 import { useChainId, useAccount } from '@wagmi/vue'
 import { getUserTokenBalance, approveToken, checkAllowance } from '@/utils/requestWEB3.js'
@@ -146,9 +146,10 @@ export const useLPVault = () => {
 
       // USDT金额转换为BigInt 18位小数
       const amountBigInt = parseUnits(String(price), 18)
-      console.log(amountBigInt)
+      // console.log(amountBigInt)
       // 余额查询START
       const userBalance = await getUserTokenBalance(usdtTokenAddress, address.value, 'balanceOf')
+      // console.log(userBalance)
       if (userBalance < amountBigInt) {
         Message.error(t('lpVault.insufficientBalance'))
         return

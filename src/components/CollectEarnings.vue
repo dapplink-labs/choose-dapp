@@ -58,7 +58,7 @@ import { formatDateTime } from '@/utils/format_date.js'
 import { writeContractOptimized } from '@/utils/requestWEB3.js'
 import { formatChoAmount } from '@/utils/format_amount.js'
 import stakingManagerABI from '@/assets/abi/stakingManagerABI.json'
-import networks from '@/assets/json/networks.json'
+import networks from '@/assets/json/networks.js'
 
 const { t } = useI18n()
 const { address } = useAccount()

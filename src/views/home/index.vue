@@ -1,19 +1,26 @@
 <template>
-  <div class="home-page ">
-
-
+  <div class="home-page">
     <!-- Banner轮播图板块 -->
     <div class="banner-section">
       <div class="banner-container">
-        <swiper :modules="swiperModules" :slides-per-view="1" :space-between="0" :loop="true" :autoplay="{
-          delay: 3000,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: false
-        }" :pagination="{
-          clickable: true,
-          bulletClass: 'swiper-pagination-bullet',
-          bulletActiveClass: 'swiper-pagination-bullet-active'
-        }" :navigation="false" class="banner-swiper">
+        <swiper
+          :modules="swiperModules"
+          :slides-per-view="1"
+          :space-between="0"
+          :loop="true"
+          :autoplay="{
+            delay: 3000,
+            disableOnInteraction: false,
+            pauseOnMouseEnter: false,
+          }"
+          :pagination="{
+            clickable: true,
+            bulletClass: 'swiper-pagination-bullet',
+            bulletActiveClass: 'swiper-pagination-bullet-active',
+          }"
+          :navigation="false"
+          class="banner-swiper"
+        >
           <swiper-slide v-for="(banner, index) in bannerList" :key="index">
             <div class="banner-item" @click="goHref(banner)">
               <img :src="banner.img" class="banner-image" />
@@ -28,12 +35,17 @@
       <!-- 功能暂不开放覆盖层 -->
       <div class="coming-soon-overlay">
         <div class="coming-soon-content">
-          <img src="@/assets/icon/11.png" :alt="$t('home.comingSoonAlt') || '暂不开放'" class="coming-soon-icon" />
-          <p class="coming-soon-text">{{ $t('home.comingSoon') || '预测功能即将上线' }}</p>
+          <img
+            src="@/assets/icon/11.png"
+            :alt="$t('home.comingSoonAlt') || '暂不开放'"
+            class="coming-soon-icon"
+          />
+          <p class="coming-soon-text">
+            {{ $t("home.comingSoon") || "预测功能即将上线" }}
+          </p>
         </div>
       </div>
       <div class="content-wrapper">
-
         <!-- PC 顶部筛选栏（PC端显示，移动端隐藏） -->
         <div class="pc-filter-section">
           <div class="pc-filter-container">
@@ -41,17 +53,35 @@
               <el-icon class="pc-search-icon" aria-hidden="true">
                 <Search />
               </el-icon>
-              <input v-model="searchQuery" class="pc-search-input" type="text"
-                :placeholder="`${t('home.searchPlaceholder')}${t('home.multiMarket')}`" />
+              <input
+                v-model="searchQuery"
+                class="pc-search-input"
+                type="text"
+                :placeholder="`${t('home.searchPlaceholder')}${t('home.multiMarket')}`"
+              />
             </div>
 
             <div class="pc-action-icons">
-              <div class="pc-action-btn" @click="handleBookmark" aria-label="bookmark">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
-                  <path fill="currentColor"
-                    d="M12.988,19a2.964,2.964,0,0,1-1.789-.606L8,16l-3.2,2.4A2.962,2.962,0,0,1,3.012,19a3.069,3.069,0,0,1-2.089-.836A2.954,2.954,0,0,1,0,16V3A3,3,0,0,1,3,0H13a3,3,0,0,1,3,3V16a2.954,2.954,0,0,1-.923,2.168A3.069,3.069,0,0,1,12.988,19ZM8,14a1.984,1.984,0,0,1,1.2.4l3.2,2.4a.987.987,0,0,0,.6.2,1.024,1.024,0,0,0,.7-.279A.984.984,0,0,0,14,16V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V16a1,1,0,0,0,1,1,.987.987,0,0,0,.6-.2l3.2-2.4A1.984,1.984,0,0,1,8,14Z" />
-                  <path fill="currentColor" d="M0,1A1,1,0,0,1,1,0H7A1,1,0,0,1,7,2H1A1,1,0,0,1,0,1Z"
-                    transform="translate(4 4)" />
+              <div
+                class="pc-action-btn"
+                @click="handleBookmark"
+                aria-label="bookmark"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    fill="currentColor"
+                    d="M12.988,19a2.964,2.964,0,0,1-1.789-.606L8,16l-3.2,2.4A2.962,2.962,0,0,1,3.012,19a3.069,3.069,0,0,1-2.089-.836A2.954,2.954,0,0,1,0,16V3A3,3,0,0,1,3,0H13a3,3,0,0,1,3,3V16a2.954,2.954,0,0,1-.923,2.168A3.069,3.069,0,0,1,12.988,19ZM8,14a1.984,1.984,0,0,1,1.2.4l3.2,2.4a.987.987,0,0,0,.6.2,1.024,1.024,0,0,0,.7-.279A.984.984,0,0,0,14,16V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V16a1,1,0,0,0,1,1,.987.987,0,0,0,.6-.2l3.2-2.4A1.984,1.984,0,0,1,8,14Z"
+                  />
+                  <path
+                    fill="currentColor"
+                    d="M0,1A1,1,0,0,1,1,0H7A1,1,0,0,1,7,2H1A1,1,0,0,1,0,1Z"
+                    transform="translate(4 4)"
+                  />
                 </svg>
               </div>
             </div>
@@ -60,8 +90,13 @@
 
             <div class="pc-tab-wrapper">
               <div class="pc-tab-scroll">
-                <button v-for="tag in pcTagButtons" :key="tag.value" class="pc-tab-btn"
-                  :class="{ active: activeTag === tag.value }" @click="handleTagClick(tag.value)">
+                <button
+                  v-for="tag in pcTagButtons"
+                  :key="tag.value"
+                  class="pc-tab-btn"
+                  :class="{ active: activeTag === tag.value }"
+                  @click="handleTagClick(tag.value)"
+                >
                   {{ tag.label }}
                 </button>
               </div>
@@ -69,14 +104,18 @@
           </div>
         </div>
 
-
         <div class="filter-section">
           <div class="filter-container">
             <!-- 标签按钮行 -->
             <div class="tag-scroll-wrapper">
               <div class="tag-scroll-container">
-                <button v-for="tag in tagButtons" :key="tag.value" class="tag-btn"
-                  :class="{ active: activeTag === tag.value }" @click="handleTagClick(tag.value)">
+                <button
+                  v-for="tag in tagButtons"
+                  :key="tag.value"
+                  class="tag-btn"
+                  :class="{ active: activeTag === tag.value }"
+                  @click="handleTagClick(tag.value)"
+                >
                   {{ tag.label }}
                 </button>
               </div>
@@ -87,28 +126,58 @@
             <!-- 右侧操作按钮 -->
             <div class="action-buttons">
               <div class="action-btn" @click="handleFilter">
-                <svg xmlns=" http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="icon">
+                <svg
+                  xmlns=" http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  class="icon"
+                >
                   <g transform="translate(-295 -358)">
-                    <rect fill="none" width="24" height="24" transform="translate(295 358)" />
+                    <rect
+                      fill="none"
+                      width="24"
+                      height="24"
+                      transform="translate(295 358)"
+                    />
                     <g transform="translate(298 361)">
-                      <path fill="currentColor"
+                      <path
+                        fill="currentColor"
                         d="M7,8A4,4,0,0,1,3.126,5H1A1,1,0,0,1,1,3H3.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H10.874A4,4,0,0,1,7,8ZM7,2A2,2,0,1,0,9,4,2,2,0,0,0,7,2Z"
-                        transform="translate(0 10)" />
-                      <path fill="currentColor"
-                        d="M11,8A4,4,0,0,1,7.126,5H1A1,1,0,0,1,1,3H7.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H14.874A4,4,0,0,1,11,8Zm0-6a2,2,0,1,0,2,2A2,2,0,0,0,11,2Z" />
+                        transform="translate(0 10)"
+                      />
+                      <path
+                        fill="currentColor"
+                        d="M11,8A4,4,0,0,1,7.126,5H1A1,1,0,0,1,1,3H7.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H14.874A4,4,0,0,1,11,8Zm0-6a2,2,0,1,0,2,2A2,2,0,0,0,11,2Z"
+                      />
                     </g>
                   </g>
                 </svg>
               </div>
               <div class="action-btn bookmark-btn" @click="handleBookmark">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                >
                   <g transform="translate(-336 -358)">
-                    <rect fill="none" width="24" height="24" transform="translate(336 358)" />
+                    <rect
+                      fill="none"
+                      width="24"
+                      height="24"
+                      transform="translate(336 358)"
+                    />
                     <g transform="translate(340 361)">
-                      <path fill="currentColor"
-                        d="M12.988,19a2.964,2.964,0,0,1-1.789-.606L8,16l-3.2,2.4A2.962,2.962,0,0,1,3.012,19a3.069,3.069,0,0,1-2.089-.836A2.954,2.954,0,0,1,0,16V3A3,3,0,0,1,3,0H13a3,3,0,0,1,3,3V16a2.954,2.954,0,0,1-.923,2.168A3.069,3.069,0,0,1,12.988,19ZM8,14a1.984,1.984,0,0,1,1.2.4l3.2,2.4a.987.987,0,0,0,.6.2,1.024,1.024,0,0,0,.7-.279A.984.984,0,0,0,14,16V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V16a1,1,0,0,0,1,1,.987.987,0,0,0,.6-.2l3.2-2.4A1.984,1.984,0,0,1,8,14Z" />
-                      <path fill="currentColor" d="M0,1A1,1,0,0,1,1,0H7A1,1,0,0,1,7,2H1A1,1,0,0,1,0,1Z"
-                        transform="translate(4 4)" />
+                      <path
+                        fill="currentColor"
+                        d="M12.988,19a2.964,2.964,0,0,1-1.789-.606L8,16l-3.2,2.4A2.962,2.962,0,0,1,3.012,19a3.069,3.069,0,0,1-2.089-.836A2.954,2.954,0,0,1,0,16V3A3,3,0,0,1,3,0H13a3,3,0,0,1,3,3V16a2.954,2.954,0,0,1-.923,2.168A3.069,3.069,0,0,1,12.988,19ZM8,14a1.984,1.984,0,0,1,1.2.4l3.2,2.4a.987.987,0,0,0,.6.2,1.024,1.024,0,0,0,.7-.279A.984.984,0,0,0,14,16V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V16a1,1,0,0,0,1,1,.987.987,0,0,0,.6-.2l3.2-2.4A1.984,1.984,0,0,1,8,14Z"
+                      />
+                      <path
+                        fill="currentColor"
+                        d="M0,1A1,1,0,0,1,1,0H7A1,1,0,0,1,7,2H1A1,1,0,0,1,0,1Z"
+                        transform="translate(4 4)"
+                      />
                     </g>
                   </g>
                 </svg>
@@ -123,7 +192,9 @@
                 <div class="filter-dropdown">
                   <!-- 排序按钮 -->
                   <button class="filter-select-btn">
-                    <div class="filter-label"><span>排序:</span> {{ currentSortLabel }}</div>
+                    <div class="filter-label">
+                      <span>排序:</span> {{ currentSortLabel }}
+                    </div>
                     <el-icon class="filter-arrow">
                       <ArrowDownBold />
                     </el-icon>
@@ -131,13 +202,14 @@
                   <!-- 频率按钮 -->
 
                   <button class="filter-select-btn">
-                    <div class="filter-label"><span>频率:</span> {{ currentFrequencyLabel }}</div>
+                    <div class="filter-label">
+                      <span>频率:</span> {{ currentFrequencyLabel }}
+                    </div>
                     <el-icon class="filter-arrow">
                       <ArrowDownBold />
                     </el-icon>
                   </button>
                 </div>
-
               </div>
             </div>
           </transition>
@@ -145,52 +217,116 @@
 
         <div class="main-list-section">
           <div class="left-vertical-list">
-            <div class="list-item large-item" v-for="(item, index) in leftList" :key="'left-' + index">
+            <div
+              class="list-item large-item"
+              v-for="(item, index) in leftList"
+              :key="'left-' + index"
+            >
               <div class="item-header">
-                <img :src="item.avatar" :alt="$t('common.userAvatar')" class="user-avatar">
+                <img
+                  :src="item.avatar"
+                  :alt="$t('common.userAvatar')"
+                  class="user-avatar"
+                />
                 <div class="item-meta">
-                  <div class="item-title" @click="navigateToEarnings()">{{ item.title }}</div>
+                  <div class="item-title" @click="navigateToEarnings()">
+                    {{ item.title }}
+                  </div>
                 </div>
                 <div class="percentage-semicircle">
                   <svg class="semicircle-chart" viewBox="0 0 100 60">
                     <!-- 背景半圆 -->
-                    <path class="semicircle-background" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke-width="8" />
+                    <path
+                      class="semicircle-background"
+                      d="M 10 50 A 40 40 0 0 1 90 50"
+                      fill="none"
+                      stroke-width="8"
+                    />
                     <!-- 进度半圆 -->
-                    <path class="semicircle-progress" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#E44096"
-                      stroke-width="8" stroke-linecap="round" :stroke-dasharray="125.6"
-                      :stroke-dashoffset="(125.6 * (100 - parseInt(item.percentage))) / 100" />
+                    <path
+                      class="semicircle-progress"
+                      d="M 10 50 A 40 40 0 0 1 90 50"
+                      fill="none"
+                      stroke="#E44096"
+                      stroke-width="8"
+                      stroke-linecap="round"
+                      :stroke-dasharray="125.6"
+                      :stroke-dashoffset="
+                        (125.6 * (100 - parseInt(item.percentage))) / 100
+                      "
+                    />
                     <!-- 百分比文本 -->
-                    <text class="semicircle-percentage" x="52" y="50" text-anchor="middle" dy="0">{{ item.percentage
-                    }}</text>
+                    <text
+                      class="semicircle-percentage"
+                      x="52"
+                      y="50"
+                      text-anchor="middle"
+                      dy="0"
+                    >
+                      {{ item.percentage }}
+                    </text>
                   </svg>
-                  <div class="percentage-label">{{ $t('home.opportunity') }}</div>
+                  <div class="percentage-label">
+                    {{ $t("home.opportunity") }}
+                  </div>
                 </div>
               </div>
               <div class="item-leverage-info">
                 <div class="leverage-item">
-                  <span class="leverage-label">{{ $t('home.maxLeverage') || '最大杠杆倍数' }}:</span>
-                  <span class="leverage-value">{{ item.maxLeverage || '10X' }}</span>
+                  <span class="leverage-label"
+                    >{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span
+                  >
+                  <span class="leverage-value">{{
+                    item.maxLeverage || "10X"
+                  }}</span>
                 </div>
                 <div class="leverage-item">
-                  <span class="leverage-label">{{ $t('home.maxReturn') || '最大回报' }}:</span>
-                  <span class="leverage-value">{{ item.maxReturn || '182%' }}</span>
+                  <span class="leverage-label"
+                    >{{ $t("home.maxReturn") || "最大回报" }}:</span
+                  >
+                  <span class="leverage-value">{{
+                    item.maxReturn || "182%"
+                  }}</span>
                 </div>
               </div>
               <div class="item-actions">
-                <button class="action-btn yes-btn" @click="navigateToDetail(item, 'yes')">Yes</button>
-                <button class="action-btn no-btn" @click="navigateToDetail(item, 'no')">No</button>
+                <button
+                  class="action-btn yes-btn"
+                  @click="navigateToDetail(item, 'yes')"
+                >
+                  Yes
+                </button>
+                <button
+                  class="action-btn no-btn"
+                  @click="navigateToDetail(item, 'no')"
+                >
+                  No
+                </button>
               </div>
               <div class="item-amount">
                 <div class="amount-left">
                   <div class="time-info" :class="{ urgent: item.isTimeUrgent }">
-                    <span v-if="item.isTimeUrgent" class="time-dot" aria-hidden="true">
+                    <span
+                      v-if="item.isTimeUrgent"
+                      class="time-dot"
+                      aria-hidden="true"
+                    >
                       <em></em>
                     </span>
-                    <svg v-else class="time-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12"
-                      height="12" viewBox="0 0 12 12">
+                    <svg
+                      v-else
+                      class="time-icon"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 12 12"
+                    >
                       <path
                         d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
-                        transform="translate(-69.818 -69.818)" fill="currentColor" />
+                        transform="translate(-69.818 -69.818)"
+                        fill="currentColor"
+                      />
                     </svg>
                     <span class="time-text">{{ item.timeRemaining }}</span>
                   </div>
@@ -198,68 +334,134 @@
                     <el-icon class="participant-icon">
                       <Avatar />
                     </el-icon>
-                    <span class="participant-text">{{ item.participantCount.toLocaleString() }}</span>
+                    <span class="participant-text">{{
+                      item.participantCount.toLocaleString()
+                    }}</span>
                   </div>
                   <span class="voi-amount">VOI：${{ item.amount }}</span>
                 </div>
-                <svg t="1765591111184" class="icon-sc" :class="{ active: item.isFavorite }" viewBox="0 0 1024 1024"
-                  version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5484" width="14" height="14"
-                  @click.stop="toggleFavorite(item)">
+                <svg
+                  t="1765591111184"
+                  class="icon-sc"
+                  :class="{ active: item.isFavorite }"
+                  viewBox="0 0 1024 1024"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  p-id="5484"
+                  width="14"
+                  height="14"
+                  @click.stop="toggleFavorite(item)"
+                >
                   <path
                     d="M389.461333 85.333333l253.354667 0.021334c5.397333 0.042667 10.602667 0.128 15.616 0.256l14.506667 0.490666 13.482666 0.789334c43.306667 3.072 71.104 10.965333 99.733334 26.282666a197.738667 197.738667 0 0 1 82.005333 82.005334c15.317333 28.629333 23.210667 56.426667 26.282667 99.733333l0.789333 13.482667 0.490667 14.506666 0.149333 7.658667 0.128 16.213333v501.525334a85.333333 85.333333 0 0 1-123.498667 76.330666L518.186667 797.44l-3.2-1.557333-2.965334-1.322667-2.986666 1.322667-257.514667 128.725333A85.333333 85.333333 0 0 1 128 848.298667l0.021333-509.781334c0.042667-5.397333 0.128-10.602667 0.256-15.616l0.490667-14.506666 0.789333-13.482667c3.072-43.306667 10.965333-71.104 26.282667-99.733333a197.738667 197.738667 0 0 1 82.005333-82.005334c28.629333-15.317333 56.426667-23.210667 99.733334-26.282666l13.482666-0.789334 14.506667-0.490666 7.658667-0.149334 16.213333-0.128z m252.16 85.354667H382.378667l-13.184 0.170667-6.122667 0.149333-11.413333 0.426667-10.325334 0.64c-4.906667 0.384-9.493333 0.832-13.76 1.365333l-8.149333 1.173333c-11.712 1.92-21.12 4.650667-29.866667 8.32l-5.76 2.602667c-1.92 0.917333-3.797333 1.877333-5.674666 2.88a112.426667 112.426667 0 0 0-47.018667 47.018667 145.664 145.664 0 0 0-2.88 5.674666l-2.602667 5.76c-3.669333 8.746667-6.4 18.154667-8.32 29.866667l-1.173333 8.149333c-0.533333 4.266667-0.981333 8.832-1.344 13.76l-0.64 10.325334a514.133333 514.133333 0 0 0-0.256 5.546666l-0.341333 11.989334-0.170667 13.184L213.333333 848.277333l256.469334-128.170666c10.965333-5.312 18.112-7.850667 26.88-9.536a80.213333 80.213333 0 0 1 30.634666 0c9.856 1.898667 17.664 4.885333 31.189334 11.648L810.666667 848.298667l-0.021334-508.586667-0.170666-13.226667a709.973333 709.973333 0 0 0-0.149334-6.101333l-0.426666-11.413333-0.64-10.325334c-0.384-4.906667-0.832-9.493333-1.365334-13.76l-1.173333-8.149333a129.984 129.984 0 0 0-8.32-29.866667l-2.602667-5.76a145.664 145.664 0 0 0-2.88-5.674666 112.426667 112.426667 0 0 0-47.018666-47.018667 145.664 145.664 0 0 0-5.674667-2.88l-5.76-2.602667c-8.746667-3.669333-18.154667-6.4-29.866667-8.32l-8.149333-1.173333c-4.266667-0.533333-8.832-0.981333-13.76-1.344l-10.325333-0.64a514.133333 514.133333 0 0 0-5.546667-0.256l-11.989333-0.341333L641.642667 170.666667zM576 298.666667a42.666667 42.666667 0 0 1 3.2 85.226666L576 384h-128a42.666667 42.666667 0 0 1-3.2-85.226667L448 298.666667h128z"
-                    :fill="item.isFavorite ? '#CA4064' : '#909090'" p-id="5485"></path>
+                    :fill="item.isFavorite ? '#CA4064' : '#909090'"
+                    p-id="5485"
+                  ></path>
                 </svg>
               </div>
             </div>
           </div>
 
           <div class="right-horizontal-list">
-            <div class="list-item small-item" v-for="(item, index) in rightList" :key="'right-' + index">
+            <div
+              class="list-item small-item"
+              v-for="(item, index) in rightList"
+              :key="'right-' + index"
+            >
               <div class="item-header">
-                <img :src="item.avatar" :alt="$t('common.userAvatar')" class="user-avatar">
+                <img
+                  :src="item.avatar"
+                  :alt="$t('common.userAvatar')"
+                  class="user-avatar"
+                />
                 <div class="item-meta">
                   <div class="item-title">{{ item.title }}</div>
                 </div>
               </div>
               <div class="item-leverage-info">
                 <div class="leverage-item">
-                  <span class="leverage-label">{{ $t('home.maxLeverage') || '最大杠杆倍数' }}:</span>
-                  <span class="leverage-value">{{ item.maxLeverage || '10X' }}</span>
+                  <span class="leverage-label"
+                    >{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span
+                  >
+                  <span class="leverage-value">{{
+                    item.maxLeverage || "10X"
+                  }}</span>
                 </div>
                 <div class="leverage-item">
-                  <span class="leverage-label">{{ $t('home.maxReturn') || '最大回报' }}:</span>
-                  <span class="leverage-value">{{ item.maxReturn || '182%' }}</span>
+                  <span class="leverage-label"
+                    >{{ $t("home.maxReturn") || "最大回报" }}:</span
+                  >
+                  <span class="leverage-value">{{
+                    item.maxReturn || "182%"
+                  }}</span>
                 </div>
               </div>
               <div class="item-options">
                 <div class="option-item">
-                  <div class="option-text"><span>{{ item.options[0].text }}</span> <span>{{ item.percentage }}</span>
+                  <div class="option-text">
+                    <span>{{ item.options[0].text }}</span>
+                    <span>{{ item.percentage }}</span>
                   </div>
                   <div class="option-buttons">
-                    <button class="option-btn yes-btn" @click="navigateToDetail(item, 'yes')">Yes</button>
-                    <button class="option-btn no-btn" @click="navigateToDetail(item, 'no')">No</button>
+                    <button
+                      class="option-btn yes-btn"
+                      @click="navigateToDetail(item, 'yes')"
+                    >
+                      Yes
+                    </button>
+                    <button
+                      class="option-btn no-btn"
+                      @click="navigateToDetail(item, 'no')"
+                    >
+                      No
+                    </button>
                   </div>
                 </div>
                 <div class="option-item">
-                  <div class="option-text"><span>{{ item.options[1].text }}</span> <span>{{ item.percentage }}</span>
+                  <div class="option-text">
+                    <span>{{ item.options[1].text }}</span>
+                    <span>{{ item.percentage }}</span>
                   </div>
                   <div class="option-buttons">
-                    <button class="option-btn yes-btn" @click="navigateToDetail(item, 'yes')">Yes</button>
-                    <button class="option-btn no-btn" @click="navigateToDetail(item, 'no')">No</button>
+                    <button
+                      class="option-btn yes-btn"
+                      @click="navigateToDetail(item, 'yes')"
+                    >
+                      Yes
+                    </button>
+                    <button
+                      class="option-btn no-btn"
+                      @click="navigateToDetail(item, 'no')"
+                    >
+                      No
+                    </button>
                   </div>
                 </div>
               </div>
               <div class="item-amount">
                 <div class="amount-left">
                   <div class="time-info" :class="{ urgent: item.isTimeUrgent }">
-                    <span v-if="item.isTimeUrgent" class="time-dot" aria-hidden="true">
+                    <span
+                      v-if="item.isTimeUrgent"
+                      class="time-dot"
+                      aria-hidden="true"
+                    >
                       <em></em>
                     </span>
-                    <svg v-else class="time-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12"
-                      height="12" viewBox="0 0 12 12">
+                    <svg
+                      v-else
+                      class="time-icon"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 12 12"
+                    >
                       <path
                         d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
-                        transform="translate(-69.818 -69.818)" fill="currentColor" />
+                        transform="translate(-69.818 -69.818)"
+                        fill="currentColor"
+                      />
                     </svg>
                     <span class="time-text">{{ item.timeRemaining }}</span>
                   </div>
@@ -267,16 +469,29 @@
                     <el-icon class="participant-icon">
                       <Avatar />
                     </el-icon>
-                    <span class="participant-text">{{ item.participantCount.toLocaleString() }}</span>
+                    <span class="participant-text">{{
+                      item.participantCount.toLocaleString()
+                    }}</span>
                   </div>
                   <span class="voi-amount">VOI：${{ item.amount }}</span>
                 </div>
-                <svg t="1765591111184" class="icon-sc" :class="{ active: item.isFavorite }" viewBox="0 0 1024 1024"
-                  version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5484" width="14" height="14"
-                  @click.stop="toggleFavorite(item)">
+                <svg
+                  t="1765591111184"
+                  class="icon-sc"
+                  :class="{ active: item.isFavorite }"
+                  viewBox="0 0 1024 1024"
+                  version="1.1"
+                  xmlns="http://www.w3.org/2000/svg"
+                  p-id="5484"
+                  width="14"
+                  height="14"
+                  @click.stop="toggleFavorite(item)"
+                >
                   <path
                     d="M389.461333 85.333333l253.354667 0.021334c5.397333 0.042667 10.602667 0.128 15.616 0.256l14.506667 0.490666 13.482666 0.789334c43.306667 3.072 71.104 10.965333 99.733334 26.282666a197.738667 197.738667 0 0 1 82.005333 82.005334c15.317333 28.629333 23.210667 56.426667 26.282667 99.733333l0.789333 13.482667 0.490667 14.506666 0.149333 7.658667 0.128 16.213333v501.525334a85.333333 85.333333 0 0 1-123.498667 76.330666L518.186667 797.44l-3.2-1.557333-2.965334-1.322667-2.986666 1.322667-257.514667 128.725333A85.333333 85.333333 0 0 1 128 848.298667l0.021333-509.781334c0.042667-5.397333 0.128-10.602667 0.256-15.616l0.490667-14.506666 0.789333-13.482667c3.072-43.306667 10.965333-71.104 26.282667-99.733333a197.738667 197.738667 0 0 1 82.005333-82.005334c28.629333-15.317333 56.426667-23.210667 99.733334-26.282666l13.482666-0.789334 14.506667-0.490666 7.658667-0.149334 16.213333-0.128z m252.16 85.354667H382.378667l-13.184 0.170667-6.122667 0.149333-11.413333 0.426667-10.325334 0.64c-4.906667 0.384-9.493333 0.832-13.76 1.365333l-8.149333 1.173333c-11.712 1.92-21.12 4.650667-29.866667 8.32l-5.76 2.602667c-1.92 0.917333-3.797333 1.877333-5.674666 2.88a112.426667 112.426667 0 0 0-47.018667 47.018667 145.664 145.664 0 0 0-2.88 5.674666l-2.602667 5.76c-3.669333 8.746667-6.4 18.154667-8.32 29.866667l-1.173333 8.149333c-0.533333 4.266667-0.981333 8.832-1.344 13.76l-0.64 10.325334a514.133333 514.133333 0 0 0-0.256 5.546666l-0.341333 11.989334-0.170667 13.184L213.333333 848.277333l256.469334-128.170666c10.965333-5.312 18.112-7.850667 26.88-9.536a80.213333 80.213333 0 0 1 30.634666 0c9.856 1.898667 17.664 4.885333 31.189334 11.648L810.666667 848.298667l-0.021334-508.586667-0.170666-13.226667a709.973333 709.973333 0 0 0-0.149334-6.101333l-0.426666-11.413333-0.64-10.325334c-0.384-4.906667-0.832-9.493333-1.365334-13.76l-1.173333-8.149333a129.984 129.984 0 0 0-8.32-29.866667l-2.602667-5.76a145.664 145.664 0 0 0-2.88-5.674666 112.426667 112.426667 0 0 0-47.018666-47.018667 145.664 145.664 0 0 0-5.674667-2.88l-5.76-2.602667c-8.746667-3.669333-18.154667-6.4-29.866667-8.32l-8.149333-1.173333c-4.266667-0.533333-8.832-0.981333-13.76-1.344l-10.325333-0.64a514.133333 514.133333 0 0 0-5.546667-0.256l-11.989333-0.341333L641.642667 170.666667zM576 298.666667a42.666667 42.666667 0 0 1 3.2 85.226666L576 384h-128a42.666667 42.666667 0 0 1-3.2-85.226667L448 298.666667h128z"
-                    :fill="item.isFavorite ? '#CA4064' : '#909090'" p-id="5485"></path>
+                    :fill="item.isFavorite ? '#CA4064' : '#909090'"
+                    p-id="5485"
+                  ></path>
                 </svg>
               </div>
             </div>
@@ -288,278 +503,289 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import NavBar2 from '@/components/navBar2.vue'
-import { Search, Avatar, ArrowDownBold } from '@element-plus/icons-vue'
-import router from '@/router'
-import { useI18n } from 'vue-i18n'
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Autoplay, Pagination } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/pagination'
-import bannerImg from '@/assets/images/banner.png'
-import banner0Img from '@/assets/images/banner0.png'
-import banner2Img from '@/assets/images/banner2.png'
-import linghua1Img from '@/assets/images/linghua1.png'
-import banner4Img from '@/assets/images/banner4.png'
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import NavBar2 from "@/components/navBar2.vue";
+import { Search, Avatar, ArrowDownBold } from "@element-plus/icons-vue";
+import router from "@/router";
+import { useI18n } from "vue-i18n";
+import { Swiper, SwiperSlide } from "swiper/vue";
+import { Autoplay, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import bannerImg from "@/assets/images/banner.png";
+import banner0Img from "@/assets/images/banner0.png";
+import banner2Img from "@/assets/images/banner2.png";
+import linghua1Img from "@/assets/images/linghua1.png";
+import banner4Img from "@/assets/images/banner4.png";
 
-const { t } = useI18n()
+const { t } = useI18n();
 
 // Swiper 模块
-const swiperModules = [Autoplay, Pagination]
+const swiperModules = [Autoplay, Pagination];
 
 // 轮播图数据
 const bannerList = ref([
   {
     img: bannerImg,
     // 跳转至外部链接官网
-    href: "https://web.chooseme.vip/"
-  }, {
+    href: "https://web.chooseme.vip/",
+  },
+  {
     img: banner0Img,
-    href: "https://web.chooseme.vip/"
-  }, {
+    href: "/LPVault",
+  },
+  {
     img: banner2Img,
-    href: "https://web.chooseme.vip/"
-  }, {
+    href: "https://web.chooseme.vip/",
+  },
+  {
     img: linghua1Img,
-    href: "https://web.chooseme.vip/"
-  }
-  , {
+    href: "https://web.chooseme.vip/",
+  },
+  {
     img: banner4Img,
-    href: "https://web.chooseme.vip/"
-  }
-
-])
+    href: "https://web.chooseme.vip/",
+  },
+]);
 function goHref(item) {
-  window.open(item.href, '_blank')
+  if (item.href.includes("https")) {
+    window.open(item.href, "_blank");
+  } else {
+    router.push(item.href);
+  }
 }
 // 禁止页面滚动
 onMounted(() => {
   // document.body.style.overflow = 'hidden'
-})
+});
 
 onUnmounted(() => {
-  document.body.style.overflow = ''
-})
+  document.body.style.overflow = "";
+});
 
 // 搜索相关（PC 顶部栏）
-const searchQuery = ref('')
+const searchQuery = ref("");
 
 // 标签按钮数据
 const tagButtons = ref([
-  { value: 'bitcoin', label: 'Bitcoin' },
-  { value: 'ethereum', label: 'Ethereum' },
-  { value: 'solana', label: 'Solana' },
-  { value: 'meme', label: 'Meme' },
-  { value: 'defi', label: 'DeFi' },
-  { value: 'nft', label: 'NFT' },
-  { value: 'web3', label: 'Web3' },
-  { value: 'ai', label: 'AI' }
-])
+  { value: "bitcoin", label: "Bitcoin" },
+  { value: "ethereum", label: "Ethereum" },
+  { value: "solana", label: "Solana" },
+  { value: "meme", label: "Meme" },
+  { value: "defi", label: "DeFi" },
+  { value: "nft", label: "NFT" },
+  { value: "web3", label: "Web3" },
+  { value: "ai", label: "AI" },
+]);
 
 // PC tab（含“全部”）
-const pcTagButtons = computed(() => [{ value: 'all', label: t('home.all') }, ...tagButtons.value])
+const pcTagButtons = computed(() => [
+  { value: "all", label: t("home.all") },
+  ...tagButtons.value,
+]);
 
 // 当前激活的标签
-const activeTag = ref('all')
+const activeTag = ref("all");
 
 // 模拟数据：左边垂直列表
 const leftList = ref([
   {
-    avatar: 'https://picsum.photos/seed/user1/40/40',
-    title: '鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？',
-    percentage: '75%',
-    amount: '19.00',
+    avatar: "https://picsum.photos/seed/user1/40/40",
+    title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
+    percentage: "75%",
+    amount: "19.00",
     yesCount: 1234,
     noCount: 567,
     isFavorite: false,
-    maxLeverage: '10X',
-    maxReturn: '182%',
-    timeRemaining: '04:30:57',
+    maxLeverage: "10X",
+    maxReturn: "182%",
+    timeRemaining: "04:30:57",
     participantCount: 1280,
-    isTimeUrgent: false // 时间是否紧急（控制图标状态）
+    isTimeUrgent: false, // 时间是否紧急（控制图标状态）
   },
   {
-    avatar: 'https://picsum.photos/seed/user2/40/40',
-    title: '鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？',
-    percentage: '25%',
-    amount: '19.00',
+    avatar: "https://picsum.photos/seed/user2/40/40",
+    title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
+    percentage: "25%",
+    amount: "19.00",
     yesCount: 1234,
     noCount: 567,
     isFavorite: false,
-    maxLeverage: '10X',
-    maxReturn: '182%',
-    timeRemaining: '02:15:30',
+    maxLeverage: "10X",
+    maxReturn: "182%",
+    timeRemaining: "02:15:30",
     participantCount: 1280,
-    isTimeUrgent: true // 时间紧急状态
+    isTimeUrgent: true, // 时间紧急状态
   },
   {
-    avatar: 'https://picsum.photos/seed/user3/40/40',
-    title: '鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？',
-    percentage: '50%',
-    amount: '19.00',
+    avatar: "https://picsum.photos/seed/user3/40/40",
+    title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
+    percentage: "50%",
+    amount: "19.00",
     yesCount: 1234,
     noCount: 567,
     isFavorite: false,
-    maxLeverage: '10X',
-    maxReturn: '182%',
-    timeRemaining: '12:45:20',
+    maxLeverage: "10X",
+    maxReturn: "182%",
+    timeRemaining: "12:45:20",
     participantCount: 1280,
-    isTimeUrgent: false
+    isTimeUrgent: false,
   },
   {
-    avatar: 'https://picsum.photos/seed/user4/40/40',
-    title: '鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？',
-    percentage: '90%',
-    amount: '19.00',
+    avatar: "https://picsum.photos/seed/user4/40/40",
+    title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
+    percentage: "90%",
+    amount: "19.00",
     yesCount: 1234,
     noCount: 567,
     isFavorite: false,
-    maxLeverage: '10X',
-    maxReturn: '182%',
-    timeRemaining: '01:20:10',
+    maxLeverage: "10X",
+    maxReturn: "182%",
+    timeRemaining: "01:20:10",
     participantCount: 1280,
-    isTimeUrgent: true
+    isTimeUrgent: true,
   },
   {
-    avatar: 'https://picsum.photos/seed/user5/40/40',
-    title: '鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？',
-    percentage: '33%',
-    amount: '19.00',
+    avatar: "https://picsum.photos/seed/user5/40/40",
+    title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
+    percentage: "33%",
+    amount: "19.00",
     yesCount: 1234,
     noCount: 567,
     isFavorite: false,
-    maxLeverage: '10X',
-    maxReturn: '182%',
-    timeRemaining: '08:15:45',
+    maxLeverage: "10X",
+    maxReturn: "182%",
+    timeRemaining: "08:15:45",
     participantCount: 1280,
-    isTimeUrgent: false
-  }
-])
+    isTimeUrgent: false,
+  },
+]);
 
 // 生成右边列表项的辅助函数
-const createRightListItem = (seed, title = '美联储12月会做出决定吗？') => ({
+const createRightListItem = (seed, title = "美联储12月会做出决定吗？") => ({
   avatar: `https://picsum.photos/seed/user${seed}/40/40`,
   title,
-  percentage: '14%',
-  amount: '19.00',
+  percentage: "14%",
+  amount: "19.00",
   isFavorite: false,
-  maxLeverage: '10X',
-  maxReturn: '182%',
-  timeRemaining: '04:30:57',
+  maxLeverage: "10X",
+  maxReturn: "182%",
+  timeRemaining: "04:30:57",
   participantCount: 1280,
   isTimeUrgent: false,
   options: [
-    { text: '下调50个基点以上', percentage: '2%', yesCount: 123, noCount: 456 },
-    { text: '增长超过25基点', percentage: '32%', yesCount: 789, noCount: 101 }
-  ]
-})
+    { text: "下调50个基点以上", percentage: "2%", yesCount: 123, noCount: 456 },
+    { text: "增长超过25基点", percentage: "32%", yesCount: 789, noCount: 101 },
+  ],
+});
 
 // 模拟数据：右边横向列表（通过 CSS 控制每行展示数量）
 const rightList = ref(
-  Array.from({ length: 20 }, (_, index) => createRightListItem(6 + index))
-)
+  Array.from({ length: 20 }, (_, index) => createRightListItem(6 + index)),
+);
 
 // 处理搜索
 const handleSearch = () => {
   // 这里可以实现搜索逻辑
-}
+};
 
 // 筛选面板显示状态
-const showFilterPanel = ref(false)
+const showFilterPanel = ref(false);
 
 // 排序选项
 const sortOptions = [
-  { value: 'liquidity', label: '流动性' },
-  { value: 'volume', label: '24小时交易量' },
-  { value: 'time', label: '时间排序' },
-  { value: 'default', label: '默认排序' }
-]
+  { value: "liquidity", label: "流动性" },
+  { value: "volume", label: "24小时交易量" },
+  { value: "time", label: "时间排序" },
+  { value: "default", label: "默认排序" },
+];
 
 // 频率选项
 const frequencyOptions = [
-  { value: 'daily', label: '每日' },
-  { value: 'weekly', label: '每周' },
-  { value: 'monthly', label: '每月' },
-  { value: 'all', label: '全部' }
-]
+  { value: "daily", label: "每日" },
+  { value: "weekly", label: "每周" },
+  { value: "monthly", label: "每月" },
+  { value: "all", label: "全部" },
+];
 
 // 选中的排序方式
-const selectedSort = ref('liquidity')
+const selectedSort = ref("liquidity");
 
 // 选中的频率
-const selectedFrequency = ref('daily')
+const selectedFrequency = ref("daily");
 
 // 获取当前排序标签
 const currentSortLabel = computed(() => {
-  const option = sortOptions.find(opt => opt.value === selectedSort.value)
-  return option ? option.label : '流动性'
-})
+  const option = sortOptions.find((opt) => opt.value === selectedSort.value);
+  return option ? option.label : "流动性";
+});
 
 // 获取当前频率标签
 const currentFrequencyLabel = computed(() => {
-  const option = frequencyOptions.find(opt => opt.value === selectedFrequency.value)
-  return option ? option.label : '每日'
-})
+  const option = frequencyOptions.find(
+    (opt) => opt.value === selectedFrequency.value,
+  );
+  return option ? option.label : "每日";
+});
 
 // 处理筛选
 const handleFilter = () => {
-  showFilterPanel.value = !showFilterPanel.value
-}
+  showFilterPanel.value = !showFilterPanel.value;
+};
 
 // 处理视图切换
 const handleViewToggle = () => {
-  router.push('/leaderboard')
-}
+  router.push("/leaderboard");
+};
 
 // 跳转到收益页面
 const navigateToEarnings = () => {
-  router.push('/earnings')
-}
+  router.push("/earnings");
+};
 
 // 检测是否为移动端
 const checkIsMobile = () => {
-  if (typeof window !== 'undefined') {
-    return window.innerWidth <= 768
+  if (typeof window !== "undefined") {
+    return window.innerWidth <= 768;
   }
-  return false
-}
+  return false;
+};
 
 // 跳转到详情页面
 const navigateToDetail = (item, choice) => {
-  const isMobile = checkIsMobile()
-  const detailPath = isMobile ? '/detail-h5' : '/detail'
+  const isMobile = checkIsMobile();
+  const detailPath = isMobile ? "/detail-h5" : "/detail";
 
   router.push({
     path: detailPath,
     query: {
       choice,
-      id: item.id || item.title
-    }
-  })
-}
+      id: item.id || item.title,
+    },
+  });
+};
 
 // 处理标签点击
 const handleTagClick = (tagValue) => {
-  activeTag.value = tagValue
+  activeTag.value = tagValue;
   // 这里可以根据标签筛选内容
-}
+};
 
 // 处理收藏点击
 const handleBookmark = () => {
   // 这里可以实现收藏功能
-}
+};
 
 // 切换收藏状态
 const toggleFavorite = (item) => {
-  item.isFavorite = !item.isFavorite
-}
+  item.isFavorite = !item.isFavorite;
+};
 </script>
 
 <style scoped lang="scss">
 // 公共变量
-$yes-color: #BBFF2E;
-$no-color: #CA4064;
+$yes-color: #bbff2e;
+$no-color: #ca4064;
 $yes-bg-light: rgba(37, 167, 80, 0.2);
 $no-bg-light: rgba(202, 64, 100, 0.2);
 $radius-sm: 6px;
@@ -597,10 +823,12 @@ $transition-ease: 0.3s ease;
 
 .home-page {
   min-height: 100vh;
-  background-color: var(--bg-page, #FCFCFC);
+  background-color: var(--bg-page, #fcfcfc);
   color: var(--text-color, #1a1a1a);
   padding-top: 112px; // header(64px) + navbar2(48px)
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 
   // Banner图样式
   .banner-section {
@@ -674,8 +902,6 @@ $transition-ease: 0.3s ease;
       width: 100%;
     }
 
-
-
     .filter-section {
       margin-bottom: 24px;
 
@@ -710,7 +936,7 @@ $transition-ease: 0.3s ease;
 
             .tag-btn {
               padding: 6px 14px;
-              border: 1px solid var(--border-color, #E0E0E0);
+              border: 1px solid var(--border-color, #e0e0e0);
               border-radius: 5px;
               font-size: 14px;
               color: var(--text-gray, #666666);
@@ -719,7 +945,7 @@ $transition-ease: 0.3s ease;
               cursor: pointer;
               transition: all $transition-fast;
               white-space: nowrap;
-              background: var(--bg-page, #F5F5F5);
+              background: var(--bg-page, #f5f5f5);
               font-weight: 400;
 
               &.active {
@@ -866,8 +1092,8 @@ $transition-ease: 0.3s ease;
         gap: 8px;
         padding: 10px 14px;
         border-radius: $radius-md;
-        background: #F4F4F4;
-        border: 1px solid #F1F1F1;
+        background: #f4f4f4;
+        border: 1px solid #f1f1f1;
         min-width: 260px;
         height: 40px;
         box-sizing: border-box;
@@ -887,7 +1113,7 @@ $transition-ease: 0.3s ease;
         width: 100%;
 
         &::placeholder {
-          color: rgba(0, 0, 0, 0.40);
+          color: rgba(0, 0, 0, 0.4);
         }
       }
 
@@ -906,7 +1132,9 @@ $transition-ease: 0.3s ease;
         color: rgba(0, 0, 0, 0.62);
         cursor: pointer;
         border-radius: $radius-md;
-        transition: background $transition-fast, color $transition-fast;
+        transition:
+          background $transition-fast,
+          color $transition-fast;
 
         &.active {
           background: rgba(0, 0, 0, 0.05);
@@ -917,7 +1145,7 @@ $transition-ease: 0.3s ease;
       .pc-divider {
         width: 1px;
         height: 18px;
-        background: rgba(0, 0, 0, 0.10);
+        background: rgba(0, 0, 0, 0.1);
         flex-shrink: 0;
       }
 
@@ -944,19 +1172,22 @@ $transition-ease: 0.3s ease;
         border-radius: 5px;
         cursor: pointer;
         padding: 8px 16px;
-        font-family: PingFang SC, PingFang SC;
+        font-family:
+          PingFang SC,
+          PingFang SC;
         font-weight: 500;
         font-size: 12px;
         color: var(--text-color, #1a1a1a);
         background: transparent;
-        transition: background $transition-fast, color $transition-fast;
+        transition:
+          background $transition-fast,
+          color $transition-fast;
 
         &.active {
           background: #000;
           color: #fff;
           font-weight: 600;
         }
-
       }
     }
 
@@ -999,7 +1230,7 @@ $transition-ease: 0.3s ease;
         overflow: hidden;
         background: var(--bg-card, #ffffff);
         border-radius: $radius-md;
-        border: 1px solid #F4F4F4;
+        border: 1px solid #f4f4f4;
         transition: all $transition-fast;
         box-sizing: border-box;
       }
@@ -1072,7 +1303,7 @@ $transition-ease: 0.3s ease;
         }
 
         .semicircle-background {
-          stroke: var(--border-color, #E5E5E5);
+          stroke: var(--border-color, #e5e5e5);
           transition: stroke $transition-ease;
         }
 
@@ -1161,7 +1392,7 @@ $transition-ease: 0.3s ease;
         justify-content: space-between;
         padding: 7px 16px;
         box-sizing: border-box;
-        background: var(--bg-page, #F5F5F5);
+        background: var(--bg-page, #f5f5f5);
         border-radius: 0 0 $radius-md $radius-md;
         gap: 8px;
 
@@ -1210,12 +1441,13 @@ $transition-ease: 0.3s ease;
           .voi-amount,
           .time-icon,
           .participant-icon {
-            font-family: PingFang SC, PingFang SC;
+            font-family:
+              PingFang SC,
+              PingFang SC;
             font-weight: 400;
             font-size: 12px;
             color: var(--text-dark-gray, #999);
           }
-
         }
 
         .icon-sc {
@@ -1226,7 +1458,7 @@ $transition-ease: 0.3s ease;
           flex-shrink: 0;
 
           &.active {
-            fill: #CA4064;
+            fill: #ca4064;
           }
         }
       }
@@ -1305,7 +1537,6 @@ $transition-ease: 0.3s ease;
       padding: 28px 24px 56px;
       max-width: 100%;
 
-
       .filter-section {
         .filter-container {
           gap: 10px;
@@ -1349,18 +1580,30 @@ $transition-ease: 0.3s ease;
   .gradient-mask-right {
     right: -1px;
     display: block;
-    background: linear-gradient(to right, transparent 0%, rgba(255, 255, 255, 0.3) 30%, rgba(255, 255, 255, 0.7) 70%, var(--bg-page-h5, #1a1a1a) 100%) !important;
+    background: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(255, 255, 255, 0.3) 30%,
+      rgba(255, 255, 255, 0.7) 70%,
+      var(--bg-page-h5, #1a1a1a) 100%
+    ) !important;
   }
 
   .theme-dark {
     .gradient-mask-right {
-      background: linear-gradient(to right, transparent 0%, rgba(26, 26, 26, 0.3) 30%, rgba(26, 26, 26, 0.7) 70%, var(--bg-page-h5, #1a1a1a) 100%) !important;
+      background: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(26, 26, 26, 0.3) 30%,
+        rgba(26, 26, 26, 0.7) 70%,
+        var(--bg-page-h5, #1a1a1a) 100%
+      ) !important;
     }
   }
 
   .home-page {
     padding-top: 60px;
-    background-color: var(--bg-page-h5, #FFFFFF);
+    background-color: var(--bg-page-h5, #ffffff);
 
     .banner-section {
       display: block; // 移动端显示
@@ -1405,7 +1648,7 @@ $transition-ease: 0.3s ease;
             width: 80%;
 
             .tag-scroll-container {
-            padding-right: 20px;
+              padding-right: 20px;
               gap: 5px;
 
               .tag-btn {
@@ -1443,7 +1686,7 @@ $transition-ease: 0.3s ease;
         .list-item {
           border-radius: $radius-lg;
           background: var(--bg-card, #ffffff);
-          border: 1px solid #F4F4F4;
+          border: 1px solid #f4f4f4;
 
           .item-header {
             margin-bottom: 10px;
@@ -1492,7 +1735,7 @@ $transition-ease: 0.3s ease;
               }
 
               &.active {
-                fill: #CA4064;
+                fill: #ca4064;
               }
             }
           }
@@ -1541,17 +1784,17 @@ $transition-ease: 0.3s ease;
                 transition: all $transition-fast;
 
                 &.yes-btn {
-                  background: var(--button-bg-y, #2EBE69);
-                  color: var(--text-color-y, #2EBE69);
+                  background: var(--button-bg-y, #2ebe69);
+                  color: var(--text-color-y, #2ebe69);
 
                   &.active {
-                    background: var(--button-bg-y, #2EBE69);
+                    background: var(--button-bg-y, #2ebe69);
                   }
                 }
 
                 &.no-btn {
-                  background: var(--button-bg-n, #E44096);
-                  color: var(--text-color-n, #E44096);
+                  background: var(--button-bg-n, #e44096);
+                  color: var(--text-color-n, #e44096);
 
                   &.active {
                     background: rgba(228, 64, 150, 1);
@@ -1670,28 +1913,28 @@ $transition-ease: 0.3s ease;
 
                     &.yes-btn {
                       background: rgba(37, 167, 80, 0.2);
-                      color: #25A750;
+                      color: #25a750;
 
                       &:hover {
                         background: rgba(37, 167, 80, 0.3);
                       }
 
                       &.active {
-                        background: #25A750;
+                        background: #25a750;
                         color: #fff;
                       }
                     }
 
                     &.no-btn {
                       background: rgba(202, 64, 100, 0.2);
-                      color: #CA4064;
+                      color: #ca4064;
 
                       &:hover {
                         background: rgba(202, 64, 100, 0.3);
                       }
 
                       &.active {
-                        background: #CA4064;
+                        background: #ca4064;
                         color: #fff;
                       }
                     }
@@ -1707,8 +1950,8 @@ $transition-ease: 0.3s ease;
 
   .pc-filter-section {
     .pc-search-box {
-      background: var(--bg-page, #F5F5F5);
-      border: 1px solid rgba(255, 255, 255, 0.10);
+      background: var(--bg-page, #f5f5f5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .pc-search-icon {
@@ -1748,7 +1991,7 @@ $transition-ease: 0.3s ease;
       .filter-select-btn {
         margin-right: 10px;
         border-radius: 16px;
-        border: 1px solid #2F2F2F;
+        border: 1px solid #2f2f2f;
         background: transparent;
         color: var(--text-color, #1a1a1a);
         padding: 6px 15px;
@@ -1763,10 +2006,8 @@ $transition-ease: 0.3s ease;
         vertical-align: middle;
         color: var(--text-color, #1a1a1a);
       }
-
     }
   }
-
 }
 
 // PC 端隐藏移动端 filter-section（> 480px）
@@ -1784,7 +2025,7 @@ $transition-ease: 0.3s ease;
 .coming-soon-overlay {
   position: absolute;
   inset: 0;
-  display: none;
+  display: flex;
   justify-content: center;
   padding-top: 100px;
   box-sizing: border-box;

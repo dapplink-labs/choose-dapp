@@ -328,7 +328,7 @@ import bridge from "@/assets/abi/bridgeABI"
 const bridgeABI = bridge.abi
 import { parseEther } from 'viem'
 import BigNumber from 'bignumber.js';
-import networks from "../../assets/json/networks.json"
+import networks from "../../assets/json/networks.js"
 import { getbridgeFees } from "@/api/bridgePrice"
 import { getBridgeRecords } from "@/api/records.js"
 import Message from '@/utils/message'
