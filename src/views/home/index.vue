@@ -3,24 +3,15 @@
     <!-- Banner轮播图板块 -->
     <div class="banner-section">
       <div class="banner-container">
-        <swiper
-          :modules="swiperModules"
-          :slides-per-view="1"
-          :space-between="0"
-          :loop="true"
-          :autoplay="{
-            delay: 3000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: false,
-          }"
-          :pagination="{
+        <swiper :modules="swiperModules" :slides-per-view="1" :space-between="0" :loop="true" :autoplay="{
+          delay: 3000,
+          disableOnInteraction: false,
+          pauseOnMouseEnter: false,
+        }" :pagination="{
             clickable: true,
             bulletClass: 'swiper-pagination-bullet',
             bulletActiveClass: 'swiper-pagination-bullet-active',
-          }"
-          :navigation="false"
-          class="banner-swiper"
-        >
+          }" :navigation="false" class="banner-swiper">
           <swiper-slide v-for="(banner, index) in bannerList" :key="index">
             <div class="banner-item" @click="goHref(banner)">
               <img :src="banner.img" class="banner-image" />
@@ -31,15 +22,14 @@
     </div>
 
     <NavBar2 />
+
     <div class="main-content">
       <!-- 功能暂不开放覆盖层 -->
-      <div class="coming-soon-overlay">
+      <div class="coming-soon-overlay" :style="{
+        display: isComingSoon ? 'flex' : 'none',
+      }">
         <div class="coming-soon-content">
-          <img
-            src="@/assets/icon/11.png"
-            :alt="$t('home.comingSoonAlt') || '暂不开放'"
-            class="coming-soon-icon"
-          />
+          <img src="@/assets/icon/11.png" :alt="$t('home.comingSoonAlt') || '暂不开放'" class="coming-soon-icon" />
           <p class="coming-soon-text">
             {{ $t("home.comingSoon") || "预测功能即将上线" }}
           </p>
@@ -53,35 +43,17 @@
               <el-icon class="pc-search-icon" aria-hidden="true">
                 <Search />
               </el-icon>
-              <input
-                v-model="searchQuery"
-                class="pc-search-input"
-                type="text"
-                :placeholder="`${t('home.searchPlaceholder')}${t('home.multiMarket')}`"
-              />
+              <input v-model="searchQuery" class="pc-search-input" type="text"
+                :placeholder="`${t('home.searchPlaceholder')}${t('home.multiMarket')}`" />
             </div>
 
             <div class="pc-action-icons">
-              <div
-                class="pc-action-btn"
-                @click="handleBookmark"
-                aria-label="bookmark"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M12.988,19a2.964,2.964,0,0,1-1.789-.606L8,16l-3.2,2.4A2.962,2.962,0,0,1,3.012,19a3.069,3.069,0,0,1-2.089-.836A2.954,2.954,0,0,1,0,16V3A3,3,0,0,1,3,0H13a3,3,0,0,1,3,3V16a2.954,2.954,0,0,1-.923,2.168A3.069,3.069,0,0,1,12.988,19ZM8,14a1.984,1.984,0,0,1,1.2.4l3.2,2.4a.987.987,0,0,0,.6.2,1.024,1.024,0,0,0,.7-.279A.984.984,0,0,0,14,16V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V16a1,1,0,0,0,1,1,.987.987,0,0,0,.6-.2l3.2-2.4A1.984,1.984,0,0,1,8,14Z"
-                  />
-                  <path
-                    fill="currentColor"
-                    d="M0,1A1,1,0,0,1,1,0H7A1,1,0,0,1,7,2H1A1,1,0,0,1,0,1Z"
-                    transform="translate(4 4)"
-                  />
+              <div class="pc-action-btn" @click="handleBookmark" aria-label="bookmark">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24">
+                  <path fill="currentColor"
+                    d="M12.988,19a2.964,2.964,0,0,1-1.789-.606L8,16l-3.2,2.4A2.962,2.962,0,0,1,3.012,19a3.069,3.069,0,0,1-2.089-.836A2.954,2.954,0,0,1,0,16V3A3,3,0,0,1,3,0H13a3,3,0,0,1,3,3V16a2.954,2.954,0,0,1-.923,2.168A3.069,3.069,0,0,1,12.988,19ZM8,14a1.984,1.984,0,0,1,1.2.4l3.2,2.4a.987.987,0,0,0,.6.2,1.024,1.024,0,0,0,.7-.279A.984.984,0,0,0,14,16V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V16a1,1,0,0,0,1,1,.987.987,0,0,0,.6-.2l3.2-2.4A1.984,1.984,0,0,1,8,14Z" />
+                  <path fill="currentColor" d="M0,1A1,1,0,0,1,1,0H7A1,1,0,0,1,7,2H1A1,1,0,0,1,0,1Z"
+                    transform="translate(4 4)" />
                 </svg>
               </div>
             </div>
@@ -90,13 +62,8 @@
 
             <div class="pc-tab-wrapper">
               <div class="pc-tab-scroll">
-                <button
-                  v-for="tag in pcTagButtons"
-                  :key="tag.value"
-                  class="pc-tab-btn"
-                  :class="{ active: activeTag === tag.value }"
-                  @click="handleTagClick(tag.value)"
-                >
+                <button v-for="tag in pcTagButtons" :key="tag.value" class="pc-tab-btn"
+                  :class="{ active: activeTag === tag.value }" @click="handleTagClick(tag.value)">
                   {{ tag.label }}
                 </button>
               </div>
@@ -109,13 +76,8 @@
             <!-- 标签按钮行 -->
             <div class="tag-scroll-wrapper">
               <div class="tag-scroll-container">
-                <button
-                  v-for="tag in tagButtons"
-                  :key="tag.value"
-                  class="tag-btn"
-                  :class="{ active: activeTag === tag.value }"
-                  @click="handleTagClick(tag.value)"
-                >
+                <button v-for="tag in tagButtons" :key="tag.value" class="tag-btn"
+                  :class="{ active: activeTag === tag.value }" @click="handleTagClick(tag.value)">
                   {{ tag.label }}
                 </button>
               </div>
@@ -126,58 +88,28 @@
             <!-- 右侧操作按钮 -->
             <div class="action-buttons">
               <div class="action-btn" @click="handleFilter">
-                <svg
-                  xmlns=" http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  class="icon"
-                >
+                <svg xmlns=" http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" class="icon">
                   <g transform="translate(-295 -358)">
-                    <rect
-                      fill="none"
-                      width="24"
-                      height="24"
-                      transform="translate(295 358)"
-                    />
+                    <rect fill="none" width="24" height="24" transform="translate(295 358)" />
                     <g transform="translate(298 361)">
-                      <path
-                        fill="currentColor"
+                      <path fill="currentColor"
                         d="M7,8A4,4,0,0,1,3.126,5H1A1,1,0,0,1,1,3H3.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H10.874A4,4,0,0,1,7,8ZM7,2A2,2,0,1,0,9,4,2,2,0,0,0,7,2Z"
-                        transform="translate(0 10)"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M11,8A4,4,0,0,1,7.126,5H1A1,1,0,0,1,1,3H7.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H14.874A4,4,0,0,1,11,8Zm0-6a2,2,0,1,0,2,2A2,2,0,0,0,11,2Z"
-                      />
+                        transform="translate(0 10)" />
+                      <path fill="currentColor"
+                        d="M11,8A4,4,0,0,1,7.126,5H1A1,1,0,0,1,1,3H7.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H14.874A4,4,0,0,1,11,8Zm0-6a2,2,0,1,0,2,2A2,2,0,0,0,11,2Z" />
                     </g>
                   </g>
                 </svg>
               </div>
               <div class="action-btn bookmark-btn" @click="handleBookmark">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                   <g transform="translate(-336 -358)">
-                    <rect
-                      fill="none"
-                      width="24"
-                      height="24"
-                      transform="translate(336 358)"
-                    />
+                    <rect fill="none" width="24" height="24" transform="translate(336 358)" />
                     <g transform="translate(340 361)">
-                      <path
-                        fill="currentColor"
-                        d="M12.988,19a2.964,2.964,0,0,1-1.789-.606L8,16l-3.2,2.4A2.962,2.962,0,0,1,3.012,19a3.069,3.069,0,0,1-2.089-.836A2.954,2.954,0,0,1,0,16V3A3,3,0,0,1,3,0H13a3,3,0,0,1,3,3V16a2.954,2.954,0,0,1-.923,2.168A3.069,3.069,0,0,1,12.988,19ZM8,14a1.984,1.984,0,0,1,1.2.4l3.2,2.4a.987.987,0,0,0,.6.2,1.024,1.024,0,0,0,.7-.279A.984.984,0,0,0,14,16V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V16a1,1,0,0,0,1,1,.987.987,0,0,0,.6-.2l3.2-2.4A1.984,1.984,0,0,1,8,14Z"
-                      />
-                      <path
-                        fill="currentColor"
-                        d="M0,1A1,1,0,0,1,1,0H7A1,1,0,0,1,7,2H1A1,1,0,0,1,0,1Z"
-                        transform="translate(4 4)"
-                      />
+                      <path fill="currentColor"
+                        d="M12.988,19a2.964,2.964,0,0,1-1.789-.606L8,16l-3.2,2.4A2.962,2.962,0,0,1,3.012,19a3.069,3.069,0,0,1-2.089-.836A2.954,2.954,0,0,1,0,16V3A3,3,0,0,1,3,0H13a3,3,0,0,1,3,3V16a2.954,2.954,0,0,1-.923,2.168A3.069,3.069,0,0,1,12.988,19ZM8,14a1.984,1.984,0,0,1,1.2.4l3.2,2.4a.987.987,0,0,0,.6.2,1.024,1.024,0,0,0,.7-.279A.984.984,0,0,0,14,16V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V16a1,1,0,0,0,1,1,.987.987,0,0,0,.6-.2l3.2-2.4A1.984,1.984,0,0,1,8,14Z" />
+                      <path fill="currentColor" d="M0,1A1,1,0,0,1,1,0H7A1,1,0,0,1,7,2H1A1,1,0,0,1,0,1Z"
+                        transform="translate(4 4)" />
                     </g>
                   </g>
                 </svg>
@@ -217,17 +149,9 @@
 
         <div class="main-list-section">
           <div class="left-vertical-list">
-            <div
-              class="list-item large-item"
-              v-for="(item, index) in leftList"
-              :key="'left-' + index"
-            >
+            <div class="list-item large-item" v-for="(item, index) in leftList" :key="'left-' + index">
               <div class="item-header">
-                <img
-                  :src="item.avatar"
-                  :alt="$t('common.userAvatar')"
-                  class="user-avatar"
-                />
+                <img :src="item.avatar" :alt="$t('common.userAvatar')" class="user-avatar" />
                 <div class="item-meta">
                   <div class="item-title" @click="navigateToEarnings()">
                     {{ item.title }}
@@ -236,33 +160,13 @@
                 <div class="percentage-semicircle">
                   <svg class="semicircle-chart" viewBox="0 0 100 60">
                     <!-- 背景半圆 -->
-                    <path
-                      class="semicircle-background"
-                      d="M 10 50 A 40 40 0 0 1 90 50"
-                      fill="none"
-                      stroke-width="8"
-                    />
+                    <path class="semicircle-background" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke-width="8" />
                     <!-- 进度半圆 -->
-                    <path
-                      class="semicircle-progress"
-                      d="M 10 50 A 40 40 0 0 1 90 50"
-                      fill="none"
-                      stroke="#E44096"
-                      stroke-width="8"
-                      stroke-linecap="round"
-                      :stroke-dasharray="125.6"
-                      :stroke-dashoffset="
-                        (125.6 * (100 - parseInt(item.percentage))) / 100
-                      "
-                    />
+                    <path class="semicircle-progress" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#E44096"
+                      stroke-width="8" stroke-linecap="round" :stroke-dasharray="125.6" :stroke-dashoffset="(125.6 * (100 - parseInt(item.percentage))) / 100
+                        " />
                     <!-- 百分比文本 -->
-                    <text
-                      class="semicircle-percentage"
-                      x="52"
-                      y="50"
-                      text-anchor="middle"
-                      dy="0"
-                    >
+                    <text class="semicircle-percentage" x="52" y="50" text-anchor="middle" dy="0">
                       {{ item.percentage }}
                     </text>
                   </svg>
@@ -273,60 +177,37 @@
               </div>
               <div class="item-leverage-info">
                 <div class="leverage-item">
-                  <span class="leverage-label"
-                    >{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span
-                  >
+                  <span class="leverage-label">{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span>
                   <span class="leverage-value">{{
                     item.maxLeverage || "10X"
                   }}</span>
                 </div>
                 <div class="leverage-item">
-                  <span class="leverage-label"
-                    >{{ $t("home.maxReturn") || "最大回报" }}:</span
-                  >
+                  <span class="leverage-label">{{ $t("home.maxReturn") || "最大回报" }}:</span>
                   <span class="leverage-value">{{
                     item.maxReturn || "182%"
                   }}</span>
                 </div>
               </div>
               <div class="item-actions">
-                <button
-                  class="action-btn yes-btn"
-                  @click="navigateToDetail(item, 'yes')"
-                >
+                <button class="action-btn yes-btn" @click="navigateToDetail(item, 'yes')">
                   Yes
                 </button>
-                <button
-                  class="action-btn no-btn"
-                  @click="navigateToDetail(item, 'no')"
-                >
+                <button class="action-btn no-btn" @click="navigateToDetail(item, 'no')">
                   No
                 </button>
               </div>
               <div class="item-amount">
                 <div class="amount-left">
                   <div class="time-info" :class="{ urgent: item.isTimeUrgent }">
-                    <span
-                      v-if="item.isTimeUrgent"
-                      class="time-dot"
-                      aria-hidden="true"
-                    >
+                    <span v-if="item.isTimeUrgent" class="time-dot" aria-hidden="true">
                       <em></em>
                     </span>
-                    <svg
-                      v-else
-                      class="time-icon"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 12 12"
-                    >
+                    <svg v-else class="time-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12"
+                      height="12" viewBox="0 0 12 12">
                       <path
                         d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
-                        transform="translate(-69.818 -69.818)"
-                        fill="currentColor"
-                      />
+                        transform="translate(-69.818 -69.818)" fill="currentColor" />
                     </svg>
                     <span class="time-text">{{ item.timeRemaining }}</span>
                   </div>
@@ -340,57 +221,34 @@
                   </div>
                   <span class="voi-amount">VOI：${{ item.amount }}</span>
                 </div>
-                <svg
-                  t="1765591111184"
-                  class="icon-sc"
-                  :class="{ active: item.isFavorite }"
-                  viewBox="0 0 1024 1024"
-                  version="1.1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  p-id="5484"
-                  width="14"
-                  height="14"
-                  @click.stop="toggleFavorite(item)"
-                >
+                <svg t="1765591111184" class="icon-sc" :class="{ active: item.isFavorite }" viewBox="0 0 1024 1024"
+                  version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5484" width="14" height="14"
+                  @click.stop="toggleFavorite(item)">
                   <path
                     d="M389.461333 85.333333l253.354667 0.021334c5.397333 0.042667 10.602667 0.128 15.616 0.256l14.506667 0.490666 13.482666 0.789334c43.306667 3.072 71.104 10.965333 99.733334 26.282666a197.738667 197.738667 0 0 1 82.005333 82.005334c15.317333 28.629333 23.210667 56.426667 26.282667 99.733333l0.789333 13.482667 0.490667 14.506666 0.149333 7.658667 0.128 16.213333v501.525334a85.333333 85.333333 0 0 1-123.498667 76.330666L518.186667 797.44l-3.2-1.557333-2.965334-1.322667-2.986666 1.322667-257.514667 128.725333A85.333333 85.333333 0 0 1 128 848.298667l0.021333-509.781334c0.042667-5.397333 0.128-10.602667 0.256-15.616l0.490667-14.506666 0.789333-13.482667c3.072-43.306667 10.965333-71.104 26.282667-99.733333a197.738667 197.738667 0 0 1 82.005333-82.005334c28.629333-15.317333 56.426667-23.210667 99.733334-26.282666l13.482666-0.789334 14.506667-0.490666 7.658667-0.149334 16.213333-0.128z m252.16 85.354667H382.378667l-13.184 0.170667-6.122667 0.149333-11.413333 0.426667-10.325334 0.64c-4.906667 0.384-9.493333 0.832-13.76 1.365333l-8.149333 1.173333c-11.712 1.92-21.12 4.650667-29.866667 8.32l-5.76 2.602667c-1.92 0.917333-3.797333 1.877333-5.674666 2.88a112.426667 112.426667 0 0 0-47.018667 47.018667 145.664 145.664 0 0 0-2.88 5.674666l-2.602667 5.76c-3.669333 8.746667-6.4 18.154667-8.32 29.866667l-1.173333 8.149333c-0.533333 4.266667-0.981333 8.832-1.344 13.76l-0.64 10.325334a514.133333 514.133333 0 0 0-0.256 5.546666l-0.341333 11.989334-0.170667 13.184L213.333333 848.277333l256.469334-128.170666c10.965333-5.312 18.112-7.850667 26.88-9.536a80.213333 80.213333 0 0 1 30.634666 0c9.856 1.898667 17.664 4.885333 31.189334 11.648L810.666667 848.298667l-0.021334-508.586667-0.170666-13.226667a709.973333 709.973333 0 0 0-0.149334-6.101333l-0.426666-11.413333-0.64-10.325334c-0.384-4.906667-0.832-9.493333-1.365334-13.76l-1.173333-8.149333a129.984 129.984 0 0 0-8.32-29.866667l-2.602667-5.76a145.664 145.664 0 0 0-2.88-5.674666 112.426667 112.426667 0 0 0-47.018666-47.018667 145.664 145.664 0 0 0-5.674667-2.88l-5.76-2.602667c-8.746667-3.669333-18.154667-6.4-29.866667-8.32l-8.149333-1.173333c-4.266667-0.533333-8.832-0.981333-13.76-1.344l-10.325333-0.64a514.133333 514.133333 0 0 0-5.546667-0.256l-11.989333-0.341333L641.642667 170.666667zM576 298.666667a42.666667 42.666667 0 0 1 3.2 85.226666L576 384h-128a42.666667 42.666667 0 0 1-3.2-85.226667L448 298.666667h128z"
-                    :fill="item.isFavorite ? '#CA4064' : '#909090'"
-                    p-id="5485"
-                  ></path>
+                    :fill="item.isFavorite ? '#CA4064' : '#909090'" p-id="5485"></path>
                 </svg>
               </div>
             </div>
           </div>
 
           <div class="right-horizontal-list">
-            <div
-              class="list-item small-item"
-              v-for="(item, index) in rightList"
-              :key="'right-' + index"
-            >
+            <div class="list-item small-item" v-for="(item, index) in rightList" :key="'right-' + index">
               <div class="item-header">
-                <img
-                  :src="item.avatar"
-                  :alt="$t('common.userAvatar')"
-                  class="user-avatar"
-                />
+                <img :src="item.avatar" :alt="$t('common.userAvatar')" class="user-avatar" />
                 <div class="item-meta">
                   <div class="item-title">{{ item.title }}</div>
                 </div>
               </div>
               <div class="item-leverage-info">
                 <div class="leverage-item">
-                  <span class="leverage-label"
-                    >{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span
-                  >
+                  <span class="leverage-label">{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span>
                   <span class="leverage-value">{{
                     item.maxLeverage || "10X"
                   }}</span>
                 </div>
                 <div class="leverage-item">
-                  <span class="leverage-label"
-                    >{{ $t("home.maxReturn") || "最大回报" }}:</span
-                  >
+                  <span class="leverage-label">{{ $t("home.maxReturn") || "最大回报" }}:</span>
                   <span class="leverage-value">{{
                     item.maxReturn || "182%"
                   }}</span>
@@ -403,16 +261,10 @@
                     <span>{{ item.percentage }}</span>
                   </div>
                   <div class="option-buttons">
-                    <button
-                      class="option-btn yes-btn"
-                      @click="navigateToDetail(item, 'yes')"
-                    >
+                    <button class="option-btn yes-btn" @click="navigateToDetail(item, 'yes')">
                       Yes
                     </button>
-                    <button
-                      class="option-btn no-btn"
-                      @click="navigateToDetail(item, 'no')"
-                    >
+                    <button class="option-btn no-btn" @click="navigateToDetail(item, 'no')">
                       No
                     </button>
                   </div>
@@ -423,16 +275,10 @@
                     <span>{{ item.percentage }}</span>
                   </div>
                   <div class="option-buttons">
-                    <button
-                      class="option-btn yes-btn"
-                      @click="navigateToDetail(item, 'yes')"
-                    >
+                    <button class="option-btn yes-btn" @click="navigateToDetail(item, 'yes')">
                       Yes
                     </button>
-                    <button
-                      class="option-btn no-btn"
-                      @click="navigateToDetail(item, 'no')"
-                    >
+                    <button class="option-btn no-btn" @click="navigateToDetail(item, 'no')">
                       No
                     </button>
                   </div>
@@ -441,27 +287,14 @@
               <div class="item-amount">
                 <div class="amount-left">
                   <div class="time-info" :class="{ urgent: item.isTimeUrgent }">
-                    <span
-                      v-if="item.isTimeUrgent"
-                      class="time-dot"
-                      aria-hidden="true"
-                    >
+                    <span v-if="item.isTimeUrgent" class="time-dot" aria-hidden="true">
                       <em></em>
                     </span>
-                    <svg
-                      v-else
-                      class="time-icon"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
-                      viewBox="0 0 12 12"
-                    >
+                    <svg v-else class="time-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12"
+                      height="12" viewBox="0 0 12 12">
                       <path
                         d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
-                        transform="translate(-69.818 -69.818)"
-                        fill="currentColor"
-                      />
+                        transform="translate(-69.818 -69.818)" fill="currentColor" />
                     </svg>
                     <span class="time-text">{{ item.timeRemaining }}</span>
                   </div>
@@ -475,23 +308,12 @@
                   </div>
                   <span class="voi-amount">VOI：${{ item.amount }}</span>
                 </div>
-                <svg
-                  t="1765591111184"
-                  class="icon-sc"
-                  :class="{ active: item.isFavorite }"
-                  viewBox="0 0 1024 1024"
-                  version="1.1"
-                  xmlns="http://www.w3.org/2000/svg"
-                  p-id="5484"
-                  width="14"
-                  height="14"
-                  @click.stop="toggleFavorite(item)"
-                >
+                <svg t="1765591111184" class="icon-sc" :class="{ active: item.isFavorite }" viewBox="0 0 1024 1024"
+                  version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5484" width="14" height="14"
+                  @click.stop="toggleFavorite(item)">
                   <path
                     d="M389.461333 85.333333l253.354667 0.021334c5.397333 0.042667 10.602667 0.128 15.616 0.256l14.506667 0.490666 13.482666 0.789334c43.306667 3.072 71.104 10.965333 99.733334 26.282666a197.738667 197.738667 0 0 1 82.005333 82.005334c15.317333 28.629333 23.210667 56.426667 26.282667 99.733333l0.789333 13.482667 0.490667 14.506666 0.149333 7.658667 0.128 16.213333v501.525334a85.333333 85.333333 0 0 1-123.498667 76.330666L518.186667 797.44l-3.2-1.557333-2.965334-1.322667-2.986666 1.322667-257.514667 128.725333A85.333333 85.333333 0 0 1 128 848.298667l0.021333-509.781334c0.042667-5.397333 0.128-10.602667 0.256-15.616l0.490667-14.506666 0.789333-13.482667c3.072-43.306667 10.965333-71.104 26.282667-99.733333a197.738667 197.738667 0 0 1 82.005333-82.005334c28.629333-15.317333 56.426667-23.210667 99.733334-26.282666l13.482666-0.789334 14.506667-0.490666 7.658667-0.149334 16.213333-0.128z m252.16 85.354667H382.378667l-13.184 0.170667-6.122667 0.149333-11.413333 0.426667-10.325334 0.64c-4.906667 0.384-9.493333 0.832-13.76 1.365333l-8.149333 1.173333c-11.712 1.92-21.12 4.650667-29.866667 8.32l-5.76 2.602667c-1.92 0.917333-3.797333 1.877333-5.674666 2.88a112.426667 112.426667 0 0 0-47.018667 47.018667 145.664 145.664 0 0 0-2.88 5.674666l-2.602667 5.76c-3.669333 8.746667-6.4 18.154667-8.32 29.866667l-1.173333 8.149333c-0.533333 4.266667-0.981333 8.832-1.344 13.76l-0.64 10.325334a514.133333 514.133333 0 0 0-0.256 5.546666l-0.341333 11.989334-0.170667 13.184L213.333333 848.277333l256.469334-128.170666c10.965333-5.312 18.112-7.850667 26.88-9.536a80.213333 80.213333 0 0 1 30.634666 0c9.856 1.898667 17.664 4.885333 31.189334 11.648L810.666667 848.298667l-0.021334-508.586667-0.170666-13.226667a709.973333 709.973333 0 0 0-0.149334-6.101333l-0.426666-11.413333-0.64-10.325334c-0.384-4.906667-0.832-9.493333-1.365334-13.76l-1.173333-8.149333a129.984 129.984 0 0 0-8.32-29.866667l-2.602667-5.76a145.664 145.664 0 0 0-2.88-5.674666 112.426667 112.426667 0 0 0-47.018666-47.018667 145.664 145.664 0 0 0-5.674667-2.88l-5.76-2.602667c-8.746667-3.669333-18.154667-6.4-29.866667-8.32l-8.149333-1.173333c-4.266667-0.533333-8.832-0.981333-13.76-1.344l-10.325333-0.64a514.133333 514.133333 0 0 0-5.546667-0.256l-11.989333-0.341333L641.642667 170.666667zM576 298.666667a42.666667 42.666667 0 0 1 3.2 85.226666L576 384h-128a42.666667 42.666667 0 0 1-3.2-85.226667L448 298.666667h128z"
-                    :fill="item.isFavorite ? '#CA4064' : '#909090'"
-                    p-id="5485"
-                  ></path>
+                    :fill="item.isFavorite ? '#CA4064' : '#909090'" p-id="5485"></path>
                 </svg>
               </div>
             </div>
@@ -519,6 +341,9 @@ import linghua1Img from "@/assets/images/linghua1.png";
 import banner4Img from "@/assets/images/banner4.png";
 
 const { t } = useI18n();
+const isComingSoon = computed(() => {
+  return import.meta.env?.VITE_IS_COMING_SOON === 'true'
+});
 
 // Swiper 模块
 const swiperModules = [Autoplay, Pagination];
@@ -1580,24 +1405,20 @@ $transition-ease: 0.3s ease;
   .gradient-mask-right {
     right: -1px;
     display: block;
-    background: linear-gradient(
-      to right,
-      transparent 0%,
-      rgba(255, 255, 255, 0.3) 30%,
-      rgba(255, 255, 255, 0.7) 70%,
-      var(--bg-page-h5, #1a1a1a) 100%
-    ) !important;
+    background: linear-gradient(to right,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 30%,
+        rgba(255, 255, 255, 0.7) 70%,
+        var(--bg-page-h5, #1a1a1a) 100%) !important;
   }
 
   .theme-dark {
     .gradient-mask-right {
-      background: linear-gradient(
-        to right,
-        transparent 0%,
-        rgba(26, 26, 26, 0.3) 30%,
-        rgba(26, 26, 26, 0.7) 70%,
-        var(--bg-page-h5, #1a1a1a) 100%
-      ) !important;
+      background: linear-gradient(to right,
+          transparent 0%,
+          rgba(26, 26, 26, 0.3) 30%,
+          rgba(26, 26, 26, 0.7) 70%,
+          var(--bg-page-h5, #1a1a1a) 100%) !important;
     }
   }
 
@@ -2025,7 +1846,6 @@ $transition-ease: 0.3s ease;
 .coming-soon-overlay {
   position: absolute;
   inset: 0;
-  display: none;
   justify-content: center;
   padding-top: 100px;
   box-sizing: border-box;
