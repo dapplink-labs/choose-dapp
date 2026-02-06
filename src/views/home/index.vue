@@ -2025,7 +2025,7 @@ $transition-ease: 0.3s ease;
 .coming-soon-overlay {
   position: absolute;
   inset: 0;
-  display: flex;
+  display: none;
   justify-content: center;
   padding-top: 100px;
   box-sizing: border-box;
