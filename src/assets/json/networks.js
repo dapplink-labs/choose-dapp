@@ -89,6 +89,8 @@ export default [
     cpContract: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
     ethContract: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
     bridgeContract: "0x0000000000000000000000000000000000000000",
-    ...(import.meta.env.MODE === "development" ? devContracts : prodContracts),
+    ...(import.meta.env.VITE_MANAGER_ADDRESS_PROD !== "true"
+      ? devContracts
+      : prodContracts),
   },
 ];
