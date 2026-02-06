@@ -3,7 +3,7 @@
         <NavBar2 />
         <div class="main-content">
             <!-- 功能暂不开放覆盖层 -->
-            <div class="coming-soon-overlay">
+            <div class="coming-soon-overlay" v-if="isComingSoon">
                 <div class="coming-soon-content">
                     <img src="@/assets/icon/11.png" :alt="$t('home.comingSoonAlt') || '暂不开放'"
                         class="coming-soon-icon" />
@@ -237,6 +237,7 @@ import router from "@/router";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
+const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
 
 // 搜索相关（PC 顶部栏）
 const searchQuery = ref("");
@@ -1048,7 +1049,7 @@ const toggleFavorite = (item) => {
 .coming-soon-overlay {
     position: absolute;
     inset: 0;
-    display: none;
+    display: flex;
     justify-content: center;
     padding-top: 100px;
     box-sizing: border-box;

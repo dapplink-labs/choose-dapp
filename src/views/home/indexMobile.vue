@@ -24,7 +24,7 @@
         <NavBar2 />
         <div class="main-content">
             <!-- 功能暂不开放覆盖层 -->
-            <div class="coming-soon-overlay">
+            <div class="coming-soon-overlay" v-if="isComingSoon">
                 <div class="coming-soon-content">
                     <img src="@/assets/icon/11.png" :alt="$t('home.comingSoonAlt') || '暂不开放'"
                         class="coming-soon-icon" />
@@ -172,13 +172,13 @@
                                     <span class="leverage-label">{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxLeverage || "10X"
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <div class="leverage-item">
                                     <span class="leverage-label">{{ $t("home.maxReturn") || "最大回报" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxReturn || "182%"
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
                             <div class="item-actions">
@@ -210,7 +210,7 @@
                                         </el-icon>
                                         <span class="participant-text">{{
                                             item.participantCount.toLocaleString()
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <span class="voi-amount">VOI：${{ item.amount }}</span>
                                 </div>
@@ -241,13 +241,13 @@
                                     <span class="leverage-label">{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxLeverage || "10X"
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <div class="leverage-item">
                                     <span class="leverage-label">{{ $t("home.maxReturn") || "最大回报" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxReturn || "182%"
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
                             <div class="item-options">
@@ -287,7 +287,7 @@
                                         </el-icon>
                                         <span class="participant-text">{{
                                             item.participantCount.toLocaleString()
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <span class="voi-amount">VOI：${{ item.amount }}</span>
                                 </div>
@@ -319,6 +319,7 @@ import banner4Img from "@/assets/images/banner4.png";
 
 const { t } = useI18n();
 const route = useRoute();
+const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
 
 // Swiper 模块
 const swiperModules = [Autoplay, Pagination];
@@ -757,7 +758,7 @@ $gradient-mask-right: linear-gradient(to right,
 
                 .filter-dropdown {
                     display: block;
-                    width: 100%;    
+                    width: 100%;
                 }
 
                 .filter-select-btn {
@@ -1143,7 +1144,7 @@ $gradient-mask-right: linear-gradient(to right,
 .coming-soon-overlay {
     position: absolute;
     inset: 0;
-    display: none;
+    display: flex;
     justify-content: center;
     padding-top: 100px;
     box-sizing: border-box;
