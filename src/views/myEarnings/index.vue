@@ -108,7 +108,7 @@ const handleNodeEarnings = () => {
   router.push({
     path: "/myNode",
     query: {
-      id: activeNode ?? "",
+      id: activeNode ?? "093ba260586549c087ef43b6a1326265",
     },
   });
 }

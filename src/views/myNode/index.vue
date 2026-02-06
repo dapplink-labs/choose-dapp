@@ -13,13 +13,13 @@
             <div class="box">
                 <div class="item">
                     <b>{{ $t('myNode.choIncome') }}</b>
-                    <p> {{ formatAmount(choIncome) }}≈{{ formatAmount(choIncome * cho2usdt_rate) }}<span
+                    <p> {{ formatAmount(choIncome) }}≈{{ formatUsdtAmount(choIncome * cho2usdt_rate) }}<span
                             class="currey">USDT</span></p>
                 </div>
                 <div class="item">
-                    <b>{{ $t('myNode.subCoinIncome') }}</b>
-                    <p> {{ formatAmount(subCoinIncome) }}≈{{ formatAmount(subCoinIncome * cho2usdt_rate) }}<span
-                            class="currey">USDT</span>
+                    <b>{{ $t('myNode.projectedReturns') }}</b>
+                    <p> {{ formatAmount(projectedReturns) }}≈{{ formatUsdtAmount(projectedReturns * cho2usdt_rate)
+                        }}<span class="currey">USDT</span>
                     </p>
                 </div>
             </div>
@@ -174,7 +174,7 @@ import ActivationMarquee from '@/components/ActivationMarquee.vue'
 import { ArrowRightBold } from '@element-plus/icons-vue'
 import { getNodeServiceProvidersInfo, getMyTeamInfo, nodeclaimReward } from '@/api/API'
 import { formatDateTime } from '@/utils/format_date.js'
-import { formatChoAmount } from '@/utils/format_amount'
+import { formatChoAmount, formatTokenAmount } from '@/utils/format_amount'
 import avatarImg1 from '@/assets/icon/avatarImg1.png'
 import avatarImg2 from '@/assets/icon/avatarImg2.png'
 import avatarImg3 from '@/assets/icon/avatarImg3.png'
@@ -214,6 +214,8 @@ const secondaryMarketIncome = ref(0)
 const directReferralIncome = ref(0)
 const teamIncome = ref(0)
 const nodeType = ref(0)
+const projectedReturns = ref(0) // 个人预测收益
+
 
 
 function showInfo() {
@@ -328,6 +330,11 @@ const handleInviterAvatarError = (e) => {
 
 // 格式化金额（CHO为6精度，需要先转换）
 const formatAmount = (value) => formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true })
+// USDT 金额（18 精度）
+const formatUsdtAmount = (value) => {
+
+    return formatTokenAmount(value, { decimals: 6, maxFractionDigits: 4, useGrouping: true })
+};
 
 // 获取邀请列表：直推为 type=1，团队为 type=2
 const getMyTeamInfoList = async () => {
@@ -385,6 +392,7 @@ async function init() {
         const data = res?.data?.data?.provider_info || {}
         choIncome.value = data.total_reward ?? '0'
         subCoinIncome.value = data.son_coin_reward ?? '0'
+        projectedReturns.value = data.total_prediction_reward ?? '0' // 个人预测收益
         cho2usdt_rate.value = data.cho2usdt_rate ?? 0
         nodeIncome.value = data.node_reward ?? '0'
         networkFeeIncome.value = data.fee_reward ?? '0'
