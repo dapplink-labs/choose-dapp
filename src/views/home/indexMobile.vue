@@ -39,14 +39,28 @@
                     <div class="filter-container">
                         <!-- 标签按钮行 -->
                         <div class="tag-scroll-wrapper">
-                            <div class="tag-scroll-container">
-                                <button v-for="tag in tagButtons" :key="tag.value" class="tag-btn"
-                                    :class="{ active: activeTag === tag.value }" @click="handleTagClick(tag.value)">
-                                    {{ tag.label }}
-                                </button>
+                            <div class="tag-scroll-container" :class="{ 'is-esports-search': showDateFilter }">
+                                <!-- 电子竞技选中：隐藏标签按钮，替换为搜索输入框 -->
+                                <div v-if="showDateFilter" class="esports-search">
+                                    <svg class="esports-search-icon" viewBox="0 0 24 24" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                        <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <input class="esports-search-input" type="text" placeholder="Search" 
+                                        @focus="handleEsportsSearch" />
+                                </div>
+                                <template v-else>
+                                    <button v-for="tag in tagButtons" :key="tag.value" class="tag-btn"
+                                        :class="{ active: activeTag === tag.value }" @click="handleTagClick(tag.value)">
+                                        {{ tag.label }}
+                                    </button>
+                                </template>
                             </div>
                             <!-- 右侧渐变遮罩 -->
-                            <div class="gradient-mask gradient-mask-right"></div>
+                            <div class="gradient-mask gradient-mask-right" v-if="!showDateFilter"></div>
                         </div>
 
                         <!-- 右侧操作按钮 -->
@@ -526,6 +540,7 @@ const handleTagClick = (tagValue) => {
     activeTag.value = tagValue;
 };
 
+
 // 处理筛选按钮点击
 const handleFilter = () => {
     showFilterPanel.value = !showFilterPanel.value;
@@ -693,6 +708,48 @@ $gradient-mask-right: linear-gradient(to right,
 
                             &.active {
                                 color: var(--text-color, #1a1a1a);
+                            }
+                        }
+
+                        &.is-esports-search {
+                            padding-right: 0;
+                            gap: 0;
+                            overflow: hidden;
+                        }
+
+                        .esports-search {
+                            width: 100%;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            padding: 10px 12px;
+                            border-radius: 10px;
+                            border: 1px solid rgba(255, 255, 255, 0.14);
+                            background: rgba(255, 255, 255, 0.06);
+                            box-sizing: border-box;
+                            cursor: text;
+
+                            .esports-search-icon {
+                                width: 18px;
+                                height: 18px;
+                                flex-shrink: 0;
+                                color: rgba(255, 255, 255, 0.7);
+                            }
+
+                            .esports-search-input {
+                                flex: 1;
+                                min-width: 0;
+                                border: none;
+                                outline: none;
+                                background: transparent;
+                                color: rgba(255, 255, 255, 0.85);
+                                font-size: 16px;
+                                line-height: 1.2;
+                                padding: 0;
+
+                                &::placeholder {
+                                    color: rgba(255, 255, 255, 0.55);
+                                }
                             }
                         }
                     }

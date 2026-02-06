@@ -486,7 +486,7 @@ export default {
   },
   lpVault: {
     title: "Staking Pool",
-    desc: "The world's first on-chain cyclical entry, cyclical LP pool, cyclical elimination, and cyclical application mechanism based on a perpetual motion machine. Each investment level follows a cyclical pattern of LP group → pool destruction, with the contract executing automatically.",
+    desc: "The world’s first on-chain looping engine: loop in, loop to form LP pools, loop out, and loop to re-apply. For each investment tier, LP pools are formed and executed automatically by the contract.",
     learnMore: "Learn more",
     nodeStaking: "Activate Node",
     myLPIncome: "My Profit",
