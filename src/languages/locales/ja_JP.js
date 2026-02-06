@@ -235,6 +235,7 @@ export default {
     "others": "その他",
     "chooseMe": "ChooseMe",
     "stakingPool": "ノード購入",
+    "myEarnings": "私の収入",
     "lpVault": "ステーキングプール",
     "onChainData": "オンチェーンデータ",
     "predictionMarket": "予測市場を作成",
@@ -732,5 +733,19 @@ export default {
     "vote": "投票",
     "votedToday": "本日はすでに投票済みです",
     "currentVotes": "現在の票数："
+  },
+  "myEarnings": {
+    "title": "私の収益",
+    "desc": "ノードとステーキングの収益を一目で確認でき、資産の成長をいつでも把握できます。",
+    "nodeEarnings": "ノード収益",
+    "nodeEarningsDesc": "ノード購入による累積収益",
+    "stakingEarnings": "ステーキング収益",
+    "stakingEarningsDesc": "ステーキング期間とルールに基づき決済",
+    "myPerformance": "私の実績",
+    "performanceDesc": "実際の実績は最終決済結果に準じます",
+    "teamPerformance": "チーム総実績",
+    "directTeamPerformance": "直紹介チーム実績",
+    "largeAreaPerformance": "大エリア実績",
+    "smallAreaPerformance": "小エリア実績"
   }
 }

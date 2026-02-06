@@ -3,6 +3,7 @@ import { createRouter, createWebHistory,createWebHashHistory } from 'vue-router'
 import bridge from "../views/bridge/index.vue"
 import home from "../views/home/index.vue"
 import earnings from "../views/earnings/index.vue"
+import myEarnings from "../views/myEarnings/index.vue"
 import leaderboard from "../views/leaderboard/index.vue"
 import leaderboardH5 from "../views/leaderboardH5/index.vue"
 import detail from "../views/detail/index.vue"
@@ -28,6 +29,7 @@ import bill from "../views/bill/index.vue"
 import helpCenter from "../views/helpCenter/index.vue"
 import sportsEventsH5 from "../views/sportsEventsH5/index.vue"
 import sportsDetailH5 from "../views/sportsDetailH5/index.vue"
+
 
 const router = createRouter({
   history:  createWebHashHistory(),
@@ -72,7 +74,11 @@ const router = createRouter({
     {
       path: '/my-earnings',
       name: 'myEarnings',
-      component: () => import('../views/myEarnings/index.vue'),
+      component: myEarnings,
+       meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
     },
     {
       path: '/leaderboard',

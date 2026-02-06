@@ -235,6 +235,7 @@ export default {
     "others": "其他",
     "chooseMe": "ChooseMe",
     "stakingPool": "节点购买",
+    "myEarnings": "我的收益",
     "lpVault": "质押池",
     "onChainData": "链上数据",
     "predictionMarket": "创建预测市场",
@@ -731,5 +732,19 @@ export default {
     "vote": "投票",
     "votedToday": "今日已投票",
     "currentVotes": "当前票数："
+  },
+  "myEarnings": {
+    "title": "我的收益",
+    "desc": "节点与质押收益清晰展示，一目了然，随时掌握资产增长动态。",
+    "nodeEarnings": "节点收益",
+    "nodeEarningsDesc": "节点购买产生的累计收益",
+    "stakingEarnings": "质押收益",
+    "stakingEarningsDesc": "根据质押周期与规则按时结算",
+    "myPerformance": "我的业绩",
+    "performanceDesc": "实际业绩以最终结算结果为准",
+    "teamPerformance": "团队总业绩",
+    "directTeamPerformance": "所有直推团队业绩",
+    "largeAreaPerformance": "大区业绩",
+    "smallAreaPerformance": "小区业绩"
   }
 }

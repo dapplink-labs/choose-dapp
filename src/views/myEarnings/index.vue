@@ -6,9 +6,9 @@
       <BackHeaderNav :type="1" />
 
       <div class="page-header">
-        <h1 class="page-title">我的收益</h1>
+        <h1 class="page-title">{{ t('myEarnings.title') }}</h1>
         <p class="page-desc">
-          节点与质押收益清晰展示，一目了然，随时掌握资产增长动态。
+          {{ t('myEarnings.desc') }}
         </p>
       </div>
 
@@ -17,8 +17,8 @@
         <!-- Node Earnings -->
         <div class="earning-card" @click="handleNodeEarnings">
           <div class="card-left">
-            <div class="card-title">节点收益</div>
-            <div class="card-desc">节点购买产生的累计收益</div>
+            <div class="card-title">{{ t('myEarnings.nodeEarnings') }}</div>
+            <div class="card-desc">{{ t('myEarnings.nodeEarningsDesc') }}</div>
           </div>
           <div class="card-right">
             <span class="amount">12,345,678</span>
@@ -31,8 +31,8 @@
         <!-- Staking Earnings -->
         <div class="earning-card" @click="handleStakingEarnings">
           <div class="card-left">
-            <div class="card-title">质押收益</div>
-            <div class="card-desc">根据质押周期与规则按时结算</div>
+            <div class="card-title">{{ t('myEarnings.stakingEarnings') }}</div>
+            <div class="card-desc">{{ t('myEarnings.stakingEarningsDesc') }}</div>
           </div>
           <div class="card-right">
             <span class="amount">12,345,678</span>
@@ -46,25 +46,25 @@
       <!-- Section 2: Performance -->
       <div class="performance-section">
         <div class="section-header">
-          <h2 class="section-title">我的业绩</h2>
-          <p class="section-desc">实际业绩以最终结算结果为准</p>
+          <h2 class="section-title">{{ t('myEarnings.myPerformance') }}</h2>
+          <p class="section-desc">{{ t('myEarnings.performanceDesc') }}</p>
         </div>
 
         <div class="performance-grid">
           <div class="perf-card">
-            <div class="perf-label">团队总业绩</div>
+            <div class="perf-label">{{ t('myEarnings.teamPerformance') }}</div>
             <div class="perf-value">12,345,678</div>
           </div>
           <div class="perf-card">
-            <div class="perf-label">所有直推团队业绩</div>
+            <div class="perf-label">{{ t('myEarnings.directTeamPerformance') }}</div>
             <div class="perf-value">12,345,678</div>
           </div>
           <div class="perf-card">
-            <div class="perf-label">大区业绩</div>
+            <div class="perf-label">{{ t('myEarnings.largeAreaPerformance') }}</div>
             <div class="perf-value">12,345,678</div>
           </div>
           <div class="perf-card">
-            <div class="perf-label">小区业绩</div>
+            <div class="perf-label">{{ t('myEarnings.smallAreaPerformance') }}</div>
             <div class="perf-value">12,345,678</div>
           </div>
         </div>
@@ -77,13 +77,27 @@
 import { ref } from 'vue'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import { ArrowRightBold } from '@element-plus/icons-vue'
+import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
+
+const { locale, t } = useI18n();
+const router = useRouter();
 
 const handleNodeEarnings = () => {
   console.log('Navigate to Node Earnings')
+  const activeNode = ""
+  // 跳转到 myNode 页面，并传递已激活节点的 id
+  router.push({
+    path: "/myNode",
+    query: {
+      id: activeNode ?? "",
+    },
+  });
 }
 
 const handleStakingEarnings = () => {
   console.log('Navigate to Staking Earnings')
+  router.push('/myIncome')
 }
 </script>
 
@@ -117,9 +131,11 @@ const handleStakingEarnings = () => {
 
 /* Header Section */
 .page-header {
-  margin-top: 60px; /* Space for BackHeaderNav */
+  margin-top: 60px;
+  /* Space for BackHeaderNav */
   margin-bottom: 24px;
-  color: #fff; /* Always white on banner */
+  color: #fff;
+  /* Always white on banner */
 }
 
 .page-title {
@@ -185,8 +201,10 @@ const handleStakingEarnings = () => {
 .amount {
   font-size: 20px;
   font-weight: 600;
-  color: #10B981; /* Green color for positive value */
-  font-family: 'DIN', sans-serif; /* Assuming a number font is used */
+  color: #10B981;
+  /* Green color for positive value */
+  font-family: 'DIN', sans-serif;
+  /* Assuming a number font is used */
 }
 
 .arrow-icon {
@@ -270,7 +288,9 @@ const handleStakingEarnings = () => {
 
 /* Specific Dark Mode Styles if CSS Variables aren't enough */
 :global(.theme-dark) {
-  .earning-card, .perf-card {
+
+  .earning-card,
+  .perf-card {
     border: 1px solid #333;
   }
 }

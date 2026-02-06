@@ -235,6 +235,7 @@ export default {
     "others": "기타",
     "chooseMe": "ChooseMe",
     "stakingPool": "노드 구매",
+    "myEarnings": "내 수입",
     "lpVault": "스테이킹 풀",
     "onChainData": "온체인 데이터",
     "predictionMarket": "예측 시장 생성",
@@ -732,5 +733,19 @@ export default {
     "vote": "투표",
     "votedToday": "오늘 이미 투표했습니다",
     "currentVotes": "현재 표 수: "
+  },
+  "myEarnings": {
+    "title": "나의 수익",
+    "desc": "노드 및 스테이킹 수익을 명확히 표시하여 자산 성장을 언제든 확인할 수 있습니다.",
+    "nodeEarnings": "노드 수익",
+    "nodeEarningsDesc": "노드 구매 누적 수익",
+    "stakingEarnings": "스테이킹 수익",
+    "stakingEarningsDesc": "스테이킹 주기 및 규칙에 따라 정산",
+    "myPerformance": "나의 실적",
+    "performanceDesc": "실제 실적은 최종 정산 결과에 따릅니다",
+    "teamPerformance": "팀 총 실적",
+    "directTeamPerformance": "직추천 팀 실적",
+    "largeAreaPerformance": "대구역 실적",
+    "smallAreaPerformance": "소구역 실적"
   }
 }
