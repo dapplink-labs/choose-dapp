@@ -2,9 +2,16 @@
   <div class="navbar2">
     <div class="navbar-container">
       <!-- 导航链接区域 -->
-      <div class="nav-section">
+      <div class="nav-section" ref="navSectionRef">
         <template v-for="(item, index) in navItems" :key="item.key">
-          <div class="nav-item" :class="{ active: activeNav === item.key }" @click="handleNavClick(item.key)">
+          <div 
+            class="nav-item" 
+            :class="{ active: activeNav === item.key }" 
+            :ref="el => { if (el) navItemRefs[item.key] = el }"
+            :tabindex="activeNav === item.key ? 0 : -1"
+            @click="handleNavClick(item.key)"
+            @keydown.enter="handleNavClick(item.key)"
+            @keydown.space.prevent="handleNavClick(item.key)">
             <!-- 趋势图标使用自定义 SVG -->
             <svg v-if="item.key === 'trends'" class="nav-icon trends-icon" viewBox="0 0 1024 1024" version="1.1"
               xmlns="http://www.w3.org/2000/svg" width="16" height="16">
@@ -37,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
@@ -69,7 +76,7 @@ const navItems = [
   { key: 'ai', label: '人工智能', path: null } 
 ]
 
-// 路由到导航key的映射
+// 路由到导航key的映射（不含带 query 的电子竞技）
 const routeToNavKey = {
   '/home': 'trends',
   '/breaking': 'breaking',
@@ -80,9 +87,39 @@ const routeToNavKey = {
 // 当前激活的导航项
 const activeNav = ref(props.activeNav || '')
 
+// Refs
+const navSectionRef = ref(null)
+const navItemRefs = ref({})
+
+// 聚焦到选中的按钮
+const focusActiveNav = async () => {
+  await nextTick()
+  const activeKey = activeNav.value
+  if (activeKey && navItemRefs.value[activeKey]) {
+    const activeElement = navItemRefs.value[activeKey]
+    // 滚动到可视区域
+    activeElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: 'center'
+    })
+    // 聚焦元素（用于键盘导航）
+    if (activeElement.focus) {
+      activeElement.focus({ preventScroll: true })
+    }
+  }
+}
+
 // 根据当前路由自动设置激活的导航项
 const updateActiveNavFromRoute = () => {
   const currentPath = route.path
+
+  // 在 /home 页面上，优先使用 query.nav（用于电子竞技等筛选按钮）
+  if (currentPath === '/home' && route.query.nav) {
+    activeNav.value = String(route.query.nav)
+    return
+  }
+
   const navKey = routeToNavKey[currentPath] || ''
   if (navKey) {
     activeNav.value = navKey
@@ -94,9 +131,23 @@ watch(() => route.path, () => {
   updateActiveNavFromRoute()
 })
 
+// 监听 query.nav 变化（用于电子竞技等筛选按钮）
+watch(() => route.query.nav, () => {
+  updateActiveNavFromRoute()
+})
+
+// 监听 activeNav 变化，自动聚焦
+watch(activeNav, () => {
+  focusActiveNav()
+})
+
 // 组件挂载时设置激活状态
 onMounted(() => {
   updateActiveNavFromRoute()
+  // 延迟聚焦，确保 DOM 已渲染
+  setTimeout(() => {
+    focusActiveNav()
+  }, 100)
 })
 
 // 方法
@@ -104,10 +155,28 @@ const handleNavClick = (key) => {
   activeNav.value = key
   emit('nav-click', key)
 
-  // 路由跳转：path 为 null 时是筛选按钮，不跳转；path 不为 null 则跳转
   const navItem = navItems.find(item => item.key === key)
+
+  // 普通导航：直接跳转到对应 path
   if (navItem && navItem.path !== null) {
     router.push(navItem.path)
+    // 聚焦到选中的按钮
+    nextTick(() => {
+      focusActiveNav()
+    })
+    return
+  }
+
+  // 筛选按钮：通过路由 query 控制页面状态（目前只按需处理电子竞技）
+  if (key === 'esports') {
+    router.push({
+      path: '/home',
+      query: { nav: 'esports' },
+    })
+    // 聚焦到选中的按钮
+    nextTick(() => {
+      focusActiveNav()
+    })
   }
 }
 </script>
@@ -155,6 +224,7 @@ const handleNavClick = (key) => {
       transition: all 0.2s;
       white-space: nowrap;
       position: relative;
+      outline: none;
     }
 
     /* 竖杠分隔符样式 */
@@ -357,6 +427,8 @@ const handleNavClick = (key) => {
         white-space: nowrap; // 不折行
         gap: 6px; // 图标和文字之间的间距
         vertical-align: middle;
+        outline: none;
+
 
         .nav-icon {
           display: flex; // 移动端显示图标
@@ -464,6 +536,8 @@ const handleNavClick = (key) => {
         white-space: nowrap;
         gap: 6px;
         vertical-align: middle;
+        outline: none;
+
 
         .nav-icon {
           display: flex;
@@ -571,6 +645,8 @@ const handleNavClick = (key) => {
         white-space: nowrap;
         gap: 5px;
         vertical-align: middle;
+        outline: none;
+
 
         .nav-icon {
           display: flex;
