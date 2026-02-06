@@ -473,11 +473,12 @@ export default {
       "distributedDescTemplate": "轻量级 Web3 节点服务，支持主流链，适合初创项目与个人开发者快速加入。预测平台内置轻量节点，为生态内应用提供稳定链上数据读取与交易广播。赶快邀请你的好友来参与赢取更多的收益奖励。",
       "clusterDescTemplate": "高阶级 Web3 节点服务，支持主流链，是预测平台的核心基础设施，支撑高并发实时投资、链上预言机喂价及大型奖池即时结算。赶快邀请你的好友来参与赢取更多的收益奖励。"
     },
-    "sellEnd":"节点售卖结束"
+    "sellEnd":"节点售卖结束",
+  
   },
   "lpVault": {
     "title": "质押池",
-    "desc": "全球首创一套链上循环进场，循环组LP底池，循环销毁、循环出局、循环应用上永动机。每个投资档位按照组LP→销毁底池的循环模式，合约自动执行。",
+    "desc": "全球首创一套链上循环进场，循环组LP底池，循环出局、循环应用上永动机。每个投资档位按照组LP→销毁底池的循环模式，合约自动执行。",
     "learnMore": "了解更多",
     "nodeStaking": "激活节点",
     "myLPIncome": "我的收益",
@@ -485,7 +486,7 @@ export default {
     "dailyEarnings": "日化收益",
     "cycleDays": "周期天数",
     "totalEarnings": "总收益",
-    "activateComputingPower": "激活节点",
+    "activateStaking": "激活质押",
     "activationMsg": "地址 {address} 已激活[ {nodeType} ]",
     "nodeTypes": {
       "T1": "信息节点",

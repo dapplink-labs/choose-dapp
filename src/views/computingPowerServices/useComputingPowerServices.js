@@ -90,8 +90,6 @@ export function useComputingPowerServices() {
 
   // 打开购买节点弹窗
   const handleBuy = (type) => {
-    Message.warning(t("computingPower.sellEnd"));
-    return;
     activeNodeTab.value = type;
     showPurchaseNode.value = true;
   };
@@ -347,19 +345,19 @@ export function useComputingPowerServices() {
   const getButtonText = (nodeType) => {
     const node = nodeProducts.value.find((n) => n.type === nodeType);
     if (!node) {
-      return t("computingPower.activateBtn");
+      return t("computingPower.sellEnd");
     }
 
     const isActive = node.is_active;
     if (isActive === 1) {
-      return t("computingPower.activateBtn");
+      return t("computingPower.sellEnd");
     } else if (isActive === 2) {
       return t("computingPower.activating");
     } else if (isActive === 3) {
       return t("computingPower.purchased");
     }
 
-    return t("computingPower.activateBtn");
+    return t("computingPower.sellEnd");
   };
 
   return {
