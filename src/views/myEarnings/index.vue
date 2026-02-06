@@ -21,7 +21,7 @@
             <div class="card-desc">{{ t('myEarnings.nodeEarningsDesc') }}</div>
           </div>
           <div class="card-right">
-            <span class="amount">{{ formatAmount(choIncome) }}</span>
+            <span class="amount">{{ formatAmount(0) }}</span>
             <el-icon class="arrow-icon">
               <ArrowRightBold />
             </el-icon>
@@ -35,7 +35,7 @@
             <div class="card-desc">{{ t('myEarnings.stakingEarningsDesc') }}</div>
           </div>
           <div class="card-right">
-            <span class="amount">{{ formatAmount(currentNodeStakingInfo?.total_reward) }}</span>
+            <span class="amount">{{ formatAmount(0) }}</span>
             <el-icon class="arrow-icon">
               <ArrowRightBold />
             </el-icon>
@@ -82,15 +82,13 @@ import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { formatChoAmount, formatTokenAmount } from '@/utils/format_amount'
 import {
-  getNodeStakingInfo,
-  getNodeStakingRecords,
-  getNodeServiceProvidersInfo
+
 } from "@/api/API";
 
 const { locale, t } = useI18n();
 const router = useRouter();
 const { address } = useAccount()
-const choIncome = ref('0') // 个人节点收益
+
 
 
 // 格式化金额（CHO为6精度，需要先转换）
@@ -119,67 +117,7 @@ const handleStakingEarnings = () => {
   console.log('Navigate to Staking Earnings')
   router.push('/myIncome')
 }
-// 获取节点质押记录
-const getNodeStakingRecordsList = async () => {
-  const res =
-    (await getNodeStakingRecords({ address: address.value }))?.data?.data
-      ?.list || [];
-  myNodes.value = res.map((item) => {
-    return {
-      id: item.id,
-      nodeName: t(nodeTypeMap[item.type]?.nodeNameKey || ""),
-      nodeTag: nodeTypeMap[item.type]?.nodeTag || "",
-      purchaseTime: formatDateTime(item.created),
-      status: item.status,
-      round: item.round,
-    };
-  });
-  currentNodeStakingInfo.value = myNodes.value[0] ? myNodes.value[0] : {};
-  fetchNodeStakingInfo();
- 
-};
-// 获取节点质押信息
-// 进度条：总收益 / 预估收益
-// 总收益 = 静态收益 + 直推收益 + 团队收益 + 平级收益 + 流水分红
-// 如果当前节点是创世节点（T6），还要加上创世节点5%收益
-// 如果当前节点是超级节点（T5），还要加上超级节点收益
-// 预估收益 = forecast_income
-// 静态收益 = node_reward
-// 直推收益 = direct_reward
-// 团队收益 = team_reward
-// 平级收益 = lateral_reward
-// 流水分红 = dividend_reward
-// 创世节点5%收益 = creation_reward
-// 超级节点收益 = super_node_reward
-const fetchNodeStakingInfo = async () => {
-  if (!currentNodeStakingInfo.value?.id) return;
-  const res = await getNodeStakingInfo({
-    address: address.value,
-    staking_order_id: currentNodeStakingInfo.value.id,
-    round: currentNodeStakingInfo.value.round,
-  });
 
-  const data = res?.data?.data || {};
-  data.id = currentNodeStakingInfo.value.id;
-  data.name = t(nodeTypeMap[data.node_level]?.nodeNameKey || "");
-  currentNodeStakingInfo.value = data;
-
-
-};
-
-async function init() {
-    await getNodeServiceProvidersInfo({
-        id: String(route.query.id || ''),
-        address: address.value
-    }).then(res => {
-        const data = res?.data?.data?.provider_info || {}
-        choIncome.value = data.total_reward ?? '0'
-      
-    }).catch(err => {
-        console.error('获取节点收益详情失败：', err)
-    })
-
-}
 </script>
 
 <style scoped lang="scss">
