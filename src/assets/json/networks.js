@@ -14,30 +14,29 @@ const devContracts = {
 
 // 生产环境合约地址
 const prodContracts = {
-   proxyAirdropManager: "0x68e242c1fc985Df810CB2a7dcf69F11728187dF3",
-     proxyCapitalManager: "0x8a0A30958d6373e75198fC6b2f44b900F81f2a8E",
-     proxyChooseMeToken: "0x1172Df0e8869e1B347C267eE166128EBCC9fd38D",
-     proxyDaoRewardManager: "0x8f176Ce04BAf12772bfe872c51A3709FCEB37459",
-     proxyEcosystemManager: "0xa66005E2D74f87f7e56343c89bB8EA663aA8187f",
-     proxyEventFundingManager: "0x56EC5Bb65eA5768b75A7c4347D1699495D37e876",
-     proxyFomoTreasureManager: "0xd88a0a738e979B43E115e4712232b75f7a9Ca87a",
-     proxyMarketManager0: "0xab44bc8C7e4989e95A921B9bc420D030A1E82CCa",
-     proxyMarketManager1: "0xFEED2d39dCb00A998Edb4017fe07E8a989032380",
-     proxyMarketManager2: "0xC588C77010254ef63b809EBECCA5059612BcE89A",
-     proxyMarketManager3: "0x525bFC1577b264e1aB9BcE6903bF9E9937861Cc7",
-     proxyMarketManager4: "0xf0edC702d0CC4f24241eb65D1C8B7c5468C063FA",
-     proxyMarketManager5: "0xAaC5252b9743CC7680fA725e82316D5661b5fa89",
-     proxyMarketManager6: "0x9f617A98Ba83129ADB12d8E179efDEa0ca5C7Afb",
-     proxyMarketManager7: "0x9b2EE573ba9797566fa8adc74F5d938808bd87f4",
-     proxyMarketManager8: "0x5Df6c65e847BfAacA41B6e85283b1Af4E6e15e7C",
-     proxyMarketManager9: "0x46c5b60FDaB517f181aB8F73849789C21d988Bcb",
-     proxyNodeManager: "0x867BA35Fe620A98af51B4eE7bD554394BD660abd",
-     proxyStakingManager: "0xD45a3a21d7f34b4dc09EF6131A2068742CeF23e9",
-     proxySubTokenFundingManager: "0x80B9AaF5728E5A7b5d58C4bf1910d1F9E30fDE3E",
-     proxyTechManager: "0x7E942089CD1e5A8b264bCE27c37EeAD611406af9",
-     usdtTokenAddress: "0x55d398326f99059fF775485246999027B3197955",
-}
-
+  proxyAirdropManager: "0x68e242c1fc985Df810CB2a7dcf69F11728187dF3",
+  proxyCapitalManager: "0x8a0A30958d6373e75198fC6b2f44b900F81f2a8E",
+  proxyChooseMeToken: "0x1172Df0e8869e1B347C267eE166128EBCC9fd38D",
+  proxyDaoRewardManager: "0x8f176Ce04BAf12772bfe872c51A3709FCEB37459",
+  proxyEcosystemManager: "0xa66005E2D74f87f7e56343c89bB8EA663aA8187f",
+  proxyEventFundingManager: "0x56EC5Bb65eA5768b75A7c4347D1699495D37e876",
+  proxyFomoTreasureManager: "0xd88a0a738e979B43E115e4712232b75f7a9Ca87a",
+  proxyMarketManager0: "0xab44bc8C7e4989e95A921B9bc420D030A1E82CCa",
+  proxyMarketManager1: "0xFEED2d39dCb00A998Edb4017fe07E8a989032380",
+  proxyMarketManager2: "0xC588C77010254ef63b809EBECCA5059612BcE89A",
+  proxyMarketManager3: "0x525bFC1577b264e1aB9BcE6903bF9E9937861Cc7",
+  proxyMarketManager4: "0xf0edC702d0CC4f24241eb65D1C8B7c5468C063FA",
+  proxyMarketManager5: "0xAaC5252b9743CC7680fA725e82316D5661b5fa89",
+  proxyMarketManager6: "0x9f617A98Ba83129ADB12d8E179efDEa0ca5C7Afb",
+  proxyMarketManager7: "0x9b2EE573ba9797566fa8adc74F5d938808bd87f4",
+  proxyMarketManager8: "0x5Df6c65e847BfAacA41B6e85283b1Af4E6e15e7C",
+  proxyMarketManager9: "0x46c5b60FDaB517f181aB8F73849789C21d988Bcb",
+  proxyNodeManager: "0x867BA35Fe620A98af51B4eE7bD554394BD660abd",
+  proxyStakingManager: "0xD45a3a21d7f34b4dc09EF6131A2068742CeF23e9",
+  proxySubTokenFundingManager: "0x80B9AaF5728E5A7b5d58C4bf1910d1F9E30fDE3E",
+  proxyTechManager: "0x7E942089CD1e5A8b264bCE27c37EeAD611406af9",
+  usdtTokenAddress: "0x55d398326f99059fF775485246999027B3197955",
+};
 
 export default [
   {
@@ -90,6 +89,6 @@ export default [
     cpContract: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
     ethContract: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
     bridgeContract: "0x0000000000000000000000000000000000000000",
-    ...(import.meta.env.MODE==='"development"' ? devContracts : prodContracts)
+    ...(import.meta.env.MODE === "development" ? devContracts : prodContracts),
   },
 ];
