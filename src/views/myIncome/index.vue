@@ -75,7 +75,7 @@
           <b>{{ $t("myIncome.forecastFlowBonusUSDT") }}</b>
           <p>
             +{{
-              formatUsdtAmount(currentNodeStakingInfo?.predict_trading_reward)
+              formatUsdtAmount(parseInt(currentNodeStakingInfo?.predict_trading_reward))
             }}
           </p>
         </div>
@@ -203,7 +203,7 @@
             {{ $t("myIncome.flowBonusIncomeCHO") }}
           </div>
           <div class="earnings-value">
-            {{ formatUsdtAmount(currentNodeStakingInfo?.dividend_reward) }}
+            {{ formatUsdtAmount(parseInt(currentNodeStakingInfo?.dividend_reward)) }}
           </div>
         </div>
       </div>

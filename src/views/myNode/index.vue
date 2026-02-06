@@ -13,11 +13,14 @@
             <div class="box">
                 <div class="item">
                     <b>{{ $t('myNode.choIncome') }}</b>
-                    <p>{{ formatAmount(choIncome) }}</p>
+                    <p> {{ formatAmount(choIncome) }}≈{{ formatAmount(choIncome * cho2usdt_rate) }}<span
+                            class="currey">USDT</span></p>
                 </div>
                 <div class="item">
                     <b>{{ $t('myNode.subCoinIncome') }}</b>
-                    <p>{{ formatAmount(subCoinIncome) }}</p>
+                    <p> {{ formatAmount(subCoinIncome) }}≈{{ formatAmount(subCoinIncome * cho2usdt_rate) }}<span
+                            class="currey">USDT</span>
+                    </p>
                 </div>
             </div>
 
@@ -66,11 +69,7 @@
             </div>
 
             <!-- 一键领取按钮：凌晨 2-3 点禁止领取，显示“收益计算中” -->
-            <button
-                class="claim-all-btn"
-                :disabled="claimLoading || isClaimDisabledByTime"
-                @click="handleClaimReward"
-            >
+            <button class="claim-all-btn" :disabled="claimLoading || isClaimDisabledByTime" @click="handleClaimReward">
                 {{
                     isClaimDisabledByTime
                         ? $t('myIncome.calculating')
@@ -116,12 +115,8 @@
                     <div v-for="item in currentList" :key="item.address" class="team-item">
                         <div class="team-avatar">
                             <div class="avatar-content">
-                                <img
-                                    :src="item.avatar || avatarImg"
-                                    alt="avatar"
-                                    class="avatar-img"
-                                    @error="handleInviterAvatarError"
-                                />
+                                <img :src="item.avatar || avatarImg" alt="avatar" class="avatar-img"
+                                    @error="handleInviterAvatarError" />
                             </div>
                         </div>
                         <div class="team-info-content">
@@ -209,6 +204,7 @@ const isClaimDisabledByTime = computed(() => {
 // 顶部收益数据
 const choIncome = ref('0')
 const subCoinIncome = ref('0') // 子币收益暂无数据，写死 0
+const cho2usdt_rate = ref(0) // CHO 到 USDT 的汇率
 
 // 待领取收益数据
 const nodeIncome = ref(0)
@@ -389,7 +385,7 @@ async function init() {
         const data = res?.data?.data?.provider_info || {}
         choIncome.value = data.total_reward ?? '0'
         subCoinIncome.value = data.son_coin_reward ?? '0'
-
+        cho2usdt_rate.value = data.cho2usdt_rate ?? 0
         nodeIncome.value = data.node_reward ?? '0'
         networkFeeIncome.value = data.fee_reward ?? '0'
         subCoinFeeIncome.value = data.sub_coin_service_reward ?? '0'
@@ -529,6 +525,11 @@ onMounted(async () => {
                     font-size: 24px;
                     color: var(--text-color, #1a1a1a);
                     transition: color 0.3s ease;
+
+                    .currey {
+                        font-size: 12px;
+                        color: var(--text-color-secondary, #999);
+                    }
                 }
             }
         }
