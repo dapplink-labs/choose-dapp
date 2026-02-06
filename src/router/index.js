@@ -70,6 +70,11 @@ const router = createRouter({
       component: earnings,
     },
     {
+      path: '/my-earnings',
+      name: 'myEarnings',
+      component: () => import('../views/myEarnings/index.vue'),
+    },
+    {
       path: '/leaderboard',
       name: 'leaderboard',
       component: leaderboardH5,
