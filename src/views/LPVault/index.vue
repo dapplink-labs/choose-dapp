@@ -61,7 +61,7 @@
                         <span class="metric-label">{{ $t('lpVault.totalEarnings') }}</span>
                         <span class="metric-value total-earnings">
                             <img class="total-icon" src="@/assets/icon/LP1.png" alt="" />
-                            {{ node.totalEarnings }} CHO
+                            {{ node.totalEarnings }} USDT
                         </span>
                     </div>
                 </div>
@@ -69,7 +69,7 @@
                 <!-- 为T6节点时，不显示激活按钮 -->
                 <button :disabled="node.nodeLevel === 'T6' ? true : false" class="node-item-btn"
                     @click="handleActivate(node.type)">
-                    {{ $t('lpVault.activateComputingPower') }}
+                    {{ $t('lpVault.activateStaking') }}
                 </button>
             </div>
         </div>
