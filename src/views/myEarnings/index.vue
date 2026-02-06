@@ -41,6 +41,28 @@
             </el-icon>
           </div>
         </div>
+
+        <!-- Flow Earnings -->
+        <div class="earning-card">
+          <div class="card-left">
+            <div class="card-title">{{ t('myEarnings.flowEarnings') }}</div>
+            <div class="card-desc">{{ t('myEarnings.flowEarningsDesc') }}</div>
+          </div>
+          <div class="card-right">
+            <span class="amount">{{ formatAmount(0) }}</span>
+          </div>
+        </div>
+
+        <!-- Sub-coin Earnings -->
+        <div class="earning-card">
+          <div class="card-left">
+            <div class="card-title">{{ t('myEarnings.subCoinEarnings') }}</div>
+            <div class="card-desc">{{ t('myEarnings.subCoinEarningsDesc') }}</div>
+          </div>
+          <div class="card-right">
+            <span class="amount">{{ formatAmount(0) }}</span>
+          </div>
+        </div>
       </div>
 
       <!-- Section 2: Performance -->
@@ -50,13 +72,9 @@
           <p class="section-desc">{{ t('myEarnings.performanceDesc') }}</p>
         </div>
 
-        <div class="performance-grid">
+        <div class="performance-scroll-container">
           <div class="perf-card">
             <div class="perf-label">{{ t('myEarnings.teamPerformance') }}</div>
-            <div class="perf-value">12,345,678</div>
-          </div>
-          <div class="perf-card">
-            <div class="perf-label">{{ t('myEarnings.directTeamPerformance') }}</div>
             <div class="perf-value">12,345,678</div>
           </div>
           <div class="perf-card">
@@ -69,6 +87,44 @@
           </div>
         </div>
       </div>
+
+      <!-- Section 3: All Direct Team Earnings -->
+      <div class="team-earnings-section">
+        <div class="section-header">
+          <h2 class="section-title">{{ t('myEarnings.allDirectTeamPerformance') }}</h2>
+          <p class="section-desc">{{ t('myEarnings.performanceDesc') }}</p>
+        </div>
+
+        <div class="tabs">
+          <div 
+            class="tab-item" 
+            :class="{ active: activeTab === 'team' }"
+            @click="activeTab = 'team'"
+          >
+            {{ t('myEarnings.teamPerformanceTab') }}
+          </div>
+          <div 
+            class="tab-item" 
+            :class="{ active: activeTab === 'staking' }"
+            @click="activeTab = 'staking'"
+          >
+            {{ t('myEarnings.stakingDetails') }}
+          </div>
+        </div>
+
+        <div class="team-list">
+           <div class="list-item" v-for="(item, index) in teamList" :key="index">
+              <div class="item-left">
+                <img :src="item.avatar" class="avatar" />
+                <span class="address">{{ item.address }}</span>
+              </div>
+              <div class="item-right">
+                <span class="plus">+</span>
+                <span class="amount">{{ item.amount }} {{ item.token }}</span>
+              </div>
+           </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -78,6 +134,7 @@ import { ref } from 'vue'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import { ArrowRightBold } from '@element-plus/icons-vue'
 import { useAccount, useChainId } from '@wagmi/vue'
+import avatarImg from '@/assets/icon/avatar.png'
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { formatChoAmount, formatTokenAmount } from '@/utils/format_amount'
@@ -88,6 +145,16 @@ import {
 const { locale, t } = useI18n();
 const router = useRouter();
 const { address } = useAccount()
+
+const activeTab = ref('team')
+const teamList = ref([
+  { address: '0xb574...4c7d', amount: '32,567', token: 'CHO', avatar: avatarImg },
+  { address: '0xb574...4c7d', amount: '32,567', token: 'CHO', avatar: avatarImg },
+  { address: '0xb574...4c7d', amount: '32,567', token: 'CHO', avatar: avatarImg },
+  { address: '0xb574...4c7d', amount: '32,567', token: 'CHO', avatar: avatarImg },
+  { address: '0xb574...4c7d', amount: '32,567', token: 'CHO', avatar: avatarImg },
+  { address: '0xb574...4c7d', amount: '32,567', token: 'CHO', avatar: avatarImg },
+])
 
 
 
@@ -253,13 +320,22 @@ const handleStakingEarnings = () => {
   color: var(--text-color-secondary, #666);
 }
 
-.performance-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.performance-scroll-container {
+  display: flex;
+  overflow-x: auto;
   gap: 12px;
+  padding-bottom: 4px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.performance-scroll-container::-webkit-scrollbar {
+  display: none;
 }
 
 .perf-card {
+  min-width: 140px;
+  flex: 0 0 auto;
   background: var(--bg-card, #fff);
   border-radius: 12px;
   padding: 16px;
@@ -267,6 +343,83 @@ const handleStakingEarnings = () => {
   flex-direction: column;
   gap: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Team Earnings Section */
+.team-earnings-section {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tab-item {
+  padding: 8px 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.1); 
+  color: var(--text-color-secondary, #999);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+:global(.theme-light) .tab-item {
+  background: #E0E0E0;
+  color: #666;
+}
+
+.tab-item.active {
+  background: var(--text-color-primary, #fff);
+  color: var(--bg-page-h5, #000);
+  font-weight: 600;
+}
+
+.team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #10B981;
+  padding: 2px;
+  object-fit: cover;
+}
+
+.address {
+  font-size: 16px;
+  color: var(--text-color-primary, #fff);
+  font-weight: 500;
+}
+
+.item-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #10B981;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: 'DIN', sans-serif;
 }
 
 .perf-label {

@@ -739,14 +739,21 @@ export default {
     "title": "私の収益",
     "desc": "ノードとステーキングの収益を一目で確認でき、資産の成長をいつでも把握できます。",
     "nodeEarnings": "ノード収益",
-    "nodeEarningsDesc": "ノード購入による累積収益",
+    "nodeEarningsDesc": "マザーコイン取引手数料収益",
     "stakingEarnings": "ステーキング収益",
-    "stakingEarningsDesc": "ステーキング期間とルールに基づき決済",
-    "myPerformance": "私の実績",
+    "stakingEarningsDesc": "プラットフォームマザーコインのステーキング予想収益",
+    "flowEarnings": "フロー収益",
+    "flowEarningsDesc": "プラットフォーム取引フローの予想収益",
+    "subCoinEarnings": "サブコイン収益",
+    "subCoinEarningsDesc": "イベントオラクル収益",
+    "myPerformance": "私の実績概要",
     "performanceDesc": "実際の実績は最終決済結果に準じます",
     "teamPerformance": "チーム総実績",
     "directTeamPerformance": "直紹介チーム実績",
     "largeAreaPerformance": "大エリア実績",
-    "smallAreaPerformance": "小エリア実績"
+    "smallAreaPerformance": "小エリア実績",
+    "allDirectTeamPerformance": "全直推チーム実績",
+    "stakingDetails": "ステーキング詳細",
+    "teamPerformanceTab": "チーム実績"
   }
 }

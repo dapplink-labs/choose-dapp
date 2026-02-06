@@ -738,14 +738,21 @@ export default {
     "title": "我的收益",
     "desc": "节点与质押收益清晰展示，一目了然，随时掌握资产增长动态。",
     "nodeEarnings": "节点收益",
-    "nodeEarningsDesc": "节点购买产生的累计收益",
+    "nodeEarningsDesc": "母币交易手续费收益",
     "stakingEarnings": "质押收益",
-    "stakingEarningsDesc": "根据质押周期与规则按时结算",
-    "myPerformance": "我的业绩",
+    "stakingEarningsDesc": "预计平台母币质押收益",
+    "flowEarnings": "流水收益",
+    "flowEarningsDesc": "预计平台交易流水收益",
+    "subCoinEarnings": "子币收益",
+    "subCoinEarningsDesc": "事件预言机收益",
+    "myPerformance": "我的业绩总览",
     "performanceDesc": "实际业绩以最终结算结果为准",
     "teamPerformance": "团队总业绩",
-    "directTeamPerformance": "所有直推团队业绩",
+    "directTeamPerformance": "直推团队业绩",
     "largeAreaPerformance": "大区业绩",
-    "smallAreaPerformance": "小区业绩"
+    "smallAreaPerformance": "小区业绩",
+    "allDirectTeamPerformance": "所有直推团队业绩",
+    "stakingDetails": "质押详情",
+    "teamPerformanceTab": "团队业绩"
   }
 }

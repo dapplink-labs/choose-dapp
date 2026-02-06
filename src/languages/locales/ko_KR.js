@@ -739,14 +739,21 @@ export default {
     "title": "나의 수익",
     "desc": "노드 및 스테이킹 수익을 명확히 표시하여 자산 성장을 언제든 확인할 수 있습니다.",
     "nodeEarnings": "노드 수익",
-    "nodeEarningsDesc": "노드 구매 누적 수익",
+    "nodeEarningsDesc": "마더 코인 거래 수수료 수익",
     "stakingEarnings": "스테이킹 수익",
-    "stakingEarningsDesc": "스테이킹 주기 및 규칙에 따라 정산",
-    "myPerformance": "나의 실적",
+    "stakingEarningsDesc": "플랫폼 마더 코인 스테이킹 예상 수익",
+    "flowEarnings": "플로우 수익",
+    "flowEarningsDesc": "플랫폼 거래 플로우 예상 수익",
+    "subCoinEarnings": "서브 코인 수익",
+    "subCoinEarningsDesc": "이벤트 오라클 수익",
+    "myPerformance": "나의 실적 개요",
     "performanceDesc": "실제 실적은 최종 정산 결과에 따릅니다",
     "teamPerformance": "팀 총 실적",
     "directTeamPerformance": "직추천 팀 실적",
     "largeAreaPerformance": "대구역 실적",
-    "smallAreaPerformance": "소구역 실적"
+    "smallAreaPerformance": "소구역 실적",
+    "allDirectTeamPerformance": "모든 직추천 팀 실적",
+    "stakingDetails": "스테이킹 상세",
+    "teamPerformanceTab": "팀 실적"
   }
 }
