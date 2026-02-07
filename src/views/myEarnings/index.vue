@@ -96,33 +96,41 @@
         </div>
 
         <div class="tabs">
-          <div 
-            class="tab-item" 
-            :class="{ active: activeTab === 'team' }"
-            @click="activeTab = 'team'"
-          >
+          <div class="tab-item" :class="{ active: activeTab === 'team' }" @click="activeTab = 'team'">
             {{ t('myEarnings.teamPerformanceTab') }}
           </div>
-          <div 
-            class="tab-item" 
-            :class="{ active: activeTab === 'staking' }"
-            @click="activeTab = 'staking'"
-          >
+          <div class="tab-item" :class="{ active: activeTab === 'staking' }" @click="activeTab = 'staking'">
             {{ t('myEarnings.stakingDetails') }}
           </div>
         </div>
 
-        <div class="team-list">
-           <div class="list-item" v-for="(item, index) in teamList" :key="index">
-              <div class="item-left">
-                <img :src="item.avatar" class="avatar" />
-                <span class="address">{{ item.address }}</span>
-              </div>
-              <div class="item-right">
-                <span class="plus">+</span>
-                <span class="amount">{{ item.amount }} {{ item.token }}</span>
-              </div>
-           </div>
+        <div class="team-list" v-if="activeTab === 'team'">
+          <div class="list-item" v-for="(item, index) in teamList" :key="index">
+            <div class="item-left">
+              <img :src="item.avatar" class="avatar" />
+              <span class="address">{{ item.address }}</span>
+            </div>
+            <div class="item-right">
+              <span class="plus">+</span>
+              <span class="amount">{{ item.amount }} {{ item.token }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="staking-list" v-if="activeTab === 'staking'">
+          <div class="staking-header">
+            <span>{{ t('myEarnings.stakingLevel') }}</span>
+            <span>{{ t('myEarnings.stakingCount') }}</span>
+          </div>
+          <div class="staking-item" v-for="(item, index) in stakingDetailsList" :key="index">
+            <div class="item-left">
+              <span class="node-name">{{ item.name }}</span>
+              <span class="node-level">{{ item.level }}</span>
+            </div>
+            <div class="item-right">
+              <span class="count">{{ item.count }}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -148,12 +156,21 @@ const { address } = useAccount()
 
 const activeTab = ref('team')
 const teamList = ref([
-  { address: '0xb574...4c7d', amount: '32,567', token: 'CHO', avatar: avatarImg },
-  { address: '0xb574...4c7d', amount: '32,567', token: 'CHO', avatar: avatarImg },
-  { address: '0xb574...4c7d', amount: '32,567', token: 'CHO', avatar: avatarImg },
-  { address: '0xb574...4c7d', amount: '32,567', token: 'CHO', avatar: avatarImg },
-  { address: '0xb574...4c7d', amount: '32,567', token: 'CHO', avatar: avatarImg },
-  { address: '0xb574...4c7d', amount: '32,567', token: 'CHO', avatar: avatarImg },
+  { address: '0xb574...4c7d', amount: '32,567', token: 'USDT', avatar: avatarImg },
+  { address: '0xb574...4c7d', amount: '32,567', token: 'USDT', avatar: avatarImg },
+  { address: '0xb574...4c7d', amount: '32,567', token: 'USDT', avatar: avatarImg },
+  { address: '0xb574...4c7d', amount: '32,567', token: 'USDT', avatar: avatarImg },
+  { address: '0xb574...4c7d', amount: '32,567', token: 'USDT', avatar: avatarImg },
+  { address: '0xb574...4c7d', amount: '32,567', token: 'USDT', avatar: avatarImg },
+])
+
+const stakingDetailsList = ref([
+  { name: '信息节点', level: 'T1', count: 18 },
+  { name: '数据节点', level: 'T2', count: 24 },
+  { name: '认证节点', level: 'T3', count: 5 },
+  { name: '共识节点', level: 'T4', count: 78 },
+  { name: '超级节点', level: 'T5', count: 9 },
+  { name: '创世节点', level: 'T6', count: 6 },
 ])
 
 
@@ -246,13 +263,13 @@ const handleStakingEarnings = () => {
 }
 
 .earning-card {
-  background: var(--bg-card, #fff);
-  border-radius: 16px;
-  padding: 20px;
+  background: #1D1D1D;
+  border-radius: 8px 8px 8px 8px;
+  border: 1px solid #2F2F2F;
+  padding: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   cursor: pointer;
   transition: transform 0.2s;
 
@@ -282,16 +299,17 @@ const handleStakingEarnings = () => {
   display: flex;
   align-items: center;
   gap: 8px;
+
+  .amount {
+    font-family: DIN, DIN;
+    font-weight: bold;
+    font-size: 20px;
+    color: #2FBC87;
+    line-height: 16px;
+  }
 }
 
-.amount {
-  font-size: 20px;
-  font-weight: 600;
-  color: #10B981;
-  /* Green color for positive value */
-  font-family: 'DIN', sans-serif;
-  /* Assuming a number font is used */
-}
+
 
 .arrow-icon {
   font-size: 16px;
@@ -305,28 +323,35 @@ const handleStakingEarnings = () => {
 }
 
 .section-header {
-  margin-bottom: 16px;
+  // margin-bottom: 16px;
 }
 
 .section-title {
   font-size: 20px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
   color: var(--text-color-primary, #000);
 }
 
 .section-desc {
+  font-family: DIN, DIN;
+  font-weight: 300;
   font-size: 12px;
-  color: var(--text-color-secondary, #666);
+  color: #909090;
+  line-height: 20px;
+  margin-bottom: 24px;
 }
 
 .performance-scroll-container {
   display: flex;
   overflow-x: auto;
-  gap: 12px;
-  padding-bottom: 4px;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
+  gap: 10px;
+
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
+
 }
 
 .performance-scroll-container::-webkit-scrollbar {
@@ -334,20 +359,23 @@ const handleStakingEarnings = () => {
 }
 
 .perf-card {
-  min-width: 140px;
+  min-width: 148px;
+  height: 96px;
   flex: 0 0 auto;
-  background: var(--bg-card, #fff);
-  border-radius: 12px;
-  padding: 16px;
+  background: #1D1D1D;
+  border-radius: 8px 8px 8px 8px;
+  border: 1px solid #2F2F2F;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  justify-content: center;
+  gap: 9px;
+
 }
 
 /* Team Earnings Section */
 .team-earnings-section {
-  margin-top: 32px;
+  margin-top: 56px;
   display: flex;
   flex-direction: column;
 }
@@ -355,13 +383,13 @@ const handleStakingEarnings = () => {
 .tabs {
   display: flex;
   gap: 12px;
-  margin-bottom: 20px;
+  margin: 24px 0;
 }
 
 .tab-item {
   padding: 8px 20px;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.1); 
+  background: rgba(255, 255, 255, 0.1);
   color: var(--text-color-secondary, #999);
   font-size: 14px;
   cursor: pointer;
@@ -401,37 +429,102 @@ const handleStakingEarnings = () => {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 2px solid #10B981;
+  border: 2px solid #BBFF2E;
   padding: 2px;
   object-fit: cover;
 }
 
 .address {
+  font-weight: 600;
   font-size: 16px;
+  line-height: 20px;
   color: var(--text-color-primary, #fff);
-  font-weight: 500;
+
 }
 
 .item-right {
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #10B981;
+
+  .amount,
+  .plus {
+    font-family: PingFang SC, PingFang SC;
+    font-weight: 500;
+    font-size: 14px;
+    color: #BBFF2E;
+    line-height: 20px;
+  }
+}
+
+.staking-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.staking-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0 12px 0;
+  color: var(--text-color-secondary, #666);
+  font-size: 12px;
+}
+
+.staking-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+:global(.theme-light) .staking-item {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.node-name {
+  font-size: 14px;
+  color: var(--text-color-primary, #fff);
+}
+
+.node-level {
+  background: rgba(217, 119, 6, 0.15);
+ font-family: Chakra Petch, Chakra Petch;
+font-weight: bold;
+font-size: 13px;
+color: #EAAB4A;
+line-height: 16px;
+  padding:0 8px;
+  border-radius: 4px;
+}
+
+:global(.theme-dark) .node-level {
+  background: #33281E;
+  color: #E6A23C;
+}
+
+.staking-item .count {
+  font-family: PingFang SC, PingFang SC;
+  font-weight: 500;
   font-size: 16px;
-  font-weight: 600;
-  font-family: 'DIN', sans-serif;
+  color: #BBFF2E;
+  line-height: 20px;
 }
 
 .perf-label {
-  font-size: 14px;
-  color: var(--text-color-secondary, #666);
+  font-family: PingFang SC, PingFang SC;
+  font-weight: 400;
+  font-size: 12px;
+  color: #FFFFFF;
+  line-height: 16px;
 }
 
 .perf-value {
+  font-family: DIN, DIN;
+  font-weight: bold;
   font-size: 20px;
-  font-weight: 600;
-  color: #10B981;
-  font-family: 'DIN', sans-serif;
+  color: #2FBC87;
+  line-height: 16px;
   word-break: break-all;
 }
 

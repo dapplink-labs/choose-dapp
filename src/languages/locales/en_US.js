@@ -764,5 +764,7 @@ export default {
     allDirectTeamPerformance: "All Direct Team Performance",
     stakingDetails: "Staking Details",
     teamPerformanceTab: "Team Performance",
+    stakingLevel: "Staking Level",
+    stakingCount: "Staking Count",
   },
 };
