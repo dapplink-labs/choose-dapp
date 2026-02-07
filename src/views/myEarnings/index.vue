@@ -237,7 +237,7 @@ const handleStakingEarnings = () => {
   margin-top: 60px;
   /* Space for BackHeaderNav */
   margin-bottom: 24px;
-  color: #fff;
+  color: var(--text-color, #000);
   /* Always white on banner */
 }
 
@@ -263,9 +263,9 @@ const handleStakingEarnings = () => {
 }
 
 .earning-card {
-  background: #1D1D1D;
+  background: var(--bg-card, #1D1D1D);
   border-radius: 8px 8px 8px 8px;
-  border: 1px solid #2F2F2F;
+  border: 1px solid var(--border-color, #2F2F2F);
   padding: 10px;
   display: flex;
   justify-content: space-between;
@@ -287,8 +287,9 @@ const handleStakingEarnings = () => {
 .card-title {
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-color-primary, #000);
+  color: var(--text-color, #000);
 }
+
 
 .card-desc {
   font-size: 12px;
@@ -304,7 +305,7 @@ const handleStakingEarnings = () => {
     font-family: DIN, DIN;
     font-weight: bold;
     font-size: 20px;
-    color: #2FBC87;
+    color: var(--text-color-primary, #2FBC87);
     line-height: 16px;
   }
 }
@@ -330,7 +331,7 @@ const handleStakingEarnings = () => {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 5px;
-  color: var(--text-color-primary, #000);
+  color: var(--text-color, #000);
 }
 
 .section-desc {
@@ -362,9 +363,9 @@ const handleStakingEarnings = () => {
   min-width: 148px;
   height: 96px;
   flex: 0 0 auto;
-  background: #1D1D1D;
+  background: var(--bg-card, #1D1D1D);
   border-radius: 8px 8px 8px 8px;
-  border: 1px solid #2F2F2F;
+  border: 1px solid var(--border-color, #2F2F2F);
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -396,13 +397,10 @@ const handleStakingEarnings = () => {
   transition: all 0.3s;
 }
 
-:global(.theme-light) .tab-item {
-  background: #E0E0E0;
-  color: #666;
-}
+
 
 .tab-item.active {
-  background: var(--text-color-primary, #fff);
+  background: var(--text-color, #1D1D1D);
   color: var(--bg-page-h5, #000);
   font-weight: 600;
 }
@@ -429,7 +427,7 @@ const handleStakingEarnings = () => {
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 2px solid #BBFF2E;
+  border: 2px solid var(--text-color-y, #2FBC87);
   padding: 2px;
   object-fit: cover;
 }
@@ -438,7 +436,7 @@ const handleStakingEarnings = () => {
   font-weight: 600;
   font-size: 16px;
   line-height: 20px;
-  color: var(--text-color-primary, #fff);
+  color: var(--text-color, #000);
 
 }
 
@@ -452,7 +450,7 @@ const handleStakingEarnings = () => {
     font-family: PingFang SC, PingFang SC;
     font-weight: 500;
     font-size: 14px;
-    color: #BBFF2E;
+    color: var(--text-color-y, #2FBC87);;
     line-height: 20px;
   }
 }
@@ -475,26 +473,24 @@ const handleStakingEarnings = () => {
   justify-content: space-between;
   align-items: center;
   padding: 16px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-color, #2F2F2F);
 }
 
-:global(.theme-light) .staking-item {
-  border-bottom: 1px solid #f0f0f0;
-}
+
 
 .node-name {
   font-size: 14px;
-  color: var(--text-color-primary, #fff);
+  color: var(--text-color, #fff);
 }
 
 .node-level {
   background: rgba(217, 119, 6, 0.15);
- font-family: Chakra Petch, Chakra Petch;
-font-weight: bold;
-font-size: 13px;
-color: #EAAB4A;
-line-height: 16px;
-  padding:0 8px;
+  font-family: Chakra Petch, Chakra Petch;
+  font-weight: bold;
+  font-size: 13px;
+  color: #EAAB4A;
+  line-height: 16px;
+  padding: 0 8px;
   border-radius: 4px;
 }
 
@@ -507,7 +503,7 @@ line-height: 16px;
   font-family: PingFang SC, PingFang SC;
   font-weight: 500;
   font-size: 16px;
-  color: #BBFF2E;
+  color: var(--text-color-y, #2FBC87);
   line-height: 20px;
 }
 
@@ -515,7 +511,8 @@ line-height: 16px;
   font-family: PingFang SC, PingFang SC;
   font-weight: 400;
   font-size: 12px;
-  color: #FFFFFF;
+  color: var(--text-color, #000);
+  ;
   line-height: 16px;
 }
 
@@ -528,35 +525,5 @@ line-height: 16px;
   word-break: break-all;
 }
 
-/* Theme Adaptation */
-/* Dark Mode Variables - Assuming these are set globally or we define local overrides */
-:global(.theme-dark) .earnings-page {
-  --bg-page-h5: #000000;
-  --bg-card: #1A1A1A;
-  --text-color-primary: #FFFFFF;
-  --text-color-secondary: #999999;
-  --text-color: #FFFFFF;
-}
 
-:global(.theme-light) .earnings-page {
-  --bg-page-h5: #F5F7FA;
-  --bg-card: #FFFFFF;
-  --text-color-primary: #000000;
-  --text-color-secondary: #666666;
-  --text-color: #000000;
-}
-
-/* Fallback for when theme class is on body but we want local scoping logic */
-@media (prefers-color-scheme: dark) {
-  /* Only if no class is present, but usually class is controlled by JS */
-}
-
-/* Specific Dark Mode Styles if CSS Variables aren't enough */
-:global(.theme-dark) {
-
-  .earning-card,
-  .perf-card {
-    border: 1px solid #333;
-  }
-}
 </style>

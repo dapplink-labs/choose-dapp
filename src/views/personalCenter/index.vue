@@ -164,11 +164,11 @@ const copyWalletAddress = async () => {
 // 生态系统菜单配置
 const baseEcosystemItems = computed(() => [
   {
-    key: "computing-power-services",
-    label: t("userInfo.stakingPool"),
+    key: "my-earnings",
+    label: t("userInfo.myEarnings"),
     icon: getIcon("1"),
     iconDark: getIcon("1Dark"),
-    path: "/computing-power-services",
+    path: "/my-earnings",
   },
   {
     key: "LPVault",
@@ -501,8 +501,8 @@ const handleClose = () => {
 
 // 允许访问的路径列表（除了这些路径外，其他都显示"待开放"）
 const allowedPaths = [
-  // "/my-earnings", // 我的收益
-  "/computing-power-services", // 节点购买
+  "/my-earnings", // 我的收益
+  // "/computing-power-services", // 节点购买
   "/LPVault", // LPVault
   // '/dashboard', // 链上数据
   // '/asset-management', // 链上资产
