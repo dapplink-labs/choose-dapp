@@ -95,7 +95,11 @@
                   ? 4 + '%'
                   : currentNodeStakingInfo?.progressPercent + '%',
             }"></div>
-            <div class="progress-indicator">
+            <div class="progress-indicator" :style="{
+              left:
+                currentNodeStakingInfo?.progressPercent + '%',
+            }"
+              :class="{ 'progress-indicator-left': (currentNodeStakingInfo?.progressPercent || 0) < 4, 'progress-indicator-right': (currentNodeStakingInfo?.progressPercent || 0) >= 96 }">
               {{ $t("myIncome.remainingClaimable") }}：
               <span class="indicator-text">{{
                 formatUsdtAmount(
@@ -107,10 +111,16 @@
         </div>
         <div class="text">
           <span>
-            0%
+            {{ formatUsdtAmount(
+              parseInt(currentNodeStakingInfo?.total_reward_usdt)
+            )
+            }} USDT
           </span>
           <span>
-            100%
+            {{ formatUsdtAmount(
+              parseInt(currentNodeStakingInfo?.forecast_income)
+            )
+            }} USDT
           </span>
         </div>
       </div>
@@ -817,7 +827,9 @@ watch(activeTab, () => {
       .progress-indicator {
         position: absolute;
         top: -25px;
-        left: 40%;
+        width: max-content;
+
+        // left: 40%;
         padding: 2px 8px 7px;
         background: url("@/assets/icon/process-price-bg.png") no-repeat;
         background-size: 100% 100%;
@@ -837,6 +849,16 @@ watch(activeTab, () => {
           color: #BBFF2E;
           // line-height: 20px;
         }
+      }
+
+      .progress-indicator-left {
+        background: url("@/assets/icon/process-price-bg-left.png") no-repeat !important;
+        background-size: 100% 100% !important;
+      }
+
+      .progress-indicator-right {
+        background: url("@/assets/icon/process-price-bg-right.png") no-repeat !important;
+        background-size: 100% 100% !important;
       }
 
       .text {
