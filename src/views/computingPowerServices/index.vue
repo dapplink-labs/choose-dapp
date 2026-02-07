@@ -14,7 +14,7 @@
         </p>
 
         <!-- 激活提示模块 - 跑马灯 -->
-        <ActivationMarquee :type="2" />
+        <!-- <ActivationMarquee :type="2" /> -->
 
         <!-- 购买节点标题区域 -->
         <div class="node-header">

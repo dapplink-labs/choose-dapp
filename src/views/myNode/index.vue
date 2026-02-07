@@ -24,7 +24,7 @@
                 </div>
             </div>
 
-            <ActivationMarquee :type="3" />
+            <!-- <ActivationMarquee :type="3" /> -->
 
             <div class="pending-income-header">
                 <h3 class="pending-title">

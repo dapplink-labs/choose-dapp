@@ -82,7 +82,7 @@
       </div>
 
       <!-- 赚取收益提示模块：使用通用跑马灯组件（type=3 展示收益样式） -->
-      <ActivationMarquee :type="4" />
+      <!-- <ActivationMarquee :type="4" /> -->
 
       <div class="pending-income-header">
         <h3 class="pending-title">{{ $t("myIncome.pendingIncome") }}</h3>
