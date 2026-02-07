@@ -23,7 +23,7 @@
         <div class="intro-time">
           <span class="time-text">{{ $t("myIncome.myLevel") }}</span>
           <span class="intro-level">
-            S1
+            {{ user_s_level || "S0" }}
           </span>
           <svg class="time-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12">
             <path
@@ -112,18 +112,6 @@
           <span>
             100%
           </span>
-          <!-- <span>{{
-            formatUsdtAmount(
-              parseInt(currentNodeStakingInfo?.total_reward_usdt),
-            )
-          }}
-            USDT</span>
-          <span>{{
-            formatUsdtAmount(
-              parseInt(currentNodeStakingInfo?.forecast_income),
-            )
-          }}
-            USDT</span> -->
         </div>
       </div>
 
@@ -344,6 +332,10 @@ const inviteList = ref([]);
 const teamNetworkList = ref([]);
 // 直推网络列表
 const directNetworkList = ref([]);
+// 用户等级
+const user_s_level = ref(0);
+
+
 
 // 获取邀请列表：直推为 type=1，团队为 type=2
 const getMyTeamInfoList = async () => {
@@ -354,6 +346,7 @@ const getMyTeamInfoList = async () => {
     node_type: 1,
   });
   const data = res?.data?.data;
+  user_s_level.value = data.user_s_level;
   teamNetworkList.value = data.team_network_list;
   directNetworkList.value = data.direct_network_list;
   effectiveCount.value =
