@@ -560,6 +560,8 @@ export default {
   },
   myIncome: {
     myIncomeCMT: "My Profit (CHO)",
+    myLevel: "My Level",
+    remainingClaimable: "Remaining Claimable",
     communityIncomeUSDT: "Community Performance (USDT)",
     computingPowerIncomeCMT: "Direct Referral Profit (CHO)",
     networkIncomeCMT: "Team Profit (CHO)",
