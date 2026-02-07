@@ -526,7 +526,7 @@ export default {
     },
     choIncome: "CHO收益",
     subCoinIncome: "子币收益",
-    projectedReturns: "我的预测收益",
+    projectedReturns: "我的预测金额",
     earnPromptShort: "赚取收益",
     pendingIncome: "待领取收益",
     nodeIncome: "节点收益",

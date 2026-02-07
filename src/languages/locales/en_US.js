@@ -531,7 +531,7 @@ export default {
     },
     choIncome: "CHO profit",
     subCoinIncome: "Sub-coin profit",
-    projectedReturns: "Personal predicted returns",
+    projectedReturns: "My predicted amount",
     earnPromptShort: "Earned",
     pendingIncome: "Pending profit",
     nodeIncome: "Node Profit",

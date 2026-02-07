@@ -533,7 +533,7 @@ export default {
     },
     choIncome: "CHO収益",
     subCoinIncome: "サブコイン収益",
-    projectedReturns: "個人の予測収益",
+    projectedReturns: "私の予想額",
     earnPromptShort: "収益を獲得",
     pendingIncome: "発行済み報酬",
     nodeIncome: "ノード収益",
