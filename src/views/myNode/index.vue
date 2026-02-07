@@ -13,14 +13,15 @@
             <div class="box">
                 <div class="item">
                     <b>{{ $t('myNode.choIncome') }}</b>
-                    <p> {{ formatAmount(choIncome) }}≈{{ formatUsdtAmount(choIncome * cho2usdt_rate) }}<span
-                            class="currey">USDT</span></p>
+                    <p> {{ formatAmount(choIncome) }}</p>
+                    <span class="currey">≈{{ formatUsdtAmount(choIncome * cho2usdt_rate) }} USDT</span>
                 </div>
                 <div class="item">
                     <b>{{ $t('myNode.projectedReturns') }}</b>
-                    <p> {{ formatAmount(projectedReturns) }}≈{{ formatUsdtAmount(projectedReturns * cho2usdt_rate)
-                        }}<span class="currey">USDT</span>
+                    <p> {{ formatAmount(projectedReturns) }}
                     </p>
+                    <span class="currey">≈{{ formatUsdtAmount(projectedReturns * cho2usdt_rate)
+                        }} USDT</span>
                 </div>
             </div>
 
@@ -534,10 +535,12 @@ onMounted(async () => {
                     color: var(--text-color, #1a1a1a);
                     transition: color 0.3s ease;
 
-                    .currey {
-                        font-size: 12px;
-                        color: var(--text-color-secondary, #999);
-                    }
+
+                }
+
+                .currey {
+                    font-size: 12px;
+                    color: var(--text-color-secondary, #999);
                 }
             }
         }
