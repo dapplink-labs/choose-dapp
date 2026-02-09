@@ -1,5 +1,6 @@
 <template>
-  <div class="earnings-page">
+  <div class="earnings-page" v-loading="isLoading" :element-loading-text="t('common.loading') || 'Loading...'"
+    element-loading-background="rgba(0, 0, 0, 0.8)">
     <div class="page-bg"></div>
 
     <div class="content-wrapper">
@@ -167,6 +168,8 @@ const { locale, t } = useI18n();
 const router = useRouter();
 const { address } = useAccount()
 
+const isLoading = ref(false)
+
 const activeTab = ref('team')
 
 // API Data
@@ -188,6 +191,7 @@ const stakingDetailsList = ref([])
 
 const fetchMyIncomeData = async () => {
   if (!address.value) return
+  isLoading.value = true
   try {
     const res = await getMyIncome({ address: address.value })
     const response = res.data || {}
@@ -218,6 +222,10 @@ const fetchMyIncomeData = async () => {
     }
   } catch (error) {
     console.error('Failed to fetch my income:', error)
+  } finally {
+    setTimeout(() => {
+      isLoading.value = false
+    }, 500)
   }
 }
 
