@@ -154,7 +154,7 @@ import { ref } from 'vue'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import { ArrowRightBold } from '@element-plus/icons-vue'
 import { useAccount, useChainId } from '@wagmi/vue'
-import avatarImg from '@/assets/icon/avatar.png'
+import avatarImg from '@/assets/icon/LP1.png'
 import emptyImg from '@/assets/images/empty.png'
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
@@ -193,14 +193,14 @@ const fetchMyIncomeData = async () => {
     const response = res.data || {}
     if (response && response.success) {
       const data = response.data
-      myIncomeData.value =  response.data
+      myIncomeData.value = response.data
 
       // Update lists
       teamList.value = data.direct_performance_list.map(item => ({
         address: formatAddress(item.address),
         amount: formatUsdtAmount(item.direct_performance),
         token: 'USDT', // Assuming USDT based on context
-        avatar: avatarImg
+        avatar: item.avatar || avatarImg
       }))
 
       stakingDetailsList.value = data.staking_detail_list.map(item => {
