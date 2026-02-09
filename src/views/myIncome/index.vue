@@ -525,8 +525,8 @@ const fetchNodeStakingInfo = async () => {
   currentNodeStakingInfo.value = data;
   // 返回两个字段 已发放奖励  总奖励  计算百分比
   currentNodeStakingInfo.value.progressPercent =
-    (currentNodeStakingInfo.value.total_reward_usdt /
-      currentNodeStakingInfo.value.forecast_income) *
+    (1 - (currentNodeStakingInfo.value.total_reward_usdt /
+      currentNodeStakingInfo.value.forecast_income)) *
     100;
   // currentNodeStakingInfo.forecast_income 总奖励
   // currentNodeStakingInfo.total_reward_usdt 已发放奖励USDT
