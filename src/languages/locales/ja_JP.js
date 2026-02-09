@@ -775,5 +775,9 @@ export default {
     teamPerformanceTab: "直推実績",
     stakingLevel: "ステーキングレベル",
     stakingCount: "ステーキング数",
+    directDailyIncome: "毎日の紹介収益(USDT)",
+    teamDailyIncome: "チーム日収益(USDT)",
+    directTotalIncome: "直推総収益(USDT)",
+    teamTotalIncome: "チーム総収益(USDT)",
   },
 };

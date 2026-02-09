@@ -114,13 +114,34 @@
         <div class="team-list" v-if="activeTab === 'team'">
           <template v-if="teamList.length > 0">
             <div class="list-item" v-for="(item, index) in teamList" :key="index">
-              <div class="item-left">
+              <div class="item-header">
                 <img :src="item.avatar" class="avatar" />
                 <span class="address">{{ item.address }}</span>
+                <div class="badges">
+                  <span class="badge level-badge" v-if="item.user_level">
+                    <img src="@/assets/icon/level-bg.png" class="badge-icon" v-if="false" />
+                    {{ item.user_level }}
+                  </span>
+                  <span class="badge node-badge" v-if="item.node_level">{{ item.node_level }}</span>
+                </div>
               </div>
-              <div class="item-right">
-                <span class="plus">+</span>
-                <span class="amount">{{ item.amount }} {{ item.token }}</span>
+              <div class="item-stats">
+                <div class="stat-col">
+                  <div class="stat-label">{{ t('myEarnings.directDailyIncome') }}</div>
+                  <div class="stat-value green">{{ item.direct_daily_income }}</div>
+                </div>
+                <div class="stat-col right-align">
+                  <div class="stat-label">{{ t('myEarnings.teamDailyIncome') }}</div>
+                  <div class="stat-value green">{{ item.team_daily_income }}</div>
+                </div>
+                <div class="stat-col">
+                  <div class="stat-label">{{ t('myEarnings.directTotalIncome') }}</div>
+                  <div class="stat-value green">{{ item.direct_total_income }}</div>
+                </div>
+                <div class="stat-col right-align">
+                  <div class="stat-label">{{ t('myEarnings.teamTotalIncome') }}</div>
+                  <div class="stat-value green">{{ item.team_total_income }}</div>
+                </div>
               </div>
             </div>
           </template>
@@ -209,9 +230,13 @@ const fetchMyIncomeData = async () => {
       // Update lists
       teamList.value = data.direct_performance_list.map(item => ({
         address: formatAddress(item.address),
-        amount: formatUsdtAmount(item.direct_performance),
-        token: 'USDT', // Assuming USDT based on context
-        avatar: item.avatar || avatarImg
+        avatar: item.avatar || avatarImg,
+        user_level: item.s_level || '',
+        node_level: item.t_level || '',
+        direct_daily_income: formatUsdtAmount(item.today_direct_income || 0),
+        team_daily_income: formatUsdtAmount(item.today_team_income || 0),
+        direct_total_income: formatUsdtAmount(item.total_direct_income || 0),
+        team_total_income: formatUsdtAmount(item.total_team_income || 0)
       }))
 
       stakingDetailsList.value = data.staking_detail_list.map(item => {
@@ -306,7 +331,7 @@ const handleStakingEarnings = () => {
 .earnings-page {
   width: 100%;
   position: relative;
-  background-color: var(--bg-page-h5, #FFFFFF);
+  background: var(--bg-page-h5, #ffffff);
   min-height: 100vh;
   color: var(--text-color, #000);
 }
@@ -320,6 +345,8 @@ const handleStakingEarnings = () => {
   background: url("@/assets/images/banner5.png") no-repeat top center;
   background-size: cover;
   z-index: 1;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 60%, transparent 100%);
 }
 
 .content-wrapper {
@@ -518,7 +545,7 @@ const handleStakingEarnings = () => {
 .tabs {
   display: flex;
   gap: 12px;
-  margin: 24px 0;
+  margin-bottom: 12px;
 }
 
 .tab-item {
@@ -547,11 +574,17 @@ const handleStakingEarnings = () => {
 
 .list-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-color, #2F2F2F);
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
-.item-left {
+.item-header {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -571,22 +604,74 @@ const handleStakingEarnings = () => {
   font-size: 16px;
   line-height: 20px;
   color: var(--text-color, #000);
-
 }
 
-.item-right {
+.badges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: 4px;
+}
+
+.badge {
   display: flex;
   align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.level-badge {
+  padding: 0px 11px 0px 29px;
+  height: 20px;
+  background: url("@/assets/icon/level-bg.png") no-repeat;
+  background-size: 100% 100%;
+  color: #BEF002;
+}
+
+.node-badge {
+  padding: 2px 8px;
+  background: rgba(234, 171, 74, 0.15);
+  color: #EAAB4A;
+}
+
+.item-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+  padding-left: 63px;
+  box-sizing: border-box;
+}
+
+
+
+.stat-col {
+  display: flex;
+  flex-direction: column;
   gap: 4px;
 
-  .amount,
-  .plus {
-    font-family: PingFang SC, PingFang SC;
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--text-color-y, #2FBC87);
-    ;
-    line-height: 20px;
+  &.right-align {
+    align-items: flex-end;
+    text-align: right;
+  }
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-color-secondary, #999);
+}
+
+.stat-value {
+  font-family: PingFang SC, PingFang SC;
+  font-weight: 500;
+  font-size: 14px;
+  color: #32B764;
+  line-height: 20px;
+
+  &.green {
+    color: #2FBC87;
   }
 }
 
