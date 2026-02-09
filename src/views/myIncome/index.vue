@@ -5,40 +5,30 @@
     <div class="banner1">
       <div class="intro">
         <div class="intro-header">
-          <h1 class="intro-title">{{ currentNodeStakingInfo?.name }}</h1>
-          <div class="intro-tag">{{ currentNodeStakingInfo?.node_level }}</div>
+          <h1 class="intro-title">
+            {{ currentNodeStakingInfo?.name || "--" }}
+          </h1>
+          <div class="intro-tag">
+            {{ currentNodeStakingInfo?.node_level || "--" }}
+          </div>
           <div class="intro-action-icon" @click="handleSwap">
-            <svg
-              t="1766805327912"
-              class="icon"
-              viewBox="0 0 1024 1024"
-              version="1.1"
-              xmlns="http://www.w3.org/2000/svg"
-              p-id="1596"
-              width="20"
-              height="20"
-            >
+            <svg t="1766805327912" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+              p-id="1596" width="20" height="20">
               <path
                 d="M618.688 149.312l0 213.376L64 362.688 64 448l896 0L618.688 149.312zM405.312 874.688l0-213.376L960 661.312 960 576 64 576 405.312 874.688z"
-                fill="currentColor"
-                p-id="1597"
-              ></path>
+                fill="currentColor" p-id="1597"></path>
             </svg>
           </div>
         </div>
         <div class="intro-time">
-          <svg
-            class="time-icon"
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            viewBox="0 0 12 12"
-          >
+          <span class="time-text">{{ $t("myIncome.myLevel") }}</span>
+          <span class="intro-level">
+            {{ user_s_level || "S0" }}
+          </span>
+          <svg class="time-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12">
             <path
               d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
-              transform="translate(-69.818 -69.818)"
-              fill="currentColor"
-            />
+              transform="translate(-69.818 -69.818)" fill="currentColor" />
           </svg>
           <span class="time-text">
             {{ $t("myIncome.purchaseTime") }}:
@@ -75,7 +65,9 @@
           <b>{{ $t("myIncome.forecastFlowBonusUSDT") }}</b>
           <p>
             +{{
-              formatUsdtAmount(parseInt(currentNodeStakingInfo?.predict_trading_reward))
+              formatUsdtAmount(
+                parseInt(currentNodeStakingInfo?.predict_trading_reward),
+              )
             }}
           </p>
         </div>
@@ -97,51 +89,39 @@
       <div class="processDiv">
         <div class="progress-bar-container">
           <div class="progress-bar">
-            <div
-              class="progress-fill"
-              :style="{
-                width:
-                  currentNodeStakingInfo?.progressPercent < 4
-                    ? 4 + '%'
-                    : currentNodeStakingInfo?.progressPercent + '%',
-              }"
-            ></div>
-            <div
-              class="progress-indicator"
-              :style="{
-                left:
-                  currentNodeStakingInfo?.progressPercent < 4
-                    ? 4 + '%'
-                    : currentNodeStakingInfo?.progressPercent + '%',
-              }"
-            >
-              <span class="indicator-text"
-                >{{
-                  formatProgressPercent(
-                    currentNodeStakingInfo?.progressPercent,
-                  )
-                }}%</span
-              >
+            <div class="progress-fill" :style="{
+              width:
+                (currentNodeStakingInfo?.progressPercent || 0) < 4
+                  ? 4 + '%'
+                  : currentNodeStakingInfo?.progressPercent + '%',
+            }"></div>
+            <div class="progress-indicator" :style="{
+              left:
+                currentNodeStakingInfo?.progressPercent + '%',
+            }"
+              :class="{ 'progress-indicator-left': (currentNodeStakingInfo?.progressPercent || 0) < 4, 'progress-indicator-right': (currentNodeStakingInfo?.progressPercent || 0) >= 96 }">
+              {{ $t("myIncome.remainingClaimable") }}：
+              <span class="indicator-text">{{
+                formatUsdtAmount(
+                  parseInt(currentNodeStakingInfo?.forecast_income) - parseInt(currentNodeStakingInfo?.total_reward_usdt),
+                )
+              }}U</span>
             </div>
           </div>
         </div>
         <div class="text">
-          <span
-            >{{
-              formatUsdtAmount(
-                parseInt(currentNodeStakingInfo?.total_reward_usdt),
-              )
-            }}
-            USDT</span
-          >
-          <span
-            >{{
-              formatUsdtAmount(
-                parseInt(currentNodeStakingInfo?.forecast_income),
-              )
-            }}
-            USDT</span
-          >
+          <span>
+            {{ formatUsdtAmount(
+              parseInt(currentNodeStakingInfo?.total_reward_usdt)
+            )
+            }} USDT
+          </span>
+          <span>
+            {{ formatUsdtAmount(
+              parseInt(currentNodeStakingInfo?.forecast_income)
+            )
+            }} USDT
+          </span>
         </div>
       </div>
 
@@ -167,10 +147,7 @@
           </div>
         </div>
         <!-- 创世节点 5% 收益：仅当当前节点为创世节点（例如 T6）时显示 -->
-        <div
-          class="earnings-item"
-          v-if="currentNodeStakingInfo?.node_level === 'T6'"
-        >
+        <div class="earnings-item" v-if="currentNodeStakingInfo?.node_level === 'T6'">
           <div class="earnings-label">
             {{ $t("myIncome.genesisNodeIncomeCHO") }}
           </div>
@@ -179,10 +156,7 @@
           </div>
         </div>
         <!-- 超级节点收益：仅当当前节点为超级节点（例如 T5）时显示 -->
-        <div
-          class="earnings-item"
-          v-if="currentNodeStakingInfo?.node_level === 'T5'"
-        >
+        <div class="earnings-item" v-if="currentNodeStakingInfo?.node_level === 'T5'">
           <div class="earnings-label">
             {{ $t("myIncome.superNodeIncomeCHO") }}
           </div>
@@ -203,17 +177,17 @@
             {{ $t("myIncome.flowBonusIncomeCHO") }}
           </div>
           <div class="earnings-value">
-            {{ formatUsdtAmount(parseInt(currentNodeStakingInfo?.dividend_reward)) }}
+            {{
+              formatUsdtAmount(
+                parseInt(currentNodeStakingInfo?.dividend_reward),
+              )
+            }}
           </div>
         </div>
       </div>
 
-      <button
-        class="claim-all-btn"
-        :class="{ 'claim-all-btn--disabled': isClaimDisabledByTime }"
-        :disabled="isClaimDisabledByTime"
-        @click="openCollectEarnings"
-      >
+      <button class="claim-all-btn" :class="{ 'claim-all-btn--disabled': isClaimDisabledByTime }"
+        :disabled="isClaimDisabledByTime" @click="openCollectEarnings">
         {{ claimButtonText }}
       </button>
     </div>
@@ -222,16 +196,10 @@
     <div class="my-team">
       <div class="team-content">
         <div class="team-tabs">
-          <div
-            :class="['tab-btn', { active: activeTab === 'direct' }]"
-            @click="activeTab = 'direct'"
-          >
+          <div :class="['tab-btn', { active: activeTab === 'direct' }]" @click="activeTab = 'direct'">
             {{ $t("myNode.directAddress") }}
           </div>
-          <div
-            :class="['tab-btn', { active: activeTab === 'team' }]"
-            @click="activeTab = 'team'"
-          >
+          <div :class="['tab-btn', { active: activeTab === 'team' }]" @click="activeTab = 'team'">
             {{ $t("myNode.teamAddress") }}
           </div>
         </div>
@@ -257,32 +225,16 @@
 
         <!-- 层级树状图占位 -->
         <div class="team-tree-placeholder">
-          <TeamTree
-            :type="activeTab === 'direct' ? 1 : 2"
-            :node_type="1"
-            :team_network_list="teamNetworkList"
-            :direct_network_list="directNetworkList"
-          />
+          <TeamTree :type="activeTab === 'direct' ? 1 : 2" :node_type="1" :team_network_list="teamNetworkList"
+            :direct_network_list="directNetworkList" />
         </div>
 
         <div class="team-list" v-if="currentList.length > 0">
-          <div
-            v-for="item in currentList"
-            :key="item.address"
-            class="team-item"
-          >
+          <div v-for="item in currentList" :key="item.address" class="team-item">
             <div class="team-avatar">
               <div class="avatar-content">
-                <img
-                 
-                                    :src="item.avatar || avatarImg"
-                                   
-                  alt="avatar"
-                                   
-                  class="avatar-img"
-               
-                                    @error="handleInviterAvatarError"
-                                />
+                <img :src="item.avatar || avatarImg" alt="avatar" class="avatar-img"
+                  @error="handleInviterAvatarError" />
               </div>
             </div>
             <div class="team-info-content">
@@ -300,17 +252,13 @@
                   </div>
                 </div>
                 <div class="team-right-info">
-                  <span class="team-reward"
-                    >+ {{ item.reward || "0" }} CHO</span
-                  >
+                  <span class="team-reward">+ {{ item.reward || "0" }} CHO</span>
                 </div>
               </div>
               <!-- 团队地址列表：显示Upline和时间 -->
               <div v-if="activeTab === 'team'" class="team-upline-row">
                 <div class="team-upline-left">
-                  <span class="team-upline-label"
-                    >{{ $t("myIncome.upline") }}:</span
-                  >
+                  <span class="team-upline-label">{{ $t("myIncome.upline") }}:</span>
                   <span class="team-upline-address">{{
                     item.upline || item.address
                   }}</span>
@@ -324,25 +272,14 @@
     </div>
 
     <!-- 我的节点弹窗 -->
-    <TabNode
-      v-model="showNodesModal"
-      :nodes="myNodes"
-      @select="handleNodeSelect"
-    />
+    <TabNode v-model="showNodesModal" :nodes="myNodes" @select="handleNodeSelect" />
 
     <!-- 领取收益弹窗 -->
-    <CollectEarnings
-      ref="collectEarningsRef"
-      @ReceiveSuccess="handleCollectSuccess"
-    />
+    <CollectEarnings ref="collectEarningsRef" @ReceiveSuccess="handleCollectSuccess" />
 
     <!-- 无节点提示弹窗 -->
     <transition name="fade">
-      <div
-        v-if="showNoNodeModal"
-        class="no-node-overlay"
-        @click.self="handleCloseNoNodeModal"
-      >
+      <div v-if="showNoNodeModal" class="no-node-overlay" @click.self="handleCloseNoNodeModal">
         <div class="no-node-card">
           <h2 class="card-title">
             {{ $t("myIncome.noStakingNode") }}
@@ -365,7 +302,7 @@ import { useThemeStore } from "@/stores/theme";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import avatarImg from "@/assets/icon/avatar.png";
-import lp1Img from '@/assets/icon/LP1.png'
+import lp1Img from "@/assets/icon/LP1.png";
 import avatarImg1 from "@/assets/icon/avatarImg1.png";
 import avatarImg2 from "@/assets/icon/avatarImg2.png";
 import avatarImg3 from "@/assets/icon/avatarImg3.png";
@@ -405,6 +342,10 @@ const inviteList = ref([]);
 const teamNetworkList = ref([]);
 // 直推网络列表
 const directNetworkList = ref([]);
+// 用户等级
+const user_s_level = ref(0);
+
+
 
 // 获取邀请列表：直推为 type=1，团队为 type=2
 const getMyTeamInfoList = async () => {
@@ -415,6 +356,7 @@ const getMyTeamInfoList = async () => {
     node_type: 1,
   });
   const data = res?.data?.data;
+  user_s_level.value = data.user_s_level;
   teamNetworkList.value = data.team_network_list;
   directNetworkList.value = data.direct_network_list;
   effectiveCount.value =
@@ -540,11 +482,11 @@ const getRandomAvatar = () => {
 
 // 邀请人列表头像加载失败兜底
 const handleInviterAvatarError = (e) => {
-    const imgEl = e?.target
-    if (!imgEl) return
-    imgEl.onerror = null
-    imgEl.src = lp1Img
-}
+  const imgEl = e?.target;
+  if (!imgEl) return;
+  imgEl.onerror = null;
+  imgEl.src = lp1Img;
+};
 const nodeTypeMap = {
   T1: { nodeTag: "T1", nodeNameKey: "purchaseNodeRecord.informationNode" },
   T2: { nodeTag: "T2", nodeNameKey: "myIncome.nodeNames.dataNode" },
@@ -588,7 +530,7 @@ const fetchNodeStakingInfo = async () => {
     100;
   // currentNodeStakingInfo.forecast_income 总奖励
   // currentNodeStakingInfo.total_reward_usdt 已发放奖励USDT
-  console.log(currentNodeStakingInfo.value);
+  // console.log("currentNodeStakingInfo.value",currentNodeStakingInfo.value);
 };
 
 // 获取节点质押记录
@@ -649,12 +591,13 @@ watch(activeTab, () => {
 <style scoped lang="scss">
 .theme-light {
   .progress-fill {
-    background-color: #2b6c18 !important;
+    background: linear-gradient(270deg, #BBFF2E 0%, #31D908 100%) !important;
+    // background-color: #2b6c18 !important;
   }
 
   .progress-indicator {
-    background-color: #2b6c18 !important;
-    border: 2px solid #ffffff !important;
+    // background-color: #2b6c18 !important;
+    // border: 2px solid #ffffff !important;
   }
 
   .claim-all-btn {
@@ -775,6 +718,23 @@ watch(activeTab, () => {
       align-items: center;
       gap: 8px;
 
+      .intro-level {
+        display: flex;
+        padding: 0px 11px 0px 29px;
+        height: 19px;
+        width: auto;
+        margin-right: 32px;
+        background: url("@/assets/icon/level-bg.png");
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        font-family: PingFang SC, PingFang SC;
+        font-weight: 500;
+        font-size: 14px;
+        color: #BEF002;
+        line-height: 20px;
+        text-align: center;
+      }
+
       .time-icon {
         width: 16px;
         height: 16px;
@@ -838,6 +798,7 @@ watch(activeTab, () => {
 
     .processDiv {
       margin-bottom: 24px;
+      margin-top: 30px;
 
       .progress-bar-container {
         position: relative;
@@ -858,30 +819,46 @@ watch(activeTab, () => {
         top: 0;
         left: 0;
         height: 100%;
-        background-color: var(--text-color-y, #bbff2e);
+        background: linear-gradient(270deg, #BBFF2E 0%, #31D908 100%) !important;
         border-radius: 10px;
         transition: width 0.3s ease;
       }
 
       .progress-indicator {
         position: absolute;
-        top: 50%;
-        left: 4%;
-        transform: translate(-50%, -50%);
-        height: 18px;
-        padding: 0 5px;
-        background-color: var(--text-color-y, #bbff2e);
-        border-radius: 999px;
+        top: -25px;
+        width: max-content;
+
+        // left: 40%;
+        padding: 2px 8px 7px;
+        background: url("@/assets/icon/process-price-bg.png") no-repeat;
+        background-size: 100% 100%;
         display: flex;
         align-items: center;
         justify-content: center;
         z-index: 10;
-        border: 2px solid #8ed300;
+        font-family: PingFang SC, PingFang SC;
+        font-weight: 500;
+        font-size: 10px;
+        color: #ffffff;
 
         .indicator-text {
-          font-size: 12px;
-          color: var(--bg-page-h5, #ffffff);
+          font-family: PingFang SC, PingFang SC;
+          font-weight: 500;
+          font-size: 10px;
+          color: #BBFF2E;
+          // line-height: 20px;
         }
+      }
+
+      .progress-indicator-left {
+        background: url("@/assets/icon/process-price-bg-left.png") no-repeat !important;
+        background-size: 100% 100% !important;
+      }
+
+      .progress-indicator-right {
+        background: url("@/assets/icon/process-price-bg-right.png") no-repeat !important;
+        background-size: 100% 100% !important;
       }
 
       .text {
@@ -1276,6 +1253,7 @@ watch(activeTab, () => {
 
 .theme-dark .myIncome {
   .cps-card-header {
+
     .back-btn,
     .record-btn,
     .open-btn {
@@ -1335,6 +1313,7 @@ watch(activeTab, () => {
 
         .team-upline-row {
           .team-upline-left {
+
             .team-upline-label,
             .team-upline-address {
               color: #999999 !important;

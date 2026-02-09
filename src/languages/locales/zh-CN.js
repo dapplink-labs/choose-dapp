@@ -526,7 +526,7 @@ export default {
     },
     choIncome: "CHO收益",
     subCoinIncome: "子币收益",
-    projectedReturns: "我的预测收益",
+    projectedReturns: "我的预测金额",
     earnPromptShort: "赚取收益",
     pendingIncome: "待领取收益",
     nodeIncome: "节点收益",
@@ -555,6 +555,8 @@ export default {
   },
   myIncome: {
     myIncomeCMT: "我的收益(CHO)",
+    myLevel: "我的等级",
+    remainingClaimable: "剩余可领",
     communityIncomeUSDT: "小区业绩(USDT)",
     computingPowerIncomeCMT: "直推收益(CHO)",
     networkIncomeCMT: "团队收益(CHO)",

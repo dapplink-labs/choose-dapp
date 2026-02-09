@@ -531,7 +531,7 @@ export default {
     },
     choIncome: "CHO profit",
     subCoinIncome: "Sub-coin profit",
-    projectedReturns: "Personal predicted returns",
+    projectedReturns: "My predicted amount",
     earnPromptShort: "Earned",
     pendingIncome: "Pending profit",
     nodeIncome: "Node Profit",
@@ -560,6 +560,8 @@ export default {
   },
   myIncome: {
     myIncomeCMT: "My Profit (CHO)",
+    myLevel: "My Level",
+    remainingClaimable: "Remaining Claimable",
     communityIncomeUSDT: "Community Performance (USDT)",
     computingPowerIncomeCMT: "Direct Referral Profit (CHO)",
     networkIncomeCMT: "Team Profit (CHO)",
