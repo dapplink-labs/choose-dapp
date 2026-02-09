@@ -16,19 +16,57 @@
                 <div class="item">
                     <b>{{ $t('myNode.choIncome') }}</b>
                     <p> {{ formatAmount(choIncome) }}</p>
-                    <span class="currey">≈{{ formatUsdtAmount(choIncome * cho2usdt_rate) }} USDT</span>
+                    <span class="currey">≈{{ formatAmount(choIncome * cho2usdt_rate) }} USDT</span>
                 </div>
                 <div class="item">
                     <b>{{ $t('myNode.projectedReturns') }}</b>
                     <p> {{ formatAmount(projectedReturns) }}
                     </p>
-                    <span class="currey">≈{{ formatUsdtAmount(projectedReturns * cho2usdt_rate)
+                    <span class="currey">≈{{ formatAmount(projectedReturns * cho2usdt_rate)
                     }} USDT</span>
                 </div>
             </div>
 
             <!-- <ActivationMarquee :type="3" /> -->
-
+            <div class="processDiv">
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" :style="{
+                            width:
+                                (progressPercent || 0) < 4
+                                    ? 4 + '%'
+                                    : progressPercent + '%',
+                        }"></div>
+                        <div class="progress-indicator" :style="{
+                            left:
+                                progressPercent + '%',
+                        }"
+                            :class="{ 'progress-indicator-left': (progressPercent || 0) < 4, 'progress-indicator-right': (progressPercent || 0) >= 96 }">
+                            {{ $t("myIncome.remainingClaimable") }}：
+                            <span class="indicator-text">{{
+                                formatUsdtAmount(
+                                    parseInt(forecast_income) -
+                                    parseInt(choIncome),
+                                )
+                            }}U</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text">
+                    <span>
+                        {{ formatUsdtAmount(
+                         parseInt(choIncome)
+                        )
+                        }} USDT
+                    </span>
+                    <span>
+                        {{ formatUsdtAmount(
+                            parseInt(forecast_income)
+                        )
+                        }} USDT
+                    </span>
+                </div>
+            </div>
             <div class="pending-income-header">
                 <h3 class="pending-title">
                     <span>{{ $t('myNode.pendingIncome') }}</span>
@@ -44,6 +82,7 @@
                     </el-icon>
                 </button>
             </div>
+
             <div class="pending-income-grid">
                 <div class="income-item">
                     <div class="income-label">{{ $t('myNode.nodeIncome') }}</div>
@@ -208,6 +247,9 @@ const isClaimDisabledByTime = computed(() => {
 const choIncome = ref('0')
 const subCoinIncome = ref('0') // 子币收益暂无数据，写死 0
 const cho2usdt_rate = ref(0) // CHO 到 USDT 的汇率
+const forecast_income = ref('0') // 预测收益
+const progressPercent = ref(0) // 进度百分比
+
 
 // 待领取收益数据
 const nodeIncome = ref(0)
@@ -336,8 +378,11 @@ const handleInviterAvatarError = (e) => {
 const formatAmount = (value) => formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true })
 // USDT 金额（18 精度）
 const formatUsdtAmount = (value) => {
-
-    return formatTokenAmount(value, { decimals: 6, maxFractionDigits: 4, useGrouping: true })
+    return formatTokenAmount(value, {
+        decimals: 18,
+        maxFractionDigits: 2,
+        useGrouping: true,
+    });
 };
 
 // 获取邀请列表：直推为 type=1，团队为 type=2
@@ -388,6 +433,14 @@ const goToClaimRecord = () => {
         }
     })
 }
+// 进度百分比：保留两位小数（截断，不四舍五入）
+const formatProgressPercent = (value) => {
+    const num = Number(value) || 0;
+    // 先放大 100 倍取整，再缩小，达到“截断两位小数”的效果
+    const truncated = Math.trunc(num * 100) / 100;
+    return String(truncated);
+};
+
 async function init() {
     await getNodeServiceProvidersInfo({
         id: String(route.query.id || ''),
@@ -406,6 +459,10 @@ async function init() {
         teamIncome.value = data.team_reward ?? '0'
         nodeType.value = Number(data.node_type ?? 0)
         purchaseTime.value = data.created ?? 0
+        forecast_income.value = data.forecast_income ?? '0' // 预测收益
+        progressPercent.value = formatProgressPercent((1 - (data.total_reward /
+            data.forecast_income)) *
+            100)
     }).catch(err => {
         console.error('获取节点收益详情失败：', err)
     })
@@ -534,7 +591,7 @@ onMounted(async () => {
             display: flex;
             justify-content: space-between;
             gap: 18px;
-            margin-bottom: 26px;
+            margin-bottom: 46px;
 
             .item {
                 flex: 1;
@@ -599,6 +656,83 @@ onMounted(async () => {
                     color: var(--text-color-y, #BBFF2E);
                     font-weight: 600;
                 }
+            }
+        }
+
+        .processDiv {
+            margin-bottom: 24px;
+            margin-top: 30px;
+
+            .progress-bar-container {
+                position: relative;
+                width: 100%;
+            }
+
+            .progress-bar {
+                position: relative;
+                width: 100%;
+                height: 12px;
+                background-color: #e0e0e0;
+                border-radius: 10px;
+                overflow: visible;
+            }
+
+            .progress-fill {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                background: linear-gradient(270deg, #BBFF2E 0%, #31D908 100%) !important;
+                border-radius: 10px;
+                transition: width 0.3s ease;
+            }
+
+            .progress-indicator {
+                position: absolute;
+                top: -25px;
+                width: max-content;
+
+                // left: 40%;
+                padding: 2px 8px 7px;
+                background: url("@/assets/icon/process-price-bg.png") no-repeat;
+                background-size: 100% 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10;
+                font-family: PingFang SC, PingFang SC;
+                font-weight: 500;
+                font-size: 10px;
+                color: #ffffff;
+
+                .indicator-text {
+                    font-family: PingFang SC, PingFang SC;
+                    font-weight: 500;
+                    font-size: 10px;
+                    color: #BBFF2E;
+                    // line-height: 20px;
+                }
+            }
+
+            .progress-indicator-left {
+                background: url("@/assets/icon/process-price-bg-left.png") no-repeat !important;
+                background-size: 100% 100% !important;
+            }
+
+            .progress-indicator-right {
+                background: url("@/assets/icon/process-price-bg-right.png") no-repeat !important;
+                background-size: 100% 100% !important;
+            }
+
+            .text {
+                margin-top: 8px;
+                display: flex;
+                justify-content: space-between;
+                align-content: center;
+                font-weight: 600;
+                font-size: 12px;
+                color: var(--text-dark-gray, #999999);
+                transition: color 0.3s ease;
             }
         }
 
