@@ -8,6 +8,12 @@
 
       <div class="page-header">
         <h1 class="page-title">{{ t('myEarnings.title') }}</h1>
+        <div class="page-header-level">
+          <span class="time-text">{{ $t("myIncome.myLevel") }}</span>
+          <span class="intro-level">
+            {{ myIncomeData?.user_level || "S0" }}
+          </span>
+        </div>
         <p class="page-desc">
           {{ t('myEarnings.desc') }}
         </p>
@@ -182,6 +188,7 @@ const myIncomeData = ref({
   team_total_performance: '0',
   major_region_performance: '0',
   minor_region_performance: '0',
+  user_level: '',
   direct_performance_list: [],
   staking_detail_list: []
 })
@@ -329,7 +336,42 @@ const handleStakingEarnings = () => {
   /* Space for BackHeaderNav */
   margin-bottom: 24px;
   color: var(--text-color, #000);
+
   /* Always white on banner */
+
+  .page-header-level {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+
+    .time-text {
+      font-family:
+        PingFang SC,
+        PingFang SC;
+      font-weight: 400;
+      font-size: 14px;
+      color: var(--text-color, #ffffff);
+      opacity: 0.8;
+      margin-right: 8px;
+    }
+
+    .intro-level {
+      display: flex;
+      padding: 0px 11px 0px 29px;
+      height: 19px;
+      width: auto;
+      margin-right: 32px;
+      background: url("@/assets/icon/level-bg.png");
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      font-family: PingFang SC, PingFang SC;
+      font-weight: 500;
+      font-size: 14px;
+      color: #BEF002;
+      line-height: 20px;
+      text-align: center;
+    }
+  }
 }
 
 .page-title {
