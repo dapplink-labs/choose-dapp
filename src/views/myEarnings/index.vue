@@ -15,13 +15,13 @@
       <!-- Section 1: Earnings Cards -->
       <div class="earnings-cards">
         <!-- Node Earnings -->
-        <div class="earning-card" @click="handleNodeEarnings">
+        <div class="earning-card" @click="handleNodeEarnings" v-if="myIncomeData.active_node_id">
           <div class="card-left">
             <div class="card-title">{{ t('myEarnings.nodeEarnings') }}</div>
             <div class="card-desc">{{ t('myEarnings.nodeEarningsDesc') }}</div>
           </div>
           <div class="card-right">
-            <span class="amount">{{ formatAmount(0) }}</span>
+            <span class="amount">{{ formatAmount(myIncomeData.node_income) }}</span>
             <el-icon class="arrow-icon">
               <ArrowRightBold />
             </el-icon>
@@ -35,7 +35,7 @@
             <div class="card-desc">{{ t('myEarnings.stakingEarningsDesc') }}</div>
           </div>
           <div class="card-right">
-            <span class="amount">{{ formatAmount(0) }}</span>
+            <span class="amount">{{ formatAmount(myIncomeData.staking_income) }}</span>
             <el-icon class="arrow-icon">
               <ArrowRightBold />
             </el-icon>
@@ -49,7 +49,7 @@
             <div class="card-desc">{{ t('myEarnings.flowEarningsDesc') }}</div>
           </div>
           <div class="card-right">
-            <span class="amount">{{ formatAmount(0) }}</span>
+            <span class="amount">{{ formatUsdtAmount(myIncomeData.forecast_income) }}</span>
           </div>
         </div>
 
@@ -60,7 +60,7 @@
             <div class="card-desc">{{ t('myEarnings.subCoinEarningsDesc') }}</div>
           </div>
           <div class="card-right">
-            <span class="amount">{{ formatAmount(0) }}</span>
+            <span class="amount">{{ formatAmount(myIncomeData.sub_coin_income) }}</span>
           </div>
         </div>
       </div>
@@ -75,15 +75,15 @@
         <div class="performance-scroll-container">
           <div class="perf-card">
             <div class="perf-label">{{ t('myEarnings.teamPerformance') }}</div>
-            <div class="perf-value">12,345,678</div>
+            <div class="perf-value">{{ formatUsdtAmount(myIncomeData.team_total_performance) }}</div>
           </div>
           <div class="perf-card">
             <div class="perf-label">{{ t('myEarnings.largeAreaPerformance') }}</div>
-            <div class="perf-value">12,345,678</div>
+            <div class="perf-value">{{ formatUsdtAmount(myIncomeData.major_region_performance) }}</div>
           </div>
           <div class="perf-card">
             <div class="perf-label">{{ t('myEarnings.smallAreaPerformance') }}</div>
-            <div class="perf-value">12,345,678</div>
+            <div class="perf-value">{{ formatUsdtAmount(myIncomeData.minor_region_performance) }}</div>
           </div>
         </div>
       </div>
@@ -105,31 +105,43 @@
         </div>
 
         <div class="team-list" v-if="activeTab === 'team'">
-          <div class="list-item" v-for="(item, index) in teamList" :key="index">
-            <div class="item-left">
-              <img :src="item.avatar" class="avatar" />
-              <span class="address">{{ item.address }}</span>
+          <template v-if="teamList.length > 0">
+            <div class="list-item" v-for="(item, index) in teamList" :key="index">
+              <div class="item-left">
+                <img :src="item.avatar" class="avatar" />
+                <span class="address">{{ item.address }}</span>
+              </div>
+              <div class="item-right">
+                <span class="plus">+</span>
+                <span class="amount">{{ item.amount }} {{ item.token }}</span>
+              </div>
             </div>
-            <div class="item-right">
-              <span class="plus">+</span>
-              <span class="amount">{{ item.amount }} {{ item.token }}</span>
-            </div>
+          </template>
+          <div v-else class="empty-state">
+            <img :src="emptyImg" alt="No Data" class="empty-img" />
+            <div class="empty-text">{{ t('common.noData') || '暂无记录' }}</div>
           </div>
         </div>
 
         <div class="staking-list" v-if="activeTab === 'staking'">
-          <div class="staking-header">
+          <div class="staking-header" v-if="stakingDetailsList.length > 0">
             <span>{{ t('myEarnings.stakingLevel') }}</span>
             <span>{{ t('myEarnings.stakingCount') }}</span>
           </div>
-          <div class="staking-item" v-for="(item, index) in stakingDetailsList" :key="index">
-            <div class="item-left">
-              <span class="node-name">{{ item.name }}</span>
-              <span class="node-level">{{ item.level }}</span>
+          <template v-if="stakingDetailsList.length > 0">
+            <div class="staking-item" v-for="(item, index) in stakingDetailsList" :key="index">
+              <div class="item-left">
+                <span class="node-name">{{ item.name }}</span>
+                <span class="node-level">{{ item.level }}</span>
+              </div>
+              <div class="item-right">
+                <span class="count">{{ item.count }}</span>
+              </div>
             </div>
-            <div class="item-right">
-              <span class="count">{{ item.count }}</span>
-            </div>
+          </template>
+          <div v-else class="empty-state">
+            <img :src="emptyImg" alt="No Data" class="empty-img" />
+            <div class="empty-text">{{ t('common.noData') }}</div>
           </div>
         </div>
       </div>
@@ -143,11 +155,12 @@ import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import { ArrowRightBold } from '@element-plus/icons-vue'
 import { useAccount, useChainId } from '@wagmi/vue'
 import avatarImg from '@/assets/icon/avatar.png'
+import emptyImg from '@/assets/images/empty.png'
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { formatChoAmount, formatTokenAmount } from '@/utils/format_amount'
 import {
-
+  getMyIncome
 } from "@/api/API";
 
 const { locale, t } = useI18n();
@@ -155,25 +168,95 @@ const router = useRouter();
 const { address } = useAccount()
 
 const activeTab = ref('team')
-const teamList = ref([
-  { address: '0xb574...4c7d', amount: '32,567', token: 'USDT', avatar: avatarImg },
-  { address: '0xb574...4c7d', amount: '32,567', token: 'USDT', avatar: avatarImg },
-  { address: '0xb574...4c7d', amount: '32,567', token: 'USDT', avatar: avatarImg },
-  { address: '0xb574...4c7d', amount: '32,567', token: 'USDT', avatar: avatarImg },
-  { address: '0xb574...4c7d', amount: '32,567', token: 'USDT', avatar: avatarImg },
-  { address: '0xb574...4c7d', amount: '32,567', token: 'USDT', avatar: avatarImg },
-])
 
-const stakingDetailsList = ref([
-  { name: '信息节点', level: 'T1', count: 18 },
-  { name: '数据节点', level: 'T2', count: 24 },
-  { name: '认证节点', level: 'T3', count: 5 },
-  { name: '共识节点', level: 'T4', count: 78 },
-  { name: '超级节点', level: 'T5', count: 9 },
-  { name: '创世节点', level: 'T6', count: 6 },
-])
+// API Data
+const myIncomeData = ref({
+  active_node_id: '',
+  forecast_income: '0',
+  node_income: '0',
+  staking_income: '0',
+  sub_coin_income: '0',
+  team_total_performance: '0',
+  major_region_performance: '0',
+  minor_region_performance: '0',
+  direct_performance_list: [],
+  staking_detail_list: []
+})
+
+const teamList = ref([])
+const stakingDetailsList = ref([])
+
+const fetchMyIncomeData = async () => {
+  if (!address.value) return
+  try {
+    const res = await getMyIncome({ address: address.value })
+    const response = res.data || {}
+    if (response && response.success) {
+      const data = response.data
+      myIncomeData.value =  response.data
+
+      // Update lists
+      teamList.value = data.direct_performance_list.map(item => ({
+        address: formatAddress(item.address),
+        amount: formatUsdtAmount(item.direct_performance),
+        token: 'USDT', // Assuming USDT based on context
+        avatar: avatarImg
+      }))
+
+      stakingDetailsList.value = data.staking_detail_list.map(item => {
+        // Map staking_level to name if possible, otherwise use level
+        const level = item.staking_level
+        let name = level
+        // Simple mapping based on T1-T6 if needed, or just display level
+        // If needed we can import nodeTypeMap logic or similar
+        return {
+          name: getNodeNameByLevel(level),
+          level: level,
+          count: item.count
+        }
+      })
+    }
+  } catch (error) {
+    console.error('Failed to fetch my income:', error)
+  }
+}
+
+// Helper to get node name (simplified version of what might be in other components)
+const getNodeNameByLevel = (level) => {
+  const map = {
+    'T1': t('myIncome.nodeNames.infoNode'),
+    'T2': t('myIncome.nodeNames.dataNode'),
+    'T3': t('myIncome.nodeNames.validationNode'),
+    'T4': t('myIncome.nodeNames.consensusNode'),
+    'T5': t('myIncome.superNode'), // Note: key might be slightly different in locales
+    'T6': t('myIncome.nodeNames.genesisNode')
+  }
+  return map[level] || level
+}
+
+// Watch for address changes
+import { watch, onMounted } from 'vue'
+
+watch(address, (newVal) => {
+  if (newVal) {
+    fetchMyIncomeData()
+  }
+})
+
+onMounted(() => {
+  if (address.value) {
+    fetchMyIncomeData()
+  }
+})
 
 
+
+
+const formatAddress = (addr) => {
+  if (!addr) return ''
+  if (addr.length <= 10) return addr
+  return `${addr.slice(0, 6)}...${addr.slice(-4)}`
+}
 
 // 格式化金额（CHO为6精度，需要先转换）
 const formatAmount = (value) => formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true })
@@ -187,7 +270,7 @@ const formatUsdtAmount = (value) => {
 };
 const handleNodeEarnings = () => {
   console.log('Navigate to Node Earnings')
-  const activeNode = ""
+  const activeNode = myIncomeData.value.active_node_id
   // 跳转到 myNode 页面，并传递已激活节点的 id
   router.push({
     path: "/myNode",
@@ -360,6 +443,7 @@ const handleStakingEarnings = () => {
 }
 
 .perf-card {
+  box-sizing: border-box;
   min-width: 148px;
   height: 96px;
   flex: 0 0 auto;
@@ -450,7 +534,8 @@ const handleStakingEarnings = () => {
     font-family: PingFang SC, PingFang SC;
     font-weight: 500;
     font-size: 14px;
-    color: var(--text-color-y, #2FBC87);;
+    color: var(--text-color-y, #2FBC87);
+    ;
     line-height: 20px;
   }
 }
@@ -525,5 +610,23 @@ const handleStakingEarnings = () => {
   word-break: break-all;
 }
 
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
 
+  .empty-img {
+    width: 96px;
+    height: 96px;
+    margin-bottom: 12px;
+    // opacity: 0.8;
+  }
+
+  .empty-text {
+    font-size: 14px;
+    color: var(--text-color, #fff);
+  }
+}
 </style>
