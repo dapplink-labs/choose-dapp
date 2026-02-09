@@ -95,11 +95,8 @@
                   ? 4 + '%'
                   : currentNodeStakingInfo?.progressPercent + '%',
             }"></div>
-            <div class="progress-indicator" :style="{
-              left:
-                currentNodeStakingInfo?.progressPercent + '%',
-            }"
-              :class="{ 'progress-indicator-left': (currentNodeStakingInfo?.progressPercent || 0) < 4, 'progress-indicator-right': (currentNodeStakingInfo?.progressPercent || 0) >= 96 }">
+            <div class="progress-indicator" :style="{ left: progressIndicatorLeft }"
+              :class="{ 'progress-indicator-left': (currentNodeStakingInfo?.progressPercent || 0) < 20, 'progress-indicator-right': (currentNodeStakingInfo?.progressPercent || 0) >= 90 }">
               {{ $t("myIncome.remainingClaimable") }}：
               <span class="indicator-text">{{
                 formatUsdtAmount(
@@ -458,6 +455,13 @@ const formatProgressPercent = (value) => {
   return String(truncated);
 };
 
+const progressIndicatorLeft = computed(() => {
+  const p = Number(currentNodeStakingInfo?.progressPercent) || 0;
+  if (p === 0) return `${p}%`;
+  if (p < 20) return `${p - 4}%`;
+  if (p >= 90) return `${p - 24}%`;
+  return `${p - 14}%`;
+});
 // 地址截取：前6位 + ... + 后4位
 const shortAddress = (addr) => {
   if (!addr) return "";

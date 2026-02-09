@@ -23,7 +23,7 @@
                     <p> {{ formatAmount(projectedReturns) }}
                     </p>
                     <span class="currey">≈{{ formatAmount(projectedReturns * cho2usdt_rate)
-                    }} USDT</span>
+                        }} USDT</span>
                 </div>
             </div>
 
@@ -37,16 +37,13 @@
                                     ? 4 + '%'
                                     : progressPercent + '%',
                         }"></div>
-                        <div class="progress-indicator" :style="{
-                            left:
-                                progressPercent + '%',
-                        }"
-                            :class="{ 'progress-indicator-left': (progressPercent || 0) < 4, 'progress-indicator-right': (progressPercent || 0) >= 96 }">
+                        <div class="progress-indicator" :style="{ left: progressIndicatorLeft }"
+                            :class="{ 'progress-indicator-left': (progressPercent || 0) < 20, 'progress-indicator-right': (progressPercent || 0) >= 90 }">
                             {{ $t("myIncome.remainingClaimable") }}：
                             <span class="indicator-text">{{
                                 formatUsdtAmount(
                                     parseInt(forecast_income) -
-                                    parseInt(choIncome),
+                                    parseInt(total_reward_usdt),
                                 )
                             }}U</span>
                         </div>
@@ -55,7 +52,7 @@
                 <div class="text">
                     <span>
                         {{ formatUsdtAmount(
-                         parseInt(choIncome)
+                            parseInt(total_reward_usdt)
                         )
                         }} USDT
                     </span>
@@ -249,6 +246,7 @@ const subCoinIncome = ref('0') // 子币收益暂无数据，写死 0
 const cho2usdt_rate = ref(0) // CHO 到 USDT 的汇率
 const forecast_income = ref('0') // 预测收益
 const progressPercent = ref(0) // 进度百分比
+const total_reward_usdt = ref('0') // 节点总收益（USDT）
 
 
 // 待领取收益数据
@@ -441,6 +439,14 @@ const formatProgressPercent = (value) => {
     return String(truncated);
 };
 
+const progressIndicatorLeft = computed(() => {
+    const p = Number(progressPercent.value) || 0;
+    if (p === 0) return `${p}%`;
+    if (p < 20) return `${p - 4}%`;
+    if (p >= 90) return `${p - 24}%`;
+    return `${p - 14}%`;
+});
+
 async function init() {
     await getNodeServiceProvidersInfo({
         id: String(route.query.id || ''),
@@ -460,7 +466,8 @@ async function init() {
         nodeType.value = Number(data.node_type ?? 0)
         purchaseTime.value = data.created ?? 0
         forecast_income.value = data.forecast_income ?? '0' // 预测收益
-        progressPercent.value = formatProgressPercent((1 - (data.total_reward /
+        total_reward_usdt.value = data.total_reward_usdt ?? '0' // 节点总收益（USDT）
+        progressPercent.value = formatProgressPercent((1 - (data.total_reward_usdt /
             data.forecast_income)) *
             100)
     }).catch(err => {
