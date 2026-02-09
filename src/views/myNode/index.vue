@@ -6,6 +6,8 @@
 
         <div class="banner1">
             <h1 class="page-title">{{ nodeType === 0 ? $t('myNode.distributedNode') : $t('myNode.clusterNode') }}</h1>
+            <p class="page-desc">{{ nodeType === 0 ? $t('myNode.distributedDesc') : $t('myNode.clusterDesc') }}</p>
+            <p class="time-text">{{ $t("myIncome.purchaseTime") }}: {{ formatDateTime(purchaseTime || 0) }}</p>
         </div>
         <div class="cps-bg"></div>
 
@@ -21,7 +23,7 @@
                     <p> {{ formatAmount(projectedReturns) }}
                     </p>
                     <span class="currey">≈{{ formatUsdtAmount(projectedReturns * cho2usdt_rate)
-                        }} USDT</span>
+                    }} USDT</span>
                 </div>
             </div>
 
@@ -216,6 +218,7 @@ const directReferralIncome = ref(0)
 const teamIncome = ref(0)
 const nodeType = ref(0)
 const projectedReturns = ref(0) // 个人预测收益
+const purchaseTime = ref(0) // 购买时间
 
 
 
@@ -402,6 +405,7 @@ async function init() {
         directReferralIncome.value = data.direct_reward ?? '0'
         teamIncome.value = data.team_reward ?? '0'
         nodeType.value = Number(data.node_type ?? 0)
+        purchaseTime.value = data.created ?? 0
     }).catch(err => {
         console.error('获取节点收益详情失败：', err)
     })
@@ -490,6 +494,24 @@ onMounted(async () => {
         height: auto;
         justify-content: space-between;
         padding-top: 60px; // 为 fixed 的 BackHeaderNav 预留空间
+        margin-bottom: 22px;
+
+        .time-text {
+            font-family:
+                PingFang SC,
+                PingFang SC;
+            font-weight: 400;
+            font-size: 14px;
+            color: var(--bg-opposite, #ffffff);
+            opacity: 0.8;
+        }
+
+        .page-desc {
+            font-size: 14px;
+            color: var(--bg-opposite, #ffffff);
+            line-height: 24px;
+            margin: 10px 0;
+        }
     }
 
     .page-title {
@@ -497,7 +519,7 @@ onMounted(async () => {
         font-weight: bold;
         font-size: 28px;
         color: var(--bg-opposite, #1a1a1a);
-        margin-bottom: 22px;
+
         transition: color 0.3s ease;
         z-index: 999;
     }

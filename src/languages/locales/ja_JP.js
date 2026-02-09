@@ -560,6 +560,10 @@ export default {
     directIneffectiveCount: "無効直接紹介人数",
     teamEffectiveCount: "有効チーム人数",
     teamIneffectiveCount: "無効チーム人数",
+    distributedDesc:
+      "ハイグレードな Web3 ノードサービスで、主要チェーンをサポートし、予測プラットフォームのコアインフラとして機能します。高頻度・高並列のリアルタイム投資、オンチェーンオラクルの価格フィード、大規模プールの即時精算を支えます。今すぐ友だちを招待して、より多くの報酬を一緒に獲得しましょう。",
+    clusterDesc:
+      "取引手数料 0.5% とネットワーク全体の取引手数料からの利益分配を受け取るには、少なくとも 100 個の T1 レベル以上の担保付きアカウントが必要です。",
   },
   myIncome: {
     myIncomeCMT: "私の収入 (CHO)",

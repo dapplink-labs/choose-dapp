@@ -552,6 +552,10 @@ export default {
     directIneffectiveCount: "无效直推人数",
     teamEffectiveCount: "有效团队人数",
     teamIneffectiveCount: "无效团队人数",
+    distributedDesc:
+      "需直推两个T1以上级别质押节点，才有全网手续费买卖收益0.5%CHO流水分红",
+    clusterDesc:
+      "需网体100个质押T1以上级别，才有全网手续费买卖收益0.5%CHO流水分红",
   },
   myIncome: {
     myIncomeCMT: "我的收益(CHO)",

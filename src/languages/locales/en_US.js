@@ -557,6 +557,10 @@ export default {
     directIneffectiveCount: "Ineffective Direct Referral Members",
     teamEffectiveCount: "Effective Team Members",
     teamIneffectiveCount: "Ineffective Team Members",
+    distributedDesc:
+      "A lightweight Web3 node service that supports major blockchains, ideal for startups and individual developers to join quickly. The prediction platform integrates lightweight nodes to provide stable on-chain data reads and transaction broadcasting for ecosystem dApps. Invite your friends now and earn more rewards together.",
+    clusterDesc:
+      "An advanced Web3 node service that supports major blockchains and serves as the core infrastructure of the prediction platform, powering high-concurrency real-time investing, on-chain oracle price feeds, and instant settlement of large prize pools. Invite your friends now and earn more rewards together.",
   },
   myIncome: {
     myIncomeCMT: "My Profit (CHO)",
