@@ -765,7 +765,7 @@ export default {
     smallAreaPerformance: "소구역 실적",
     allDirectTeamPerformance: "모든 직추천 팀 실적",
     stakingDetails: "스테이킹 상세",
-    teamPerformanceTab: "팀 실적",
+    teamPerformanceTab: "직추천 실적",
     stakingLevel: "후원 레벨",
     stakingCount: "서약자 수",
   },

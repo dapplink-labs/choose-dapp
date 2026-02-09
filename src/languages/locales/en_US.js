@@ -765,7 +765,7 @@ export default {
     smallAreaPerformance: "Small Area Performance",
     allDirectTeamPerformance: "All Direct Team Performance",
     stakingDetails: "Staking Details",
-    teamPerformanceTab: "Team Performance",
+    teamPerformanceTab: "Direct Team Performance",
     stakingLevel: "Staking Level",
     stakingCount: "Staking Count",
   },

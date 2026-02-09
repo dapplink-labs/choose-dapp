@@ -768,7 +768,7 @@ export default {
     smallAreaPerformance: "小エリア実績",
     allDirectTeamPerformance: "全直推チーム実績",
     stakingDetails: "ステーキング詳細",
-    teamPerformanceTab: "チーム実績",
+    teamPerformanceTab: "直推実績",
     stakingLevel: "ステーキングレベル",
     stakingCount: "ステーキング数",
   },

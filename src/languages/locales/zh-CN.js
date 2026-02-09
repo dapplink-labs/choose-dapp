@@ -758,7 +758,7 @@ export default {
     smallAreaPerformance: "小区业绩",
     allDirectTeamPerformance: "所有直推团队业绩",
     stakingDetails: "质押详情",
-    teamPerformanceTab: "团队业绩",
+    teamPerformanceTab: "直推业绩",
     stakingLevel: "质押等级",
     stakingCount: "质押人数",
   },
