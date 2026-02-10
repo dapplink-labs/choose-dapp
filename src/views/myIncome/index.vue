@@ -100,7 +100,7 @@
               {{ $t("myIncome.remainingClaimable") }}：
               <span class="indicator-text">{{
                 formatUsdtAmount(
-                  parseInt(currentNodeStakingInfo?.forecast_income) - parseInt(currentNodeStakingInfo?.total_reward_usdt),
+                  parseInt(currentNodeStakingInfo?.forecast_income) - parseInt(currentNodeStakingInfo?.produced_income),
                 )
               }}U</span>
             </div>
@@ -109,7 +109,7 @@
         <div class="text">
           <span>
             {{ formatUsdtAmount(
-              parseInt(currentNodeStakingInfo?.total_reward_usdt)
+              parseInt(currentNodeStakingInfo?.produced_income)
             )
             }} USDT
           </span>
@@ -459,7 +459,8 @@ const progressIndicatorLeft = computed(() => {
   const p = Number(currentNodeStakingInfo?.progressPercent) || 0;
   if (p === 0) return `${p}%`;
   if (p < 20) return `${p - 4}%`;
-  if (p >= 90) return `${p - 24}%`;
+  if (97 >= p && p >= 90) return `${p - 24}%`;
+  if (p > 97) return `${p - 26}%`;
   return `${p - 14}%`;
 });
 // 地址截取：前6位 + ... + 后4位
@@ -529,11 +530,11 @@ const fetchNodeStakingInfo = async () => {
   currentNodeStakingInfo.value = data;
   // 返回两个字段 已发放奖励  总奖励  计算百分比
   currentNodeStakingInfo.value.progressPercent =
-    (1 - (currentNodeStakingInfo.value.total_reward_usdt /
+    (1 - (currentNodeStakingInfo.value.produced_income /
       currentNodeStakingInfo.value.forecast_income)) *
     100;
   // currentNodeStakingInfo.forecast_income 总奖励
-  // currentNodeStakingInfo.total_reward_usdt 已发放奖励USDT
+  // currentNodeStakingInfo.produced_income 已发放奖励USDT
   // console.log("currentNodeStakingInfo.value",currentNodeStakingInfo.value);
 };
 

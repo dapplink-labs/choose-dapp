@@ -443,7 +443,8 @@ const progressIndicatorLeft = computed(() => {
     const p = Number(progressPercent.value) || 0;
     if (p === 0) return `${p}%`;
     if (p < 20) return `${p - 4}%`;
-    if (p >= 90) return `${p - 24}%`;
+    if (97 >= p && p >= 90) return `${p - 24}%`;
+    if (p > 97) return `${p - 26}%`;
     return `${p - 14}%`;
 });
 
@@ -466,9 +467,9 @@ async function init() {
         nodeType.value = Number(data.node_type ?? 0)
         purchaseTime.value = data.created ?? 0
         forecast_income.value = data.forecast_income ?? '0' // 预测收益
-        total_reward_usdt.value = data.total_reward_usdt ?? '0' // 节点总收益（USDT）
-        progressPercent.value = formatProgressPercent((1 - (data.total_reward_usdt /
-            data.forecast_income)) *
+        total_reward_usdt.value = data.produced_income ?? '0' // 节点总收益（USDT）
+        progressPercent.value = formatProgressPercent((1 - ((Number(data.produced_income) || 0) /
+            Number(data.forecast_income) || 0)) *
             100)
     }).catch(err => {
         console.error('获取节点收益详情失败：', err)
