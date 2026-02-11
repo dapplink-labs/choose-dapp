@@ -26,6 +26,7 @@
     "fullpage.js": "^4.0.37",
     "mitt": "^3.0.1",
     "pinia": "^3.0.3",
+    "qrcode": "^1.5.4",
     "swiper": "^11.2.8",
     "typescript": "^5.9.3",
     "viem": "latest",

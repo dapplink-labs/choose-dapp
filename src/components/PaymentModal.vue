@@ -76,6 +76,10 @@
                             </button>
                         </div>
                     </div>
+                    <!-- 市价单平均价格 -->
+                    <div v-if="orderType === 'market'" class="avg-price-row">
+                        <span class="avg-price-text">平均价格：{{ averagePrice }}¢</span>
+                    </div>
 
                     <!-- 5. 杠杆 -->
                     <div class="input-section">
@@ -127,6 +131,7 @@ const leverage = ref(2)
 
 const totalCost = computed(() => ((price.value * shares.value) / 100).toFixed(2))
 const potentialGain = computed(() => shares.value.toFixed(2))
+const averagePrice = computed(() => price.value)
 
 function adjustShares(val) {
     shares.value = Math.max(0, shares.value + val)
@@ -387,6 +392,17 @@ function handleConfirm() { console.log('Trade Confirmed') }
         border-radius: 6px;
         font-size: 12px;
         font-weight: bold;
+    }
+}
+
+.avg-price-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+    
+    .avg-price-text {
+        font-size: 12px;
+        color: #888;
     }
 }
 

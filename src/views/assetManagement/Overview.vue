@@ -217,13 +217,11 @@ const formatEarnings = (num) => {
 
 // 操作按钮处理
 const handleDeposit = () => {
-  console.log('充币')
-  // TODO: 实现充币逻辑
+  router.push('/deposit')
 }
 
 const handleWithdraw = () => {
-  console.log('提币')
-  // TODO: 实现提币逻辑
+  router.push('/withdraw')
 }
 
 const handleBill = () => {

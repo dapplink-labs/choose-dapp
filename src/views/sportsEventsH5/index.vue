@@ -31,17 +31,27 @@
         </div>
 
         <div class="main-body">
-            <!-- 2. NBA 标题与日期选择 -->
+            <!-- 2. 标题与日期选择 -->
             <div class="nba-title-row">
                 <div class="title-left">
-                    <div class="icon-circle blue">
+                    <!-- 世界杯/足球图标 -->
+                    <div v-if="activeCategory === 'worldcup' || activeCategory === 'football'"
+                        class="icon-circle orange">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20.001">
+                            <path
+                                d="M95.579,57.689l1.067-.667c-.4,0-.667-.133-1.067-.133H94.512Zm-7.863,6,2.8,1.067,4.531-3.067.133-3.067-2-1.467a10.317,10.317,0,0,0-6.262,4.267l.8,2.267Zm7.73-1.2-4.264,2.933,1.465,5.067,5.2.133,1.732-4.933-4.131-3.2Zm.533-3.867v3.067l4.261,3.2,2.932-.933.8-2.133a10.52,10.52,0,0,0-6-4.667l-2,1.467Zm-9.33,5.2-.4-1.2a7.71,7.71,0,0,0-.667,1.867Zm17.855.8-.133-.933-.267.667Zm-2.8,9.867h-1.333l-.4,1.2A5.074,5.074,0,0,0,101.707,74.489Zm1.732-9.467-2.8.8-1.865,5.2,1.733,2.533h2.264a9.436,9.436,0,0,0,2.532-6.4v-.667l-1.867-1.467ZM89.848,73.156l1.867-2.267-1.6-5.2-2.931-1.067-1.867,1.333v.8a10.387,10.387,0,0,0,2.133,6.534Zm-1.465.933a6.268,6.268,0,0,0,1.6,1.2l-.4-1.2Zm11.194-.133-1.6-2.267-5.6-.133-1.865,2.4.8,2.133a8.94,8.94,0,0,0,3.731.8,8.828,8.828,0,0,0,3.731-.667Z"
+                                transform="translate(-85.305 -56.889)" fill="currentColor" />
+                        </svg>
+                    </div>
+                    <!-- NBA/篮球图标 -->
+                    <div v-else class="icon-circle blue">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 19.999">
                             <path
                                 d="M180.016,170.921a7.381,7.381,0,0,1-1.391,6.813l2.216,2.216,6.582-6.582A9.957,9.957,0,0,0,180.016,170.921ZM190.81,181.67a9.975,9.975,0,0,0-2.45-7.368l-6.583,6.583,2.155,2.155A7.383,7.383,0,0,1,190.81,181.67ZM184.891,184l3.47,3.469A9.934,9.934,0,0,0,190.614,183,6.075,6.075,0,0,0,184.891,184Zm-1.936,6.66a9.9,9.9,0,0,0,4.471-2.254l-3.47-3.47a6.071,6.071,0,0,0-1,5.724Zm-6.226-12.95-3.407-3.407a9.932,9.932,0,0,0-2.246,4.434A6.07,6.07,0,0,0,176.729,177.709ZM183,183.977l-2.155-2.156-6.584,6.584a9.958,9.958,0,0,0,7.369,2.448A7.369,7.369,0,0,1,183,183.977Zm-12.122-3.918a9.966,9.966,0,0,0,2.447,7.41l6.584-6.583-2.218-2.217A7.376,7.376,0,0,1,170.875,180.059Zm7.817-8.938a9.956,9.956,0,0,0-4.434,2.245l3.408,3.408A6.066,6.066,0,0,0,178.692,171.122Z"
                                 transform="translate(-170.841 -170.886)" fill="currentColor" />
                         </svg>
                     </div>
-                    <span>NBA</span>
+                    <span>{{ currentCategoryTitle }}</span>
                 </div>
                 <div class="day-pill">
                     比赛日 {{ selectedMatchday }} <el-icon class="ml-1">
@@ -52,12 +62,14 @@
 
             <!-- 3. 类型切换 Tab -->
             <div class="type-tabs">
-                <button class="tab-btn active">比赛</button>
-                <button class="tab-btn">属性</button>
+                <button class="tab-btn" :class="{ active: activeTab === 'match' }"
+                    @click="activeTab = 'match'">比赛</button>
+                <button class="tab-btn" :class="{ active: activeTab === 'player' }" @click="activeTab = 'player'">{{
+                    activeCategory === 'worldcup' || activeCategory === 'football' ? '球员盘' : '属性' }}</button>
             </div>
 
-            <!-- 4. 赛事列表 -->
-            <div class="event-list">
+            <!-- 4. 赛事列表 - NBA/篮球 -->
+            <div v-if="activeCategory === 'nba' || activeCategory === 'basketball'" class="event-list">
                 <div v-for="(event, idx) in eventsList" :key="idx" class="event-wrapper">
                     <div v-if="event.date" class="date-label">{{ event.date }}</div>
 
@@ -96,29 +108,171 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 4. 赛事列表 - 世界杯/足球 比赛 -->
+            <div v-if="(activeCategory === 'worldcup' || activeCategory === 'football') && activeTab === 'match'"
+                class="event-list worldcup-list">
+                <div v-for="(event, idx) in worldcupEventsList" :key="idx" class="event-wrapper">
+                    <div v-if="event.date" class="date-label">{{ event.date }}</div>
+
+                    <div class="event-card worldcup-card">
+                        <div class="card-meta">
+                            <div class="meta-left">
+                                <span class="time-tag">{{ event.time }}</span>
+                                <span class="vol-text">{{ event.volume }} 交易量</span>
+                            </div>
+                            <button class="view-btn" type="button" @click.stop="handleGameView(event)">
+                                游戏视角 <span class="arrow">›</span>
+                            </button>
+                        </div>
+
+                        <div class="teams-box worldcup-teams">
+                            <div class="team-line">
+                                <img :src="event.team1.logo" class="logo-img" />
+                                <span class="short-name">{{ event.team1.shortName }}</span>
+                                <span class="full-name">{{ event.team1.name }}</span>
+                                <span class="record">{{ event.team1.record }}</span>
+                            </div>
+                            <div class="team-line">
+                                <img :src="event.team2.logo" class="logo-img" />
+                                <span class="short-name">{{ event.team2.shortName }}</span>
+                                <span class="full-name">{{ event.team2.name }}</span>
+                                <span class="record">{{ event.team2.record }}</span>
+                            </div>
+                        </div>
+
+                        <div class="bet-row three-btns">
+                            <button class="odds-btn btn-yellow" type="button" @click.stop="openPayment(event, 'team1')">
+                                {{ event.team1.shortName }} {{ event.team1.odds }} ¢
+                            </button>
+                            <button class="odds-btn btn-gray" type="button" @click.stop="openPayment(event, 'draw')">
+                                DET {{ event.drawOdds }} ¢
+                            </button>
+                            <button class="odds-btn btn-pink" type="button" @click.stop="openPayment(event, 'team2')">
+                                {{ event.team2.shortName }} {{ event.team2.odds }} ¢
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 球员盘列表 - 世界杯/足球 -->
+            <div v-if="(activeCategory === 'worldcup' || activeCategory === 'football') && activeTab === 'player'"
+                class="player-panel-list">
+                <div v-for="(item, idx) in playerPanelList" :key="idx" class="player-card">
+                    <div class="card-header">
+                        <img :src="item.avatar" class="card-avatar" />
+                        <div class="card-title">{{ item.title }}</div>
+                    </div>
+                    <div class="card-leverage">
+                        <div class="leverage-item">
+                            <span class="label">最大杠杆倍数:</span>
+                            <span class="value">{{ item.maxLeverage }}</span>
+                        </div>
+                        <div class="leverage-item">
+                            <span class="label">最大回报:</span>
+                            <span class="value">{{ item.maxReturn }}</span>
+                        </div>
+                    </div>
+                    <div class="card-options">
+                        <div v-for="(opt, optIdx) in item.options" :key="optIdx" class="option-row">
+                            <div class="option-info">
+                                <span class="option-name">{{ opt.name }}</span>
+                                <span class="option-percent">{{ opt.percent }}</span>
+                            </div>
+                            <div class="option-btns">
+                                <button class="opt-btn yes" @click="openPayment(item, 'yes')">Yes</button>
+                                <button class="opt-btn no" @click="openPayment(item, 'no')">No</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="footer-left">
+                            <span class="time-info">
+                                <svg class="time-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12"
+                                    height="12" viewBox="0 0 12 12">
+                                    <path
+                                        d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
+                                        transform="translate(-69.818 -69.818)" fill="currentColor" />
+                                </svg>
+                                {{ item.timeRemaining }}
+                            </span>
+                            <span class="participant-info">
+                                <el-icon class="user-icon">
+                                    <Avatar />
+                                </el-icon>
+                                {{ item.participantCount.toLocaleString() }}
+                            </span>
+                            <span class="voi-info">VOI：${{ item.amount }}</span>
+                        </div>
+                        <svg class="bookmark-icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="14"
+                            height="14">
+                            <path
+                                d="M389.461333 85.333333l253.354667 0.021334c5.397333 0.042667 10.602667 0.128 15.616 0.256l14.506667 0.490666 13.482666 0.789334c43.306667 3.072 71.104 10.965333 99.733334 26.282666a197.738667 197.738667 0 0 1 82.005333 82.005334c15.317333 28.629333 23.210667 56.426667 26.282667 99.733333l0.789333 13.482667 0.490667 14.506666 0.149333 7.658667 0.128 16.213333v501.525334a85.333333 85.333333 0 0 1-123.498667 76.330666L518.186667 797.44l-3.2-1.557333-2.965334-1.322667-2.986666 1.322667-257.514667 128.725333A85.333333 85.333333 0 0 1 128 848.298667l0.021333-509.781334c0.042667-5.397333 0.128-10.602667 0.256-15.616l0.490667-14.506666 0.789333-13.482667c3.072-43.306667 10.965333-71.104 26.282667-99.733333a197.738667 197.738667 0 0 1 82.005333-82.005334c28.629333-15.317333 56.426667-23.210667 99.733334-26.282666l13.482666-0.789334 14.506667-0.490666 7.658667-0.149334 16.213333-0.128z m252.16 85.354667H382.378667l-13.184 0.170667-6.122667 0.149333-11.413333 0.426667-10.325334 0.64c-4.906667 0.384-9.493333 0.832-13.76 1.365333l-8.149333 1.173333c-11.712 1.92-21.12 4.650667-29.866667 8.32l-5.76 2.602667c-1.92 0.917333-3.797333 1.877333-5.674666 2.88a112.426667 112.426667 0 0 0-47.018667 47.018667 145.664 145.664 0 0 0-2.88 5.674666l-2.602667 5.76c-3.669333 8.746667-6.4 18.154667-8.32 29.866667l-1.173333 8.149333c-0.533333 4.266667-0.981333 8.832-1.344 13.76l-0.64 10.325334a514.133333 514.133333 0 0 0-0.256 5.546666l-0.341333 11.989334-0.170667 13.184L213.333333 848.277333l256.469334-128.170666c10.965333-5.312 18.112-7.850667 26.88-9.536a80.213333 80.213333 0 0 1 30.634666 0c9.856 1.898667 17.664 4.885333 31.189334 11.648L810.666667 848.298667l-0.021334-508.586667-0.170666-13.226667a709.973333 709.973333 0 0 0-0.149334-6.101333l-0.426666-11.413333-0.64-10.325334c-0.384-4.906667-0.832-9.493333-1.365334-13.76l-1.173333-8.149333a129.984 129.984 0 0 0-8.32-29.866667l-2.602667-5.76a145.664 145.664 0 0 0-2.88-5.674666 112.426667 112.426667 0 0 0-47.018666-47.018667 145.664 145.664 0 0 0-5.674667-2.88l-5.76-2.602667c-8.746667-3.669333-18.154667-6.4-29.866667-8.32l-8.149333-1.173333c-4.266667-0.533333-8.832-0.981333-13.76-1.344l-10.325333-0.64a514.133333 514.133333 0 0 0-5.546667-0.256l-11.989333-0.341333L641.642667 170.666667zM576 298.666667a42.666667 42.666667 0 0 1 3.2 85.226666L576 384h-128a42.666667 42.666667 0 0 1-3.2-85.226667L448 298.666667h128z"
+                                fill="#909090" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- 购买弹窗 -->
     <PaymentModal v-model="showPayment" />
+
+    <!-- 联赛选择器 -->
+    <LeagueSelector v-model:visible="showLeagueSelector" :selected-league="selectedLeague"
+        @select="handleLeagueSelect" />
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown, Avatar } from '@element-plus/icons-vue'
 import tyIcon01 from '@/assets/icon/tyIcon01.png'
 import tyIcon02 from '@/assets/icon/tyIcon02.png'
 import NavBar2 from '@/components/navBar2.vue'
 import PaymentModal from '@/components/PaymentModal.vue'
+import LeagueSelector from './LeagueSelector.vue'
 
 const router = useRouter()
 const activeCategory = ref('nba')
 const selectedMatchday = ref(9)
+const activeTab = ref('match')
 
 const showPayment = ref(false)
 const selectedEvent = ref(null)
 const selectedSide = ref(null)
+
+// 联赛选择器状态
+const showLeagueSelector = ref(false)
+const selectedLeague = ref('')
+
+// 计算当前分类标题
+const currentCategoryTitle = computed(() => {
+    const categoryMap = {
+        'worldcup': '世界杯',
+        'nba': 'NBA',
+        'football': '足球',
+        'basketball': '篮球'
+    }
+    return categoryMap[activeCategory.value] || 'NBA'
+})
+
+const handleCategoryClick = (categoryKey) => {
+    // 足球和篮球不切换，只打开联赛选择器
+    if (categoryKey === 'football' || categoryKey === 'basketball') {
+        showLeagueSelector.value = true
+        return
+    }
+    activeCategory.value = categoryKey
+    activeTab.value = 'match' // 切换分类时重置tab
+}
+
+const handleLeagueSelect = (league) => {
+    selectedLeague.value = league.id
+    console.log('选择联赛:', league.name)
+}
 
 const handleGameView = (event) => {
     router.push('/sports-detail-h5')
@@ -169,6 +323,73 @@ const eventsList = ref([
         team2: { name: '湖人队', shortName: 'Cle', record: '8-6-5', logo: tyIcon02, odds: '69' }
     }
 ])
+
+// 世界杯赛事列表
+const worldcupEventsList = ref([
+    {
+        date: '周一,1月5日', time: '4:00 AM', volume: '$37,755,917', drawOdds: '32',
+        team1: { name: 'Leeds United FC', shortName: 'lee', record: '5-6-8', logo: tyIcon01, odds: '32' },
+        team2: { name: 'Man Utd', shortName: 'MUN', record: '8-6-5', logo: tyIcon02, odds: '32' }
+    },
+    {
+        date: '', time: '4:00 AM', volume: '$37,755,917', drawOdds: '32',
+        team1: { name: 'Leeds United FC', shortName: 'lee', record: '5-6-8', logo: tyIcon01, odds: '32' },
+        team2: { name: 'Man Utd', shortName: 'MUN', record: '8-6-5', logo: tyIcon02, odds: '32' }
+    },
+    {
+        date: '周一,1月6日', time: '6:00 AM', volume: '$25,500,000', drawOdds: '28',
+        team1: { name: 'Chelsea FC', shortName: 'CHE', record: '6-4-9', logo: tyIcon01, odds: '35' },
+        team2: { name: 'Arsenal', shortName: 'ARS', record: '7-5-7', logo: tyIcon02, odds: '37' }
+    },
+    {
+        date: '', time: '8:00 AM', volume: '$18,200,000', drawOdds: '30',
+        team1: { name: 'Liverpool FC', shortName: 'LIV', record: '8-3-8', logo: tyIcon01, odds: '40' },
+        team2: { name: 'Man City', shortName: 'MCI', record: '9-2-8', logo: tyIcon02, odds: '30' }
+    }
+])
+
+// 球员盘列表
+const playerPanelList = ref([
+    {
+        avatar: tyIcon01,
+        title: '2026 FIFA 世界杯冠军',
+        maxLeverage: '10X',
+        maxReturn: '182%',
+        options: [
+            { name: '西班牙', percent: '82%' },
+            { name: '葡萄牙', percent: '32%' }
+        ],
+        timeRemaining: '04:30:57',
+        participantCount: 1280,
+        amount: '19.00'
+    },
+    {
+        avatar: tyIcon01,
+        title: '2026 FIFA 世界杯 最佳射手',
+        maxLeverage: '10X',
+        maxReturn: '182%',
+        options: [
+            { name: '姆巴佩', percent: '82%' },
+            { name: '罗伯特·莱万多夫斯基', percent: '18%' }
+        ],
+        timeRemaining: '04:30:57',
+        participantCount: 1280,
+        amount: '19.00'
+    },
+    {
+        avatar: tyIcon01,
+        title: '2026 FIFA 世界杯 金球奖',
+        maxLeverage: '8X',
+        maxReturn: '156%',
+        options: [
+            { name: '梅西', percent: '65%' },
+            { name: 'C罗', percent: '35%' }
+        ],
+        timeRemaining: '02:15:30',
+        participantCount: 890,
+        amount: '25.50'
+    }
+])
 </script>
 
 <style scoped lang="scss">
@@ -180,10 +401,10 @@ const eventsList = ref([
 }
 
 .sports-events-h5-page {
-    background-color: #000;
+    background-color: var(--bg-page-h5);
     min-height: 100vh;
     padding-top: 50px;
-    color: #fff;
+    color: var(--bg-opposite);
     width: 100%;
     max-width: 100vw;
     overflow-x: hidden;
@@ -240,7 +461,7 @@ const eventsList = ref([
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #555; // 默认图标颜色
+            color: var(--text-dark-gray); // 默认图标颜色
             transition: all 0.3s;
 
             &.worldcup {
@@ -260,24 +481,24 @@ const eventsList = ref([
             font-size: 11px;
             padding: 0 5px;
             border-radius: 20px;
-            border: 2px solid #000;
+            border: 2px solid var(--border-color);
             min-width: 14px;
         }
 
         .category-label {
             font-size: 12px;
-            color: #888;
+            color: var(--text-dark-gray);
             margin-top: 8px;
         }
 
         &.active {
             .category-icon {
-                background: #2a2a2a;
+                background: var(--bg-opposite);
                 transform: scale(1.05);
             }
 
             .category-label {
-                color: #fff;
+                color: var(--bg-opposite);
                 font-weight: bold;
             }
         }
@@ -302,6 +523,10 @@ const eventsList = ref([
             color: #1e88e5;
         }
 
+        .icon-circle.orange {
+            color: #f68b24;
+        }
+
         span {
             font-family: Noto Sans SC, Noto Sans SC;
             font-weight: 900;
@@ -311,14 +536,19 @@ const eventsList = ref([
     }
 
     .day-pill {
-        background: #222;
+        background: var(--bg-page);
+        border: 1px solid var(--border-color);
         padding: 6px 14px;
         border-radius: 20px;
-        color: #999;
+        color: var(--text-dark-gray);
         font-size: 13px;
         font-weight: 500;
         display: flex;
         align-items: center;
+
+        .el-icon {
+            color: var(--text-dark-gray);
+        }
     }
 }
 
@@ -334,13 +564,14 @@ const eventsList = ref([
         padding: 8px 28px;
         border-radius: 8px;
         border: none;
-        background: #1c1c1c;
-        color: #888;
+        background: var(--bg-page-h5);
+        color: var(--text-dark-gray);
         font-weight: bold;
+        border: 1px solid var(--border-color);
 
         &.active {
-            background: #fff;
-            color: #000;
+            background: var(--bg-opposite);
+            color: var(--bg-page-h5);
         }
     }
 }
@@ -367,7 +598,7 @@ const eventsList = ref([
     }
 
     .event-card {
-        border-bottom: 1px solid #1a1a1a;
+        border-bottom: 1px solid var(--border-color);
         padding: 10px 0 25px;
         margin-bottom: 10px;
         cursor: pointer;
@@ -386,7 +617,7 @@ const eventsList = ref([
             box-sizing: border-box;
 
             .time-tag {
-                background: #1c1c1c;
+                background: var(--bg-page);
                 padding: 4px 10px;
                 border-radius: 6px;
                 font-size: 13px;
@@ -395,15 +626,15 @@ const eventsList = ref([
             }
 
             .vol-text {
-                color: #666;
+                color: var(--text-dark-gray);
                 font-size: 14px;
             }
 
             .view-btn {
-                background: #141414;
+                background: var(--bg-page);
                 padding: 4px 10px;
                 border-radius: 6px;
-                color: #888;
+                color: var(--bg-opposite);
                 font-size: 13px;
                 border: none;
                 cursor: pointer;
@@ -447,7 +678,7 @@ const eventsList = ref([
                 }
 
                 .record {
-                    color: #444;
+                    color: var(--text-dark-gray);
                     font-size: 14px;
                 }
             }
@@ -464,7 +695,7 @@ const eventsList = ref([
                 height: 54px;
                 border-radius: 12px;
                 border: none;
-                color: #fff;
+                color: var(--text-opposite);
                 font-size: 18px;
                 font-weight: bold;
                 transition: transform 0.1s;
@@ -487,7 +718,7 @@ const eventsList = ref([
 
                 &:active {
                     transform: translateY(2px);
-                    
+
                     &::after {
                         height: 6px;
                     }
@@ -495,7 +726,7 @@ const eventsList = ref([
 
                 &.knicks {
                     background: #f68b24;
-                    
+
                     &::after {
                         background: #c96f1a; // 较暗的棕橙色边缘
                     }
@@ -503,10 +734,300 @@ const eventsList = ref([
 
                 &.lakers {
                     background: #eab308;
-                    
+
                     &::after {
                         background: #c99a06; // 较暗的棕金色边缘
                     }
+                }
+
+                // 世界杯按钮样式
+                &.team-a {
+                    background: #2563eb;
+
+                    &::after {
+                        background: #1d4ed8;
+                    }
+                }
+
+                &.team-b {
+                    background: #dc2626;
+
+                    &::after {
+                        background: #b91c1c;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// 世界杯列表样式
+.worldcup-list {
+    .worldcup-teams {
+        .team-line {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+
+            .logo-img {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                margin-right: 10px;
+                object-fit: cover;
+            }
+
+            .short-name {
+                font-size: 14px;
+                font-weight: 500;
+                color: var(--text-dark-gray);
+                margin-right: 4px;
+            }
+
+            .full-name {
+                font-size: 17px;
+                font-weight: bold;
+                color: var(--bg-opposite);
+                margin-right: 10px;
+            }
+
+            .record {
+                font-size: 14px;
+                color: var(--text-dark-gray);
+            }
+        }
+    }
+
+    .bet-row.three-btns {
+        display: flex;
+        gap: 10px;
+
+        .odds-btn {
+            flex: 1;
+            height: 48px;
+            border-radius: 10px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.1s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 6px;
+                border-radius: 0 0 10px 10px;
+            }
+
+            &:active {
+                transform: translateY(2px);
+
+                &::after {
+                    height: 4px;
+                }
+            }
+
+            &.btn-yellow {
+                background: #eab308;
+                color: var(--bg-opposite);
+
+                &::after {
+                    background: #ca9a06;
+                }
+            }
+
+            &.btn-gray {
+                background: var(--text-dark-gray);
+                color: var(--bg-opposite);
+
+                &::after {
+                    background: #222;
+                }
+            }
+
+            &.btn-pink {
+                background: #db2777;
+                color: var(--bg-opposite);
+
+                &::after {
+                    background: #be185d;
+                }
+            }
+        }
+    }
+}
+
+// 球员盘列表样式
+.player-panel-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 40px;
+
+    .player-card {
+        background: var(--bg-page-h5);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+
+            .card-avatar {
+                width: 48px;
+                height: 48px;
+                border-radius: 10px;
+                object-fit: cover;
+            }
+
+            .card-title {
+                font-size: 15px;
+                font-weight: 600;
+                color: var(--bg-opposite);
+                flex: 1;
+            }
+        }
+
+        .card-leverage {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 16px 12px;
+
+            .leverage-item {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+
+                .label {
+                    font-size: 12px;
+                    color: var(--text-dark-gray);
+                }
+
+                .value {
+                    font-size: 12px;
+                    color: var(--bg-opposite);
+                    font-weight: 600;
+                }
+            }
+        }
+
+        .card-options {
+            padding: 0 16px 16px;
+
+            .option-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 12px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+
+                .option-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                    flex: 1;
+
+                    .option-name {
+                        font-size: 14px;
+                        color: var(--bg-opposite);
+                        min-width: 120px;
+                    }
+
+                    .option-percent {
+                        font-size: 14px;
+                        color: var(--text-dark-gray);
+                    }
+                }
+
+                .option-btns {
+                    display: flex;
+                    gap: 8px;
+
+                    .opt-btn {
+                        width: 70px;
+                        height: 36px;
+                        border-radius: 8px;
+                        border: none;
+                        font-size: 14px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s;
+
+                        &.yes {
+                            background: rgba(47, 188, 135, 0.2);
+                            color: #2FBC87;
+
+                            &:active {
+                                background: rgba(47, 188, 135, 0.4);
+                            }
+                        }
+
+                        &.no {
+                            background: rgba(155, 89, 118, 0.3);
+                            color: #db2777;
+
+                            &:active {
+                                background: rgba(155, 89, 118, 0.5);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg-page);
+            border-radius: 0 0 16px 16px;
+
+            .footer-left {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+
+                .time-info,
+                .participant-info,
+                .voi-info {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-size: 12px;
+                    color: var(--text-dark-gray);
+                }
+
+                .time-icon,
+                .user-icon {
+                    width: 12px;
+                    height: 12px;
+                    color: var(--text-dark-gray);
+                }
+            }
+
+            .bookmark-icon {
+                width: 16px;
+                height: 20px;
+                color: var(--text-dark-gray);
+                cursor: pointer;
+                transition: color 0.2s;
+
+                &:hover {
+                    color: var(--bg-opposite);
                 }
             }
         }

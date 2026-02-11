@@ -69,7 +69,7 @@ const navItems = [
   { key: 'esports', label: '电子竞技', path: null },
   { key: 'sports', label: '体育', path: '/sports-events-h5' }, 
   { key: 'finance', label: '经济', path: null }, 
-  { key: 'crypto', label: '加密货币', path: null },
+  { key: 'crypto', label: '加密货币', path: '/bitcoin-up-down' },
   { key: 'company', label: '公司', path: null },
   { key: 'popularCulture', label: '流行文化', path: null },
   { key: 'technology', label: '技术', path: null },
@@ -82,6 +82,7 @@ const routeToNavKey = {
   '/breaking': 'breaking',
   '/news': 'news',
   '/sports-events-h5': 'sports',
+  '/bitcoin-up-down': 'crypto',
 }
 
 // 当前激活的导航项

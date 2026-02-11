@@ -34,6 +34,72 @@ export default {
     "withdrawFee": "출금 수수료(1%)",
     "winnerFee": "승자 수수료(3%)"
   },
+  "withdraw": {
+    "title": "출금",
+    "receiveAddress": "수신 주소",
+    "receiveAddressPlaceholder": "수신 주소를 입력하거나 붙여넣기",
+    "selectCurrency": "통화 선택",
+    "withdrawNetwork": "출금 네트워크",
+    "withdrawAmount": "출금 수량",
+    "withdrawAmountPlaceholder": "수량 입력",
+    "max": "Max",
+    "balance": "잔액",
+    "youWillReceive": "수령 예정",
+    "feePercent": "수수료({percent}%)",
+    "confirmWithdraw": "출금 확인"
+  },
+  "deposit": {
+    "title": "입금",
+    "minAmountLabel": "최소 입금액: ",
+    "yourAddress": "입금 주소",
+    "copy": "복사",
+    "selectCurrency": "통화 선택",
+    "selectNetwork": "네트워크 선택"
+  },
+  "transactionSuccess": {
+    "title": "거래 성공",
+    "withdraw": {
+      "amountLabel": "출금 수량",
+      "completed": "출금 완료",
+      "success": "출금 성공"
+    },
+    "deposit": {
+      "amountLabel": "입금 수량",
+      "completed": "입금 완료",
+      "success": "입금 성공"
+    },
+    "address": "주소",
+    "network": "네트워크",
+    "networkFee": "네트워크 수수료",
+    "txId": "블록체인 거래 ID",
+    "submitTime": "제출 시간",
+    "referenceNo": "참조 번호",
+    "depositAccount": "입금 계정",
+    "viewOnExplorer": "블록체인 익스플로러에서 보기",
+    "depositCompleted": "입금을 완료했습니다"
+  },
+  "bitcoinUpDown": {
+    "title": "Bitcoin Up or Down",
+    "priceToBeat": "PRICE TO BEAT",
+    "currentPrice": "CURRENT PRICE",
+    "record": "기록",
+    "positions": "Positions",
+    "orders": "Orders",
+    "history": "History",
+    "up": "Up",
+    "shares": "주",
+    "avgPrice": "평균가",
+    "cost": "비용",
+    "current": "현재",
+    "profit": "수익",
+    "withdraw": "출금",
+    "orderBook": "오더북",
+    "rules": "규칙",
+    "buyUp": "Buy Up",
+    "buyDown": "Buy Down",
+    "min": "분",
+    "sec": "초"
+  },
   "link": {
     "titel": "지갑 연결",
     "exit": "연결 해제"
@@ -205,7 +271,9 @@ export default {
     "amount": "Amount",
     "all": "All",
     "success": "Successful",
-    "pending": "Pending"
+    "pending": "Pending",
+    "copied": "복사됨",
+    "copyFailed": "복사 실패"
   },
   "header": {
     "searchPlaceholder": "Search ChooseMe",

@@ -34,6 +34,72 @@ export default {
     "withdrawFee": "提现手续费(1%)",
     "winnerFee": "赢家抽水(3%)"
   },
+  "withdraw": {
+    "title": "提币",
+    "receiveAddress": "接收地址",
+    "receiveAddressPlaceholder": "请输入或粘贴接收地址",
+    "selectCurrency": "选择币种",
+    "withdrawNetwork": "提币网络",
+    "withdrawAmount": "提币数量",
+    "withdrawAmountPlaceholder": "请输入数量",
+    "max": "Max",
+    "balance": "余额",
+    "youWillReceive": "你将收到",
+    "feePercent": "手续费({percent}%)",
+    "confirmWithdraw": "确定提币"
+  },
+  "deposit": {
+    "title": "充币",
+    "minAmountLabel": "最小充币额: ",
+    "yourAddress": "你的存款地址",
+    "copy": "复制",
+    "selectCurrency": "选择币种",
+    "selectNetwork": "选择网络"
+  },
+  "transactionSuccess": {
+    "title": "交易成功",
+    "withdraw": {
+      "amountLabel": "提币数量",
+      "completed": "已提取",
+      "success": "提币成功"
+    },
+    "deposit": {
+      "amountLabel": "充币数量",
+      "completed": "已充入",
+      "success": "充币成功"
+    },
+    "address": "地址",
+    "network": "网络",
+    "networkFee": "网络费用",
+    "txId": "区块链交易ID",
+    "submitTime": "提交时间",
+    "referenceNo": "参考编号",
+    "depositAccount": "充值账户",
+    "viewOnExplorer": "在区块链浏览器上查看",
+    "depositCompleted": "我已完成充值"
+  },
+  "bitcoinUpDown": {
+    "title": "Bitcoin Up or Down",
+    "priceToBeat": "PRICE TO BEAT",
+    "currentPrice": "CURRENT PRICE",
+    "record": "记录",
+    "positions": "Positions",
+    "orders": "Orders",
+    "history": "History",
+    "up": "Up",
+    "shares": "股",
+    "avgPrice": "均价",
+    "cost": "成本",
+    "current": "当前",
+    "profit": "收益",
+    "withdraw": "提现",
+    "orderBook": "订单簿",
+    "rules": "规则",
+    "buyUp": "Buy Up",
+    "buyDown": "Buy Down",
+    "min": "分",
+    "sec": "秒"
+  },
   "link": {
     "titel": "链接钱包",
     "exit": "断开链接"
@@ -205,7 +271,9 @@ export default {
     "amount": "金额",
     "all": "全部",
     "success": "成功",
-    "pending": "待办"
+    "pending": "待办",
+    "copied": "已复制",
+    "copyFailed": "复制失败"
   },
   "header": {
     "searchPlaceholder": "搜索ChooseMe",

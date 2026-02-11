@@ -20,6 +20,9 @@ import detailH5 from "../views/detailH5/index.vue"
 import predictionDetailH5 from "../views/predictionDetailH5/index.vue"
 import purchaseNodeRecord from "../views/purchaseNodeRecord/index.vue"
 import assetManagement from "../views/assetManagement/index.vue"
+import deposit from "../views/deposit/index.vue"
+import withdraw from "../views/withdraw/index.vue"
+import transactionSuccess from "../views/transactionSuccess/index.vue"
 import claimRecord from "../views/claimRecord/index.vue"
 import searchPage from "../views/searchPage/index.vue"
 import userInfo from "../views/userInfo/index.vue"
@@ -28,6 +31,7 @@ import bill from "../views/bill/index.vue"
 import helpCenter from "../views/helpCenter/index.vue"
 import sportsEventsH5 from "../views/sportsEventsH5/index.vue"
 import sportsDetailH5 from "../views/sportsDetailH5/index.vue"
+import bitcoinUpDown from "../views/bitcoinUpDown/index.vue"
 
 const router = createRouter({
   history:  createWebHashHistory(),
@@ -97,6 +101,15 @@ const router = createRouter({
       path: '/prediction-detail-h5',
       name: 'predictionDetailH5',
       component: predictionDetailH5,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/bitcoin-up-down',
+      name: 'bitcoinUpDown',
+      component: bitcoinUpDown,
       meta: {
         hideHeader: true,
         hideFooterNav: true
@@ -206,6 +219,37 @@ const router = createRouter({
         hideHeader: true,
         hideFooterNav: true
       }
+    },
+    {
+      path: '/deposit',
+      name: 'deposit',
+      component: deposit,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/withdraw',
+      name: 'withdraw',
+      component: withdraw,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/transaction-success',
+      name: 'transactionSuccess',
+      component: transactionSuccess,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/withdraw-success',
+      redirect: (to) => ({ path: '/transaction-success', query: to.query })
     },
     {
       path: '/claim-record',

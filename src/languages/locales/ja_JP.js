@@ -34,6 +34,72 @@ export default {
     "withdrawFee": "出金手数料(1%)",
     "winnerFee": "勝者手数料(3%)"
   },
+  "withdraw": {
+    "title": "出金",
+    "receiveAddress": "受取アドレス",
+    "receiveAddressPlaceholder": "受取アドレスを入力または貼り付け",
+    "selectCurrency": "通貨を選択",
+    "withdrawNetwork": "出金ネットワーク",
+    "withdrawAmount": "出金数量",
+    "withdrawAmountPlaceholder": "数量を入力",
+    "max": "Max",
+    "balance": "残高",
+    "youWillReceive": "受取額",
+    "feePercent": "手数料({percent}%)",
+    "confirmWithdraw": "出金を確定"
+  },
+  "deposit": {
+    "title": "入金",
+    "minAmountLabel": "最小入金額: ",
+    "yourAddress": "入金アドレス",
+    "copy": "コピー",
+    "selectCurrency": "通貨を選択",
+    "selectNetwork": "ネットワークを選択"
+  },
+  "transactionSuccess": {
+    "title": "取引成功",
+    "withdraw": {
+      "amountLabel": "出金数量",
+      "completed": "出金済み",
+      "success": "出金成功"
+    },
+    "deposit": {
+      "amountLabel": "入金数量",
+      "completed": "入金済み",
+      "success": "入金成功"
+    },
+    "address": "アドレス",
+    "network": "ネットワーク",
+    "networkFee": "ネットワーク手数料",
+    "txId": "ブロックチェーン取引ID",
+    "submitTime": "送信時間",
+    "referenceNo": "参照番号",
+    "depositAccount": "入金アカウント",
+    "viewOnExplorer": "ブロックチェーンエクスプローラーで表示",
+    "depositCompleted": "入金が完了しました"
+  },
+  "bitcoinUpDown": {
+    "title": "Bitcoin Up or Down",
+    "priceToBeat": "PRICE TO BEAT",
+    "currentPrice": "CURRENT PRICE",
+    "record": "記録",
+    "positions": "Positions",
+    "orders": "Orders",
+    "history": "History",
+    "up": "Up",
+    "shares": "株",
+    "avgPrice": "平均価格",
+    "cost": "コスト",
+    "current": "現在",
+    "profit": "損益",
+    "withdraw": "出金",
+    "orderBook": "オーダーブック",
+    "rules": "ルール",
+    "buyUp": "Buy Up",
+    "buyDown": "Buy Down",
+    "min": "分",
+    "sec": "秒"
+  },
   "link": {
     "titel": "ウォレット接続",
     "exit": "接続解除"
@@ -205,7 +271,9 @@ export default {
     "amount": "Amount",
     "all": "All",
     "success": "Successful",
-    "pending": "Pending"
+    "pending": "Pending",
+    "copied": "コピーしました",
+    "copyFailed": "コピーに失敗しました"
   },
   "header": {
     "searchPlaceholder": "Search ChooseMe",
