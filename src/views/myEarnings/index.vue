@@ -233,10 +233,10 @@ const fetchMyIncomeData = async () => {
         avatar: item.avatar || avatarImg,
         user_level: item.s_level || '',
         node_level: item.t_level || '',
-        direct_daily_income: formatUsdtAmount(item.today_direct_income || 0),
-        team_daily_income: formatUsdtAmount(item.today_team_income || 0),
-        direct_total_income: formatUsdtAmount(item.total_direct_income || 0),
-        team_total_income: formatUsdtAmount(item.total_team_income || 0)
+        direct_daily_income: formatAmount(item.today_direct_income || 0),
+        team_daily_income: formatAmount(item.today_team_income || 0),
+        direct_total_income: formatAmount(item.total_direct_income || 0),
+        team_total_income: formatAmount(item.total_team_income || 0)
       }))
 
       stakingDetailsList.value = data.staking_detail_list.map(item => {
