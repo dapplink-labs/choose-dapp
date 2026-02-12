@@ -772,9 +772,9 @@ export default {
     teamPerformanceTab: "Direct Team Performance",
     stakingLevel: "Staking Level",
     stakingCount: "Staking Count",
-    directDailyIncome: "Direct Daily Income(USDT)",
-    teamDailyIncome: "Team Daily Income(USDT)",
-    directTotalIncome: "Direct Total Income(USDT)",
-    teamTotalIncome: "Team Total Income(USDT)",
+    directDailyIncome: "Direct Daily Income(CHO)",
+    teamDailyIncome: "Team Daily Income(CHO)",
+    directTotalIncome: "Direct Total Income(CHO)",
+    teamTotalIncome: "Team Total Income(CHO)",
   },
 };

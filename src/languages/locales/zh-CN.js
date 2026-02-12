@@ -765,9 +765,9 @@ export default {
     teamPerformanceTab: "直推业绩",
     stakingLevel: "质押等级",
     stakingCount: "质押人数",
-    directDailyIncome: "直推日收益(USDT)",
-    teamDailyIncome: "团队日收益(USDT)",
-    directTotalIncome: "直推总收益(USDT)",
-    teamTotalIncome: "团队总收益(USDT)",
+    directDailyIncome: "直推日收益(CHO)",
+    teamDailyIncome: "团队日收益(CHO)",
+    directTotalIncome: "直推总收益(CHO)",
+    teamTotalIncome: "团队总收益(CHO)",
   },
 };

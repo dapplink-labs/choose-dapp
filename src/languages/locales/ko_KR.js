@@ -772,9 +772,9 @@ export default {
     teamPerformanceTab: "직추천 실적",
     stakingLevel: "후원 레벨",
     stakingCount: "서약자 수",
-    directDailyIncome: "일일 추천 수익(USDT)",
-    teamDailyIncome: "팀 일일 수익(USDT)",
-    directTotalIncome: "직추천 총 수익(USDT)",
-    teamTotalIncome: "팀 총 수익(USDT)",
+    directDailyIncome: "일일 추천 수익(CHO)",
+    teamDailyIncome: "팀 일일 수익(CHO)",
+    directTotalIncome: "직추천 총 수익(CHO)",
+    teamTotalIncome: "팀 총 수익(CHO)",
   },
 };
