@@ -79,3 +79,8 @@ export const nodeclaimReward =(data)=>{
 export const stakingclaimReward =(data)=>{
     return request.post('/api/v1/staking/claimReward', data)
 }
+
+// 我的收益接口
+export const getMyIncome = (data) => {
+    return request.get('/api/v2/person/myIncome', { params: data })
+}
