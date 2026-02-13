@@ -268,6 +268,7 @@ export default {
     "balance": "余额",
     "price": "价格",
     "time": "时间",
+    "resolve": "解决",
     "amount": "金额",
     "all": "全部",
     "success": "成功",
@@ -292,7 +293,20 @@ export default {
     "all": "全部",
     "opportunity": "机会",
     "maxLeverage": "最大杠杆倍数",
-    "maxReturn": "最大回报"
+    "maxReturn": "最大回报",
+    "dateFilter": {
+      "all": "全部",
+      "allDates": "所有日期",
+      "weekdays": {
+        "mon": "星期一",
+        "tue": "星期二",
+        "wed": "星期三",
+        "thu": "星期四",
+        "fri": "星期五",
+        "sat": "星期六",
+        "sun": "星期日"
+      }
+    }
   },
   "footerNav": {
     "home": "首页",
@@ -437,6 +451,7 @@ export default {
     "whatDoYouPredict": "你预测什么？",
     "outcome": "结果",
     "chance": "概率",
+    "chanceText": "机会",
     "buyYes": "买入是",
     "buyNo": "买入否",
     "comments": "评论",
@@ -445,6 +460,22 @@ export default {
     "yesHolders": "是持仓者",
     "noHolders": "否持仓者",
     "bought": "买入",
+    "tradeYes": "交易Yes",
+    "tradeNo": "交易No",
+    "months": {
+      "jan": "1月",
+      "feb": "2月",
+      "mar": "3月",
+      "apr": "4月",
+      "may": "5月",
+      "jun": "6月",
+      "jul": "7月",
+      "aug": "8月",
+      "sep": "9月",
+      "oct": "10月",
+      "nov": "11月",
+      "dec": "12月"
+    },
     "timeRanges": {
       "1D": "1天",
       "1W": "1周",
@@ -788,6 +819,67 @@ export default {
       "esports": "电子竞技"
     }
   },
+  "sports": {
+    "volume": "交易量",
+    "moneyline": "胜负盘",
+    "spread": "让球盘",
+    "total": "总比分",
+    "over": "超过",
+    "under": "低于",
+    "draw": "平",
+    "marketOrder": "市价单",
+    "limitOrder": "限价单",
+    "orderBook": "订单簿",
+    "chart": "图表",
+    "buy": "买入",
+    "sell": "卖出",
+    "avgPrice": "均价",
+    "shares": "股"
+  },
+  "crypto": {
+    "upOrDown": "涨跌预测",
+    "priceToBeat": "目标价格",
+    "currentPrice": "当前价格",
+    "record": "记录",
+    "positions": "持仓",
+    "orders": "订单",
+    "history": "历史",
+    "avgPrice": "均价",
+    "cost": "成本",
+    "current": "当前",
+    "profit": "收益",
+    "withdraw": "提现",
+    "openOrders": "未完成订单",
+    "cancelAll": "取消全部",
+    "filled": "已成交",
+    "untilCancel": "直到取消",
+    "min": "分",
+    "sec": "秒",
+    "up": "Up",
+    "down": "Down"
+  },
+  "sportsEvents": {
+    "worldCup": "世界杯",
+    "football": "足球",
+    "basketball": "篮球",
+    "matchDay": "比赛日",
+    "match": "比赛",
+    "playerMarket": "球员盘",
+    "props": "属性",
+    "gameView": "游戏视角",
+    "maxLeverage": "最大杠杆倍数",
+    "maxReturn": "最大回报",
+    "weekdays": {
+      "mon": "周一",
+      "tue": "周二",
+      "wed": "周三",
+      "thu": "周四",
+      "fri": "周五",
+      "sat": "周六",
+      "sun": "周日"
+    },
+    "dateFormat": "{weekday},{month}{day}日"
+  },
   "eventPool": {
     "title": "事件池",
     "heroTitle": "对在线事件进行投票",
@@ -799,5 +891,38 @@ export default {
     "vote": "投票",
     "votedToday": "今日已投票",
     "currentVotes": "当前票数："
+  },
+  "payment": {
+    "buy": "买入",
+    "sell": "卖出",
+    "marketOrder": "市价单",
+    "limitOrder": "限价单",
+    "balance": "余额",
+    "limitPrice": "限价",
+    "shares": "股数",
+    "avgPrice": "平均价格",
+    "leverage": "杠杆",
+    "maxLeverageTip": "最大可用杠杆: 10 X (暂未开放)",
+    "total": "总计",
+    "potentialGain": "可获得",
+    "buyNo": "Buy No",
+    "buyYes": "Buy Yes"
+  },
+  "datePicker": {
+    "title": "按日期范围筛选",
+    "desc": "你可以查看过去的{days}天的订单记录",
+    "days": "{n} 天",
+    "year": "年",
+    "month": "月",
+    "day": "日"
+  },
+  "claimSuccess": {
+    "congratulations": "恭喜获得",
+    "withdrawFee": "提现手续费(1%)",
+    "winnerFee": "赢家抽水(3%)",
+    "questionTitle": "以太坊在12月28日的价格—？",
+    "betWin": "投{bet}赢得",
+    "claim": "Claim",
+    "done": "Done"
   }
 }

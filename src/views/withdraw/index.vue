@@ -1,6 +1,6 @@
 <template>
-  <div class="withdraw-page">
-    <BackHeaderNav :title="$t('withdraw.title')" />
+  <div class="withdraw-page" ref="pageRef">
+    <BackHeaderNav :title="$t('withdraw.title')" scrollContainer=".withdraw-page" />
 
     <div class="main-content">
       <!-- 接收地址 -->
@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 
@@ -97,6 +97,48 @@ const feeRate = ref(3)
 const showCurrencyPicker = ref(false)
 
 const currencyList = ['USDT', 'CHO']
+
+// 处理键盘弹出时的滚动问题
+const pageRef = ref(null)
+
+const preventOverscroll = (e) => {
+  const el = e.currentTarget
+  const scrollTop = el.scrollTop
+  const scrollHeight = el.scrollHeight
+  const clientHeight = el.clientHeight
+  
+  if (scrollTop <= 0 && e.deltaY < 0) {
+    e.preventDefault()
+  }
+  if (scrollTop + clientHeight >= scrollHeight && e.deltaY > 0) {
+    e.preventDefault()
+  }
+}
+
+const handleTouchMove = (e) => {
+  const el = document.querySelector('.withdraw-page')
+  if (!el) return
+  
+  const scrollTop = el.scrollTop
+  const scrollHeight = el.scrollHeight
+  const clientHeight = el.clientHeight
+  
+  // 如果内容不需要滚动，阻止默认行为
+  if (scrollHeight <= clientHeight) {
+    e.preventDefault()
+  }
+}
+
+onMounted(() => {
+  // 禁止 iOS 橡皮筋效果
+  document.body.style.overscrollBehavior = 'none'
+  document.documentElement.style.overscrollBehavior = 'none'
+})
+
+onUnmounted(() => {
+  document.body.style.overscrollBehavior = ''
+  document.documentElement.style.overscrollBehavior = ''
+})
 
 const handleAmountInput = () => {
   const val = parseFloat(withdrawAmount.value)
@@ -167,17 +209,21 @@ const handleConfirm = () => {
 <style scoped lang="scss">
 .withdraw-page {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   background-color: var(--bg-page-h5);
   color: var(--text-color);
   transition: background-color 0.3s ease, color 0.3s ease;
   padding-top: 60px;
   box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .main-content {
   padding: 20px 16px 24px;
-  padding-bottom: 200px;
   /* 为底部固定区域留出空间 */
 }
 
@@ -296,13 +342,8 @@ const handleConfirm = () => {
 
 /* 底部固定区域 */
 .fixed-bottom {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--bg-page-h5);
-  padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
-  z-index: 100;
+  padding: 0 16px ;
+  box-sizing: border-box;
 }
 
 .summary-section {

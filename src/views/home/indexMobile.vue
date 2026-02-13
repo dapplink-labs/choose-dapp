@@ -131,8 +131,8 @@
                     <!-- 固定在最左侧的"全部" -->
                     <div class="date-card fixed-all" :class="{ active: activeDateKey === 'all' }"
                         @click="handleDateClick('all')">
-                        <div class="date-title">全部</div>
-                        <div class="date-subtitle">所有日期</div>
+                        <div class="date-title">{{ $t('home.dateFilter.all') }}</div>
+                        <div class="date-subtitle">{{ $t('home.dateFilter.allDates') }}</div>
                         <div class="date-count">{{ totalDateCount }}</div>
                     </div>
 
@@ -141,7 +141,7 @@
                         <div class="date-scroll">
                             <div v-for="item in dateFilterList" :key="item.key" class="date-card"
                                 :class="{ active: activeDateKey === item.key }" @click="handleDateClick(item.key)">
-                                <div class="date-title">{{ item.weekLabel }}</div>
+                                <div class="date-title">{{ $t(`home.dateFilter.weekdays.${item.weekKey}`) }}</div>
                                 <div class="date-subtitle">{{ item.date }}</div>
                                 <div class="date-count">{{ item.count }}</div>
                             </div>
@@ -397,12 +397,12 @@ const showDateFilter = computed(() => route.query.nav === "esports");
 
 // 日期筛选数据
 const dateFilterList = ref([
-    { key: "mon", weekLabel: "星期一", date: "01.01", count: 0 },
-    { key: "tue", weekLabel: "星期二", date: "01.02", count: 6 },
-    { key: "wed", weekLabel: "星期三", date: "01.03", count: 0 },
-    { key: "thu", weekLabel: "星期四", date: "01.04", count: 0 },
-    { key: "fri", weekLabel: "星期五", date: "01.05", count: 0 },
-    { key: "sat", weekLabel: "星期六", date: "01.06", count: 0 },
+    { key: "mon", weekKey: "mon", date: "01.01", count: 0 },
+    { key: "tue", weekKey: "tue", date: "01.02", count: 6 },
+    { key: "wed", weekKey: "wed", date: "01.03", count: 0 },
+    { key: "thu", weekKey: "thu", date: "01.04", count: 0 },
+    { key: "fri", weekKey: "fri", date: "01.05", count: 0 },
+    { key: "sat", weekKey: "sat", date: "01.06", count: 0 },
 ]);
 
 const activeDateKey = ref("all");

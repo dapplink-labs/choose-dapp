@@ -268,6 +268,7 @@ export default {
     "balance": "Balance",
     "price": "가격",
     "time": "Time",
+    "resolve": "해결",
     "amount": "Amount",
     "all": "All",
     "success": "Successful",
@@ -292,7 +293,20 @@ export default {
     "all": "All",
     "opportunity": "Chance",
     "maxLeverage": "Maximum leverage",
-    "maxReturn": "Maximum return"
+    "maxReturn": "Maximum return",
+    "dateFilter": {
+      "all": "전체",
+      "allDates": "모든 날짜",
+      "weekdays": {
+        "mon": "월요일",
+        "tue": "화요일",
+        "wed": "수요일",
+        "thu": "목요일",
+        "fri": "금요일",
+        "sat": "토요일",
+        "sun": "일요일"
+      }
+    }
   },
   "footerNav": {
     "home": "홈",
@@ -789,6 +803,67 @@ export default {
       "esports": "Esports"
     }
   },
+  "sports": {
+    "volume": "거래량",
+    "moneyline": "승패",
+    "spread": "핸디캡",
+    "total": "총 점수",
+    "over": "오버",
+    "under": "언더",
+    "draw": "무승부",
+    "marketOrder": "시장가 주문",
+    "limitOrder": "지정가 주문",
+    "orderBook": "주문장",
+    "chart": "차트",
+    "buy": "매수",
+    "sell": "매도",
+    "avgPrice": "평균가",
+    "shares": "주"
+  },
+  "crypto": {
+    "upOrDown": "상승 또는 하락",
+    "priceToBeat": "목표 가격",
+    "currentPrice": "현재 가격",
+    "record": "기록",
+    "positions": "포지션",
+    "orders": "주문",
+    "history": "내역",
+    "avgPrice": "평균가",
+    "cost": "비용",
+    "current": "현재",
+    "profit": "수익",
+    "withdraw": "출금",
+    "openOrders": "미체결 주문",
+    "cancelAll": "전체 취소",
+    "filled": "체결됨",
+    "untilCancel": "취소까지",
+    "min": "분",
+    "sec": "초",
+    "up": "Up",
+    "down": "Down"
+  },
+  "sportsEvents": {
+    "worldCup": "월드컵",
+    "football": "축구",
+    "basketball": "농구",
+    "matchDay": "경기일",
+    "match": "경기",
+    "playerMarket": "선수 마켓",
+    "props": "속성",
+    "gameView": "게임 뷰",
+    "maxLeverage": "최대 레버리지",
+    "maxReturn": "최대 수익률",
+    "weekdays": {
+      "mon": "월요일",
+      "tue": "화요일",
+      "wed": "수요일",
+      "thu": "목요일",
+      "fri": "금요일",
+      "sat": "토요일",
+      "sun": "일요일"
+    },
+    "dateFormat": "{weekday}, {month}월 {day}일"
+  },
   "eventPool": {
     "title": "이벤트 풀",
     "heroTitle": "진행 중인 이벤트에 투표하세요",
@@ -800,5 +875,38 @@ export default {
     "vote": "투표",
     "votedToday": "오늘 이미 투표했습니다",
     "currentVotes": "현재 표 수: "
+  },
+  "payment": {
+    "buy": "매수",
+    "sell": "매도",
+    "marketOrder": "시장가",
+    "limitOrder": "지정가",
+    "balance": "잔액",
+    "limitPrice": "지정가",
+    "shares": "주식 수",
+    "avgPrice": "평균 가격",
+    "leverage": "레버리지",
+    "maxLeverageTip": "최대 레버리지: 10X (미개방)",
+    "total": "합계",
+    "potentialGain": "예상 수익",
+    "buyNo": "Buy No",
+    "buyYes": "Buy Yes"
+  },
+  "datePicker": {
+    "title": "날짜 범위로 필터",
+    "desc": "지난 {days}일간의 주문 기록을 확인할 수 있습니다",
+    "days": "{n}일",
+    "year": "년",
+    "month": "월",
+    "day": "일"
+  },
+  "claimSuccess": {
+    "congratulations": "축하합니다",
+    "withdrawFee": "출금 수수료(1%)",
+    "winnerFee": "승자 수수료(3%)",
+    "questionTitle": "12월 28일 이더리움 가격은?",
+    "betWin": "{bet} 베팅하여 획득",
+    "claim": "받기",
+    "done": "완료"
   }
 }

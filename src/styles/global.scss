@@ -6,6 +6,11 @@
   padding: 0;
 }
 
+html, body {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
 
 .fade-enter-active,
 .fade-leave-active {

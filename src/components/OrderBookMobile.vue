@@ -115,14 +115,14 @@ const formatNumber = (num) => {
 <style scoped lang="scss">
 .obm {
     margin-top: 12px;
-    color: #ffffff;
+    color: var(--bg-opposite);
     font-size: 12px;
 }
 
 .obm-header {
     display: flex;
     padding: 4px 0 8px;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-dark-gray);
 }
 
 .obm-header-cell {
@@ -135,12 +135,11 @@ const formatNumber = (num) => {
 }
 
 .obm-panel {
-    background: #000;
     padding: 10px 0 0;
 }
 
 .obm-rows {
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    border-top: 1px solid var(--border-color);
 }
 
 .obm-row {
@@ -165,7 +164,7 @@ const formatNumber = (num) => {
 
 .obm-volume-bar {
     height: calc(100% + 1px);
-    background: #000;
+    background: var(--bg-opposite);
     position: relative;
     z-index: 1;
 }
@@ -188,12 +187,12 @@ const formatNumber = (num) => {
 }
 
 .obm-price-sell {
-    color: #ff4aa7;
+    color: var(--text-color-n);
     font-weight: 600;
 }
 
 .obm-price-buy {
-    color: #d4ff00;
+    color: var(--text-color-y);
     font-weight: 600;
 }
 

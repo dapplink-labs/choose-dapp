@@ -8,9 +8,7 @@
     </div>
 
     <div v-if="activeTab === 'book'" class="book-panel">
-      <!-- 数据保护 -->
-      <OrderBookMobile v-if="matchData" :match-data="matchData" :active-side="activeSide" />
-      <div v-else class="loading-box">Loading...</div>
+      <OrderBookMobile :match-data="orderBookData" :active-side="activeSide" />
     </div>
 
     <div v-else-if="activeTab === 'chart'" class="chart-panel">
@@ -35,20 +33,40 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, watch, onMounted, onUnmounted, nextTick, computed } from 'vue'
 import * as echarts from 'echarts'
+import { useI18n } from 'vue-i18n'
 import OrderBookMobile from '@/components/OrderBookMobile.vue'
+import { useThemeStore } from '@/stores/theme'
+
+const { t } = useI18n()
+const themeStore = useThemeStore()
 
 const props = defineProps({
   matchData: { type: Object, default: null },
   activeSide: { type: String, default: 'yes' }
 })
 
-const tabs = [
-  { label: '订单簿', value: 'book' },
-  { label: '图形', value: 'chart' },
-  { label: '解决', value: 'resolve' }
-]
+// 默认订单簿数据
+const defaultMatchData = {
+  team1: { name: '主队', odds: '32' },
+  team2: { name: '客队', odds: '68' }
+}
+
+// 使用传入的数据或默认数据
+const orderBookData = props.matchData || defaultMatchData
+
+// 图表颜色配置
+const chartColors = computed(() => ({
+  axisLabel: themeStore.isDark ? '#555' : '#999',
+  splitLine: themeStore.isDark ? '#222' : '#e0e0e0'
+}))
+
+const tabs = computed(() => [
+  { label: t('sports.orderBook'), value: 'book' },
+  { label: t('sports.chart'), value: 'chart' },
+  { label: t('common.resolve'), value: 'resolve' }
+])
 const activeTab = ref('chart')
 
 // ===== 图表状态 =====
@@ -79,10 +97,12 @@ const handleIndex = ref(totalData.length - 10)
 const updateChart = () => {
   if (!chartInstance) return
 
+  const colors = chartColors.value
+
   const option = {
-    backgroundColor: '#000',
-    animation: false, // 全局关闭动画，防止拖拽滞后和 coord 报错
-    grid: { left: '2%', right: '12%', top: '22%', bottom: '15%', containLabel: false },
+    backgroundColor: 'transparent',
+    animation: false,
+    grid: { left: '2%', right: '14%', top: '15%', bottom: '12%', containLabel: false },
     xAxis: {
       type: 'category',
       data: Array.from({ length: totalData.length }, (_, i) => i),
@@ -90,36 +110,50 @@ const updateChart = () => {
       axisTick: { show: false },
       axisLabel: {
         show: true,
-        interval: (idx) => [0, 29, 59].includes(idx),
-        formatter: (v) => v == 0 ? '1月' : v == 29 ? '3月' : v == 59 ? '5月' : '',
-        color: '#555'
+        interval: (idx) => [0, Math.floor(totalData.length / 2), totalData.length - 1].includes(idx),
+        formatter: (v) => {
+          if (v == 0) return '1月'
+          if (v == Math.floor(totalData.length / 2)) return '3月'
+          if (v == totalData.length - 1) return '5月'
+          return ''
+        },
+        color: colors.axisLabel,
+        fontSize: 10
       }
     },
     yAxis: {
-      type: 'value', position: 'right', min: 0, max: 100, interval: 20,
-      axisLine: { show: false }, axisTick: { show: false },
-      axisLabel: { formatter: '{value}%', color: '#555', fontSize: 11 },
-      splitLine: { lineStyle: { color: '#111' } }
+      type: 'value',
+      position: 'right',
+      min: 0,
+      max: 100,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        formatter: '{value}%',
+        color: colors.axisLabel,
+        fontSize: 10
+      },
+      splitLine: { lineStyle: { color: colors.splitLine } }
     },
     series: [
       {
-        name: 'Background', // 底部的虚化线
+        name: 'Background',
         type: 'line',
         data: totalData,
         smooth: 0.4,
         symbol: 'none',
-        lineStyle: { width: 3, color: 'rgba(25, 217, 107, 0.15)' }
+        lineStyle: { width: 2.5, color: 'rgba(25, 217, 107, 0.15)' }
       },
       {
-        name: 'Progress', // 前段的高亮线
+        name: 'Progress',
         type: 'line',
         data: totalData.slice(0, handleIndex.value + 1),
         smooth: 0.4,
         symbol: 'none',
-        lineStyle: { width: 3, color: '#19d96b' },
+        lineStyle: { width: 2.5, color: '#19d96b' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(25, 217, 107, 0.15)' },
+            { offset: 0, color: 'rgba(25, 217, 107, 0.2)' },
             { offset: 1, color: 'transparent' }
           ])
         }
@@ -129,7 +163,7 @@ const updateChart = () => {
 
   chartInstance.setOption(option)
 
-  // 处理原点
+  // 绘制可拖拽圆点
   setTimeout(() => {
     if (!chartInstance) return
     const xPix = chartInstance.convertToPixel({ xAxisIndex: 0 }, handleIndex.value)
@@ -141,7 +175,7 @@ const updateChart = () => {
         id: 'handle',
         x: xPix, y: yPix,
         shape: { r: 8 },
-        style: { fill: '#19d96b', stroke: 'rgba(25, 217, 107, 0.3)', lineWidth: 15 },
+        style: { fill: '#19d96b', stroke: 'rgba(25, 217, 107, 0.3)', lineWidth: 12 },
         draggable: true,
         z: 100,
         ondrag: function () {
@@ -205,6 +239,13 @@ watch(activeTab, async (val) => {
   }
 })
 
+// 监听主题变化，更新图表
+watch(() => themeStore.isDark, () => {
+  if (chartInstance && activeTab.value === 'chart') {
+    updateChart()
+  }
+})
+
 onMounted(() => {
   if (activeTab.value === 'chart') nextTick(() => initChart())
   window.addEventListener('resize', () => chartInstance?.resize())
@@ -217,27 +258,26 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .sports-orderbook {
-  background: #000;
   width: 100%;
 }
 
 .tabs-row {
   display: flex;
   gap: 24px;
-  padding: 10px 16px;
-  border-bottom: 1px solid #1b1b1b;
+  padding: 10px 16px 0;
+  border-bottom: 1px solid var(--border-color);
 
   .tab-btn {
     background: transparent;
     border: none;
-    color: #888;
+    color: var(--text-dark-gray);
     font-size: 15px;
-    padding-bottom: 10px;
+    padding-bottom: 15px;
     position: relative;
     cursor: pointer;
 
     &.active {
-      color: #fff;
+      color: var(--bg-opposite);
       font-weight: bold;
 
       &::after {
@@ -247,7 +287,7 @@ onUnmounted(() => {
         left: 0;
         right: 0;
         height: 2px;
-        background: #fff;
+        background: var(--bg-opposite);
       }
     }
   }
@@ -263,11 +303,11 @@ onUnmounted(() => {
     .time-range-btn {
       background: transparent;
       border: none;
-      color: #555;
+      color: var(--text-dark-gray);
       font-size: 12px;
 
       &.active {
-        color: #fff;
+        color: var(--bg-opposite);
         font-weight: bold;
       }
     }
@@ -278,7 +318,6 @@ onUnmounted(() => {
   position: relative;
   width: 100%;
   height: 280px;
-  background: #000;
 
   .chart-canvas {
     width: 100%;
@@ -314,6 +353,6 @@ onUnmounted(() => {
 .loading-box {
   padding: 40px;
   text-align: center;
-  color: #555;
+  color: var(--text-dark-gray);
 }
 </style>

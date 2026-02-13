@@ -9,15 +9,15 @@
                 <div class="trade-nav">
                     <div class="side-tabs">
                         <button :class="['nav-tab', { active: activeSide === 'buy' }]"
-                            @click="activeSide = 'buy'">买入</button>
+                            @click="activeSide = 'buy'">{{ $t('payment.buy') }}</button>
                         <button :class="['nav-tab', { active: activeSide === 'sell' }]"
-                            @click="activeSide = 'sell'">卖出</button>
+                            @click="activeSide = 'sell'">{{ $t('payment.sell') }}</button>
                     </div>
                     <div class="type-pills">
                         <button :class="['pill', { active: orderType === 'market' }]"
-                            @click="orderType = 'market'">市价单</button>
+                            @click="orderType = 'market'">{{ $t('payment.marketOrder') }}</button>
                         <button :class="['pill', { active: orderType === 'limit' }]"
-                            @click="orderType = 'limit'">限价单</button>
+                            @click="orderType = 'limit'">{{ $t('payment.limitOrder') }}</button>
                     </div>
                 </div>
 
@@ -39,7 +39,7 @@
                             <div class="balance-info">
                                 <el-icon>
                                     <Wallet />
-                                </el-icon> 余额 $1000.03
+                                </el-icon> {{ $t('payment.balance') }} $1000.03
                             </div>
                         </div>
                     </div>
@@ -48,7 +48,7 @@
 
                     <!-- 3. 限价输入 -->
                     <div class="input-section" v-if="orderType === 'limit'">
-                        <label class="input-label">限价</label>
+                        <label class="input-label">{{ $t('payment.limitPrice') }}</label>
                         <div class="stepper-box">
                             <button class="step-btn" @click="price > 1 && price--">-</button>
                             <div class="step-center">
@@ -60,7 +60,7 @@
 
                     <!-- 4. 股数输入 -->
                     <div class="input-section" style="margin-bottom: 10px;">
-                        <label class="input-label">股数</label>
+                        <label class="input-label">{{ $t('payment.shares') }}</label>
                         <div class="stepper-box">
                             <div class="input-box">
                                 <input v-model.number="shares" type="number" class="main-input" />
@@ -78,12 +78,12 @@
                     </div>
                     <!-- 市价单平均价格 -->
                     <div v-if="orderType === 'market'" class="avg-price-row">
-                        <span class="avg-price-text">平均价格：{{ averagePrice }}¢</span>
+                        <span class="avg-price-text">{{ $t('payment.avgPrice') }}：{{ averagePrice }}¢</span>
                     </div>
 
                     <!-- 5. 杠杆 -->
                     <div class="input-section">
-                        <label class="input-label">杠杆</label>
+                        <label class="input-label">{{ $t('payment.leverage') }}</label>
                         <div class="leverage-group">
                             <button :class="['lev-btn', { active: leverage === 2 }]" @click="leverage = 2">x 2</button>
                             <button :class="['lev-btn', { active: leverage === 5 }]" @click="leverage = 5">🚀 x
@@ -91,24 +91,24 @@
                             <button :class="['lev-btn', { active: leverage === 10 }]" @click="leverage = 10">🔥 x
                                 MAX</button>
                         </div>
-                        <p class="leverage-tip">最大可用杠杆: 10 X (暂未开放)</p>
+                        <p class="leverage-tip">{{ $t('payment.maxLeverageTip') }}</p>
                     </div>
 
                     <!-- 6. 结算汇总 -->
                     <div class="summary-section">
                         <div class="summary-row">
-                            <span class="s-label">总计</span>
+                            <span class="s-label">{{ $t('payment.total') }}</span>
                             <span class="s-value">${{ totalCost }}</span>
                         </div>
                         <div class="summary-row">
-                            <span class="s-label">可获得</span>
+                            <span class="s-label">{{ $t('payment.potentialGain') }}</span>
                             <span class="s-value-gain">💵 +${{ potentialGain }}</span>
                         </div>
                     </div>
 
                     <!-- 7. 执行按钮 -->
                     <button class="execute-btn" @click="handleConfirm">
-                        Buy No
+                        {{ $t('payment.buyNo') }}
                     </button>
                 </div>
             </div>
@@ -118,8 +118,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Wallet } from '@element-plus/icons-vue'
 
+const { t } = useI18n()
 const props = defineProps({ modelValue: Boolean })
 const emit = defineEmits(['update:modelValue'])
 
@@ -157,7 +159,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
     background: var(--bg-page);
     border-radius: 20px 20px 0 0;
     padding: 0 16px 24px;
-    color: #fff;
+    color: var(--bg-opposite);
     font-family: sans-serif;
     overflow-y: auto;
     max-height: 70vh;
@@ -182,7 +184,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
         right: 0;
         width: 40px;
         height: 4px;
-        background: #333;
+        background: var(--text-dark-gray);
         border-radius: 2px;
         margin: 0 auto 16px;
     }
@@ -210,18 +212,18 @@ function handleConfirm() { console.log('Trade Confirmed') }
             padding: 4px 0;
             cursor: pointer;
             padding-bottom: 12px;
-            color: #909090;
+            color: var(--text-dark-gray);
 
 
             &.active {
-                color: #ccff33;
-                border-bottom: 2px solid #ccff33;
+                color: var(--text-color-y);
+                border-bottom: 2px solid var(--text-color-y);
             }
         }
     }
 
     .type-pills {
-        background: #1a1a1a;
+        background: var(--bg-page);
         padding: 4px;
         border-radius: 6px;
         display: flex;
@@ -232,14 +234,14 @@ function handleConfirm() { console.log('Trade Confirmed') }
             font-family: PingFang SC, PingFang SC;
             font-weight: 400;
             font-size: 14px;
-            color: #909090;
+            color: var(--text-dark-gray);
             padding: 4px 6px;
             border-radius: 4px;
             cursor: pointer;
 
             &.active {
-                background: #333;
-                color: #fff;
+                background: var(--text-dark-gray);
+                color: var(--bg-opposite);
             }
         }
     }
@@ -262,8 +264,8 @@ function handleConfirm() { console.log('Trade Confirmed') }
     }
 
     .outcome-badge {
-        background: rgba(202, 64, 100, 0.2);
-        color: #CA4064;
+        background: var(--button-bg-n);
+        color: var(--text-color-n);
         padding: 6px 12px;
         border-radius: 6px;
         font-size: 13px;
@@ -271,10 +273,15 @@ function handleConfirm() { console.log('Trade Confirmed') }
         display: flex;
         align-items: center;
         gap: 8px;
+
+        &.active {
+            background: var(--button-bg-y);
+            color: var(--text-color-y);
+        }
     }
 
     .balance-info {
-        color: #888;
+        color: var(--text-dark-gray);
         font-size: 13px;
         display: flex;
         align-items: center;
@@ -284,7 +291,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
 
 .divider {
     height: 1px;
-    background: #1a1a1a;
+    background: var(--border-color);
     margin: 20px 0;
 }
 
@@ -301,14 +308,14 @@ function handleConfirm() { console.log('Trade Confirmed') }
         width: 50px;
         font-size: 15px;
         font-weight: bold;
-        color: #eee;
+        color: var(--text-dark-gray);
     }
 }
 
 .stepper-box {
     flex: 0.8;
-    background: #151515;
-    border: 1px solid #222;
+    background: var(--bg-page);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -320,12 +327,12 @@ function handleConfirm() { console.log('Trade Confirmed') }
         height: 100%;
         background: none;
         border: none;
-        color: #fff;
+        color: var(--text-dark-gray);
         font-size: 20px;
         cursor: pointer;
 
         &:active {
-            background: #222;
+            background: var(--border-color);
         }
     }
 
@@ -347,15 +354,15 @@ function handleConfirm() { console.log('Trade Confirmed') }
     .step-sub {
         margin-top: 2px;
         font-size: 12px;
-        color: #777;
+        color: var(--text-dark-gray);
     }
 }
 
 
 .input-box {
     flex: 1;
-    background: #151515;
-    border: 1px solid #222;
+    background: var(--bg-page);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     height: 48px;
     padding: 0 16px;
@@ -366,7 +373,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
         width: 100%;
         background: none;
         border: none;
-        color: #fff;
+        color: var(--bg-opposite);
         text-align: right;
         font-size: 18px;
         font-weight: bold;
@@ -385,9 +392,9 @@ function handleConfirm() { console.log('Trade Confirmed') }
     gap: 8px;
 
     .quick-share-btn {
-        background: #222;
+        background: var(--bg-opposite);
         border: none;
-        color: #ccc;
+        color: var(--bg-page-h5);
         padding: 6px 15px;
         border-radius: 6px;
         font-size: 12px;
@@ -399,10 +406,10 @@ function handleConfirm() { console.log('Trade Confirmed') }
     display: flex;
     justify-content: flex-end;
     margin-top: 8px;
-    
+
     .avg-price-text {
         font-size: 12px;
-        color: #888;
+        color: var(--text-dark-gray);
     }
 }
 
@@ -415,9 +422,9 @@ function handleConfirm() { console.log('Trade Confirmed') }
 
     .lev-btn {
         flex: 1;
-        background: #222;
+        background: var(--bg-opposite);
         border: none;
-        color: #888;
+        color: var(--text-dark-gray);
         padding: 10px 0;
         border-radius: 10px;
         font-size: 12px;
@@ -433,7 +440,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
 .leverage-tip {
     padding-bottom: 20px;
     font-size: 11px;
-    color: #555;
+    color: var(--text-dark-gray);
     text-align: right;
     width: 100%;
     flex-basis: 100%; // 在 flex 容器中独占一整行
@@ -463,7 +470,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
         .s-value-gain {
             font-size: 18px;
             font-weight: 900;
-            color: #ccff33;
+            color: var(--text-color-y);
         }
     }
 }
@@ -472,7 +479,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
 .execute-btn {
     width: 100%;
     height: 52px;
-    background: #ccff33;
+    background: var(--text-color-y);
     border: none;
     border-radius: 14px;
     font-family: PingFang SC, PingFang SC;
@@ -497,5 +504,109 @@ function handleConfirm() { console.log('Trade Confirmed') }
 .slide-up-leave-to {
     transform: translateY(100%);
     opacity: 0;
+}
+
+// 亮色主题适配
+:global(.theme-light) {
+    .trade-modal {
+        background: var(--bg-page);
+
+        .grabber::after {
+            background: #ccc;
+        }
+
+        .trade-nav {
+            border-bottom-color: #e0e0e0;
+
+            .side-tabs .nav-tab {
+                color: #999;
+
+                &.active {
+                    color: #2FBC87;
+                    border-bottom-color: #2FBC87;
+                }
+            }
+
+            .type-pills {
+                background: #f0f0f0;
+
+                .pill {
+                    color: #666;
+
+                    &.active {
+                        background: #fff;
+                        color: #333;
+                    }
+                }
+            }
+        }
+
+        .target-info .target-title {
+            color: var(--bg-opposite);
+        }
+
+        .balance-info {
+            color: #666;
+        }
+
+        .divider {
+            background: #e0e0e0;
+        }
+
+        .input-label {
+            color: #333;
+        }
+
+        .stepper-box,
+        .input-box {
+            background: #f5f5f5;
+            border-color: #e0e0e0;
+
+            .step-btn {
+                color: #333;
+
+                &:active {
+                    background: #e8e8e8;
+                }
+            }
+
+            .step-value {
+                color: #333;
+            }
+
+            .main-input {
+                color: #333;
+            }
+        }
+
+        .quick-share-btn {
+            background: #e8e8e8;
+            color: #333;
+        }
+
+        .avg-price-text {
+            color: #666;
+        }
+
+        .lev-btn {
+            background: #e8e8e8;
+            color: #666;
+        }
+
+        .leverage-tip {
+            color: #999;
+            border-bottom-color: #e0e0e0;
+        }
+
+        .summary-row {
+            .s-label {
+                color: #666;
+            }
+
+            .s-value {
+                color: #333;
+            }
+        }
+    }
 }
 </style>

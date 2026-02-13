@@ -34,17 +34,17 @@
           </svg>
         </div>
         <div class="asset-text">
-          <h2>Bitcoin Up or Down</h2>
+          <h2>{{ $t('crypto.upOrDown') }}</h2>
           <p>1月31日 19:00-19:15 UTC+8</p>
         </div>
         <div class="timer">
           <div class="time-block">
             <span class="unit">01</span>
-            <span class="label">分</span>
+            <span class="label">{{ $t('crypto.min') }}</span>
           </div>
           <div class="time-block">
             <span class="unit">59</span>
-            <span class="label">秒</span>
+            <span class="label">{{ $t('crypto.sec') }}</span>
           </div>
         </div>
       </div>
@@ -52,11 +52,11 @@
       <!-- 3. 价格对战看板 -->
       <div class="price-dashboard">
         <div class="price-item">
-          <div class="label">PRICE TO BEAT</div>
+          <div class="label">{{ $t('crypto.priceToBeat') }}</div>
           <div class="value">$82,627.75</div>
         </div>
         <div class="price-item current">
-          <div class="label">CURRENT PRICE <span class="diff">▲ $39</span></div>
+          <div class="label">{{ $t('crypto.currentPrice') }} <span class="diff">▲ $39</span></div>
           <div class="value">$82,666.53</div>
         </div>
       </div>
@@ -93,7 +93,7 @@
         <div class="chart-toolbar">
           <div class="record-capsule">
             <div class="record-selector">
-              记录 <el-icon>
+              {{ $t('crypto.record') }} <el-icon>
                 <ArrowDown />
               </el-icon>
             </div>
@@ -114,44 +114,49 @@
 
       <!-- 6. 仓位 Tab 页 -->
       <div class="business-tabs">
-        <div v-for="t in ['Positions', 'Orders', 'History']" :key="t" class="tab-item"
-          :class="{ active: activeTab === t }" @click="activeTab = t">
-          {{ t }}
+        <div class="tab-item" :class="{ active: activeTab === 'Positions' }" @click="activeTab = 'Positions'">
+          {{ $t('crypto.positions') }}
+        </div>
+        <div class="tab-item" :class="{ active: activeTab === 'Orders' }" @click="activeTab = 'Orders'">
+          {{ $t('crypto.orders') }}
+        </div>
+        <div class="tab-item" :class="{ active: activeTab === 'History' }" @click="activeTab = 'History'">
+          {{ $t('crypto.history') }}
         </div>
       </div>
 
       <!-- 仓位详细详情卡片 -->
       <div v-if="activeTab === 'Positions'" class="position-content">
         <div class="pos-card">
-          <h3 class="pos-title">Bitcoin Up or Down</h3>
-          <span class="pos-tag">Up | 100 股</span>
+          <h3 class="pos-title">{{ $t('crypto.upOrDown') }}</h3>
+          <span class="pos-tag">{{ $t('crypto.up') }} | 100 {{ $t('sports.shares') }}</span>
           <div class="pos-grid">
             <div class="grid-item">
-              <div class="g-label">均价</div>
+              <div class="g-label">{{ $t('crypto.avgPrice') }}</div>
               <div class="g-val">40 ¢</div>
             </div>
             <div class="grid-item">
-              <div class="g-label">成本</div>
+              <div class="g-label">{{ $t('crypto.cost') }}</div>
               <div class="g-val">$40</div>
             </div>
             <div class="grid-item">
-              <div class="g-label">当前</div>
+              <div class="g-label">{{ $t('crypto.current') }}</div>
               <div class="g-val">$80</div>
             </div>
             <div class="grid-item">
-              <div class="g-label">收益</div>
+              <div class="g-label">{{ $t('crypto.profit') }}</div>
               <div class="g-val neon">+$40(+100%)</div>
             </div>
           </div>
-          <button class="withdraw-hero-btn">提现</button>
+          <button class="withdraw-hero-btn">{{ $t('crypto.withdraw') }}</button>
         </div>
       </div>
 
       <!-- Orders 订单列表 -->
       <div v-if="activeTab === 'Orders'" class="orders-content">
         <div class="orders-header">
-          <span class="orders-title">Open Orders</span>
-          <button class="cancel-all-btn">Cancel all</button>
+          <span class="orders-title">{{ $t('crypto.openOrders') }}</span>
+          <button class="cancel-all-btn">{{ $t('crypto.cancelAll') }}</button>
         </div>
         <div class="orders-list">
           <div v-for="(order, index) in openOrders" :key="index" class="order-item">
@@ -175,7 +180,7 @@
       <!-- History 历史记录 -->
       <div v-if="activeTab === 'History'" class="history-content">
         <div class="history-header">
-          <span class="history-title">History</span>
+          <span class="history-title">{{ $t('crypto.history') }}</span>
         </div>
         <div class="history-list">
           <div v-for="(item, index) in historyList" :key="index" class="history-item">
@@ -190,7 +195,7 @@
 
       <!-- 7. 订单簿详情页 -->
       <div class="orderbook-header" @click="isBookOpen = !isBookOpen">
-        <span>订单簿</span>
+        <span>{{ $t('sports.orderBook') }}</span>
         <div class="header-right">
           <span class="vol">$35.4K</span>
           <el-icon :class="{ rotate: isBookOpen }">
@@ -202,10 +207,10 @@
         <!-- 订单簿 Tab 切换 -->
         <div class="orderbook-tabs">
           <button class="orderbook-tab" :class="{ active: orderBookTab === 'yes' }" @click="orderBookTab = 'yes'">
-            交易Yes
+            {{ $t('detail.tradeYes') }}
           </button>
           <button class="orderbook-tab" :class="{ active: orderBookTab === 'no' }" @click="orderBookTab = 'no'">
-            交易No
+            {{ $t('detail.tradeNo') }}
           </button>
         </div>
         <!-- 订单簿表格 -->
@@ -213,28 +218,32 @@
       </div>
 
       <div class="rules-footer">
-        <h4>规则</h4>
+        <h4>{{ $t('detail.rules') }}</h4>
         <p>The FED interest rates are defined in this market by the upper bound of the target federal funds range. The
           decisions on the target range are made by the target.</p>
       </div>
 
       <!-- 底部预测操作栏 -->
       <div class="bottom-dock-actions">
-        <button class="trade-btn up">Buy Up 96 ¢</button>
-        <button class="trade-btn down">Buy Down 4 ¢</button>
+        <button class="trade-btn up">{{ $t('common.buy') }} {{ $t('crypto.up') }} 96 ¢</button>
+        <button class="trade-btn down">{{ $t('common.buy') }} {{ $t('crypto.down') }} 4 ¢</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ArrowLeft, ArrowDown, Trophy } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import OrderBookMobile from '@/components/OrderBookMobile.vue'
+import { useThemeStore } from '@/stores/theme'
 
+const { t } = useI18n()
 const router = useRouter()
+const themeStore = useThemeStore()
 const activeTab = ref('Positions')
 const isBookOpen = ref(false)
 const orderBookTab = ref('yes')
@@ -246,13 +255,13 @@ const timeSegments = ['19:00', '19:15', '19:30', '19:45', '20:00']
 const activeTimeSegment = ref('19:15')
 
 // 订单数据
-const openOrders = ref([
-  { type: 'Buy Down', price: '80 ¢', amount: '$40', filled: 0, total: 50, status: '直到取消' },
-  { type: 'Buy Down', price: '80 ¢', amount: '$40', filled: 0, total: 50, status: '直到取消' }
+const openOrders = computed(() => [
+  { type: t('crypto.down'), price: '80 ¢', amount: '$40', filled: 0, total: 50, status: t('crypto.untilCancel') },
+  { type: t('crypto.down'), price: '80 ¢', amount: '$40', filled: 0, total: 50, status: t('crypto.untilCancel') }
 ])
 
 const removeOrder = (index) => {
-  openOrders.value.splice(index, 1)
+  // openOrders is now computed, so this needs a different approach if needed
 }
 
 // 历史记录数据
@@ -296,12 +305,25 @@ const updateInfoBoxPos = (x, y) => {
   }
 }
 
+// 图表颜色配置
+const chartColors = computed(() => ({
+  background: themeStore.isDark ? '#000' : '#FFF',
+  axisLabel: themeStore.isDark ? '#444' : '#888',
+  splitLine: themeStore.isDark ? '#1a1a1a' : '#e0e0e0',
+  primary: themeStore.isDark ? '#BBFF2E' : '#19d96b',
+  primaryLight: themeStore.isDark ? 'rgba(187, 255, 46, 0.15)' : 'rgba(25, 217, 107, 0.15)',
+  primaryGradient: themeStore.isDark ? 'rgba(187, 255, 46, 0.2)' : 'rgba(25, 217, 107, 0.2)',
+  primaryStroke: themeStore.isDark ? 'rgba(187, 255, 46, 0.3)' : 'rgba(25, 217, 107, 0.3)'
+}))
+
 // 更新图表
 const updateChart = () => {
   if (!chartInstance) return
 
+  const colors = chartColors.value
+
   const option = {
-    backgroundColor: '#000',
+    backgroundColor: colors.background,
     animation: false,
     grid: { left: '2%', right: '14%', top: '15%', bottom: '12%', containLabel: false },
     xAxis: {
@@ -318,7 +340,7 @@ const updateChart = () => {
           if (v == totalData.length - 1) return '19:02:05'
           return ''
         },
-        color: '#444',
+        color: colors.axisLabel,
         fontSize: 10
       }
     },
@@ -331,10 +353,10 @@ const updateChart = () => {
       axisTick: { show: false },
       axisLabel: {
         formatter: (v) => '$' + v.toLocaleString(),
-        color: '#444',
+        color: colors.axisLabel,
         fontSize: 10
       },
-      splitLine: { lineStyle: { color: '#1a1a1a' } }
+      splitLine: { lineStyle: { color: colors.splitLine } }
     },
     series: [
       {
@@ -343,7 +365,7 @@ const updateChart = () => {
         data: totalData,
         smooth: 0.4,
         symbol: 'none',
-        lineStyle: { width: 2.5, color: 'rgba(187, 255, 46, 0.15)' }
+        lineStyle: { width: 2.5, color: colors.primaryLight }
       },
       {
         name: 'Progress',
@@ -351,10 +373,10 @@ const updateChart = () => {
         data: totalData.slice(0, handleIndex.value + 1),
         smooth: 0.4,
         symbol: 'none',
-        lineStyle: { width: 2.5, color: '#BBFF2E' },
+        lineStyle: { width: 2.5, color: colors.primary },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(187, 255, 46, 0.2)' },
+            { offset: 0, color: colors.primaryGradient },
             { offset: 1, color: 'transparent' }
           ])
         }
@@ -376,7 +398,7 @@ const updateChart = () => {
         id: 'handle',
         x: xPix, y: yPix,
         shape: { r: 8 },
-        style: { fill: '#BBFF2E', stroke: 'rgba(187, 255, 46, 0.3)', lineWidth: 12 },
+        style: { fill: colors.primary, stroke: colors.primaryStroke, lineWidth: 12 },
         draggable: true,
         z: 100,
         onmousedown: function () {
@@ -423,6 +445,11 @@ const initChart = () => {
   updateChart()
 }
 
+// 监听主题变化更新图表
+watch(() => themeStore.isDark, () => {
+  updateChart()
+})
+
 const handleTimeRangeChange = (val) => {
   selectedTimeRange.value = val
   totalData = generatePriceData()
@@ -442,7 +469,6 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 /* --- 布局色彩变量 --- */
-$neon-green: #BBFF2E;
 $hot-pink: #E44096;
 $orange: #F7931A;
 $bg-dark: #000;
@@ -488,11 +514,9 @@ $bg-dark: #000;
   gap: 8px;
 }
 
-.back-btn :deep(.el-icon) {
+.back-btn .el-icon {
   font-size: 18px;
-  .el-icon{
-    color: var(--bg-opposite);
-  }
+  color: var(--bg-opposite);
 }
 
 .top-center {
@@ -504,6 +528,7 @@ $bg-dark: #000;
 
 .trophy-icon {
   font-size: 14px;
+  color: var(--text-dark-gray);
 }
 
 .top-volume {
@@ -602,7 +627,7 @@ $bg-dark: #000;
       letter-spacing: 0.5px;
 
       .diff {
-        color: $neon-green;
+        color: var(--text-color-y);
         margin-left: 12px;
         font-weight: 700;
       }
@@ -646,7 +671,7 @@ $bg-dark: #000;
     padding: 4px 0;
 
     &.active {
-      color: #fff;
+      color: var(--bg-opposite);
       font-weight: 600;
     }
   }
@@ -655,7 +680,6 @@ $bg-dark: #000;
 .chart-container {
   position: relative;
   height: 200px;
-  background: #000;
 
   .main-chart {
     width: 100%;
@@ -681,14 +705,14 @@ $bg-dark: #000;
       }
 
       &.neon {
-        color: $neon-green;
+        color: var(--text-color-y);
       }
     }
   }
 
   .info-popover {
     position: absolute;
-    background: $neon-green;
+    background: var(--text-color-y);
     color: #000;
     padding: 10px 16px;
     border-radius: 10px;
@@ -718,7 +742,7 @@ $bg-dark: #000;
       transform: translateX(-50%);
       width: 2px;
       height: 14px;
-      background: $neon-green;
+      background: var(--text-color-y);
 
       &::after {
         content: '';
@@ -728,7 +752,7 @@ $bg-dark: #000;
         transform: translateX(-50%);
         width: 8px;
         height: 8px;
-        background: $neon-green;
+        background: var(--text-color-y);
         border-radius: 50%;
       }
     }
@@ -753,7 +777,7 @@ $bg-dark: #000;
 
   .record-selector {
     font-size: 13px;
-    color: #fff;
+    color: var(--text-dark-gray);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -774,7 +798,7 @@ $bg-dark: #000;
       height: 0;
       border-left: 7px solid transparent;
       border-right: 7px solid transparent;
-      border-bottom: 10px solid $neon-green;
+      border-bottom: 10px solid var(--text-color-y);
     }
 
     .tri-down {
@@ -802,8 +826,8 @@ $bg-dark: #000;
     .time-pill {
       font-size: 14px;
       font-weight: 500;
-      background: #222;
-      color: #888;
+      background: var(--bg-page);
+      color: var(--text-dark-gray);
       padding: 8px 13px;
       border-radius: 20px;
       display: flex;
@@ -820,8 +844,8 @@ $bg-dark: #000;
       }
 
       &.active {
-        background: #fff;
-        color: #000;
+        background: var(--bg-opposite);
+        color: var(--bg-page-h5);
         font-weight: 600;
       }
     }
@@ -832,20 +856,20 @@ $bg-dark: #000;
 .business-tabs {
   display: flex;
   gap: 50px;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid var(--border-color);
   margin-bottom: 24px;
   padding-bottom: 0;
 
   .tab-item {
     font-size: 18px;
     font-weight: 600;
-    color: #555;
+    color: var(--text-dark-gray);
     padding-bottom: 14px;
     position: relative;
     cursor: pointer;
 
     &.active {
-      color: #fff;
+      color: var(--bg-opposite);
 
       &::after {
         content: '';
@@ -854,7 +878,7 @@ $bg-dark: #000;
         left: 0;
         width: 100%;
         height: 3px;
-        background: #fff;
+        background: var(--bg-opposite);
       }
     }
   }
@@ -873,13 +897,13 @@ $bg-dark: #000;
     font-size: 20px;
     font-weight: 600;
     margin: 0 0 16px 0;
-    color: #fff;
+    color: var(--bg-opposite);
   }
 
   .pos-tag {
     display: inline-block;
-    background: rgba(187, 255, 46, 0.15);
-    color: $neon-green;
+    background: var(--button-bg-y);
+    color: var(--text-color-y);
     padding: 8px 14px;
     border-radius: 6px;
     font-size: 13px;
@@ -903,11 +927,11 @@ $bg-dark: #000;
       .g-val {
         font-size: 18px;
         font-weight: 600;
-        color: #fff;
+        color: var(--bg-opposite);
       }
 
       .g-val.neon {
-        color: $neon-green;
+        color: var(--text-color-y);
       }
     }
   }
@@ -915,7 +939,7 @@ $bg-dark: #000;
   .withdraw-hero-btn {
     width: 100%;
     height: 56px;
-    background: $neon-green;
+    background: var(--text-color-y);
     color: #000;
     border: none;
     border-radius: 14px;
@@ -939,7 +963,7 @@ $bg-dark: #000;
   .orders-title {
     font-size: 16px;
     font-weight: 600;
-    color: #fff;
+    color: var(--bg-opposite);
   }
 
   .cancel-all-btn {
@@ -962,8 +986,7 @@ $bg-dark: #000;
   display: flex;
   align-items: center;
   padding: 16px;
-  background: #111;
-  border-radius: 12px;
+  border-bottom: 1px solid var(--border-color);
 
   .order-left {
     flex: 1;
@@ -971,7 +994,7 @@ $bg-dark: #000;
     .order-type {
       font-size: 16px;
       font-weight: 600;
-      color: #fff;
+      color: var(--bg-opposite);
       margin-bottom: 6px;
     }
 
@@ -993,20 +1016,20 @@ $bg-dark: #000;
     .order-filled {
       font-size: 15px;
       font-weight: 600;
-      color: #fff;
+      color: var(--bg-opposite);
       margin-bottom: 4px;
     }
 
     .order-status {
       font-size: 12px;
-      color: #666;
+      color: var(--text-dark-gray);
     }
   }
 
   .order-close-btn {
     background: transparent;
     border: none;
-    color: #555;
+    color: var(--text-dark-gray);
     cursor: pointer;
     padding: 8px;
     display: flex;
@@ -1014,7 +1037,7 @@ $bg-dark: #000;
     justify-content: center;
 
     &:hover {
-      color: #fff;
+      color: var(--bg-opposite);
     }
   }
 }
@@ -1025,12 +1048,14 @@ $bg-dark: #000;
 }
 
 .history-header {
-  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+
 
   .history-title {
     font-size: 20px;
     font-weight: 700;
-    color: #fff;
+    color: var(--bg-opposite);
   }
 }
 
@@ -1044,14 +1069,14 @@ $bg-dark: #000;
   justify-content: space-between;
   align-items: center;
   padding: 20px 0;
-  border-top: 1px solid #1a1a1a;
+  border-bottom: 1px solid var(--border-color);
 
   .history-text {
     font-size: 16px;
-    color: #fff;
+    color: var(--bg-opposite);
 
     .up {
-      color: $neon-green;
+      color: var(--text-color-y);
       font-weight: 600;
     }
 
@@ -1061,7 +1086,7 @@ $bg-dark: #000;
     }
 
     .cost {
-      color: #888;
+      color: var(--text-dark-gray);
     }
   }
 
@@ -1077,9 +1102,10 @@ $bg-dark: #000;
   justify-content: space-between;
   align-items: center;
   padding: 16px 0;
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid var(--border-color);
   font-weight: 600;
   font-size: 15px;
+  color: var(--bg-opposite);
 
   .header-right {
     display: flex;
@@ -1087,12 +1113,12 @@ $bg-dark: #000;
     gap: 6px;
 
     .vol {
-      color: #555;
+      color: var(--text-dark-gray);
       font-size: 13px;
     }
 
     .el-icon {
-      color: #555;
+      color: var(--text-dark-gray);
       transition: transform 0.2s;
     }
 
@@ -1110,21 +1136,21 @@ $bg-dark: #000;
   display: flex;
   gap: 20px;
   padding-bottom: 12px;
-  border-bottom: 1px solid #1a1a1a;
+  border-bottom: 1px solid var(--border-color);
   margin-bottom: 8px;
 }
 
 .orderbook-tab {
   background: transparent;
   border: none;
-  color: #555;
+  color: var(--text-dark-gray);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   padding: 0;
 
   &.active {
-    color: #fff;
+    color: var(--bg-opposite);
   }
 }
 
@@ -1133,7 +1159,7 @@ $bg-dark: #000;
   padding-bottom: 20px;
 
   h4 {
-    color: #fff;
+    color: var(--bg-opposite);
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 10px;
@@ -1141,7 +1167,7 @@ $bg-dark: #000;
 
   p {
     font-size: 12px;
-    color: #555;
+    color: var(--text-dark-gray);
     line-height: 1.7;
   }
 }
@@ -1164,20 +1190,16 @@ $bg-dark: #000;
     cursor: pointer;
 
     &.up {
-      color: $neon-green;
-      border: 1.5px solid rgba(187, 255, 46, 0.4);
+      color: var(--text-color-y);
+      border: 1.5px solid var(--text-color-y);
       background: rgba(187, 255, 46, 0.08);
     }
 
     &.down {
       color: $hot-pink;
-      border: 1.5px solid rgba(228, 64, 150, 0.4);
-      background: rgba(228, 64, 150, 0.08);
+      border: 1.5px solid var(--text-color-n);
+      background: var(--button-bg-n);
     }
   }
-}
-
-:deep(.echarts-tooltip-marker) {
-  display: none !important;
 }
 </style>

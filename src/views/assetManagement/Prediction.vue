@@ -362,7 +362,7 @@ watch(() => themeStore.isDark, () => {
 
     .time-selector {
       display: flex;
-      gap: 8px;
+      gap: 4px;
       align-items: center;
       flex-shrink: 0;
       margin-left: auto;

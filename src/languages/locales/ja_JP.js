@@ -268,6 +268,7 @@ export default {
     "balance": "Balance",
     "price": "価格",
     "time": "Time",
+    "resolve": "解決",
     "amount": "Amount",
     "all": "All",
     "success": "Successful",
@@ -292,7 +293,20 @@ export default {
     "all": "All",
     "opportunity": "Chance",
     "maxLeverage": "Maximum leverage",
-    "maxReturn": "Maximum return"
+    "maxReturn": "Maximum return",
+    "dateFilter": {
+      "all": "すべて",
+      "allDates": "すべての日付",
+      "weekdays": {
+        "mon": "月曜日",
+        "tue": "火曜日",
+        "wed": "水曜日",
+        "thu": "木曜日",
+        "fri": "金曜日",
+        "sat": "土曜日",
+        "sun": "日曜日"
+      }
+    }
   },
   "footerNav": {
     "home": "ホーム",
@@ -789,6 +803,67 @@ export default {
       "esports": "Esports"
     }
   },
+  "sports": {
+    "volume": "取引量",
+    "moneyline": "マネーライン",
+    "spread": "ハンディキャップ",
+    "total": "合計スコア",
+    "over": "オーバー",
+    "under": "アンダー",
+    "draw": "引分",
+    "marketOrder": "成行注文",
+    "limitOrder": "指値注文",
+    "orderBook": "オーダーブック",
+    "chart": "チャート",
+    "buy": "買い",
+    "sell": "売り",
+    "avgPrice": "平均価格",
+    "shares": "株"
+  },
+  "crypto": {
+    "upOrDown": "上昇か下落か",
+    "priceToBeat": "目標価格",
+    "currentPrice": "現在価格",
+    "record": "履歴",
+    "positions": "ポジション",
+    "orders": "注文",
+    "history": "履歴",
+    "avgPrice": "平均価格",
+    "cost": "コスト",
+    "current": "現在",
+    "profit": "利益",
+    "withdraw": "出金",
+    "openOrders": "未約定注文",
+    "cancelAll": "全てキャンセル",
+    "filled": "約定済み",
+    "untilCancel": "キャンセルまで",
+    "min": "分",
+    "sec": "秒",
+    "up": "Up",
+    "down": "Down"
+  },
+  "sportsEvents": {
+    "worldCup": "ワールドカップ",
+    "football": "サッカー",
+    "basketball": "バスケットボール",
+    "matchDay": "試合日",
+    "match": "試合",
+    "playerMarket": "選手マーケット",
+    "props": "プロップ",
+    "gameView": "ゲームビュー",
+    "maxLeverage": "最大レバレッジ",
+    "maxReturn": "最大リターン",
+    "weekdays": {
+      "mon": "月曜日",
+      "tue": "火曜日",
+      "wed": "水曜日",
+      "thu": "木曜日",
+      "fri": "金曜日",
+      "sat": "土曜日",
+      "sun": "日曜日"
+    },
+    "dateFormat": "{weekday}, {month}{day}日"
+  },
   "eventPool": {
     "title": "イベントプール",
     "heroTitle": "オンラインイベントに投票しよう",
@@ -800,5 +875,38 @@ export default {
     "vote": "投票",
     "votedToday": "本日はすでに投票済みです",
     "currentVotes": "現在の票数："
+  },
+  "payment": {
+    "buy": "買い",
+    "sell": "売り",
+    "marketOrder": "成行",
+    "limitOrder": "指値",
+    "balance": "残高",
+    "limitPrice": "指値価格",
+    "shares": "株数",
+    "avgPrice": "平均価格",
+    "leverage": "レバレッジ",
+    "maxLeverageTip": "最大レバレッジ: 10X (未開放)",
+    "total": "合計",
+    "potentialGain": "獲得可能",
+    "buyNo": "Buy No",
+    "buyYes": "Buy Yes"
+  },
+  "datePicker": {
+    "title": "日付範囲で絞り込み",
+    "desc": "過去{days}日間の注文履歴を表示できます",
+    "days": "{n}日間",
+    "year": "年",
+    "month": "月",
+    "day": "日"
+  },
+  "claimSuccess": {
+    "congratulations": "おめでとうございます",
+    "withdrawFee": "出金手数料(1%)",
+    "winnerFee": "勝者手数料(3%)",
+    "questionTitle": "12月28日のイーサリアム価格は？",
+    "betWin": "{bet}を賭けて獲得",
+    "claim": "受け取る",
+    "done": "完了"
   }
 }

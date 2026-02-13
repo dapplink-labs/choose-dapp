@@ -283,12 +283,9 @@ const handleDepositCompleted = () => {
 }
 
 .completed-btn {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 20px);
+  width: 100%;
   height: 48px;
+  margin-top: 24px;
   background: var(--text-color-y);
   border: none;
   border-radius: 12px;

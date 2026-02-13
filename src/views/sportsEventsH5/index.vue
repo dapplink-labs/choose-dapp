@@ -54,7 +54,7 @@
                     <span>{{ currentCategoryTitle }}</span>
                 </div>
                 <div class="day-pill">
-                    比赛日 {{ selectedMatchday }} <el-icon class="ml-1">
+                    {{ $t('sportsEvents.matchDay') }} {{ selectedMatchday }} <el-icon class="ml-1">
                         <ArrowDown />
                     </el-icon>
                 </div>
@@ -63,24 +63,24 @@
             <!-- 3. 类型切换 Tab -->
             <div class="type-tabs">
                 <button class="tab-btn" :class="{ active: activeTab === 'match' }"
-                    @click="activeTab = 'match'">比赛</button>
+                    @click="activeTab = 'match'">{{ $t('sportsEvents.match') }}</button>
                 <button class="tab-btn" :class="{ active: activeTab === 'player' }" @click="activeTab = 'player'">{{
-                    activeCategory === 'worldcup' || activeCategory === 'football' ? '球员盘' : '属性' }}</button>
+                    activeCategory === 'worldcup' || activeCategory === 'football' ? $t('sportsEvents.playerMarket') : $t('sportsEvents.props') }}</button>
             </div>
 
             <!-- 4. 赛事列表 - NBA/篮球 -->
             <div v-if="activeCategory === 'nba' || activeCategory === 'basketball'" class="event-list">
                 <div v-for="(event, idx) in eventsList" :key="idx" class="event-wrapper">
-                    <div v-if="event.date" class="date-label">{{ event.date }}</div>
+                    <div v-if="event.month" class="date-label">{{ formatDate(event.month, event.day, event.weekday) }}</div>
 
                     <div class="event-card">
                         <div class="card-meta">
                             <div class="meta-left">
                                 <span class="time-tag">{{ event.time }}</span>
-                                <span class="vol-text">{{ event.volume }} 交易量</span>
+                                <span class="vol-text">{{ event.volume }} {{ $t('sports.volume') }}</span>
                             </div>
                             <button class="view-btn" type="button" @click.stop="handleGameView(event)">
-                                游戏视角 <span class="arrow">›</span>
+                                {{ $t('sportsEvents.gameView') }} <span class="arrow">›</span>
                             </button>
                         </div>
 
@@ -113,16 +113,16 @@
             <div v-if="(activeCategory === 'worldcup' || activeCategory === 'football') && activeTab === 'match'"
                 class="event-list worldcup-list">
                 <div v-for="(event, idx) in worldcupEventsList" :key="idx" class="event-wrapper">
-                    <div v-if="event.date" class="date-label">{{ event.date }}</div>
+                    <div v-if="event.month" class="date-label">{{ formatDate(event.month, event.day, event.weekday) }}</div>
 
                     <div class="event-card worldcup-card">
                         <div class="card-meta">
                             <div class="meta-left">
                                 <span class="time-tag">{{ event.time }}</span>
-                                <span class="vol-text">{{ event.volume }} 交易量</span>
+                                <span class="vol-text">{{ event.volume }} {{ $t('sports.volume') }}</span>
                             </div>
                             <button class="view-btn" type="button" @click.stop="handleGameView(event)">
-                                游戏视角 <span class="arrow">›</span>
+                                {{ $t('sportsEvents.gameView') }} <span class="arrow">›</span>
                             </button>
                         </div>
 
@@ -166,11 +166,11 @@
                     </div>
                     <div class="card-leverage">
                         <div class="leverage-item">
-                            <span class="label">最大杠杆倍数:</span>
+                            <span class="label">{{ $t('sportsEvents.maxLeverage') }}:</span>
                             <span class="value">{{ item.maxLeverage }}</span>
                         </div>
                         <div class="leverage-item">
-                            <span class="label">最大回报:</span>
+                            <span class="label">{{ $t('sportsEvents.maxReturn') }}:</span>
                             <span class="value">{{ item.maxReturn }}</span>
                         </div>
                     </div>
@@ -228,6 +228,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ArrowDown, Avatar } from '@element-plus/icons-vue'
 import tyIcon01 from '@/assets/icon/tyIcon01.png'
 import tyIcon02 from '@/assets/icon/tyIcon02.png'
@@ -235,6 +236,7 @@ import NavBar2 from '@/components/navBar2.vue'
 import PaymentModal from '@/components/PaymentModal.vue'
 import LeagueSelector from './LeagueSelector.vue'
 
+const { t } = useI18n()
 const router = useRouter()
 const activeCategory = ref('nba')
 const selectedMatchday = ref(9)
@@ -251,10 +253,10 @@ const selectedLeague = ref('')
 // 计算当前分类标题
 const currentCategoryTitle = computed(() => {
     const categoryMap = {
-        'worldcup': '世界杯',
+        'worldcup': t('sportsEvents.worldCup'),
         'nba': 'NBA',
-        'football': '足球',
-        'basketball': '篮球'
+        'football': t('sportsEvents.football'),
+        'basketball': t('sportsEvents.basketball')
     }
     return categoryMap[activeCategory.value] || 'NBA'
 })
@@ -274,6 +276,14 @@ const handleLeagueSelect = (league) => {
     console.log('选择联赛:', league.name)
 }
 
+// 日期格式化函数
+const formatDate = (month, day, weekdayKey) => {
+    if (!month || !day) return ''
+    const weekday = t(`sportsEvents.weekdays.${weekdayKey}`)
+    const monthName = t(`detail.months.${month}`)
+    return t('sportsEvents.dateFormat', { weekday, month: monthName, day })
+}
+
 const handleGameView = (event) => {
     router.push('/sports-detail-h5')
 }
@@ -284,41 +294,41 @@ const openPayment = (event, side) => {
     showPayment.value = true
 }
 
-const sportsCategories = ref([
-    { key: 'worldcup', label: '世界杯', badge: 14 },
+const sportsCategories = computed(() => [
+    { key: 'worldcup', label: t('sportsEvents.worldCup'), badge: 14 },
     { key: 'nba', label: 'NBA', badge: 32 },
-    { key: 'football', label: '足球', badge: 0 },
-    { key: 'basketball', label: '篮球', badge: 0 }
+    { key: 'football', label: t('sportsEvents.football'), badge: 0 },
+    { key: 'basketball', label: t('sportsEvents.basketball'), badge: 0 }
 ])
 
 const eventsList = ref([
     {
-        date: '周一,1月5日', time: '4:00 AM', volume: '$37,755,917',
+        month: 'jan', day: 5, weekday: 'mon', time: '4:00 AM', volume: '$37,755,917',
         team1: { name: '尼克斯队', shortName: '尼克斯', record: '5-6-8', logo: tyIcon01, odds: '32' },
         team2: { name: '湖人队', shortName: '湖人', record: '8-6-5', logo: tyIcon02, odds: '69' }
     },
     {
-        date: '', time: '4:00 AM', volume: '$37,755,917',
+        month: '', day: '', weekday: '', time: '4:00 AM', volume: '$37,755,917',
         team1: { name: '尼克斯队', shortName: 'DET', record: '5-6-8', logo: tyIcon01, odds: '32' },
         team2: { name: '湖人队', shortName: 'Cle', record: '8-6-5', logo: tyIcon02, odds: '69' }
     },
     {
-        date: '周一,1月5日', time: '4:00 AM', volume: '$37,755,917',
+        month: 'jan', day: 5, weekday: 'mon', time: '4:00 AM', volume: '$37,755,917',
         team1: { name: '尼克斯队', shortName: '尼克斯', record: '5-6-8', logo: tyIcon01, odds: '32' },
         team2: { name: '湖人队', shortName: '湖人', record: '8-6-5', logo: tyIcon02, odds: '69' }
     },
     {
-        date: '', time: '4:00 AM', volume: '$37,755,917',
+        month: '', day: '', weekday: '', time: '4:00 AM', volume: '$37,755,917',
         team1: { name: '尼克斯队', shortName: 'DET', record: '5-6-8', logo: tyIcon01, odds: '32' },
         team2: { name: '湖人队', shortName: 'Cle', record: '8-6-5', logo: tyIcon02, odds: '69' }
     },
     {
-        date: '周一,1月5日', time: '4:00 AM', volume: '$37,755,917',
+        month: 'jan', day: 5, weekday: 'mon', time: '4:00 AM', volume: '$37,755,917',
         team1: { name: '尼克斯队', shortName: '尼克斯', record: '5-6-8', logo: tyIcon01, odds: '32' },
         team2: { name: '湖人队', shortName: '湖人', record: '8-6-5', logo: tyIcon02, odds: '69' }
     },
     {
-        date: '', time: '4:00 AM', volume: '$37,755,917',
+        month: '', day: '', weekday: '', time: '4:00 AM', volume: '$37,755,917',
         team1: { name: '尼克斯队', shortName: 'DET', record: '5-6-8', logo: tyIcon01, odds: '32' },
         team2: { name: '湖人队', shortName: 'Cle', record: '8-6-5', logo: tyIcon02, odds: '69' }
     }
@@ -327,22 +337,22 @@ const eventsList = ref([
 // 世界杯赛事列表
 const worldcupEventsList = ref([
     {
-        date: '周一,1月5日', time: '4:00 AM', volume: '$37,755,917', drawOdds: '32',
+        month: 'jan', day: 5, weekday: 'mon', time: '4:00 AM', volume: '$37,755,917', drawOdds: '32',
         team1: { name: 'Leeds United FC', shortName: 'lee', record: '5-6-8', logo: tyIcon01, odds: '32' },
         team2: { name: 'Man Utd', shortName: 'MUN', record: '8-6-5', logo: tyIcon02, odds: '32' }
     },
     {
-        date: '', time: '4:00 AM', volume: '$37,755,917', drawOdds: '32',
+        month: '', day: '', weekday: '', time: '4:00 AM', volume: '$37,755,917', drawOdds: '32',
         team1: { name: 'Leeds United FC', shortName: 'lee', record: '5-6-8', logo: tyIcon01, odds: '32' },
         team2: { name: 'Man Utd', shortName: 'MUN', record: '8-6-5', logo: tyIcon02, odds: '32' }
     },
     {
-        date: '周一,1月6日', time: '6:00 AM', volume: '$25,500,000', drawOdds: '28',
+        month: 'jan', day: 6, weekday: 'mon', time: '6:00 AM', volume: '$25,500,000', drawOdds: '28',
         team1: { name: 'Chelsea FC', shortName: 'CHE', record: '6-4-9', logo: tyIcon01, odds: '35' },
         team2: { name: 'Arsenal', shortName: 'ARS', record: '7-5-7', logo: tyIcon02, odds: '37' }
     },
     {
-        date: '', time: '8:00 AM', volume: '$18,200,000', drawOdds: '30',
+        month: '', day: '', weekday: '', time: '8:00 AM', volume: '$18,200,000', drawOdds: '30',
         team1: { name: 'Liverpool FC', shortName: 'LIV', record: '8-3-8', logo: tyIcon01, odds: '40' },
         team2: { name: 'Man City', shortName: 'MCI', record: '9-2-8', logo: tyIcon02, odds: '30' }
     }
