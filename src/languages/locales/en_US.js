@@ -565,6 +565,9 @@ export default {
       "A lightweight Web3 node service that supports major blockchains, ideal for startups and individual developers to join quickly. The prediction platform integrates lightweight nodes to provide stable on-chain data reads and transaction broadcasting for ecosystem dApps. Invite your friends now and earn more rewards together.",
     clusterDesc:
       "An advanced Web3 node service that supports major blockchains and serves as the core infrastructure of the prediction platform, powering high-concurrency real-time investing, on-chain oracle price feeds, and instant settlement of large prize pools. Invite your friends now and earn more rewards together.",
+    networkFeeDividend: "Network Trading Fee Dividend",
+    activated: "Activated",
+    notActivated: "Not Activated",
   },
   myIncome: {
     myIncomeCMT: "My Profit (CHO)",
@@ -765,6 +768,9 @@ export default {
     flowEarningsDesc: "Predicted platform trading flow earnings",
     subCoinEarnings: "Sub-coin Earnings",
     subCoinEarningsDesc: "Event oracle earnings",
+    fomoPoolEarnings: "FOMO Pool Earnings",
+    fomoPoolEarningsDesc:
+      "10% of predicted platform profit is distributed to FOMO pool stakers",
     myPerformance: "My Performance Overview",
     performanceDesc: "Actual performance is subject to final settlement",
     teamPerformance: "Team Total Performance",

@@ -560,6 +560,9 @@ export default {
       "需直推两个T1以上级别质押节点，才有全网手续费买卖收益0.5%CHO流水分红",
     clusterDesc:
       "需网体100个质押T1以上级别，才有全网手续费买卖收益0.5%CHO流水分红",
+    networkFeeDividend: "全网手续费买卖分红",
+    activated: "已激活",
+    notActivated: "未激活",
   },
   myIncome: {
     myIncomeCMT: "我的收益(CHO)",
@@ -758,6 +761,9 @@ export default {
     flowEarningsDesc: "预测平台交易流水收益",
     subCoinEarnings: "子币收益",
     subCoinEarningsDesc: "事件预言机收益",
+    fomoPoolEarnings: "预测平台FOMO池金额",
+    fomoPoolEarningsDesc:
+      "预测平台盈利金额的*10%，分给当天质押6000U/14000U用户",
     myPerformance: "我的业绩总览",
     performanceDesc: "实际业绩以最终结算结果为准",
     teamPerformance: "团队总业绩",

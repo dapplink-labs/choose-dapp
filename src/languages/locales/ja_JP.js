@@ -568,6 +568,9 @@ export default {
       "ハイグレードな Web3 ノードサービスで、主要チェーンをサポートし、予測プラットフォームのコアインフラとして機能します。高頻度・高並列のリアルタイム投資、オンチェーンオラクルの価格フィード、大規模プールの即時精算を支えます。今すぐ友だちを招待して、より多くの報酬を一緒に獲得しましょう。",
     clusterDesc:
       "取引手数料 0.5% とネットワーク全体の取引手数料からの利益分配を受け取るには、少なくとも 100 個の T1 レベル以上の担保付きアカウントが必要です。",
+    networkFeeDividend: "ネットワーク全体の取引手数料からの利益分配",
+    activated: "アクティブ",
+    notActivated: "非アクティブ",
   },
   myIncome: {
     myIncomeCMT: "私の収入 (CHO)",
@@ -768,6 +771,8 @@ export default {
     flowEarningsDesc: "予想プラットフォーム取引フロー収益",
     subCoinEarnings: "サブコイン収益",
     subCoinEarningsDesc: "イベントオラクル収益",
+    fomoPoolEarnings: "FOMOプール収益",
+    fomoPoolEarningsDesc: "予想プラットフォーム収益の10%がFOMOプールに配分されます",
     myPerformance: "私の実績概要",
     performanceDesc: "実際の実績は最終決済結果に準じます",
     teamPerformance: "チーム総実績",

@@ -70,6 +70,16 @@
             <span class="amount">{{ formatAmount(myIncomeData.sub_coin_income) }}</span>
           </div>
         </div>
+        <!-- fomoPool Earnings -->
+        <div class="earning-card">
+          <div class="card-left">
+            <div class="card-title">{{ t('myEarnings.fomoPoolEarnings') }}</div>
+            <div class="card-desc">{{ t('myEarnings.fomoPoolEarningsDesc') }}</div>
+          </div>
+          <div class="card-right">
+            <span class="amount">{{ formatAmount(myIncomeData.fomo_pool_income) }}</span>
+          </div>
+        </div>
       </div>
 
       <!-- Section 2: Performance -->

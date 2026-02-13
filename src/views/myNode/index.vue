@@ -17,10 +17,18 @@
             : $t("myNode.clusterDesc")
         }}
       </p>
-      <p class="time-text">
-        {{ $t("myIncome.purchaseTime") }}:
-        {{ formatDateTime(purchaseTime || 0) }}
-      </p>
+      <div class="banner-info">
+        <p class="status-text">
+          {{ $t("myNode.networkFeeDividend") }}:
+          <span :class="{ 'activated': isActivated }">{{
+            isActivated ? $t("myNode.activated") : $t("myNode.notActivated")
+          }}</span>
+        </p>
+        <p class="time-text">
+          {{ $t("myIncome.purchaseTime") }}:
+          {{ formatDateTime(purchaseTime || 0) }}
+        </p>
+      </div>
     </div>
     <div class="cps-bg"></div>
 
@@ -306,6 +314,12 @@ const teamIncome = ref(0);
 const nodeType = ref(0);
 const projectedReturns = ref(0); // 个人预测收益
 const purchaseTime = ref(0); // 购买时间
+const directed_number = ref(0);
+const target_direct_number = ref(0);
+
+const isActivated = computed(() => {
+  return Number(directed_number.value) >= Number(target_direct_number.value);
+});
 
 function showInfo() {
   detailsRef.value?.refresh();
@@ -548,6 +562,8 @@ async function init() {
       teamIncome.value = data.team_reward ?? "0";
       nodeType.value = Number(data.node_type ?? 0);
       purchaseTime.value = data.created ?? 0;
+      directed_number.value = data.directed_number ?? 0;
+      target_direct_number.value = data.target_direct_number ?? 0;
       forecast_income.value = data.forecast_income ?? "0"; // 预测收益
       total_reward_usdt.value = data.produced_income ?? "0"; // 节点总收益（USDT）
       progressPercent.value = formatProgressPercent(
@@ -556,6 +572,7 @@ async function init() {
             0)) *
         100,
       );
+      
     })
     .catch((err) => {
       console.error("获取节点收益详情失败：", err);
@@ -655,14 +672,30 @@ onMounted(async () => {
     padding-top: 60px; // 为 fixed 的 BackHeaderNav 预留空间
     margin-bottom: 22px;
 
-    .time-text {
-      font-family:
-        PingFang SC,
-        PingFang SC;
-      font-weight: 400;
-      font-size: 14px;
-      color: var(--bg-opposite, #ffffff);
-      opacity: 0.8;
+    .banner-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+
+      .status-text,
+      .time-text {
+        font-family:
+          PingFang SC,
+          PingFang SC;
+        font-weight: 400;
+        font-size: 14px;
+        color: var(--bg-opposite, #ffffff);
+        opacity: 0.8;
+        margin: 0;
+      }
+
+      .status-text {
+        span.activated {
+          color: var(--text-color-y, #bbff2e);
+          opacity: 1;
+        }
+      }
     }
 
     .page-desc {
