@@ -553,9 +553,13 @@ export default {
     teamTotalAddressCount: "팀 총 주소 수",
     directAddress: "직접 추천",
     teamAddress: "팀",
+    effectiveNodeDirectCount: "유효 노드 직접 추천 인원",
+    effectiveStakingDirectCount: "유효 스테이킹 직접 추천 인원",
     directEffectiveCount: "유효 직접 추천 인원",
     directIneffectiveCount: "무효 직접 추천 인원",
     teamEffectiveCount: "유효 팀 인원",
+    effectiveNodeTeamCount: "유효 노드 팀 인원",
+    effectiveStakingTeamCount: "유효 스테이킹 팀 인원",
     teamIneffectiveCount: "무효 팀 인원",
     distributedDesc:
       "가벼운 Web3 노드 서비스로, 주요 체인을 지원하며 초기 프로젝트와 개인 개발자가 빠르게 참여하기에 적합합니다. 예측 플랫폼에 내장된 라이트 노드는 생태계 dApp 에 안정적인 온체인 데이터 조회와 트랜잭션 브로드캐스트를 제공합니다. 지금 친구들을 초대해서 더 많은 보상을 함께 받아 보세요.",

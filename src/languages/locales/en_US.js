@@ -553,8 +553,12 @@ export default {
     teamTotalAddressCount: "Total Team Address Count",
     directAddress: "Direct",
     teamAddress: "Team",
+    effectiveNodeDirectCount: "Effective Node Direct Referral Members",
+    effectiveStakingDirectCount: "Effective Staking Direct Referral Members",
     directEffectiveCount: "Effective Direct Referral Members",
     directIneffectiveCount: "Ineffective Direct Referral Members",
+    effectiveNodeTeamCount: "Effective Node Team Members",
+    effectiveStakingTeamCount: "Effective Staking Team Members",
     teamEffectiveCount: "Effective Team Members",
     teamIneffectiveCount: "Ineffective Team Members",
     distributedDesc:

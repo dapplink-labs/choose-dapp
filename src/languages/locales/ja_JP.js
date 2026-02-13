@@ -556,9 +556,13 @@ export default {
     teamTotalAddressCount: "チーム総アドレス数",
     directAddress: "直接紹介",
     teamAddress: "チーム",
+    effectiveNodeDirectCount: "有効ノード直接紹介人数",
+    effectiveStakingDirectCount: "有効ステーキング直接紹介人数",
     directEffectiveCount: "有効直接紹介人数",
     directIneffectiveCount: "無効直接紹介人数",
     teamEffectiveCount: "有効チーム人数",
+    effectiveNodeTeamCount: "有効ノードチーム人数",
+    effectiveStakingTeamCount: "有効ステーキングチーム人数",
     teamIneffectiveCount: "無効チーム人数",
     distributedDesc:
       "ハイグレードな Web3 ノードサービスで、主要チェーンをサポートし、予測プラットフォームのコアインフラとして機能します。高頻度・高並列のリアルタイム投資、オンチェーンオラクルの価格フィード、大規模プールの即時精算を支えます。今すぐ友だちを招待して、より多くの報酬を一緒に獲得しましょう。",

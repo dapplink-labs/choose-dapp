@@ -202,22 +202,46 @@
         </div>
 
         <div class="team-header">
-          <span class="invite-count">
-            <span>{{
-              activeTab === "direct"
-                ? $t("myNode.directEffectiveCount")
-                : $t("myNode.teamEffectiveCount")
-            }}</span>
-            {{ effectiveCount }}
-          </span>
-          <span class="invite-count">
-            <span>{{
-              activeTab === "direct"
-                ? $t("myNode.directIneffectiveCount")
-                : $t("myNode.teamIneffectiveCount")
-            }}</span>
-            {{ ineffectiveCount }}
-          </span>
+          <template v-if="activeTab === 'direct'">
+            <span class="invite-count">
+              <span>{{
+                $t("myNode.effectiveNodeDirectCount")
+              }}</span>
+              {{ effectiveNodeDirectCount }}
+            </span>
+            <span class="invite-count">
+              <span>{{
+                $t("myNode.effectiveStakingDirectCount")
+              }}</span>
+              {{ effectiveStakingDirectCount }}
+            </span>
+            <span class="invite-count">
+              <span>{{
+                $t("myNode.directIneffectiveCount")
+              }}</span>
+              {{ ineffectiveCount }}
+            </span>
+          </template>
+          <template v-else>
+            <span class="invite-count">
+              <span>{{
+                $t("myNode.effectiveNodeTeamCount")
+              }}</span>
+              {{ effectiveNodeTeamCount }}
+            </span>
+            <span class="invite-count">
+              <span>{{
+                $t("myNode.effectiveStakingTeamCount")
+              }}</span>
+              {{ effectiveStakingTeamCount }}
+            </span>
+            <span class="invite-count">
+              <span>{{
+                $t("myNode.teamIneffectiveCount")
+              }}</span>
+              {{ ineffectiveCount }}
+            </span>
+          </template>
         </div>
 
         <!-- 层级树状图占位 -->
@@ -330,6 +354,14 @@ const activeTab = ref("direct");
 
 // 有效人数（直推/团队）
 const effectiveCount = ref(0);
+// 有效节点直推人数
+const effectiveNodeDirectCount = ref(0);
+// 有效质押直推人数
+const effectiveStakingDirectCount = ref(0);
+// 有效节点团队人数
+const effectiveNodeTeamCount = ref(0);
+// 有效质押团队人数
+const effectiveStakingTeamCount = ref(0);
 // 无效人数（直推/团队）
 const ineffectiveCount = ref(0);
 // 邀请列表
@@ -364,6 +396,11 @@ const getMyTeamInfoList = async () => {
     (activeTab.value === "direct"
       ? data.direct_ineffective_count
       : data.team_ineffective_count) ?? 0;
+
+  effectiveNodeDirectCount.value = data.direct_effective_node_count ?? 0;
+  effectiveStakingDirectCount.value = data.direct_effective_staking_count ?? 0;
+  effectiveNodeTeamCount.value = data.team_effective_node_count ?? 0;
+  effectiveStakingTeamCount.value = data.team_effective_staking_count ?? 0;
   const rawList =
     activeTab.value === "direct" ? data.direct_team_list : data.team_list;
   // 映射接口数据到模板需要的格式：

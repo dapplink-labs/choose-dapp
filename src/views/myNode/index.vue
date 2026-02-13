@@ -29,16 +29,12 @@
         <div class="item">
           <b>{{ $t("myNode.choIncome") }}</b>
           <p>{{ formatAmount(choIncome) }}</p>
-          <span class="currey"
-            >≈{{ formatAmount(choIncome * cho2usdt_rate) }} USDT</span
-          >
+          <span class="currey">≈{{ formatAmount(choIncome * cho2usdt_rate) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myNode.projectedReturns") }}</b>
           <p>{{ formatAmount(projectedReturns) }}</p>
-          <span class="currey"
-            >≈{{ formatAmount(projectedReturns * cho2usdt_rate) }} USDT</span
-          >
+          <span class="currey">≈{{ formatAmount(projectedReturns * cho2usdt_rate) }} USDT</span>
         </div>
       </div>
 
@@ -46,29 +42,20 @@
       <div class="processDiv">
         <div class="progress-bar-container">
           <div class="progress-bar">
-            <div
-              class="progress-fill"
-              :style="{
-                width:
-                  (progressPercent || 0) < 4 ? 4 + '%' : progressPercent + '%',
-              }"
-            ></div>
-            <div
-              class="progress-indicator"
-              :style="{ left: progressIndicatorLeft }"
-              :class="{
-                'progress-indicator-left': (progressPercent || 0) < 20,
-                'progress-indicator-right': (progressPercent || 0) >= 90,
-              }"
-            >
+            <div class="progress-fill" :style="{
+              width:
+                (progressPercent || 0) < 4 ? 4 + '%' : progressPercent + '%',
+            }"></div>
+            <div class="progress-indicator" :style="{ left: progressIndicatorLeft }" :class="{
+              'progress-indicator-left': (progressPercent || 0) < 20,
+              'progress-indicator-right': (progressPercent || 0) >= 90,
+            }">
               {{ $t("myIncome.remainingClaimable") }}：
-              <span class="indicator-text"
-                >{{
-                  formatUsdtAmount(
-                    parseInt(forecast_income) - parseInt(total_reward_usdt),
-                  )
-                }}U</span
-              >
+              <span class="indicator-text">{{
+                formatUsdtAmount(
+                  parseInt(forecast_income) - parseInt(total_reward_usdt),
+                )
+              }}U</span>
             </div>
           </div>
         </div>
@@ -83,12 +70,7 @@
         <h3 class="pending-title">
           <span>{{ $t("myNode.pendingIncome") }}</span>
 
-          <el-icon
-            size="16"
-            style="margin-top: 5px"
-            @click="showInfo"
-            :color="'var(--text-color)'"
-          >
+          <el-icon size="16" style="margin-top: 5px" @click="showInfo" :color="'var(--text-color)'">
             <QuestionFilled />
           </el-icon>
         </h3>
@@ -136,11 +118,7 @@
       </div>
 
       <!-- 一键领取按钮：凌晨 2-3 点禁止领取，显示“收益计算中” -->
-      <button
-        class="claim-all-btn"
-        :disabled="claimLoading || isClaimDisabledByTime"
-        @click="handleClaimReward"
-      >
+      <button class="claim-all-btn" :disabled="claimLoading || isClaimDisabledByTime" @click="handleClaimReward">
         {{
           isClaimDisabledByTime
             ? $t("myIncome.calculating")
@@ -155,63 +133,70 @@
     <div class="my-team">
       <div class="team-content">
         <div class="team-tabs">
-          <div
-            :class="['tab-btn', { active: activeTab === 'direct' }]"
-            @click="activeTab = 'direct'"
-          >
+          <div :class="['tab-btn', { active: activeTab === 'direct' }]" @click="activeTab = 'direct'">
             {{ $t("myNode.directAddress") }}
           </div>
-          <div
-            :class="['tab-btn', { active: activeTab === 'team' }]"
-            @click="activeTab = 'team'"
-          >
+          <div :class="['tab-btn', { active: activeTab === 'team' }]" @click="activeTab = 'team'">
             {{ $t("myNode.teamAddress") }}
           </div>
         </div>
 
         <div class="team-header">
-          <span class="invite-count">
-            <span>{{
-              activeTab === "direct"
-                ? $t("myNode.directEffectiveCount")
-                : $t("myNode.teamEffectiveCount")
-            }}</span>
-            {{ effectiveCount }}
-          </span>
-          <span class="invite-count">
-            <span>{{
-              activeTab === "direct"
-                ? $t("myNode.directIneffectiveCount")
-                : $t("myNode.teamIneffectiveCount")
-            }}</span>
-            {{ ineffectiveCount }}
-          </span>
+          <template v-if="activeTab === 'direct'">
+            <span class="invite-count">
+              <span>{{
+                $t("myNode.effectiveNodeDirectCount")
+              }}</span>
+              {{ effectiveNodeDirectCount }}
+            </span>
+            <span class="invite-count">
+              <span>{{
+                $t("myNode.effectiveStakingDirectCount")
+              }}</span>
+              {{ effectiveStakingDirectCount }}
+            </span>
+            <span class="invite-count">
+              <span>{{
+                $t("myNode.directIneffectiveCount")
+              }}</span>
+              {{ ineffectiveCount }}
+            </span>
+          </template>
+          <template v-else>
+            <span class="invite-count">
+              <span>{{
+                $t("myNode.effectiveNodeTeamCount")
+              }}</span>
+              {{ effectiveNodeTeamCount }}
+            </span>
+            <span class="invite-count">
+              <span>{{
+                $t("myNode.effectiveStakingTeamCount")
+              }}</span>
+              {{ effectiveStakingTeamCount }}
+            </span>
+            <span class="invite-count">
+              <span>{{
+                $t("myNode.teamIneffectiveCount")
+              }}</span>
+              {{ ineffectiveCount }}
+            </span>
+          </template>
+
         </div>
 
         <!-- 层级树状图占位 -->
         <div class="team-tree-placeholder">
-          <TeamTree
-            :type="activeTab === 'direct' ? 1 : 2"
-            :node_type="2"
-            :team_network_list="teamNetworkList"
-            :direct_network_list="directNetworkList"
-          />
+          <TeamTree :type="activeTab === 'direct' ? 1 : 2" :node_type="2" :team_network_list="teamNetworkList"
+            :direct_network_list="directNetworkList" />
         </div>
 
         <div class="team-list" v-if="currentList.length > 0">
-          <div
-            v-for="item in currentList"
-            :key="item.address"
-            class="team-item"
-          >
+          <div v-for="item in currentList" :key="item.address" class="team-item">
             <div class="team-avatar">
               <div class="avatar-content">
-                <img
-                  :src="item.avatar || avatarImg"
-                  alt="avatar"
-                  class="avatar-img"
-                  @error="handleInviterAvatarError"
-                />
+                <img :src="item.avatar || avatarImg" alt="avatar" class="avatar-img"
+                  @error="handleInviterAvatarError" />
               </div>
             </div>
             <div class="team-info-content">
@@ -229,17 +214,13 @@
                   </div>
                 </div>
                 <div class="team-right-info">
-                  <span class="team-reward"
-                    >+ {{ item.reward || "0" }} CHO</span
-                  >
+                  <span class="team-reward">+ {{ item.reward || "0" }} CHO</span>
                 </div>
               </div>
               <!-- 团队地址列表：显示Upline和时间 -->
               <div v-if="activeTab === 'team'" class="team-upline-row">
                 <div class="team-upline-left">
-                  <span class="team-upline-label"
-                    >{{ $t("myIncome.upline") }}:</span
-                  >
+                  <span class="team-upline-label">{{ $t("myIncome.upline") }}:</span>
                   <span class="team-upline-address">{{
                     item.upline || item.address
                   }}</span>
@@ -407,6 +388,15 @@ const directNetworkList = ref([]);
 
 // 有效直推数
 const effectiveCount = ref(0);
+// 有效节点直推人数
+const effectiveNodeDirectCount = ref(0);
+// 有效质押直推人数
+const effectiveStakingDirectCount = ref(0);
+// 有效节点团队人数
+const effectiveNodeTeamCount = ref(0);
+// 有效质押团队人数
+const effectiveStakingTeamCount = ref(0);
+
 // 无效直推数
 const ineffectiveCount = ref(0);
 // 邀请列表
@@ -482,6 +472,10 @@ const getMyTeamInfoList = async () => {
     (activeTab.value === "direct"
       ? data.direct_ineffective_count
       : data.team_ineffective_count) ?? 0;
+  effectiveNodeDirectCount.value = data.direct_effective_node_count ?? 0;
+  effectiveStakingDirectCount.value = data.direct_effective_staking_count ?? 0;
+  effectiveNodeTeamCount.value = data.team_effective_node_count ?? 0;
+  effectiveStakingTeamCount.value = data.team_effective_staking_count ?? 0;
   const rawList =
     activeTab.value === "direct" ? data.direct_team_list : data.team_list;
   // 映射接口数据到模板需要的格式：
@@ -560,7 +554,7 @@ async function init() {
         (1 -
           ((Number(data.produced_income) || 0) / Number(data.forecast_income) ||
             0)) *
-          100,
+        100,
       );
     })
     .catch((err) => {
@@ -793,11 +787,9 @@ onMounted(async () => {
         top: 0;
         left: 0;
         height: 100%;
-        background: linear-gradient(
-          270deg,
-          #bbff2e 0%,
-          #31d908 100%
-        ) !important;
+        background: linear-gradient(270deg,
+            #bbff2e 0%,
+            #31d908 100%) !important;
         border-radius: 10px;
         transition: width 0.3s ease;
       }
@@ -1264,6 +1256,7 @@ onMounted(async () => {
 
         .team-upline-row {
           .team-upline-left {
+
             .team-upline-label,
             .team-upline-address {
               color: #999999 !important;

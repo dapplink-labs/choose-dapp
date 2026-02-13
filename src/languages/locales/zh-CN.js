@@ -549,8 +549,12 @@ export default {
     directAddress: "直推",
     teamAddress: "团队",
     directEffectiveCount: "有效直推人数",
+    effectiveNodeDirectCount: "有效节点直推人数",
+    effectiveStakingDirectCount: "有效质押直推人数",
     directIneffectiveCount: "无效直推人数",
     teamEffectiveCount: "有效团队人数",
+    effectiveNodeTeamCount: "有效节点团队人数",
+    effectiveStakingTeamCount: "有效质押团队人数",
     teamIneffectiveCount: "无效团队人数",
     distributedDesc:
       "需直推两个T1以上级别质押节点，才有全网手续费买卖收益0.5%CHO流水分红",
