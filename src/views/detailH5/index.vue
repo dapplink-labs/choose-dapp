@@ -77,18 +77,29 @@
                 <!-- 图表图例 -->
                 <div class="chart-legend">
                     <div v-for="(option, index) in chartOptions" :key="index" class="legend-item">
-                        <span class="legend-dot" :style="{ backgroundColor: option.color }"></span>
+                        <span class="legend-dot" :class="index === 0 ? 'green' : 'pink'"></span>
                         <span class="legend-text">{{ option.label }} {{ option.percentage }}%</span>
                     </div>
                 </div>
 
                 <!-- 图表容器 -->
                 <div class="chart-container">
-                    <LineChartDetail :orange-data="chartData[selectedTimeRange]?.orange || []"
-                        :green-data="chartData[selectedTimeRange]?.green || []"
-                        :blue-data="chartData[selectedTimeRange]?.blue || []"
-                        :x-axis-data="chartData[selectedTimeRange]?.xAxis || []" :selected-y-value="selectedYValue"
-                        @y-value-change="handleYValueChange" />
+                    <div ref="chartRef" class="chart-canvas" />
+                    <!-- 绿色线浮动信息框 -->
+                    <div v-if="showGreenBubble" class="info-popover green-bubble" :style="greenBubbleStyle">
+                        <div class="info-price">{{ chartOptions[0].label }} {{ greenPrice.toFixed(1) }}%</div>
+                    </div>
+                    <!-- 粉色线浮动信息框 -->
+                    <div v-if="showPinkBubble" class="info-popover pink-bubble" :style="pinkBubbleStyle">
+                        <div class="info-price">{{ chartOptions[1].label }} {{ pinkPrice.toFixed(1) }}%</div>
+                    </div>
+                    <!-- 左侧价格标签 -->
+                    <div class="price-labels">
+                        <div class="price-label green">+$3</div>
+                        <div class="price-label green">+$200</div>
+                        <div class="price-label pink">+$2</div>
+                        <div class="price-label pink">+$10</div>
+                    </div>
                 </div>
             </div>
 
@@ -320,12 +331,14 @@ import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Trophy, Clock, ArrowUpBold } from '@element-plus/icons-vue'
-import LineChartDetail from '@/components/LineChartDetail.vue'
+import * as echarts from 'echarts'
 import PaymentModal from '@/components/PaymentModal.vue'
 import NavBar2 from '@/components/navBar2.vue'
+import { useThemeStore } from '@/stores/theme'
 
 const router = useRouter()
 const { t } = useI18n()
+const themeStore = useThemeStore()
 
 // 详情数据
 const detailData = ref({
@@ -370,9 +383,8 @@ function updateCountdown() {
 
 // 图表选项数据
 const chartOptions = ref([
-    { label: 'November 12-15', percentage: 13, color: '#FF9500', yesPrice: '0.8', noPrice: '99.4' },
-    { label: 'November 16+', percentage: 51, color: '#25A750', yesPrice: '0.8', noPrice: '99.4' },
-    { label: 'November 8-11', percentage: 8, color: '#3B82F6', yesPrice: '0.8', noPrice: '99.4' }
+    { label: '下降50个基点以上', percentage: 95.4, color: '#D4FF00', yesPrice: '0.8', noPrice: '99.4' },
+    { label: '下降25个基点', percentage: 4.6, color: '#E44096', yesPrice: '0.8', noPrice: '99.4' }
 ])
 
 // 时间范围选项
@@ -459,10 +471,24 @@ watch(showPayment, (newVal) => {
 onMounted(() => {
     updateCountdown()
     countdownTimer = setInterval(updateCountdown, 1000)
+    nextTick(() => {
+        initChart()
+        window.addEventListener('resize', () => chartInstance?.resize())
+    })
 })
 onUnmounted(() => {
     document.body.style.overflow = ''
     if (countdownTimer) clearInterval(countdownTimer)
+    if (chartInstance) {
+        chartInstance.dispose()
+        chartInstance = null
+    }
+    // 移除图表触摸事件监听
+    if (chartRef.value) {
+        chartRef.value.removeEventListener('touchstart', handleChartTouchStart)
+        chartRef.value.removeEventListener('touchmove', handleChartTouchMove)
+        chartRef.value.removeEventListener('touchend', handleChartTouchEnd)
+    }
 })
 
 // Comments 数据
@@ -581,145 +607,68 @@ const getRecentMonths = () => {
     return ['10月', '11月', '12月']
 }
 
-// 生成图表数据（根据图片描述的数据趋势：10月、11月、12月）
+// 生成图表数据（根据图片描述的数据趋势：1月、3月、5月）
 function generateChartData(points, range) {
-    const orangeData = []
-    const greenData = []
-    const blueData = []
+    const orangeData = []  // 绿色线 - 高位数据 (90-100%)
+    const blueData = []    // 粉色线 - 低位数据 (0-10%)
 
-    // X轴标签：10月、11月、12月
-    const xAxisData = ['10月', '11月', '12月']
-
-    // 确保数据点数量足够，至少30个点以显示平滑的曲线
+    // 确保数据点数量足够
     const actualPoints = Math.max(points, 30)
 
-    // 生成3个月的数据（根据图片描述的趋势）
     for (let i = 0; i < actualPoints; i++) {
-        const progress = i / (actualPoints - 1) // 0 到 1
+        const progress = i / (actualPoints - 1)
         const dayIndex = i
 
-        // 添加轻微的随机波动
-        const randomNoise = () => (Math.random() - 0.5) * 2 // 轻微波动
-        const dailyVariation = Math.sin(dayIndex * 0.1) * 1.5 // 每日轻微波动
-        const weeklyVariation = Math.sin(dayIndex * 0.02) * 2 // 每周波动
+        const randomNoise = () => (Math.random() - 0.5) * 3
+        const dailyVariation = Math.sin(dayIndex * 0.2) * 3
+        const weeklyVariation = Math.sin(dayIndex * 0.05) * 5
 
-        // 橙色线：85%-100%之间波动
-        // 10月开始约95%，稍微下降，11月中旬上升到接近100%，再次下降，12月结束时接近100%
-        let orangeValue
-        if (progress < 0.33) {
-            // 10月：从95%开始，稍微下降
-            const monthProgress = progress / 0.33
-            orangeValue = 95 - monthProgress * 3 + Math.sin(monthProgress * Math.PI * 2) * 2
-        } else if (progress < 0.66) {
-            // 11月：从92%上升到接近100%，然后下降
-            const monthProgress = (progress - 0.33) / 0.33
-            orangeValue = 92 + Math.sin(monthProgress * Math.PI) * 6 // 先上升到98%，再下降到92%
-            if (monthProgress < 0.5) {
-                orangeValue = 92 + monthProgress * 12 // 前半段上升
-            } else {
-                orangeValue = 98 - (monthProgress - 0.5) * 6 // 后半段下降
-            }
-        } else {
-            // 12月：从92%上升到接近100%
-            const monthProgress = (progress - 0.66) / 0.34
-            orangeValue = 92 + monthProgress * 6 + Math.sin(monthProgress * Math.PI * 2) * 1.5
-        }
-        orangeValue += dailyVariation + weeklyVariation + randomNoise()
-        orangeData.push(Math.max(85, Math.min(100, orangeValue)))
-
-        // 浅绿色/灰色线：
-        // 10月开始约50%，上升到60%，保持在60%左右直到11月底，下降到48%，回升到60%，然后急剧下降到35%
+        // 绿色线：在 70-100% 之间大幅波动
         let greenValue
-        if (progress < 0.33) {
-            // 10月：从50%上升到60%
-            const monthProgress = progress / 0.33
-            greenValue = 50 + monthProgress * 10
-        } else if (progress < 0.66) {
-            // 11月：保持在60%左右，11月底下降到48%
-            const monthProgress = (progress - 0.33) / 0.33
-            if (monthProgress < 0.8) {
-                // 11月大部分时间保持在60%左右
-                greenValue = 60 + Math.sin(monthProgress * Math.PI * 4) * 2
-            } else {
-                // 11月底下降到48%
-                greenValue = 60 - (monthProgress - 0.8) * 60 // 从60%快速下降到48%
-            }
+        if (progress < 0.2) {
+            greenValue = 70 + Math.sin(progress * Math.PI * 3) * 10
+        } else if (progress < 0.4) {
+            greenValue = 80 + Math.sin((progress - 0.2) * Math.PI * 4) * 15
+        } else if (progress < 0.6) {
+            greenValue = 85 - Math.sin((progress - 0.4) * Math.PI * 5) * 35
+        } else if (progress < 0.8) {
+            greenValue = 50 + Math.sin((progress - 0.6) * Math.PI * 4) * 20
         } else {
-            // 12月：从48%回升到60%，然后急剧下降到35%
-            const monthProgress = (progress - 0.66) / 0.34
-            if (monthProgress < 0.3) {
-                // 12月初回升到60%
-                greenValue = 48 + monthProgress * 40
-            } else {
-                // 然后急剧下降到35%
-                greenValue = 60 - (monthProgress - 0.3) * 71.4 // 从60%下降到35%
-            }
+            greenValue = 70 + (progress - 0.8) * 150  // 快速上升到100%
         }
-        greenValue += dailyVariation * 0.8 + weeklyVariation * 0.6 + randomNoise()
-        greenData.push(Math.max(30, Math.min(65, greenValue)))
+        greenValue += dailyVariation + weeklyVariation + randomNoise()
+        orangeData.push(Math.max(10, Math.min(100, greenValue)))
 
-        // 蓝色线：
-        // 10月开始约25%，有轻微波动，11月中旬下降到最低点约10%，11月底回升到25%，然后稳步下降到接近0%
-        let blueValue
-        if (progress < 0.33) {
-            // 10月：从25%开始，有轻微波动
-            const monthProgress = progress / 0.33
-            blueValue = 25 + Math.sin(monthProgress * Math.PI * 3) * 3
-        } else if (progress < 0.66) {
-            // 11月：下降到最低点约10%，然后回升到25%
-            const monthProgress = (progress - 0.33) / 0.33
-            if (monthProgress < 0.5) {
-                // 11月前半段下降到10%
-                blueValue = 25 - monthProgress * 30
-            } else {
-                // 11月后半段回升到25%
-                blueValue = 10 + (monthProgress - 0.5) * 30
-            }
+        // 粉色线：在 0-30% 之间波动
+        let pinkValue
+        if (progress < 0.3) {
+            pinkValue = 25 + Math.sin(progress * Math.PI * 4) * 8
+        } else if (progress < 0.6) {
+            pinkValue = 30 - Math.sin((progress - 0.3) * Math.PI * 5) * 20
+        } else if (progress < 0.8) {
+            pinkValue = 10 + Math.sin((progress - 0.6) * Math.PI * 3) * 15
         } else {
-            // 12月：从25%稳步下降到接近0%
-            const monthProgress = (progress - 0.66) / 0.34
-            blueValue = 25 - monthProgress * 25
+            pinkValue = 25 - (progress - 0.8) * 100  // 下降到接近0%
         }
-        blueValue += dailyVariation * 0.6 + weeklyVariation * 0.4 + randomNoise()
-        blueData.push(Math.max(0, Math.min(30, blueValue)))
+        pinkValue += dailyVariation * 0.5 + weeklyVariation * 0.3 + randomNoise() * 0.5
+        blueData.push(Math.max(0, Math.min(35, pinkValue)))
     }
 
-    // 轻微平滑处理
-    const smoothData = (data, windowSize = 1) => {
-        const smoothed = [...data]
-        for (let i = 1; i < data.length - 1; i++) {
-            smoothed[i] = (data[i - 1] + data[i] * 2 + data[i + 1]) / 4
-        }
-        return smoothed
+    // 强制端点值
+    if (orangeData.length > 0) {
+        orangeData[0] = 70
+        orangeData[orangeData.length - 1] = 98
     }
-
-    // 应用平滑处理
-    const smoothedOrange = smoothData(orangeData, 1)
-    const smoothedGreen = smoothData(greenData, 1)
-    const smoothedBlue = smoothData(blueData, 1)
-
-    // 确保关键点的值符合图片描述
-    // 橙色线：10月开始约95%，12月结束接近100%
-    if (smoothedOrange.length > 0) {
-        smoothedOrange[0] = 95
-        smoothedOrange[smoothedOrange.length - 1] = 98
-    }
-    // 绿色线：10月开始约50%，12月结束约35%
-    if (smoothedGreen.length > 0) {
-        smoothedGreen[0] = 50
-        smoothedGreen[smoothedGreen.length - 1] = 35
-    }
-    // 蓝色线：10月开始约25%，12月结束接近0%
-    if (smoothedBlue.length > 0) {
-        smoothedBlue[0] = 25
-        smoothedBlue[smoothedBlue.length - 1] = 2
+    if (blueData.length > 0) {
+        blueData[0] = 25
+        blueData[blueData.length - 1] = 5
     }
 
     return {
-        orange: smoothedOrange,
-        green: smoothedGreen,
-        blue: smoothedBlue,
-        xAxis: xAxisData
+        orange: orangeData,
+        green: [],
+        blue: blueData,
+        xAxis: Array.from({ length: orangeData.length }, (_, i) => i)
     }
 }
 
@@ -735,9 +684,341 @@ const chartData = computed(() => {
     }
 })
 
+// ECharts 相关
+const chartRef = ref(null)
+let chartInstance = null
+const greenHandleIndex = ref(0)
+const pinkHandleIndex = ref(0)
+const greenPrice = ref(95.4)
+const pinkPrice = ref(4.6)
+const showGreenBubble = ref(false)
+const showPinkBubble = ref(false)
+const greenBubbleStyle = ref({ display: 'none' })
+const pinkBubbleStyle = ref({ display: 'none' })
+
+// 图表颜色配置
+const chartColors = computed(() => ({
+    green: themeStore.isDark ? '#D4FF00' : '#19d96b',
+    greenLight: themeStore.isDark ? 'rgba(212, 255, 0, 0.15)' : 'rgba(25, 217, 107, 0.15)',
+    greenGradient: themeStore.isDark ? 'rgba(212, 255, 0, 0.2)' : 'rgba(25, 217, 107, 0.2)',
+    greenStroke: themeStore.isDark ? 'rgba(212, 255, 0, 0.3)' : 'rgba(25, 217, 107, 0.3)',
+    pink: '#E44096',
+    pinkLight: 'rgba(228, 64, 150, 0.15)',
+    pinkGradient: 'rgba(228, 64, 150, 0.2)',
+    pinkStroke: 'rgba(228, 64, 150, 0.3)',
+    axisLabel: themeStore.isDark ? '#7C7C7C' : '#888',
+    splitLine: themeStore.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'
+}))
+
+const updateChart = () => {
+    if (!chartInstance) return
+
+    const current = chartData.value[selectedTimeRange.value] || chartData.value['1W']
+    const greenData = current?.orange || []  // 使用orange作为绿色线数据
+    const pinkData = current?.blue || []     // 使用blue作为粉色线数据
+    const xAxisLabels = current?.xAxis || []
+    const colors = chartColors.value
+
+    // 初始化handleIndex
+    if (greenHandleIndex.value === 0 || greenHandleIndex.value >= greenData.length) {
+        greenHandleIndex.value = greenData.length - 1
+    }
+    if (pinkHandleIndex.value === 0 || pinkHandleIndex.value >= pinkData.length) {
+        pinkHandleIndex.value = greenData.length - 1
+    }
+
+    greenPrice.value = greenData[greenHandleIndex.value] ?? 95.4
+    pinkPrice.value = pinkData[pinkHandleIndex.value] ?? 4.6
+
+    const option = {
+        backgroundColor: 'transparent',
+        grid: {
+            left: '10%',
+            right: '12%',
+            top: '10%',
+            bottom: '16%'
+        },
+        xAxis: {
+            type: 'category',
+            data: xAxisLabels,
+            boundaryGap: false,
+            axisLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: {
+                color: colors.axisLabel,
+                fontSize: 11,
+                formatter: (value, index) => {
+                    const total = xAxisLabels.length
+                    if (index === 0) return '1月'
+                    if (index === Math.floor(total / 2)) return '3月'
+                    if (index === total - 1) return '5月'
+                    return ''
+                }
+            }
+        },
+        yAxis: {
+            type: 'value',
+            min: 0,
+            max: 100,
+            splitNumber: 5,
+            position: 'right',
+            axisLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: {
+                formatter: '{value}%',
+                color: colors.axisLabel,
+                fontSize: 11,
+                margin: 10
+            },
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    color: colors.splitLine
+                }
+            }
+        },
+        tooltip: { show: false },
+        series: [
+            // 绿色线背景
+            {
+                name: 'GreenBg',
+                type: 'line',
+                data: greenData,
+                smooth: 0.4,
+                symbol: 'none',
+                lineStyle: { width: 2.5, color: colors.greenLight }
+            },
+            // 绿色线进度
+            {
+                name: 'GreenProgress',
+                type: 'line',
+                data: greenData.slice(0, greenHandleIndex.value + 1),
+                smooth: 0.4,
+                symbol: 'none',
+                lineStyle: { width: 2.5, color: colors.green }
+            },
+            // 粉色线背景
+            {
+                name: 'PinkBg',
+                type: 'line',
+                data: pinkData,
+                smooth: 0.4,
+                symbol: 'none',
+                lineStyle: { width: 2.5, color: colors.pinkLight }
+            },
+            // 粉色线进度
+            {
+                name: 'PinkProgress',
+                type: 'line',
+                data: pinkData.slice(0, pinkHandleIndex.value + 1),
+                smooth: 0.4,
+                symbol: 'none',
+                lineStyle: { width: 2.5, color: colors.pink }
+            }
+        ]
+    }
+
+    chartInstance.setOption(option)
+
+    // 绘制可拖拽圆点
+    setTimeout(() => {
+        if (!chartInstance) return
+
+        const greenX = chartInstance.convertToPixel({ xAxisIndex: 0 }, greenHandleIndex.value)
+        const greenY = chartInstance.convertToPixel({ yAxisIndex: 0 }, greenData[greenHandleIndex.value])
+        const pinkX = chartInstance.convertToPixel({ xAxisIndex: 0 }, pinkHandleIndex.value)
+        const pinkY = chartInstance.convertToPixel({ yAxisIndex: 0 }, pinkData[pinkHandleIndex.value])
+
+        chartInstance.setOption({
+            graphic: [
+                {
+                    type: 'circle',
+                    id: 'greenHandle',
+                    x: greenX,
+                    y: greenY,
+                    shape: { r: 8 },
+                    style: { fill: colors.green, stroke: colors.greenStroke, lineWidth: 12 },
+                    draggable: true,
+                    z: 100,
+                    onmousedown: function () {
+                        showGreenBubble.value = true
+                        const snappedX = chartInstance.convertToPixel({ xAxisIndex: 0 }, greenHandleIndex.value)
+                        const snappedY = chartInstance.convertToPixel({ yAxisIndex: 0 }, greenData[greenHandleIndex.value])
+                        updateGreenBubblePos(snappedX, snappedY)
+                    },
+                    onmouseup: function () {
+                        showGreenBubble.value = false
+                    },
+                    ondragend: function () {
+                        showGreenBubble.value = false
+                    },
+                    ondrag: function () {
+                        showGreenBubble.value = true
+                        const dataPos = chartInstance.convertFromPixel({ xAxisIndex: 0 }, this.x)
+                        let idx = Math.round(Number(dataPos))
+                        idx = Math.max(0, Math.min(greenData.length - 1, idx))
+
+                        const snappedX = chartInstance.convertToPixel({ xAxisIndex: 0 }, idx)
+                        const snappedY = chartInstance.convertToPixel({ yAxisIndex: 0 }, greenData[idx])
+
+                        this.setPosition([snappedX, snappedY])
+
+                        greenHandleIndex.value = idx
+                        greenPrice.value = greenData[idx]
+                        updateGreenBubblePos(snappedX, snappedY)
+
+                        chartInstance.setOption({
+                            series: [
+                                {},
+                                { data: greenData.slice(0, idx + 1) },
+                                {},
+                                {}
+                            ]
+                        }, false)
+                    }
+                },
+                {
+                    type: 'circle',
+                    id: 'pinkHandle',
+                    x: pinkX,
+                    y: pinkY,
+                    shape: { r: 8 },
+                    style: { fill: colors.pink, stroke: colors.pinkStroke, lineWidth: 12 },
+                    draggable: true,
+                    z: 100,
+                    onmousedown: function () {
+                        showPinkBubble.value = true
+                        const snappedX = chartInstance.convertToPixel({ xAxisIndex: 0 }, pinkHandleIndex.value)
+                        const snappedY = chartInstance.convertToPixel({ yAxisIndex: 0 }, pinkData[pinkHandleIndex.value])
+                        updatePinkBubblePos(snappedX, snappedY)
+                    },
+                    onmouseup: function () {
+                        showPinkBubble.value = false
+                    },
+                    ondragend: function () {
+                        showPinkBubble.value = false
+                    },
+                    ondrag: function () {
+                        showPinkBubble.value = true
+                        const dataPos = chartInstance.convertFromPixel({ xAxisIndex: 0 }, this.x)
+                        let idx = Math.round(Number(dataPos))
+                        idx = Math.max(0, Math.min(pinkData.length - 1, idx))
+
+                        const snappedX = chartInstance.convertToPixel({ xAxisIndex: 0 }, idx)
+                        const snappedY = chartInstance.convertToPixel({ yAxisIndex: 0 }, pinkData[idx])
+
+                        this.setPosition([snappedX, snappedY])
+
+                        pinkHandleIndex.value = idx
+                        pinkPrice.value = pinkData[idx]
+                        updatePinkBubblePos(snappedX, snappedY)
+
+                        chartInstance.setOption({
+                            series: [
+                                {},
+                                {},
+                                {},
+                                { data: pinkData.slice(0, idx + 1) }
+                            ]
+                        }, false)
+                    }
+                }
+            ]
+        })
+    }, 0)
+}
+
+const updateGreenBubblePos = (x, y) => {
+    const containerWidth = chartRef.value?.offsetWidth || 300
+    const bubbleWidth = 150
+    let left = x
+    
+    // 限制水平位置，确保气泡不超出容器
+    const minLeft = bubbleWidth / 2 + 5
+    const maxLeft = containerWidth - bubbleWidth / 2 - 5
+    left = Math.max(minLeft, Math.min(maxLeft, left))
+    
+    // 限制垂直位置
+    let top = y - 40
+    if (top < -30) {
+        top = y + 25  // 如果上方空间不足，显示在下方
+    }
+    
+    greenBubbleStyle.value = {
+        left: `${left}px`,
+        top: `${top}px`,
+        transform: 'translateX(-50%)',
+        display: 'block'
+    }
+}
+
+const updatePinkBubblePos = (x, y) => {
+    const containerWidth = chartRef.value?.offsetWidth || 300
+    const bubbleWidth = 140
+    let left = x
+    
+    // 限制水平位置，确保气泡不超出容器
+    const minLeft = bubbleWidth / 2 + 5
+    const maxLeft = containerWidth - bubbleWidth / 2 - 5
+    left = Math.max(minLeft, Math.min(maxLeft, left))
+    
+    // 限制垂直位置
+    let top = y - 40
+    if (top < -30) {
+        top = y + 25
+    }
+    
+    pinkBubbleStyle.value = {
+        left: `${left}px`,
+        top: `${top}px`,
+        transform: 'translateX(-50%)',
+        display: 'block'
+    }
+}
+
+const initChart = () => {
+    if (!chartRef.value) return
+    if (chartInstance) chartInstance.dispose()
+    chartInstance = echarts.init(chartRef.value)
+    updateChart()
+    
+    // 图表交互时禁止页面滚动
+    const chartDom = chartRef.value
+    chartDom.addEventListener('touchstart', handleChartTouchStart, { passive: false })
+    chartDom.addEventListener('touchmove', handleChartTouchMove, { passive: false })
+    chartDom.addEventListener('touchend', handleChartTouchEnd, { passive: false })
+}
+
+// 图表触摸事件处理
+let isChartTouching = false
+
+const handleChartTouchStart = (e) => {
+    isChartTouching = true
+    document.body.style.overflow = 'hidden'
+}
+
+const handleChartTouchMove = (e) => {
+    if (isChartTouching) {
+        e.preventDefault()
+    }
+}
+
+const handleChartTouchEnd = () => {
+    isChartTouching = false
+    document.body.style.overflow = ''
+}
+
+// 监听主题变化
+watch(() => themeStore.isDark, () => {
+    updateChart()
+})
+
 // 方法
 const handleTimeRangeChange = (value) => {
     selectedTimeRange.value = value
+    greenHandleIndex.value = 0
+    pinkHandleIndex.value = 0
+    nextTick(() => updateChart())
 }
 
 // 打开预测详情页
@@ -995,6 +1276,14 @@ const formatNumber = (num) => {
                 width: 8px;
                 height: 8px;
                 border-radius: 50%;
+
+                &.green {
+                    background-color: var(--text-color-y);
+                }
+
+                &.pink {
+                    background-color: #E44096;
+                }
             }
 
             .legend-text {
@@ -1014,6 +1303,102 @@ const formatNumber = (num) => {
         border-radius: 8px;
         box-sizing: border-box;
         transition: background-color 0.3s ease;
+        position: relative;
+        overflow: visible;
+        margin-top: 50px;
+        margin-bottom: 20px;
+    }
+
+    .chart-canvas {
+        width: 100%;
+        height: 220px;
+    }
+
+    .info-popover {
+        position: absolute;
+        padding: 6px 12px;
+        border-radius: 6px;
+        pointer-events: none;
+        z-index: 110;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        font-size: 12px;
+
+        &.green-bubble {
+            background: var(--text-color-y);
+            color: #000;
+        }
+
+        &.pink-bubble {
+            background: #E44096;
+            color: #fff;
+        }
+
+        .info-price {
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .info-arrow {
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 12px;
+
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: -4px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+            }
+        }
+    }
+
+    .green-bubble .info-arrow {
+        background: var(--text-color-y);
+
+        &::after {
+            background: var(--text-color-y);
+        }
+    }
+
+    .pink-bubble .info-arrow {
+        background: #E44096;
+
+        &::after {
+            background: #E44096;
+        }
+    }
+
+    .price-labels {
+        position: absolute;
+        left: 8px;
+        top: 40%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .price-label {
+            font-size: 13px;
+            font-weight: 600;
+
+            &.green {
+                color: var(--text-color-y);
+            }
+
+            &.pink {
+                color: #E44096;
+            }
+        }
     }
 }
 

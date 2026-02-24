@@ -15,7 +15,7 @@
                 <span class="val">{{ amount }}</span>
                 <span class="unit">{{ tokenSymbol }}</span>
               </div>
-              <div class="status-text">恭喜获得</div>
+              <div class="status-text">{{ $t('claimSuccess.congratulations') }}</div>
             </div>
           </div>
 
@@ -25,11 +25,11 @@
               <!-- 费用列表 -->
               <div class="fee-list">
                 <div class="fee-row">
-                  <span class="label">提现手续费(1%)</span>
+                  <span class="label">{{ $t('claimSuccess.withdrawFee') }}</span>
                   <span class="val">$ 10.3</span>
                 </div>
                 <div class="fee-row">
-                  <span class="label">赢家抽水(3%)</span>
+                  <span class="label">{{ $t('claimSuccess.winnerFee') }}</span>
                   <span class="val positive">+$1.2</span>
                 </div>
               </div>
@@ -42,19 +42,19 @@
                   <img src="https://picsum.photos/seed/user24/400/400" alt="avatar" />
                 </div>
                 <div class="q-content">
-                  <div class="q-title">以太坊在12月28日的价格—？</div>
+                  <div class="q-title">{{ $t('claimSuccess.questionTitle') }}</div>
                   <div class="q-bet">
-                    投$1.00赢得 <span class="green-text">$2.87</span>
+                    {{ $t('claimSuccess.betWin', { bet: '$1.00' }) }} <span class="green-text">$2.87</span>
                   </div>
                 </div>
               </div>
 
-              <button class="main-btn" @click="handleClaim">Claim</button>
+              <button class="main-btn" @click="handleClaim">{{ $t('claimSuccess.claim') }}</button>
             </div>
 
             <!-- 领取后的状态 -->
             <div v-else class="done-view">
-              <button class="main-btn is-white" @click="handleDone">Done</button>
+              <button class="main-btn is-white" @click="handleDone">{{ $t('claimSuccess.done') }}</button>
             </div>
           </div>
         </div>
@@ -65,7 +65,10 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import SuccessfullyClaimedIcon from '@/assets/icon/SuccessfullyClaimedIcon.png'
+
+const { t } = useI18n()
 
 const props = defineProps({
   modelValue: Boolean,

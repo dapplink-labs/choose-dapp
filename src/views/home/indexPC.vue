@@ -235,6 +235,7 @@ import NavBar2 from "@/components/navBar2.vue";
 import { Search, Avatar } from "@element-plus/icons-vue";
 import router from "@/router";
 import { useI18n } from "vue-i18n";
+import { tagButtons as rawTagButtons, leftList as rawLeftList, rightList as rawRightList } from "./homeData";
 
 const { t } = useI18n();
 const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
@@ -243,16 +244,7 @@ const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "tru
 const searchQuery = ref("");
 
 // 标签按钮数据
-const tagButtons = ref([
-    { value: "bitcoin", label: "Bitcoin" },
-    { value: "ethereum", label: "Ethereum" },
-    { value: "solana", label: "Solana" },
-    { value: "meme", label: "Meme" },
-    { value: "defi", label: "DeFi" },
-    { value: "nft", label: "NFT" },
-    { value: "web3", label: "Web3" },
-    { value: "ai", label: "AI" },
-]);
+const tagButtons = ref(rawTagButtons);
 
 // PC tab（含“全部”）
 const pcTagButtons = computed(() => [
@@ -264,101 +256,10 @@ const pcTagButtons = computed(() => [
 const activeTag = ref("all");
 
 // 模拟数据：左边垂直列表
-const leftList = ref([
-    {
-        avatar: "https://picsum.photos/seed/user1/40/40",
-        title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
-        percentage: "75%",
-        amount: "19.00",
-        yesCount: 1234,
-        noCount: 567,
-        isFavorite: false,
-        maxLeverage: "10X",
-        maxReturn: "182%",
-        timeRemaining: "04:30:57",
-        participantCount: 1280,
-        isTimeUrgent: false, // 时间是否紧急（控制图标状态）
-    },
-    {
-        avatar: "https://picsum.photos/seed/user2/40/40",
-        title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
-        percentage: "25%",
-        amount: "19.00",
-        yesCount: 1234,
-        noCount: 567,
-        isFavorite: false,
-        maxLeverage: "10X",
-        maxReturn: "182%",
-        timeRemaining: "02:15:30",
-        participantCount: 1280,
-        isTimeUrgent: true, // 时间紧急状态
-    },
-    {
-        avatar: "https://picsum.photos/seed/user3/40/40",
-        title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
-        percentage: "50%",
-        amount: "19.00",
-        yesCount: 1234,
-        noCount: 567,
-        isFavorite: false,
-        maxLeverage: "10X",
-        maxReturn: "182%",
-        timeRemaining: "12:45:20",
-        participantCount: 1280,
-        isTimeUrgent: false,
-    },
-    {
-        avatar: "https://picsum.photos/seed/user4/40/40",
-        title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
-        percentage: "90%",
-        amount: "19.00",
-        yesCount: 1234,
-        noCount: 567,
-        isFavorite: false,
-        maxLeverage: "10X",
-        maxReturn: "182%",
-        timeRemaining: "01:20:10",
-        participantCount: 1280,
-        isTimeUrgent: true,
-    },
-    {
-        avatar: "https://picsum.photos/seed/user5/40/40",
-        title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
-        percentage: "33%",
-        amount: "19.00",
-        yesCount: 1234,
-        noCount: 567,
-        isFavorite: false,
-        maxLeverage: "10X",
-        maxReturn: "182%",
-        timeRemaining: "08:15:45",
-        participantCount: 1280,
-        isTimeUrgent: false,
-    },
-]);
-
-// 生成右边列表项的辅助函数
-const createRightListItem = (seed, title = "美联储12月会做出决定吗？") => ({
-    avatar: `https://picsum.photos/seed/user${seed}/40/40`,
-    title,
-    percentage: "14%",
-    amount: "19.00",
-    isFavorite: false,
-    maxLeverage: "10X",
-    maxReturn: "182%",
-    timeRemaining: "04:30:57",
-    participantCount: 1280,
-    isTimeUrgent: false,
-    options: [
-        { text: "下调50个基点以上", percentage: "2%", yesCount: 123, noCount: 456 },
-        { text: "增长超过25基点", percentage: "32%", yesCount: 789, noCount: 101 },
-    ],
-});
+const leftList = ref(rawLeftList);
 
 // 模拟数据：右边横向列表（通过 CSS 控制每行展示数量）
-const rightList = ref(
-    Array.from({ length: 20 }, (_, index) => createRightListItem(6 + index)),
-);
+const rightList = ref(rawRightList);
 
 // 跳转到收益页面
 const navigateToEarnings = () => {

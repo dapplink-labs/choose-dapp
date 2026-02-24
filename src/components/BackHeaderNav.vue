@@ -47,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, nextTick } from 'vue'
 import { defineEmits, defineProps } from 'vue'
 import { useRouter } from 'vue-router'
 import { useThemeStore } from '@/stores/theme'
@@ -96,6 +96,11 @@ const props = defineProps({
   title: {
     type: String,
     default: ''
+  },
+  // 滚动容器选择器（可选，默认监听 window）
+  scrollContainer: {
+    type: String,
+    default: ''
   }
 })
 
@@ -111,17 +116,27 @@ const showShareModal = ref(false)
 // 使用 requestAnimationFrame 优化滚动性能
 let rafId = null
 let ticking = false
+let scrollElement = null
+let mutationObserver = null
 
 // 缓动函数：ease-out-cubic，使过渡更自然
 const easeOutCubic = (t) => {
   return 1 - Math.pow(1 - t, 3)
 }
 
+// 获取滚动位置
+const getScrollTop = () => {
+  if (scrollElement && scrollElement !== window) {
+    return scrollElement.scrollTop
+  }
+  return window.scrollY || window.pageYOffset || document.documentElement.scrollTop
+}
+
 // 滚动事件处理函数（使用节流优化）
 const handleScroll = () => {
   if (!ticking) {
     rafId = requestAnimationFrame(() => {
-      scrollY.value = window.scrollY || window.pageYOffset || document.documentElement.scrollTop
+      scrollY.value = getScrollTop()
       ticking = false
     })
     ticking = true
@@ -162,15 +177,71 @@ const headerStyle = computed(() => {
 })
 
 // 页面加载完成后监听滚动事件
+const setupScrollListeners = () => {
+  const possibleContainers = document.querySelectorAll('[class*="-page"], [class*="Page"], .main-content')
+  possibleContainers.forEach(el => {
+    el.addEventListener('scroll', handleScroll, { passive: true })
+  })
+}
+
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll, { passive: true })
-  // 初始化时也执行一次
-  handleScroll()
+  // 延迟执行确保 DOM 已渲染
+  nextTick(() => {
+    // 尝试获取指定的滚动容器
+    if (props.scrollContainer) {
+      scrollElement = document.querySelector(props.scrollContainer)
+    }
+    
+    // 如果没有指定容器或找不到，同时监听 window 和常见容器
+    if (scrollElement) {
+      scrollElement.addEventListener('scroll', handleScroll, { passive: true })
+    } else {
+      // 监听 window
+      window.addEventListener('scroll', handleScroll, { passive: true })
+    }
+    
+    // 始终监听所有可能的容器
+    setupScrollListeners()
+    
+    // 监听 visualViewport 变化（键盘弹出/收起）
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', () => {
+        // 键盘弹出/收起时重新设置监听
+        setupScrollListeners()
+        handleScroll()
+      })
+    }
+    
+    // 使用 MutationObserver 监听 DOM 变化
+    mutationObserver = new MutationObserver(() => {
+      setupScrollListeners()
+    })
+    mutationObserver.observe(document.body, { childList: true, subtree: true })
+    
+    // 初始化时也执行一次
+    handleScroll()
+  })
 })
 
 // 页面卸载前清除滚动事件监听
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', handleScroll)
+  if (scrollElement && scrollElement !== window) {
+    scrollElement.removeEventListener('scroll', handleScroll)
+  }
+  // 清除可能添加的容器监听
+  const possibleContainers = document.querySelectorAll('[class*="-page"], [class*="Page"], .main-content')
+  possibleContainers.forEach(el => {
+    el.removeEventListener('scroll', handleScroll)
+  })
+  // 清除 MutationObserver
+  if (mutationObserver) {
+    mutationObserver.disconnect()
+  }
+  // 清除 visualViewport 监听
+  if (window.visualViewport) {
+    window.visualViewport.removeEventListener('resize', setupScrollListeners)
+  }
   if (rafId) {
     cancelAnimationFrame(rafId)
   }

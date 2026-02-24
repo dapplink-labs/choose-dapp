@@ -4,35 +4,40 @@ import {
   createWebHashHistory,
 } from "vue-router";
 
-import bridge from "../views/bridge/index.vue";
-import home from "../views/home/index.vue";
-import earnings from "../views/earnings/index.vue";
-import myEarnings from "../views/myEarnings/index.vue";
-import leaderboard from "../views/leaderboard/index.vue";
-import leaderboardH5 from "../views/leaderboardH5/index.vue";
-import detail from "../views/detail/index.vue";
-import breaking from "../views/breaking/index.vue";
-import accuracy from "../views/accuracy/index.vue";
-import settings from "../views/settings/index.vue";
-import personalCenter from "../views/personalCenter/index.vue";
-import linkWallet from "../views/linkWallet/index.vue";
-import computingPowerServices from "../views/computingPowerServices/index.vue";
-import myNode from "../views/myNode/index.vue";
-import myIncome from "../views/myIncome/index.vue";
-import LPVault from "../views/LPVault/index.vue";
-import dashboard from "../views/dashboard/index.vue";
-import detailH5 from "../views/detailH5/index.vue";
-import predictionDetailH5 from "../views/predictionDetailH5/index.vue";
-import purchaseNodeRecord from "../views/purchaseNodeRecord/index.vue";
-import assetManagement from "../views/assetManagement/index.vue";
-import claimRecord from "../views/claimRecord/index.vue";
-import searchPage from "../views/searchPage/index.vue";
-import userInfo from "../views/userInfo/index.vue";
-import eventPool from "../views/eventPool/index.vue";
-import bill from "../views/bill/index.vue";
-import helpCenter from "../views/helpCenter/index.vue";
-import sportsEventsH5 from "../views/sportsEventsH5/index.vue";
-import sportsDetailH5 from "../views/sportsDetailH5/index.vue";
+import bridge from "../views/bridge/index.vue"
+import home from "../views/home/index.vue"
+import earnings from "../views/earnings/index.vue"
+import myEarnings from "../views/myEarnings/index.vue"
+import leaderboard from "../views/leaderboard/index.vue"
+import leaderboardH5 from "../views/leaderboardH5/index.vue"
+import detail from "../views/detail/index.vue"
+import breaking from "../views/breaking/index.vue"
+import accuracy from "../views/accuracy/index.vue"
+import settings from "../views/settings/index.vue"
+import personalCenter from "../views/personalCenter/index.vue"
+import linkWallet from "../views/linkWallet/index.vue"
+import computingPowerServices from "../views/computingPowerServices/index.vue"
+import myNode from "../views/myNode/index.vue"
+import myIncome from "../views/myIncome/index.vue"
+import LPVault from "../views/LPVault/index.vue"
+import dashboard from "../views/dashboard/index.vue"
+import detailH5 from "../views/detailH5/index.vue"
+import predictionDetailH5 from "../views/predictionDetailH5/index.vue"
+import purchaseNodeRecord from "../views/purchaseNodeRecord/index.vue"
+import assetManagement from "../views/assetManagement/index.vue"
+import deposit from "../views/deposit/index.vue"
+import withdraw from "../views/withdraw/index.vue"
+import transactionSuccess from "../views/transactionSuccess/index.vue"
+import claimRecord from "../views/claimRecord/index.vue"
+import searchPage from "../views/searchPage/index.vue"
+import userInfo from "../views/userInfo/index.vue"
+import eventPool from "../views/eventPool/index.vue"
+import bill from "../views/bill/index.vue"
+import helpCenter from "../views/helpCenter/index.vue"
+import sportsEventsH5 from "../views/sportsEventsH5/index.vue"
+import sportsDetailH5 from "../views/sportsDetailH5/index.vue"
+import bitcoinUpDown from "../views/bitcoinUpDown/index.vue"
+
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -110,6 +115,9 @@ const router = createRouter({
       path: "/detail-h5",
       name: "detailH5",
       component: detailH5,
+      meta: {
+        hideFooterNav: true
+      }
     },
     {
       path: "/prediction-detail-h5",
@@ -119,6 +127,24 @@ const router = createRouter({
         hideHeader: true,
         hideFooterNav: true,
       },
+    },
+    {
+      path: '/bitcoin-up-down',
+      name: 'bitcoinUpDown',
+      component: bitcoinUpDown,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/bitcoin-up-down',
+      name: 'bitcoinUpDown',
+      component: bitcoinUpDown,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
     },
     {
       path: "/breaking",
@@ -226,26 +252,57 @@ const router = createRouter({
       },
     },
     {
-      path: "/claim-record",
-      name: "claimRecord",
+      path: '/deposit',
+      name: 'deposit',
+      component: deposit,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/withdraw',
+      name: 'withdraw',
+      component: withdraw,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/transaction-success',
+      name: 'transactionSuccess',
+      component: transactionSuccess,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true
+      }
+    },
+    {
+      path: '/withdraw-success',
+      redirect: (to) => ({ path: '/transaction-success', query: to.query })
+    },
+    {
+      path: '/claim-record',
+      name: 'claimRecord',
       component: claimRecord,
       meta: {
         hideHeader: true,
-        hideFooterNav: true,
-      },
+        hideFooterNav: true
+      }
     },
     {
-      path: "/bill",
-      name: "bill",
+      path: '/bill',
+      name: 'bill',
       component: bill,
       meta: {
         hideHeader: true,
-        hideFooterNav: true,
-      },
+        hideFooterNav: true
+      }
     },
     {
-      path: "/searchPage",
-      name: "searchPage",
+      path: '/searchPage',
+      name: 'searchPage',
       component: searchPage,
       meta: {
         hideHeader: true,

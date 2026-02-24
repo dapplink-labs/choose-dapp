@@ -11,7 +11,7 @@ const isMobile = ref(true)
 
 const updateIsMobile = () => {
   if (typeof window !== 'undefined') {
-    // isMobile.value = window.innerWidth <= 768
+    isMobile.value = window.innerWidth <= 768
   }
 }
 

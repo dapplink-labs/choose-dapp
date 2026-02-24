@@ -1902,7 +1902,7 @@ emoji-regex@^8.0.0:
 
 encode-utf8@^1.0.3:
   version "1.0.3"
-  resolved "https://registry.npmmirror.com/encode-utf8/-/encode-utf8-1.0.3.tgz"
+  resolved "https://registry.npmjs.org/encode-utf8/-/encode-utf8-1.0.3.tgz"
   integrity sha512-ucAnuBEhUK4boH2HjVYG5Q2mQyPorvv0u/ocS+zhdw0S8AlHYY+GOFhP1Gio5z4icpP2ivFSvhtFjQi8+T9ppw==
 
 end-of-stream@^1.1.0, end-of-stream@^1.4.0, end-of-stream@^1.4.1:
@@ -2810,9 +2810,18 @@ pump@^3.0.0:
     end-of-stream "^1.1.0"
     once "^1.3.1"
 
+qrcode@^1.5.4:
+  version "1.5.4"
+  resolved "https://registry.npmjs.org/qrcode/-/qrcode-1.5.4.tgz"
+  integrity sha512-1ca71Zgiu6ORjHqFBDpnSMTR2ReToX4l1Au1VFLyVeBTFavzQnv5JxMFr3ukHVKpSrSA2MCk0lNJSykjUfz7Zg==
+  dependencies:
+    dijkstrajs "^1.0.1"
+    pngjs "^5.0.0"
+    yargs "^15.3.1"
+
 qrcode@1.5.3:
   version "1.5.3"
-  resolved "https://registry.npmmirror.com/qrcode/-/qrcode-1.5.3.tgz"
+  resolved "https://registry.npmjs.org/qrcode/-/qrcode-1.5.3.tgz"
   integrity sha512-puyri6ApkEHYiVl4CFzo1tDkAZ+ATcnbJrJ6RiBM1Fhctdn/ix9MTE3hRph33omisEbC/2fcfemsseiKgBPKZg==
   dependencies:
     dijkstrajs "^1.0.1"

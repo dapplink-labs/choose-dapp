@@ -10,7 +10,7 @@
                 <svg class="card-border" viewBox="0 0 350 160" preserveAspectRatio="none">
                     <path
                         d="M 10,0 H 100 L 115,20 H 235 L 250,0 H 340 A 10,10 0 0 1 350,10 V 150 A 10,10 0 0 1 340,160 H 10 A 10,10 0 0 1 0,150 V 10 A 10,10 0 0 1 10,0 Z"
-                        fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+                        fill="none" class="card-border-path" stroke-width="1" />
                 </svg>
 
                 <!-- 顶部日期标签 -->
@@ -37,7 +37,7 @@
                             </div>
                             <span class="val">{{ matchData.stats.team2Percent }}%</span>
                         </div>
-                        <div class="volume-row">{{ matchData.volume }} 交易量</div>
+                        <div class="volume-row">{{ matchData.volume }} {{ $t('sports.volume') }}</div>
                         <div class="chooseme-watermark">
                             <img :src="logoUrl" alt="ChooseMe" class="chooseme-watermark-img" />
                         </div>
@@ -54,70 +54,52 @@
 
             <!-- 下方投注区域 (胜负盘) -->
             <div class="betting-area">
-                <h2 class="area-title">胜负盘</h2>
-                <div class="volume-sub">{{ matchData.volume }} 交易量</div>
+                <h2 class="area-title">{{ $t('sports.moneyline') }}</h2>
+                <div class="volume-sub">{{ matchData.volume }} {{ $t('sports.volume') }}</div>
 
                 <div class="bet-grid">
                     <button class="bet-btn-3d yellow" @click="handleBet('1')">
-                        尼克斯队 32 ¢
+                        {{ matchData.team1.name }} 32 ¢
                     </button>
                     <button class="bet-btn-3d grey" @click="handleBet('draw')">
-                        平 32 ¢
+                        {{ $t('sports.draw') }} 32 ¢
                     </button>
                     <button class="bet-btn-3d pink" @click="handleBet('2')">
-                        湖人队 32 ¢
+                        {{ matchData.team2.name }} 32 ¢
                     </button>
                 </div>
             </div>
 
             <!-- 让球盘 -->
             <div class="spread-area">
-                <h2 class="area-title">让球盘</h2>
-                <div class="volume-sub">{{ matchData.volume }} 交易量</div>
+                <h2 class="area-title">{{ $t('sports.spread') }}</h2>
+                <div class="volume-sub">{{ matchData.volume }} {{ $t('sports.volume') }}</div>
 
                 <!-- 上方两侧盘口按钮 -->
                 <div class="spread-grid">
-                    <button
-                        class="spread-btn"
-                        :class="{ active: selectedSpreadSide === 'home' }"
-                        @click="selectedSpreadSide = 'home'"
-                    >
-                        尼克斯队 -{{ currentSpread }} 32 ¢
+                    <button class="spread-btn" :class="{ active: selectedSpreadSide === 'home' }"
+                        @click="selectedSpreadSide = 'home'">
+                        {{ matchData.team1.name }} -{{ currentSpread }} 32 ¢
                     </button>
-                    <button
-                        class="spread-btn"
-                        :class="{ active: selectedSpreadSide === 'away' }"
-                        @click="selectedSpreadSide = 'away'"
-                    >
-                        湖人队 +{{ currentSpread }} 69 ¢
+                    <button class="spread-btn" :class="{ active: selectedSpreadSide === 'away' }"
+                        @click="selectedSpreadSide = 'away'">
+                        {{ matchData.team2.name }} +{{ currentSpread }} 69 ¢
                     </button>
                 </div>
 
                 <!-- 底部让分刻度选择 -->
                 <div class="spread-slider">
-                    <button
-                        class="arrow-btn"
-                        :disabled="selectedSpreadIndex === 0"
-                        @click="prevSpread"
-                    >
+                    <button class="arrow-btn" :disabled="selectedSpreadIndex === 0" @click="prevSpread">
                         ‹
                     </button>
                     <div class="spread-values">
-                        <div
-                            v-for="(val, idx) in spreadValues"
-                            :key="val"
-                            class="spread-val"
-                            :class="{ active: idx === selectedSpreadIndex }"
-                            @click="selectSpread(idx)"
-                        >
+                        <div v-for="(val, idx) in spreadValues" :key="val" class="spread-val"
+                            :class="{ active: idx === selectedSpreadIndex }" @click="selectSpread(idx)">
                             {{ val }}
                         </div>
                     </div>
-                    <button
-                        class="arrow-btn"
-                        :disabled="selectedSpreadIndex === spreadValues.length - 1"
-                        @click="nextSpread"
-                    >
+                    <button class="arrow-btn" :disabled="selectedSpreadIndex === spreadValues.length - 1"
+                        @click="nextSpread">
                         ›
                     </button>
                 </div>
@@ -128,52 +110,34 @@
 
             <!-- 总比分 -->
             <div class="spread-area total-area">
-                <h2 class="area-title">总比分</h2>
-                <div class="volume-sub">{{ matchData.volume }} 交易量</div>
+                <h2 class="area-title">{{ $t('sports.total') }}</h2>
+                <div class="volume-sub">{{ matchData.volume }} {{ $t('sports.volume') }}</div>
 
                 <!-- 上方两侧盘口按钮 -->
                 <div class="spread-grid">
-                    <button
-                        class="spread-btn"
-                        :class="{ active: selectedTotalSide === 'over' }"
-                        @click="selectedTotalSide = 'over'"
-                    >
-                        超过 {{ currentTotal }} 32 ¢
+                    <button class="spread-btn" :class="{ active: selectedTotalSide === 'over' }"
+                        @click="selectedTotalSide = 'over'">
+                        {{ $t('sports.over') }} {{ currentTotal }} 32 ¢
                     </button>
-                    <button
-                        class="spread-btn"
-                        :class="{ active: selectedTotalSide === 'under' }"
-                        @click="selectedTotalSide = 'under'"
-                    >
-                        低于 {{ currentTotal }} 69 ¢
+                    <button class="spread-btn" :class="{ active: selectedTotalSide === 'under' }"
+                        @click="selectedTotalSide = 'under'">
+                        {{ $t('sports.under') }} {{ currentTotal }} 69 ¢
                     </button>
                 </div>
 
                 <!-- 底部总比分刻度选择（独立状态） -->
                 <div class="spread-slider">
-                    <button
-                        class="arrow-btn"
-                        :disabled="selectedTotalIndex === 0"
-                        @click="prevTotal"
-                    >
+                    <button class="arrow-btn" :disabled="selectedTotalIndex === 0" @click="prevTotal">
                         ‹
                     </button>
                     <div class="spread-values">
-                        <div
-                            v-for="(val, idx) in totalValues"
-                            :key="'total-' + val"
-                            class="spread-val"
-                            :class="{ active: idx === selectedTotalIndex }"
-                            @click="selectTotal(idx)"
-                        >
+                        <div v-for="(val, idx) in totalValues" :key="'total-' + val" class="spread-val"
+                            :class="{ active: idx === selectedTotalIndex }" @click="selectTotal(idx)">
                             {{ val }}
                         </div>
                     </div>
-                    <button
-                        class="arrow-btn"
-                        :disabled="selectedTotalIndex === totalValues.length - 1"
-                        @click="nextTotal"
-                    >
+                    <button class="arrow-btn" :disabled="selectedTotalIndex === totalValues.length - 1"
+                        @click="nextTotal">
                         ›
                     </button>
                 </div>
@@ -188,12 +152,14 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import tyIcon01 from '@/assets/icon/tyIcon01.png'
 import tyIcon02 from '@/assets/icon/tyIcon02.png'
 import logoIcon from '@/assets/icon/logoIcon.png'
 import SportsOrderBook from './SportsOrderBook.vue'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 
+const { t } = useI18n()
 const router = useRouter()
 const logoUrl = logoIcon
 
@@ -280,8 +246,8 @@ const handleBet = (side) => {
 .sports-detail-h5-page {
     padding-top: 40px;
     min-height: 100vh;
-    background-color: #000;
-    color: #fff;
+    background-color: var(--bg-page-h5);
+    color: var(--text-color);
     font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
 }
 
@@ -304,7 +270,7 @@ const handleBet = (side) => {
         top: -15px;
         left: 50%;
         transform: translateX(-50%);
-        background: #2F2F2F;
+        background: var(--bg-page);
         padding: 4px 14px;
         border-radius: 6px;
         font-family: PingFang SC, PingFang SC;
@@ -346,7 +312,7 @@ const handleBet = (side) => {
 
     .team-record {
         font-size: 13px;
-        color: #555;
+        color: var(--text-dark-gray);
     }
 }
 
@@ -365,7 +331,7 @@ const handleBet = (side) => {
         .val {
             font-size: 19px;
             font-weight: 700;
-            color: #fff;
+            color: var(--bg-opposite);
         }
 
         .blocks {
@@ -394,7 +360,7 @@ const handleBet = (side) => {
 
     .volume-row {
         font-size: 13px;
-        color: #666;
+        color: var(--text-dark-gray);
         font-weight: 400;
         margin-bottom: 12px;
     }
@@ -426,7 +392,7 @@ const handleBet = (side) => {
 
     .volume-sub {
         font-size: 13px;
-        color: #555;
+        color: var(--text-dark-gray);
         margin-bottom: 25px;
     }
 
@@ -482,7 +448,7 @@ const handleBet = (side) => {
 
     .volume-sub {
         font-size: 13px;
-        color: #555;
+        color: var(--text-dark-gray);
         margin-bottom: 18px;
     }
 
@@ -495,23 +461,17 @@ const handleBet = (side) => {
 
     .spread-btn {
         height: 44px;
-        border-radius: 8px;
-        border: none;
-        background: #3a3a3a;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(180deg, #3a3a3a 0%, #2a2a2a 100%);
+        box-shadow: 0 4px 0 #1a1a1a, inset 0 1px 0 rgba(255, 255, 255, 0.08);
         color: #fff;
         font-size: 15px;
         font-weight: 600;
         font-family: PingFang SC, PingFang SC;
         cursor: pointer;
-        transition: background 0.15s, transform 0.1s;
+        transition: all 0.1s;
 
-        &.active {
-            background: #4a4a4a;
-        }
-
-        &:active {
-            transform: translateY(2px);
-        }
     }
 
     .spread-slider {
@@ -519,8 +479,8 @@ const handleBet = (side) => {
         align-items: center;
         gap: 8px;
         padding-top: 8px;
-        border-top: 1px solid #111;
-        border-bottom: 1px solid #111;
+        border-top: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
         padding-bottom: 8px;
     }
 
@@ -530,7 +490,7 @@ const handleBet = (side) => {
         border-radius: 4px;
         border: none;
         background: transparent;
-        color: #777;
+        color: var(--text-dark-gray);
         font-size: 18px;
         display: flex;
         align-items: center;
@@ -549,7 +509,7 @@ const handleBet = (side) => {
         justify-content: space-around;
         position: relative;
         font-size: 14px;
-        color: #666;
+        color: var(--text-dark-gray);
     }
 
     .spread-val {
@@ -560,7 +520,7 @@ const handleBet = (side) => {
         text-align: center;
 
         &.active {
-            color: #fff;
+            color: var(--bg-opposite);
 
             &::after {
                 content: '';
@@ -572,7 +532,7 @@ const handleBet = (side) => {
                 height: 0;
                 border-left: 6px solid transparent;
                 border-right: 6px solid transparent;
-                border-top: 6px solid #fff;
+                border-top: 6px solid var(--bg-opposite);
             }
         }
     }
@@ -580,5 +540,23 @@ const handleBet = (side) => {
 
 .total-area {
     margin-top: 10px;
+}
+
+// 亮色主题适配
+:global(.theme-light) {
+    .sports-detail-h5-page {
+        .card-border-path {
+            stroke: rgba(0, 0, 0, 0.12);
+        }
+    }
+}
+
+// 暗色主题（默认）
+:global(.theme-dark) {
+    .sports-detail-h5-page {
+        .card-border-path {
+            stroke: rgba(255, 255, 255, 0.12);
+        }
+    }
 }
 </style>

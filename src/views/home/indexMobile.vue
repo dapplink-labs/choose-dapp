@@ -49,7 +49,7 @@
                                         <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
-                                    <input class="esports-search-input" type="text" placeholder="Search" 
+                                    <input class="esports-search-input" type="text" placeholder="Search"
                                         @focus="handleEsportsSearch" />
                                 </div>
                                 <template v-else>
@@ -69,7 +69,6 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     class="icon">
                                     <g transform="translate(-295 -358)">
-                                        <rect fill="none" width="24" height="24" transform="translate(295 358)" />
                                         <g transform="translate(298 361)">
                                             <path fill="currentColor"
                                                 d="M7,8A4,4,0,0,1,3.126,5H1A1,1,0,0,1,1,3H3.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H10.874A4,4,0,0,1,7,8ZM7,2A2,2,0,1,0,9,4,2,2,0,0,0,7,2Z"
@@ -83,7 +82,6 @@
                             <div class="action-btn bookmark-btn" @click="handleBookmark">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                     <g transform="translate(-336 -358)">
-                                        <rect fill="none" width="24" height="24" transform="translate(336 358)" />
                                         <g transform="translate(340 361)">
                                             <path fill="currentColor"
                                                 d="M12.988,19a2.964,2.964,0,0,1-1.789-.606L8,16l-3.2,2.4A2.962,2.962,0,0,1,3.012,19a3.069,3.069,0,0,1-2.089-.836A2.954,2.954,0,0,1,0,16V3A3,3,0,0,1,3,0H13a3,3,0,0,1,3,3V16a2.954,2.954,0,0,1-.923,2.168A3.069,3.069,0,0,1,12.988,19ZM8,14a1.984,1.984,0,0,1,1.2.4l3.2,2.4a.987.987,0,0,0,.6.2,1.024,1.024,0,0,0,.7-.279A.984.984,0,0,0,14,16V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V16a1,1,0,0,0,1,1,.987.987,0,0,0,.6-.2l3.2-2.4A1.984,1.984,0,0,1,8,14Z" />
@@ -131,8 +129,8 @@
                     <!-- 固定在最左侧的"全部" -->
                     <div class="date-card fixed-all" :class="{ active: activeDateKey === 'all' }"
                         @click="handleDateClick('all')">
-                        <div class="date-title">全部</div>
-                        <div class="date-subtitle">所有日期</div>
+                        <div class="date-title">{{ $t('home.dateFilter.all') }}</div>
+                        <div class="date-subtitle">{{ $t('home.dateFilter.allDates') }}</div>
                         <div class="date-count">{{ totalDateCount }}</div>
                     </div>
 
@@ -141,7 +139,7 @@
                         <div class="date-scroll">
                             <div v-for="item in dateFilterList" :key="item.key" class="date-card"
                                 :class="{ active: activeDateKey === item.key }" @click="handleDateClick(item.key)">
-                                <div class="date-title">{{ item.weekLabel }}</div>
+                                <div class="date-title">{{ $t(`home.dateFilter.weekdays.${item.weekKey}`) }}</div>
                                 <div class="date-subtitle">{{ item.date }}</div>
                                 <div class="date-count">{{ item.count }}</div>
                             </div>
@@ -157,7 +155,7 @@
                             <div class="item-header">
                                 <img :src="item.avatar" :alt="$t('common.userAvatar')" class="user-avatar" />
                                 <div class="item-meta">
-                                    <div class="item-title" @click="navigateToEarnings()">
+                                    <div class="item-title" @click="navigateToDetail(item)">
                                         {{ item.title }}
                                     </div>
                                 </div>
@@ -186,13 +184,13 @@
                                     <span class="leverage-label">{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxLeverage || "10X"
-                                        }}</span>
+                                    }}</span>
                                 </div>
                                 <div class="leverage-item">
                                     <span class="leverage-label">{{ $t("home.maxReturn") || "最大回报" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxReturn || "182%"
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                             <div class="item-actions">
@@ -224,7 +222,7 @@
                                         </el-icon>
                                         <span class="participant-text">{{
                                             item.participantCount.toLocaleString()
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <span class="voi-amount">VOI：${{ item.amount }}</span>
                                 </div>
@@ -255,13 +253,13 @@
                                     <span class="leverage-label">{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxLeverage || "10X"
-                                        }}</span>
+                                    }}</span>
                                 </div>
                                 <div class="leverage-item">
                                     <span class="leverage-label">{{ $t("home.maxReturn") || "最大回报" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxReturn || "182%"
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                             <div class="item-options">
@@ -301,7 +299,7 @@
                                         </el-icon>
                                         <span class="participant-text">{{
                                             item.participantCount.toLocaleString()
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <span class="voi-amount">VOI：${{ item.amount }}</span>
                                 </div>
@@ -330,6 +328,7 @@ import banner0Img from "@/assets/images/banner0.png";
 import banner2Img from "@/assets/images/banner2.png";
 import linghua1Img from "@/assets/images/linghua1.png";
 import banner4Img from "@/assets/images/banner4.png";
+import { tagButtons as rawTagButtons, leftList as rawLeftList, rightList as rawRightList } from "./homeData";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -371,16 +370,7 @@ function goHref(item) {
 }
 
 // 标签按钮数据
-const tagButtons = ref([
-    { value: "bitcoin", label: "Bitcoin" },
-    { value: "ethereum", label: "Ethereum" },
-    { value: "solana", label: "Solana" },
-    { value: "meme", label: "Meme" },
-    { value: "defi", label: "DeFi" },
-    { value: "nft", label: "NFT" },
-    { value: "web3", label: "Web3" },
-    { value: "ai", label: "AI" },
-]);
+const tagButtons = ref(rawTagButtons);
 
 // 当前激活的标签
 const activeTag = ref("all");
@@ -405,12 +395,12 @@ const showDateFilter = computed(() => route.query.nav === "esports");
 
 // 日期筛选数据
 const dateFilterList = ref([
-    { key: "mon", weekLabel: "星期一", date: "01.01", count: 0 },
-    { key: "tue", weekLabel: "星期二", date: "01.02", count: 6 },
-    { key: "wed", weekLabel: "星期三", date: "01.03", count: 0 },
-    { key: "thu", weekLabel: "星期四", date: "01.04", count: 0 },
-    { key: "fri", weekLabel: "星期五", date: "01.05", count: 0 },
-    { key: "sat", weekLabel: "星期六", date: "01.06", count: 0 },
+    { key: "mon", weekKey: "mon", date: "01.01", count: 0 },
+    { key: "tue", weekKey: "tue", date: "01.02", count: 6 },
+    { key: "wed", weekKey: "wed", date: "01.03", count: 0 },
+    { key: "thu", weekKey: "thu", date: "01.04", count: 0 },
+    { key: "fri", weekKey: "fri", date: "01.05", count: 0 },
+    { key: "sat", weekKey: "sat", date: "01.06", count: 0 },
 ]);
 
 const activeDateKey = ref("all");
@@ -424,106 +414,10 @@ const handleDateClick = (key) => {
 };
 
 // 模拟数据：左边垂直列表
-const leftList = ref([
-    {
-        avatar: "https://picsum.photos/seed/user1/40/40",
-        title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
-        percentage: "75%",
-        amount: "19.00",
-        yesCount: 1234,
-        noCount: 567,
-        isFavorite: false,
-        maxLeverage: "10X",
-        maxReturn: "182%",
-        timeRemaining: "04:30:57",
-        participantCount: 1280,
-        isTimeUrgent: false,
-    },
-    {
-        avatar: "https://picsum.photos/seed/user2/40/40",
-        title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
-        percentage: "25%",
-        amount: "19.00",
-        yesCount: 1234,
-        noCount: 567,
-        isFavorite: false,
-        maxLeverage: "10X",
-        maxReturn: "182%",
-        timeRemaining: "02:15:30",
-        participantCount: 1280,
-        isTimeUrgent: true,
-    },
-    {
-        avatar: "https://picsum.photos/seed/user3/40/40",
-        title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
-        percentage: "50%",
-        amount: "19.00",
-        yesCount: 1234,
-        noCount: 567,
-        isFavorite: false,
-        maxLeverage: "10X",
-        maxReturn: "182%",
-        timeRemaining: "12:45:20",
-        participantCount: 1280,
-        isTimeUrgent: false,
-    },
-    {
-        avatar: "https://picsum.photos/seed/user4/40/40",
-        title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
-        percentage: "90%",
-        amount: "19.00",
-        yesCount: 1234,
-        noCount: 567,
-        isFavorite: false,
-        maxLeverage: "10X",
-        maxReturn: "182%",
-        timeRemaining: "01:20:10",
-        participantCount: 1280,
-        isTimeUrgent: true,
-    },
-    {
-        avatar: "https://picsum.photos/seed/user5/40/40",
-        title: "鲍威尔：美联储在2025年11月18日至20日会议会宣布降息2%？",
-        percentage: "33%",
-        amount: "19.00",
-        yesCount: 1234,
-        noCount: 567,
-        isFavorite: false,
-        maxLeverage: "10X",
-        maxReturn: "182%",
-        timeRemaining: "08:15:45",
-        participantCount: 1280,
-        isTimeUrgent: false,
-    },
-]);
-
-// 生成右边列表项的辅助函数
-const createRightListItem = (seed, title = "美联储12月会做出决定吗？") => ({
-    avatar: `https://picsum.photos/seed/user${seed}/40/40`,
-    title,
-    percentage: "14%",
-    amount: "19.00",
-    isFavorite: false,
-    maxLeverage: "10X",
-    maxReturn: "182%",
-    timeRemaining: "04:30:57",
-    participantCount: 1280,
-    isTimeUrgent: false,
-    options: [
-        { text: "下调50个基点以上", percentage: "2%", yesCount: 123, noCount: 456 },
-        { text: "增长超过25基点", percentage: "32%", yesCount: 789, noCount: 101 },
-    ],
-});
+const leftList = ref(rawLeftList);
 
 // 模拟数据：右边横向列表
-const rightList = ref(
-    Array.from({ length: 20 }, (_, index) => createRightListItem(6 + index)),
-);
-
-// 跳转到收益页面
-const navigateToEarnings = () => {
-    router.push("/earnings");
-};
+const rightList = ref(rawRightList);
 
 // 跳转到详情页面
 const navigateToDetail = (item, choice) => {
@@ -725,8 +619,8 @@ $gradient-mask-right: linear-gradient(to right,
                             gap: 10px;
                             padding: 10px 12px;
                             border-radius: 10px;
-                            border: 1px solid rgba(255, 255, 255, 0.14);
-                            background: rgba(255, 255, 255, 0.06);
+                            border: 1px solid var(--border-color);
+                            background: var(--bg-page);
                             box-sizing: border-box;
                             cursor: text;
 
@@ -734,7 +628,7 @@ $gradient-mask-right: linear-gradient(to right,
                                 width: 18px;
                                 height: 18px;
                                 flex-shrink: 0;
-                                color: rgba(255, 255, 255, 0.7);
+                                color: var(--text-dark-gray);
                             }
 
                             .esports-search-input {
@@ -743,13 +637,13 @@ $gradient-mask-right: linear-gradient(to right,
                                 border: none;
                                 outline: none;
                                 background: transparent;
-                                color: rgba(255, 255, 255, 0.85);
+                                color: var(--bg-opposite);
                                 font-size: 16px;
                                 line-height: 1.2;
                                 padding: 0;
 
                                 &::placeholder {
-                                    color: rgba(255, 255, 255, 0.55);
+                                    color: var(--text-dark-gray);
                                 }
                             }
                         }
@@ -857,11 +751,11 @@ $gradient-mask-right: linear-gradient(to right,
             .date-card {
                 padding: 6px 4px 8px;
                 box-sizing: border-box;
-                background: #202020;
+                background: var(--bg-page);
                 border-radius: 0;
-                border-top: 3px solid #666666;
+                border-top: 3px solid var(--border-color);
                 text-align: center;
-                color: #cccccc;
+                color: var(--text-dark-gray);
                 font-family:
                     PingFang SC,
                     PingFang SC;
@@ -882,8 +776,8 @@ $gradient-mask-right: linear-gradient(to right,
                 }
 
                 &.active {
-                    border-top-color: #d4ff3b;
-                    color: #ffffff;
+                    border-top-color: var(--text-color-y);
+                    color: var(--bg-opposite);
                 }
             }
 

@@ -68,6 +68,18 @@
                 <!-- 图表容器（ECharts 单折线图） -->
                 <div class="chart-container">
                     <div ref="chartRef" class="chart-canvas" />
+                    <!-- 浮动信息框 -->
+                    <div v-if="showHighlightBubble" class="info-popover" :style="infoBoxStyle">
+                        <div class="info-price">Yes {{ currentPrice.toFixed(1) }}%</div>
+                        <div class="info-arrow"></div>
+                    </div>
+                    <!-- 左侧价格标签 -->
+                    <div class="price-labels">
+                        <div class="price-label green">+$3</div>
+                        <div class="price-label green">+$200</div>
+                        <div class="price-label pink">+$2</div>
+                        <div class="price-label pink">+$10</div>
+                    </div>
                 </div>
             </div>
 
@@ -80,11 +92,11 @@
                 <div class="orderbook-tabs">
                     <button type="button" class="orderbook-tab" :class="{ active: activeOrderbookSide === 'yes' }"
                         @click="activeOrderbookSide = 'yes'">
-                        交易Yes
+                        {{ $t('detail.tradeYes') }}
                     </button>
                     <button type="button" class="orderbook-tab" :class="{ active: activeOrderbookSide === 'no' }"
                         @click="activeOrderbookSide = 'no'">
-                        交易No
+                        {{ $t('detail.tradeNo') }}
                     </button>
                 </div>
 
@@ -102,20 +114,22 @@ import { ArrowLeft, Trophy } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import logoIcon from '@/assets/icon/logoIcon.png'
 import OrderBookMobile from '@/components/OrderBookMobile.vue'
+import { useThemeStore } from '@/stores/theme'
 
 const { t } = useI18n()
 const router = useRouter()
+const themeStore = useThemeStore()
 
 const logoUrl = logoIcon
 
-const detailData = ref({
+const detailData = computed(() => ({
     avatar: 'https://picsum.photos/seed/prediction-detail/60/60',
-    title: '美联储一月份会做出决定吗？',
-    yesChance: '90% 机会',
+    title: t('common.fedDecision') || '美联储一月份会做出决定吗？',
+    yesChance: `90% ${t('detail.chanceText')}`,
     yesChange: '+40%',
     volume: '$153,642,644 Vol.',
     closeDate: '1月30日, 23:59 UTC+8'
-})
+}))
 
 // 图表选项（和 detailH5 保持一致，便于复用趋势）
 const timeRanges = computed(() => [
@@ -218,7 +232,20 @@ const chartData = computed(() => ({
 // ECharts 折线图
 const chartRef = ref(null)
 let chartInstance = null
-const showHighlightBubble = ref(false)
+const showHighlightBubble = ref(true)
+const infoBoxStyle = ref({ display: 'none' })
+const currentPrice = ref(95.4)
+const handleIndex = ref(0)
+
+// 图表颜色配置
+const chartColors = computed(() => ({
+    primary: themeStore.isDark ? '#D4FF00' : '#19d96b',
+    primaryLight: themeStore.isDark ? 'rgba(212, 255, 0, 0.15)' : 'rgba(25, 217, 107, 0.15)',
+    primaryGradient: themeStore.isDark ? 'rgba(212, 255, 0, 0.2)' : 'rgba(25, 217, 107, 0.2)',
+    primaryStroke: themeStore.isDark ? 'rgba(212, 255, 0, 0.3)' : 'rgba(25, 217, 107, 0.3)',
+    axisLabel: themeStore.isDark ? '#7C7C7C' : '#888',
+    splitLine: themeStore.isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'
+}))
 
 const updateChart = () => {
     if (!chartInstance) return
@@ -226,16 +253,21 @@ const updateChart = () => {
     const current = chartData.value[selectedTimeRange.value] || chartData.value['1W']
     const lineData = current?.line || []
     const xAxisLabels = current?.xAxis || ['1月', '3月', '5月']
+    const colors = chartColors.value
 
-    const highlightIndex = Math.max(0, lineData.length - 4)
-    const highlightValue = lineData[highlightIndex] ?? 95.4
+    // 初始化handleIndex为最后一个点
+    if (handleIndex.value === 0 || handleIndex.value >= lineData.length) {
+        handleIndex.value = lineData.length - 1
+    }
+    const highlightValue = lineData[handleIndex.value] ?? 95.4
+    currentPrice.value = highlightValue
 
     const option = {
-        backgroundColor: '#050505',
+        backgroundColor: 'transparent',
         grid: {
             left: '8%',
             right: '12%',
-            top: '6%',
+            top: '10%',
             bottom: '16%'
         },
         xAxis: {
@@ -245,13 +277,13 @@ const updateChart = () => {
             axisLine: { show: false },
             axisTick: { show: false },
             axisLabel: {
-                color: '#7C7C7C',
+                color: colors.axisLabel,
                 fontSize: 11,
                 formatter: (value, index) => {
                     const total = xAxisLabels.length
-                    if (index === 0) return '1月'
-                    if (index === Math.floor(total / 2)) return '3月'
-                    if (index === total - 1) return '5月'
+                    if (index === 0) return t('detail.months.jan')
+                    if (index === Math.floor(total / 2)) return t('detail.months.mar')
+                    if (index === total - 1) return t('detail.months.may')
                     return ''
                 }
             }
@@ -266,77 +298,129 @@ const updateChart = () => {
             axisTick: { show: false },
             axisLabel: {
                 formatter: '{value}%',
-                color: '#7C7C7C',
+                color: colors.axisLabel,
                 fontSize: 11,
                 margin: 10
             },
             splitLine: {
                 show: true,
                 lineStyle: {
-                    color: 'rgba(255,255,255,0.06)'
+                    color: colors.splitLine
                 }
             }
         },
         tooltip: { show: false },
         series: [
             {
+                name: 'Background',
                 type: 'line',
                 data: lineData,
-                smooth: true,
-                symbol: 'circle',
-                symbolSize: 6,
-                showSymbol: false,
+                smooth: 0.4,
+                symbol: 'none',
                 lineStyle: {
-                    color: '#D4FF00',
-                    width: 2
+                    color: colors.primaryLight,
+                    width: 2.5
+                }
+            },
+            {
+                name: 'Progress',
+                type: 'line',
+                data: lineData.slice(0, handleIndex.value + 1),
+                smooth: 0.4,
+                symbol: 'none',
+                lineStyle: {
+                    color: colors.primary,
+                    width: 2.5
                 },
                 itemStyle: {
-                    color: '#D4FF00'
+                    color: colors.primary
                 },
-                markPoint: {
-                    symbol: 'roundRect',
-                    symbolSize: [100, 28],
-                    label: {
-                        show: true,
-                        formatter: 'Yes 95.4%',
-                        color: '#000',
-                        fontSize: 12,
-                        fontWeight: 600
-                    },
-                    itemStyle: {
-                        color: '#D4FF00',
-                        borderRadius: 4,
-                        shadowBlur: 8,
-                        shadowColor: 'rgba(0,0,0,0.4)'
-                    },
-                    data: showHighlightBubble.value
-                        ? [
-                            {
-                                coord: [highlightIndex, highlightValue]
-                            }
-                        ]
-                        : []
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: colors.primaryGradient },
+                        { offset: 1, color: 'transparent' }
+                    ])
                 }
             }
         ]
     }
 
     chartInstance.setOption(option)
+
+    // 绘制可拖拽高亮圆点
+    setTimeout(() => {
+        if (!chartInstance) return
+        const xPix = chartInstance.convertToPixel({ xAxisIndex: 0 }, handleIndex.value)
+        const yPix = chartInstance.convertToPixel({ yAxisIndex: 0 }, highlightValue)
+
+        chartInstance.setOption({
+            graphic: [{
+                type: 'circle',
+                id: 'highlight',
+                x: xPix,
+                y: yPix,
+                shape: { r: 8 },
+                style: {
+                    fill: colors.primary,
+                    stroke: colors.primaryStroke,
+                    lineWidth: 12
+                },
+                draggable: true,
+                z: 100,
+                ondrag: function () {
+                    const dataPos = chartInstance.convertFromPixel({ xAxisIndex: 0 }, this.x)
+                    let idx = Math.round(Number(dataPos))
+                    idx = Math.max(0, Math.min(lineData.length - 1, idx))
+
+                    const snappedX = chartInstance.convertToPixel({ xAxisIndex: 0 }, idx)
+                    const snappedY = chartInstance.convertToPixel({ yAxisIndex: 0 }, lineData[idx])
+
+                    this.setPosition([snappedX, snappedY])
+
+                    handleIndex.value = idx
+                    currentPrice.value = lineData[idx]
+                    updateInfoBoxPos(snappedX, snappedY)
+
+                    // 更新高亮线条
+                    chartInstance.setOption({
+                        series: [
+                            {},
+                            { data: lineData.slice(0, idx + 1) }
+                        ]
+                    }, false)
+                }
+            }]
+        })
+        updateInfoBoxPos(xPix, yPix)
+    }, 0)
+}
+
+const updateInfoBoxPos = (x, y) => {
+    infoBoxStyle.value = {
+        left: `${x}px`,
+        top: `${y - 50}px`,
+        transform: 'translateX(-50%)',
+        display: 'block'
+    }
 }
 
 const initChart = () => {
     if (!chartRef.value) return
     chartInstance = echarts.init(chartRef.value)
-    chartInstance.on('click', handleChartClick)
     updateChart()
 }
+
+// 监听主题变化
+watch(() => themeStore.isDark, () => {
+    updateChart()
+})
 
 const handleChartClick = (params) => {
     if (!params || params.seriesType !== 'line') return
 
     const current = chartData.value[selectedTimeRange.value] || chartData.value['1W']
     const lineData = current?.line || []
-    const highlightIndex = Math.max(0, lineData.length - 4)
+    const highlightIndex = lineData.length - 1
 
     if (params.dataIndex === highlightIndex) {
         showHighlightBubble.value = !showHighlightBubble.value
@@ -378,23 +462,23 @@ const handleBack = () => {
 <style scoped lang="scss">
 .prediction-detail-h5-page {
     min-height: 100vh;
-    background-color: #000;
     padding-bottom: 24px;
-    color: #fff;
+    color: var(--bg-opposite);
+    background: var(--bg-page-h5);
 }
 
 .top-bar {
+    background: var(--bg-page-h5);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 10;
-    background-color: #000;
     height: 40px;
     padding: 0 12px;
     display: flex;
     align-items: center;
-    color: #ccc;
+    color: var(--text-dark-gray);
     font-size: 12px;
 }
 
@@ -417,6 +501,7 @@ const handleBack = () => {
 
 .back-btn :deep(.el-icon) {
     font-size: 18px;
+    color: var(--bg-opposite);
 }
 
 .top-center {
@@ -428,10 +513,12 @@ const handleBack = () => {
 
 .trophy-icon {
     font-size: 14px;
+    color: var(--text-dark-gray);
 }
 
 .top-volume {
     font-size: 11px;
+    color: var(--text-dark-gray);
 }
 
 .bookmark-btn svg {
@@ -554,11 +641,11 @@ const handleBack = () => {
 }
 
 .stat-label {
-    color: #888;
+    color: var(--text-dark-gray);
 }
 
 .stat-value {
-    color: #fff;
+    color: var(--bg-opposite);
 }
 
 .chart-section {
@@ -575,7 +662,7 @@ const handleBack = () => {
 
 .chart-title {
     font-size: 13px;
-    color: #ccc;
+    color: var(--text-dark-gray);
 }
 
 .chart-selected {
@@ -588,13 +675,13 @@ const handleBack = () => {
 .selected-label {
     padding: 2px 6px;
     border-radius: 999px;
-    background: #19d96b;
-    color: #000;
+    background: var(--text-color-y);
+    color: var(--bg-opposite);
     font-weight: 600;
 }
 
 .selected-value {
-    color: #19d96b;
+    color: var(--text-color-y);
     font-weight: 600;
 }
 
@@ -618,15 +705,78 @@ const handleBack = () => {
 }
 
 .chart-container {
-    background: #050505;
-    border-radius: 12px;
     padding: 4px 0;
-    overflow: hidden;
+    overflow: visible;
+    position: relative;
 }
 
 .chart-canvas {
     width: 100%;
     height: 220px;
+}
+
+.info-popover {
+    position: absolute;
+    background: var(--text-color-y);
+    color: #000;
+    padding: 8px 14px;
+    border-radius: 8px;
+    pointer-events: none;
+    z-index: 110;
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    text-align: center;
+
+    .info-price {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .info-arrow {
+        position: absolute;
+        bottom: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 12px;
+        background: var(--text-color-y);
+
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            background: var(--text-color-y);
+            border-radius: 50%;
+        }
+    }
+}
+
+.price-labels {
+    position: absolute;
+    left: 8px;
+    bottom: 0px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .price-label {
+        font-size: 13px;
+        font-weight: 600;
+
+        &.green {
+            color: var(--text-color-y);
+        }
+
+        &.pink {
+            color: #E44096;
+        }
+    }
 }
 
 .orderbook-section {

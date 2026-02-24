@@ -172,32 +172,30 @@ const updateChart = () => {
   if (!myChart) return
 
   // 模拟数据 - 根据图片描述，有正负值的柱状图
-  // Y轴显示: 640.11k, 378.16k, 116.22k, -145.73k, -407.68k
   const data = [
     { value: 116220, color: '#2FBC87' },
-    { value: 378160, color: '#2FBC87' },
-    { value: -145730, color: '#E44096' },
-    { value: -407680, color: '#E44096' },
-    { value: 640110, color: '#2FBC87' },
-    { value: 520000, color: '#2FBC87' },
-    { value: 450000, color: '#2FBC87' },
-    { value: 380000, color: '#2FBC87' },
-    { value: 300000, color: '#2FBC87' },
+    { value: 85000, color: '#2FBC87' },
+    { value: -80000, color: '#E44096' },
+    { value: 180000, color: '#2FBC87' },
+    { value: 150000, color: '#2FBC87' },
+    { value: -180000, color: '#E44096' },
     { value: 200000, color: '#2FBC87' },
-    { value: 100000, color: '#2FBC87' },
-    { value: -50000, color: '#E44096' }
+    { value: 378160, color: '#2FBC87' },
+    { value: 430000, color: '#2FBC87' },
+    { value: 116220, color: '#2FBC87' },
+    { value: 180000, color: '#2FBC87' },
+    { value: 116220, color: '#2FBC87' }
   ]
 
   const colors = chartColors.value
 
   const option = {
-    // 图表绘图区背景色
-    backgroundColor: colors.chartBg,
+    backgroundColor: 'transparent',
     grid: {
-      left: '10%',
+      left: '15%',
       right: '5%',
-      top: '15%',
-      bottom: '15%',
+      top: '10%',
+      bottom: '10%',
       containLabel: false
     },
     xAxis: {
@@ -226,12 +224,12 @@ const updateChart = () => {
         lineStyle: {
           color: colors.splitLine,
           type: 'dashed',
-          opacity: 1
+          opacity: 0.6
         }
       },
       axisLabel: {
         color: colors.axisLabel,
-        fontSize: 12,
+        fontSize: 11,
         formatter: (value) => {
           const absValue = Math.abs(value)
           if (absValue >= 1000000) {
@@ -249,11 +247,12 @@ const updateChart = () => {
         data: data.map(item => ({
           value: item.value,
           itemStyle: {
-            color: item.color,
-            borderRadius: item.value >= 0 ? [4, 4, 0, 0] : [0, 0, 4, 4]
+            color: item.value >= 0 ? '#2FBC87' : '#E44096',
+            borderRadius: item.value >= 0 ? [3, 3, 0, 0] : [0, 0, 3, 3]
           }
         })),
-        barWidth: '60%',
+        barWidth: '50%',
+        barGap: '30%',
         label: {
           show: false
         }
@@ -363,7 +362,7 @@ watch(() => themeStore.isDark, () => {
 
     .time-selector {
       display: flex;
-      gap: 8px;
+      gap: 4px;
       align-items: center;
       flex-shrink: 0;
       margin-left: auto;
@@ -401,6 +400,16 @@ watch(() => themeStore.isDark, () => {
   }
 }
 
+// 图表部分
+.chart-section {
+  margin-top: 20px;
+  
+  .chart-container {
+    width: 100%;
+    height: 240px;
+    border-radius: 12px;
+  }
+}
 
 // 奖励部分（单行表格卡片）
 .reward-section {
