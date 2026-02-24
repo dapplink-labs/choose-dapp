@@ -4,13 +4,9 @@
       <!-- 导航链接区域 -->
       <div class="nav-section" ref="navSectionRef">
         <template v-for="(item, index) in navItems" :key="item.key">
-          <div 
-            class="nav-item" 
-            :class="{ active: activeNav === item.key }" 
-            :ref="el => { if (el) navItemRefs[item.key] = el }"
-            :tabindex="activeNav === item.key ? 0 : -1"
-            @click="handleNavClick(item.key)"
-            @keydown.enter="handleNavClick(item.key)"
+          <div class="nav-item" :class="{ active: activeNav === item.key }"
+            :ref="el => { if (el) navItemRefs[item.key] = el }" :tabindex="activeNav === item.key ? 0 : -1"
+            @click="handleNavClick(item.key)" @keydown.enter="handleNavClick(item.key)"
             @keydown.space.prevent="handleNavClick(item.key)">
             <!-- 趋势图标使用自定义 SVG -->
             <svg v-if="item.key === 'trends'" class="nav-icon trends-icon" viewBox="0 0 1024 1024" version="1.1"
@@ -67,13 +63,13 @@ const navItems = [
   { key: 'breaking', label: '热点', path: '/home' }, // 使用自定义 SVG  breaking
   { key: 'news', label: '最新', path: '/home' }, // 使用自定义 SVG
   { key: 'esports', label: '电子竞技', path: null },
-  { key: 'sports', label: '体育', path: '/sports-events-h5' }, 
-  { key: 'finance', label: '经济', path: null }, 
+  { key: 'sports', label: '体育', path: '/sports-events-h5' },
+  { key: 'finance', label: '经济', path: null },
   { key: 'crypto', label: '加密货币', path: null },
   { key: 'company', label: '公司', path: null },
   { key: 'popularCulture', label: '流行文化', path: null },
   { key: 'technology', label: '技术', path: null },
-  { key: 'ai', label: '人工智能', path: null } 
+  { key: 'ai', label: '人工智能', path: null }
 ]
 
 // 路由到导航key的映射（不含带 query 的电子竞技）
@@ -152,6 +148,7 @@ onMounted(() => {
 
 // 方法
 const handleNavClick = (key) => {
+  return
   activeNav.value = key
   emit('nav-click', key)
 
