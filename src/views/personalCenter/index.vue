@@ -14,18 +14,10 @@
       <div class="action-icons">
         <!-- <img :src="isDark ? getIcon('29Dark') : getIcon('29')" :alt="$t('common.share')" class="icon-img"
           @click="handleShare" /> -->
-        <img
-          :src="isDark ? getIcon('settingDark') : getIcon('setting')"
-          :alt="$t('common.settings')"
-          class="icon-img"
-          @click="handleSettings"
-        />
-        <img
-          :src="isDark ? getIcon('closeDark') : getIcon('close')"
-          :alt="$t('common.close')"
-          class="icon-img"
-          @click="handleClose"
-        />
+        <img :src="isDark ? getIcon('settingDark') : getIcon('setting')" :alt="$t('common.settings')" class="icon-img"
+          @click="handleSettings" />
+        <img :src="isDark ? getIcon('closeDark') : getIcon('close')" :alt="$t('common.close')" class="icon-img"
+          @click="handleClose" />
       </div>
     </div>
 
@@ -34,12 +26,7 @@
 
     <!-- Ecosystem 网格布局 -->
     <div class="section-grid">
-      <div
-        v-for="item in ecosystemItems"
-        :key="item.key"
-        class="section-item"
-        @click="handleMenuClick(item)"
-      >
+      <div v-for="item in ecosystemItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
         <div class="section-icon-wrapper">
           <img :src="item.icon" :alt="item.label" class="section-icon" />
         </div>
@@ -54,12 +41,7 @@
 
     <!-- Support 网格布局 -->
     <div class="section-grid">
-      <div
-        v-for="item in supportItems"
-        :key="item.key"
-        class="section-item"
-        @click="handleMenuClick(item)"
-      >
+      <div v-for="item in supportItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
         <div class="section-icon-wrapper">
           <img :src="item.icon" :alt="item.label" class="section-icon" />
         </div>
@@ -72,12 +54,7 @@
 
     <!-- Others 网格布局 -->
     <div class="section-grid">
-      <div
-        v-for="item in othersItems"
-        :key="item.key"
-        class="section-item"
-        @click="handleMenuClick(item)"
-      >
+      <div v-for="item in othersItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
         <div class="section-icon-wrapper">
           <img :src="item.icon" :alt="item.label" class="section-icon" />
         </div>
@@ -90,12 +67,7 @@
 
     <!-- Choose Me 网格布局 -->
     <div class="section-grid">
-      <div
-        v-for="item in chooseMeItems"
-        :key="item.key"
-        class="section-item"
-        @click="handleMenuClick(item)"
-      >
+      <div v-for="item in chooseMeItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
         <div class="section-icon-wrapper">
           <img :src="item.icon" :alt="item.label" class="section-icon" />
         </div>
@@ -105,14 +77,8 @@
 
     <!-- Social links -->
     <div class="social-links">
-      <a
-        v-for="(link, idx) in friendLinks"
-        :key="idx"
-        href="javascript:void(0)"
-        class="social-link"
-        :aria-label="link.label"
-        @click="goHref(link)"
-      >
+      <a v-for="(link, idx) in friendLinks" :key="idx" href="javascript:void(0)" class="social-link"
+        :aria-label="link.label" @click="goHref(link)">
         <img :src="link.icon" :alt="link.label" />
       </a>
     </div>
@@ -198,11 +164,11 @@ const copyWalletAddress = async () => {
 // 生态系统菜单配置
 const baseEcosystemItems = computed(() => [
   {
-    key: "computing-power-services",
-    label: t("userInfo.stakingPool"),
+    key: "my-earnings",
+    label: t("userInfo.myEarnings"),
     icon: getIcon("1"),
     iconDark: getIcon("1Dark"),
-    path: "/computing-power-services",
+    path: "/my-earnings",
   },
   {
     key: "LPVault",
@@ -535,7 +501,8 @@ const handleClose = () => {
 
 // 允许访问的路径列表（除了这些路径外，其他都显示"待开放"）
 const allowedPaths = [
-  "/computing-power-services", // 节点购买
+  "/my-earnings", // 我的收益
+  // "/computing-power-services", // 节点购买
   "/LPVault", // LPVault
   // '/dashboard', // 链上数据
   // '/asset-management', // 链上资产

@@ -15,7 +15,7 @@
         </div>
 
         <!-- 激活提示模块：使用通用跑马灯组件（type 1 对应质押节点激活消息） -->
-        <ActivationMarquee :type="1" />
+        <!-- <ActivationMarquee :type="1" /> -->
 
         <h3>
             <span>{{ $t('lpVault.nodeStaking') }}</span>
