@@ -8,16 +8,16 @@
                 <!-- 1. 顶部切换栏 -->
                 <div class="trade-nav">
                     <div class="side-tabs">
-                        <button :class="['nav-tab', { active: activeSide === 'buy' }]"
-                            @click="activeSide = 'buy'">{{ $t('payment.buy') }}</button>
-                        <button :class="['nav-tab', { active: activeSide === 'sell' }]"
-                            @click="activeSide = 'sell'">{{ $t('payment.sell') }}</button>
+                        <button :class="['nav-tab', { active: activeSide === 'buy' }]" @click="activeSide = 'buy'">{{
+                            $t('payment.buy') }}</button>
+                        <button :class="['nav-tab', { active: activeSide === 'sell' }]" @click="activeSide = 'sell'">{{
+                            $t('payment.sell') }}</button>
                     </div>
                     <div class="type-pills">
-                        <button :class="['pill', { active: orderType === 'market' }]"
-                            @click="orderType = 'market'">{{ $t('payment.marketOrder') }}</button>
-                        <button :class="['pill', { active: orderType === 'limit' }]"
-                            @click="orderType = 'limit'">{{ $t('payment.limitOrder') }}</button>
+                        <button :class="['pill', { active: orderType === 'market' }]" @click="orderType = 'market'">{{
+                            $t('payment.marketOrder') }}</button>
+                        <button :class="['pill', { active: orderType === 'limit' }]" @click="orderType = 'limit'">{{
+                            $t('payment.limitOrder') }}</button>
                     </div>
                 </div>
 
@@ -392,9 +392,9 @@ function handleConfirm() { console.log('Trade Confirmed') }
     gap: 8px;
 
     .quick-share-btn {
-        background: var(--bg-opposite);
+        background: #2F2F2F;
         border: none;
-        color: var(--bg-page-h5);
+        color: var(--bg-opposite);
         padding: 6px 15px;
         border-radius: 6px;
         font-size: 12px;
@@ -422,7 +422,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
 
     .lev-btn {
         flex: 1;
-        background: var(--bg-opposite);
+        background: #2F2F2F;
         border: none;
         color: var(--text-dark-gray);
         padding: 10px 0;
@@ -506,107 +506,15 @@ function handleConfirm() { console.log('Trade Confirmed') }
     opacity: 0;
 }
 
-// 亮色主题适配
-:global(.theme-light) {
-    .trade-modal {
-        background: var(--bg-page);
+.theme-light {
+    .quick-share-btn {
+        background: #fff !important;
+        border: 1px solid var(--text-dark-gray);
+    }
 
-        .grabber::after {
-            background: #ccc;
-        }
-
-        .trade-nav {
-            border-bottom-color: #e0e0e0;
-
-            .side-tabs .nav-tab {
-                color: #999;
-
-                &.active {
-                    color: #2FBC87;
-                    border-bottom-color: #2FBC87;
-                }
-            }
-
-            .type-pills {
-                background: #f0f0f0;
-
-                .pill {
-                    color: #666;
-
-                    &.active {
-                        background: #fff;
-                        color: #333;
-                    }
-                }
-            }
-        }
-
-        .target-info .target-title {
-            color: var(--bg-opposite);
-        }
-
-        .balance-info {
-            color: #666;
-        }
-
-        .divider {
-            background: #e0e0e0;
-        }
-
-        .input-label {
-            color: #333;
-        }
-
-        .stepper-box,
-        .input-box {
-            background: #f5f5f5;
-            border-color: #e0e0e0;
-
-            .step-btn {
-                color: #333;
-
-                &:active {
-                    background: #e8e8e8;
-                }
-            }
-
-            .step-value {
-                color: #333;
-            }
-
-            .main-input {
-                color: #333;
-            }
-        }
-
-        .quick-share-btn {
-            background: #e8e8e8;
-            color: #333;
-        }
-
-        .avg-price-text {
-            color: #666;
-        }
-
-        .lev-btn {
-            background: #e8e8e8;
-            color: #666;
-        }
-
-        .leverage-tip {
-            color: #999;
-            border-bottom-color: #e0e0e0;
-        }
-
-        .summary-row {
-            .s-label {
-                color: #666;
-            }
-
-            .s-value {
-                color: #333;
-            }
-        }
+    .lev-btn {
+        background: var(--text-dark-gray) !important;
+        color: #444;
     }
 }
 </style>

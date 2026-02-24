@@ -91,7 +91,7 @@ const handleSelect = (league) => {
   max-height: 70vh;
   background: var(--bg-page);
   border-radius: 16px 16px 0 0;
-  padding: 12px 20px 34px;
+  padding: 0 20px 34px;
   overflow-y: auto;
 }
 

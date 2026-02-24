@@ -464,6 +464,7 @@ const handleBack = () => {
     min-height: 100vh;
     padding-bottom: 24px;
     color: var(--bg-opposite);
+    background: var(--bg-page-h5);
 }
 
 .top-bar {

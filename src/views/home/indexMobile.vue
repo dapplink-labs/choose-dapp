@@ -49,7 +49,7 @@
                                         <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
-                                    <input class="esports-search-input" type="text" placeholder="Search" 
+                                    <input class="esports-search-input" type="text" placeholder="Search"
                                         @focus="handleEsportsSearch" />
                                 </div>
                                 <template v-else>
@@ -69,7 +69,6 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     class="icon">
                                     <g transform="translate(-295 -358)">
-                                        <rect fill="none" width="24" height="24" transform="translate(295 358)" />
                                         <g transform="translate(298 361)">
                                             <path fill="currentColor"
                                                 d="M7,8A4,4,0,0,1,3.126,5H1A1,1,0,0,1,1,3H3.126a4,4,0,0,1,7.748,0H17a1,1,0,0,1,0,2H10.874A4,4,0,0,1,7,8ZM7,2A2,2,0,1,0,9,4,2,2,0,0,0,7,2Z"
@@ -83,7 +82,6 @@
                             <div class="action-btn bookmark-btn" @click="handleBookmark">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                     <g transform="translate(-336 -358)">
-                                        <rect fill="none" width="24" height="24" transform="translate(336 358)" />
                                         <g transform="translate(340 361)">
                                             <path fill="currentColor"
                                                 d="M12.988,19a2.964,2.964,0,0,1-1.789-.606L8,16l-3.2,2.4A2.962,2.962,0,0,1,3.012,19a3.069,3.069,0,0,1-2.089-.836A2.954,2.954,0,0,1,0,16V3A3,3,0,0,1,3,0H13a3,3,0,0,1,3,3V16a2.954,2.954,0,0,1-.923,2.168A3.069,3.069,0,0,1,12.988,19ZM8,14a1.984,1.984,0,0,1,1.2.4l3.2,2.4a.987.987,0,0,0,.6.2,1.024,1.024,0,0,0,.7-.279A.984.984,0,0,0,14,16V3a1,1,0,0,0-1-1H3A1,1,0,0,0,2,3V16a1,1,0,0,0,1,1,.987.987,0,0,0,.6-.2l3.2-2.4A1.984,1.984,0,0,1,8,14Z" />
@@ -157,7 +155,7 @@
                             <div class="item-header">
                                 <img :src="item.avatar" :alt="$t('common.userAvatar')" class="user-avatar" />
                                 <div class="item-meta">
-                                    <div class="item-title" @click="navigateToEarnings()">
+                                    <div class="item-title" @click="navigateToDetail(item)">
                                         {{ item.title }}
                                     </div>
                                 </div>
@@ -186,13 +184,13 @@
                                     <span class="leverage-label">{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxLeverage || "10X"
-                                        }}</span>
+                                    }}</span>
                                 </div>
                                 <div class="leverage-item">
                                     <span class="leverage-label">{{ $t("home.maxReturn") || "最大回报" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxReturn || "182%"
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                             <div class="item-actions">
@@ -224,7 +222,7 @@
                                         </el-icon>
                                         <span class="participant-text">{{
                                             item.participantCount.toLocaleString()
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <span class="voi-amount">VOI：${{ item.amount }}</span>
                                 </div>
@@ -255,13 +253,13 @@
                                     <span class="leverage-label">{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxLeverage || "10X"
-                                        }}</span>
+                                    }}</span>
                                 </div>
                                 <div class="leverage-item">
                                     <span class="leverage-label">{{ $t("home.maxReturn") || "最大回报" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxReturn || "182%"
-                                        }}</span>
+                                    }}</span>
                                 </div>
                             </div>
                             <div class="item-options">
@@ -301,7 +299,7 @@
                                         </el-icon>
                                         <span class="participant-text">{{
                                             item.participantCount.toLocaleString()
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <span class="voi-amount">VOI：${{ item.amount }}</span>
                                 </div>
@@ -420,11 +418,6 @@ const leftList = ref(rawLeftList);
 
 // 模拟数据：右边横向列表
 const rightList = ref(rawRightList);
-
-// 跳转到收益页面
-const navigateToEarnings = () => {
-    router.push("/earnings");
-};
 
 // 跳转到详情页面
 const navigateToDetail = (item, choice) => {
@@ -626,8 +619,8 @@ $gradient-mask-right: linear-gradient(to right,
                             gap: 10px;
                             padding: 10px 12px;
                             border-radius: 10px;
-                            border: 1px solid rgba(255, 255, 255, 0.14);
-                            background: rgba(255, 255, 255, 0.06);
+                            border: 1px solid var(--border-color);
+                            background: var(--bg-page);
                             box-sizing: border-box;
                             cursor: text;
 
@@ -635,7 +628,7 @@ $gradient-mask-right: linear-gradient(to right,
                                 width: 18px;
                                 height: 18px;
                                 flex-shrink: 0;
-                                color: rgba(255, 255, 255, 0.7);
+                                color: var(--text-dark-gray);
                             }
 
                             .esports-search-input {
@@ -644,13 +637,13 @@ $gradient-mask-right: linear-gradient(to right,
                                 border: none;
                                 outline: none;
                                 background: transparent;
-                                color: rgba(255, 255, 255, 0.85);
+                                color: var(--bg-opposite);
                                 font-size: 16px;
                                 line-height: 1.2;
                                 padding: 0;
 
                                 &::placeholder {
-                                    color: rgba(255, 255, 255, 0.55);
+                                    color: var(--text-dark-gray);
                                 }
                             }
                         }
