@@ -56,11 +56,11 @@ watch(
   { flush: 'post', immediate: true }
 )
 
-const isMobile = ref(false)
+const isMobile = ref(true)
 
 const checkIsMobile = () => {
   if (typeof window !== 'undefined') {
-    isMobile.value = window.innerWidth <= 768
+    // isMobile.value = window.innerWidth <= 768
   }
 }
 

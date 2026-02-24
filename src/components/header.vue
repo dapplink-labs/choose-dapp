@@ -498,7 +498,7 @@ onBeforeUnmount(() => {
 
   .header-container {
     width: 100%;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: space-between;
     gap: 24px;
@@ -508,7 +508,7 @@ onBeforeUnmount(() => {
   // 移动端头部
   .header-h5 {
     width: 100%;
-    display: none; // 默认隐藏，移动端显示
+    display: flex; // 默认隐藏，移动端显示
     align-items: center;
     justify-content: space-between;
     gap: 12px;
@@ -1253,12 +1253,12 @@ onBeforeUnmount(() => {
 
     // PC端头部在移动端隐藏
     .header-container {
-      display: none;
+      // display: none;
     }
 
     // 移动端头部显示
     .header-h5 {
-      display: flex;
+      // display: flex;
       gap: 6px;
 
       .h5-logo-section {

@@ -201,7 +201,7 @@ const handleNavClick = (item) => {
 // 仅在移动端显示，PC端隐藏
 @media (min-width: 769px) {
   .footer-nav {
-    display: none;
+    // display: none;
   }
 }
 </style>
