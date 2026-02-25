@@ -595,6 +595,10 @@ export default {
     cycleDays: "Cycle Days",
     totalEarnings: "Total Profits",
     activateStaking: "Activate Staking",
+    activationSuccess: "You have successfully activated the node",
+    verificationNode: "Verification Node",
+    confirm: "Confirm",
+    rewardsDistributionNote: "Node rewards will be distributed daily at 10:00 UTC+8",
     activationMsg: "Address {address} has activated [ {nodeType} ]",
     nodeTypes: {
       T1: "Information Node",

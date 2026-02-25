@@ -590,6 +590,10 @@ export default {
     cycleDays: "周期天数",
     totalEarnings: "总收益",
     activateStaking: "激活质押",
+    activationSuccess: "您已成功激活节点",
+    verificationNode: "验证节点",
+    confirm: "确定",
+    rewardsDistributionNote: "节点收益将在每天上午10:00 UTC+8发放",
     activationMsg: "地址 {address} 已激活[ {nodeType} ]",
     nodeTypes: {
       T1: "信息节点",

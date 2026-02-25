@@ -568,11 +568,10 @@ async function init() {
       total_reward_usdt.value = data.produced_income ?? "0"; // 节点总收益（USDT）
       progressPercent.value = formatProgressPercent(
         (1 -
-          ((Number(data.produced_income) || 0) / Number(data.forecast_income) ||
-            0)) *
+          (Number(data.produced_income) / Number(data.forecast_income))) *
         100,
       );
-      
+
     })
     .catch((err) => {
       console.error("获取节点收益详情失败：", err);

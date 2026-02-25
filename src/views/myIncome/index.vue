@@ -493,7 +493,7 @@ const formatProgressPercent = (value) => {
 };
 
 const progressIndicatorLeft = computed(() => {
-  const p = Number(currentNodeStakingInfo?.progressPercent) || 0;
+  const p = Number(currentNodeStakingInfo.value?.progressPercent) || 0;
   if (p === 0) return `${p}%`;
   if (p < 20) return `${p - 4}%`;
   if (97 >= p && p >= 90) return `${p - 24}%`;
