@@ -149,7 +149,6 @@ onMounted(() => {
 
 // 方法
 const handleNavClick = (key) => {
-  return
   activeNav.value = key
   emit('nav-click', key)
 

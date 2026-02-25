@@ -478,6 +478,7 @@ $bg-dark: #000;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding-bottom: 60px;
 }
 
 /* 顶部导航栏 - 参考 predictionDetailH5 */
@@ -1175,10 +1176,16 @@ $bg-dark: #000;
 /* 吸底操作 */
 /* 底部操作栏 */
 .bottom-dock-actions {
-  padding: 16px 0;
+  width: 100%;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  padding: 16px;
+  box-sizing: border-box;
   display: flex;
   gap: 12px;
   margin-top: 20px;
+  background: var(--bg-page-h5);
 
   .trade-btn {
     flex: 1;

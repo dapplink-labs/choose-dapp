@@ -103,6 +103,11 @@
                 <OrderBookMobile :active-side="activeOrderbookSide" />
             </div>
         </div>
+        <!-- 底部预测操作栏 -->
+        <div class="bottom-dock-actions">
+            <button class="trade-btn up">{{ $t('common.buy') }} {{ $t('crypto.up') }} 96 ¢</button>
+            <button class="trade-btn down">{{ $t('common.buy') }} {{ $t('crypto.down') }} 4 ¢</button>
+        </div>
     </div>
 </template>
 
@@ -462,7 +467,7 @@ const handleBack = () => {
 <style scoped lang="scss">
 .prediction-detail-h5-page {
     min-height: 100vh;
-    padding-bottom: 24px;
+    padding-bottom: 70px;
     color: var(--bg-opposite);
     background: var(--bg-page-h5);
 }
@@ -818,5 +823,43 @@ const handleBack = () => {
 
 .orderbook-tab.active {
     color: var(--bg-opposite);
+}
+
+/* 吸底操作 */
+/* 底部操作栏 */
+.bottom-dock-actions {
+    width: 100%;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    background: var(--bg-page-h5);
+    z-index: 2001;
+
+    .trade-btn {
+        flex: 1;
+        height: 48px;
+        background: transparent;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+
+        &.up {
+            color: var(--text-color-y);
+            border: 1.5px solid var(--text-color-y);
+            background: rgba(187, 255, 46, 0.08);
+        }
+
+        &.down {
+            color: var(--text-color-n);
+            border: 1.5px solid var(--text-color-n);
+            background: var(--button-bg-n);
+        }
+    }
 }
 </style>
