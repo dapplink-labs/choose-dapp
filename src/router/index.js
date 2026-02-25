@@ -39,6 +39,8 @@ import sportsDetailH5 from "../views/sportsDetailH5/index.vue"
 import bitcoinUpDown from "../views/bitcoinUpDown/index.vue"
 
 
+import claimEarnings from "../views/myIncome/claimEarnings.vue"
+
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
@@ -210,6 +212,15 @@ const router = createRouter({
       path: "/myIncome",
       name: "myIncome",
       component: myIncome,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true,
+      },
+    },
+    {
+      path: "/myIncome/claim",
+      name: "claimEarnings",
+      component: claimEarnings,
       meta: {
         hideHeader: true,
         hideFooterNav: true,

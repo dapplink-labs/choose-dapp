@@ -1,6 +1,7 @@
 /* 默认主题变量定义（亮色主题） */
 :root,
 .theme-light {
+  --bg-color-010101: #ffffff;
   --bg-color   : #ffffff;
   --text-color : #1a1a1a;
   --text-color-tabBtn : #18191D;
@@ -34,6 +35,7 @@
 
 /* 暗黑主题 */
 .theme-dark {
+  --bg-color-010101: #010101;
   --bg-color   : #1e1e1e;
   --text-color : #f2f2f2;
   --text-color-tabBtn : #999999;

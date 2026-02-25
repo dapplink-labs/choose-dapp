@@ -826,8 +826,17 @@ export default {
     title: "Node Earnings",
   },
   collectEarnings: {
-    title: "Claim Method",
+    title: "Claim Earnings",
     tip: "* You can claim all node rewards, or choose to claim rewards from a single node",
+    selectNode: "Select Claim Node",
+    selectNodePlaceholder: "Select Node",
+    claimAmount: "Claim Amount",
+    youWillReceive: "You Will Receive",
+    predictedAmount: "My Predicted Amount (20%)",
+    confirmClaim: "Confirm Claim",
+    allNodes: "All Nodes",
+    claimNote: "You can claim earnings for all nodes or select a single node to claim",
+    claimable: "Claimable Earnings",
   },
   searchPage: {
     searchPlaceholder: "Search",

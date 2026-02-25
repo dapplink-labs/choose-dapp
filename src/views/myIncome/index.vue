@@ -295,9 +295,6 @@
     <!-- 我的节点弹窗 -->
     <TabNode v-model="showNodesModal" :nodes="myNodes" @select="handleNodeSelect" />
 
-    <!-- 领取收益弹窗 -->
-    <CollectEarnings ref="collectEarningsRef" @ReceiveSuccess="handleCollectSuccess" />
-
     <!-- 无节点提示弹窗 -->
     <transition name="fade">
       <div v-if="showNoNodeModal" class="no-node-overlay" @click.self="handleCloseNoNodeModal">
@@ -330,7 +327,6 @@ import avatarImg3 from "@/assets/icon/avatarImg3.png";
 import avatarImg4 from "@/assets/icon/avatarImg4.png";
 import avatarImg5 from "@/assets/icon/avatarImg5.png";
 import TabNode from "@/components/TabNode.vue";
-import CollectEarnings from "@/components/CollectEarnings.vue";
 import TeamTree from "@/components/TeamTree.vue";
 import BackHeaderNav from "@/components/BackHeaderNav.vue";
 import ActivationMarquee from "@/components/ActivationMarquee.vue";
@@ -458,7 +454,7 @@ const collectEarningsRef = ref(null);
 // 打开领取收益弹窗
 const openCollectEarnings = () => {
   if (isClaimDisabledByTime.value) return;
-  collectEarningsRef.value?.open();
+  router.push('/myIncome/claim');
 };
 
 // 领取收益成功后的回调

@@ -820,8 +820,17 @@ export default {
     title: "节点收益",
   },
   collectEarnings: {
-    title: "领取方式",
+    title: "领取收益",
     tip: "* 您可以领取所有节点收益，或选择领取单个节点的收益",
+    selectNode: "选择领取节点",
+    selectNodePlaceholder: "选择节点",
+    claimAmount: "领取数量",
+    youWillReceive: "你将收到",
+    predictedAmount: "我的预测金额(20%)",
+    confirmClaim: "确定领取",
+    allNodes: "全部节点",
+    claimNote: "可领取全部节点收益，也可以选择领取单个节点收益",
+    claimable: "可领取收益",
   },
   searchPage: {
     searchPlaceholder: "搜索",
