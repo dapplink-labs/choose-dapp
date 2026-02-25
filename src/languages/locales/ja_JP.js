@@ -578,6 +578,10 @@ export default {
     cycleDays: "サイクル日数",
     totalEarnings: "総収益",
     activateStaking: "ステーキングをアクティベート",
+    activationSuccess: "ノードアクティベート成功！",
+    verificationNode: "検証ノード",
+    confirm: "確認",
+    rewardsDistributionNote: "ノード数익は毎日10:00UTC+8に配布されます",
     activationMsg:
       "アドレス {address} が [ {nodeType} ] をアクティベートしました",
     nodeTypes: {
