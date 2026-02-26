@@ -57,9 +57,9 @@ const { t } = useI18n()
 // 导航项配置
 const navItems = computed(() => [
   { key: 'home', label: t('footerNav.home') || '首页', path: '/home' },
-  { key: 'search', label: t('common.search') || '搜索', path: '/home' },
+  { key: 'search', label: t('common.search') || '搜索', path: '/searchPage' },
   { key: 'breaking', label: t('footerNav.breaking') || '突发', path: '/breaking' },
-  { key: 'more', label: t('common.more') || '更多', path: '/personal-center' }
+  { key: 'more', label: t('common.more') || '更多', path: '/asset-management' }
 ])
 
 // 当前激活的导航项
@@ -72,6 +72,7 @@ const routeToNavKey = {
   '/searchPage': 'search',
   '/settings': 'more',
   '/personal-center': 'more',
+  '/asset-management': 'more',
   '/earnings': 'home',
   '/leaderboard': 'home',
   '/detail': 'home',

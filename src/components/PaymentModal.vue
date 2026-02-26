@@ -26,11 +26,14 @@
                     <div class="target-info">
                         <h3 class="target-title">尼克斯队对阵湖人队</h3>
                         <div class="target-row">
-                            <div class="outcome-badge">尼克斯队 | No
-                                <span class="icon" aria-hidden="true">
+                            <div class="outcome-badge"
+                                :class="{ 'outcome-yes': outcomeBadge === 'yes', 'outcome-no': outcomeBadge === 'no' }">
+                                尼克斯队 | No
+                                <span class="icon" aria-hidden="true" style="display: inline-flex;"
+                                    @click="outcomeBadge = outcomeBadge === 'no' ? 'yes' : 'no'">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="11.997"
                                         viewBox="0 0 12 11.997">
-                                        <path fill="#e44096"
+                                        <path fill="currentColor"
                                             d="M12.028,5.674h-.994a.126.126,0,0,0-.125.125V9.787H2.652V8.654a.128.128,0,0,0-.028-.081.131.131,0,0,0-.183-.022L.2,10.307a.137.137,0,0,0,0,.206l2.239,1.756a.128.128,0,0,0,.081.028.133.133,0,0,0,.131-.131V11.032h8.383a1.122,1.122,0,0,0,1.12-1.122V5.8a.129.129,0,0,0-.128-.125ZM.28,6.923h.994A.126.126,0,0,0,1.4,6.8V2.81H9.657V3.943a.128.128,0,0,0,.028.081.131.131,0,0,0,.183.022l2.239-1.757a.137.137,0,0,0,0-.206L9.867.328A.128.128,0,0,0,9.786.3a.133.133,0,0,0-.131.131V1.565H1.275A1.122,1.122,0,0,0,.156,2.687V6.8A.125.125,0,0,0,.28,6.923Z"
                                             transform="translate(-0.155 -0.3)" />
                                     </svg>
@@ -130,6 +133,7 @@ const orderType = ref('limit')
 const price = ref(48)
 const shares = ref(100)
 const leverage = ref(2)
+const outcomeBadge = ref('no') // 'yes' or 'no'
 
 const totalCost = computed(() => ((price.value * shares.value) / 100).toFixed(2))
 const potentialGain = computed(() => shares.value.toFixed(2))
@@ -213,6 +217,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
             cursor: pointer;
             padding-bottom: 12px;
             color: var(--text-dark-gray);
+            border-bottom: 2px solid transparent;
 
 
             &.active {
@@ -273,6 +278,16 @@ function handleConfirm() { console.log('Trade Confirmed') }
         display: flex;
         align-items: center;
         gap: 8px;
+
+        &.outcome-yes {
+            background: var(--button-bg-y);
+            color: var(--text-color-y);
+        }
+
+        &.outcome-no {
+            background: var(--button-bg-n);
+            color: var(--text-color-n);
+        }
 
         &.active {
             background: var(--button-bg-y);
@@ -421,6 +436,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
     justify-content: flex-end; // 杠杆按钮靠右
 
     .lev-btn {
+        opacity: 0.5;
         flex: 1;
         background: #2F2F2F;
         border: none;

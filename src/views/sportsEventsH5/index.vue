@@ -825,6 +825,7 @@ const playerPanelList = ref([
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #fff;
 
             &::after {
                 content: '';
@@ -846,7 +847,6 @@ const playerPanelList = ref([
 
             &.btn-yellow {
                 background: #eab308;
-                color: var(--bg-opposite);
 
                 &::after {
                     background: #ca9a06;
@@ -855,16 +855,14 @@ const playerPanelList = ref([
 
             &.btn-gray {
                 background: var(--text-dark-gray);
-                color: var(--bg-opposite);
 
                 &::after {
-                    background: #222;
+                    background: #666;
                 }
             }
 
             &.btn-pink {
                 background: #db2777;
-                color: var(--bg-opposite);
 
                 &::after {
                     background: #be185d;

@@ -19,7 +19,50 @@
                 <div class="browse-buttons">
                     <button v-for="item in browseItems" :key="item.key" class="browse-btn">
                         <el-icon class="browse-icon">
-                            <component :is="item.icon" />
+
+                            <!-- 渲染内联 SVG 图标 -->
+                            <svg v-if="item.icon === 'trends'" xmlns="http://www.w3.org/2000/svg" width="14"
+                                height="8.166" viewBox="0 0 14 8.166" class="custom-svg">
+                                <path fill="currentColor"
+                                    d="M10.846,213.333a.583.583,0,1,0,0,1.167h2.091l-4.145,4.145-2.415-2.416-.089-.087a.583.583,0,0,0-.825,0l-.239.239L1.1,220.5a.583.583,0,1,0,.825.825l3.951-3.951,2.151,2.15.353.354a.583.583,0,0,0,.825,0l.191-.191,4.366-4.366v2.091a.583.583,0,1,0,1.167,0V213.9l0-.03,0,.05a.586.586,0,0,0-.225-.46l.054.048a.588.588,0,0,0-.242-.146l-.012,0-.055-.012-.013,0-.022,0-.049,0H10.846Z"
+                                    transform="translate(-0.93 -213.333)" />
+                            </svg>
+                            <svg v-else-if="item.icon === 'popular'" xmlns="http://www.w3.org/2000/svg" width="11.429"
+                                height="14" viewBox="0 0 11.429 14" class="custom-svg">
+                                <path fill="currentColor"
+                                    d="M5.714,14a5.781,5.781,0,0,1-4-1.528A5.634,5.634,0,0,1,0,8.249a15.1,15.1,0,0,1,.831-4.07.638.638,0,0,1,.616-.466.66.66,0,0,1,.609.416l.006.015.008.021c.181.487.326.893.431,1.209A2.508,2.508,0,0,0,3.571,6.81l0-.005a5.138,5.138,0,0,1-.194-1.725,4.972,4.972,0,0,1,.169-1.048A6.836,6.836,0,0,1,6.2.1a.552.552,0,0,1,.31-.1.711.711,0,0,1,.646.683,5.337,5.337,0,0,0,1.41,3.253c.1.1.229.216.377.349l.006.005a6.081,6.081,0,0,1,2.474,4.678A4.7,4.7,0,0,1,9.71,12.562,6.214,6.214,0,0,1,5.714,14ZM1.6,6.808a7.525,7.525,0,0,0-.174,1.441,4.244,4.244,0,0,0,1.266,3.174,4.346,4.346,0,0,0,3.02,1.139,4.652,4.652,0,0,0,3.07-1.095A3.363,3.363,0,0,0,10,8.968,4.541,4.541,0,0,0,8.08,5.442c-.175-.16-.355-.326-.519-.49A6.231,6.231,0,0,1,6,2.224,6.288,6.288,0,0,0,4.94,4.349a3.711,3.711,0,0,0-.12,1.445,3.231,3.231,0,0,0,.1.548l0,.008v0a1.44,1.44,0,0,1-.412,1.538A1.421,1.421,0,0,1,2.933,8.1l.63-1.268C2.948,8.067,2.932,8.1,2.931,8.1a2.379,2.379,0,0,1-.291-.176,3.6,3.6,0,0,1-.481-.407A4.075,4.075,0,0,1,1.6,6.808Z" />
+                            </svg>
+                            <svg v-else-if="item.icon === 'liquidity'" xmlns="http://www.w3.org/2000/svg" width="14"
+                                height="12.444" viewBox="0 0 14 12.444" class="custom-svg">
+                                <path fill="currentColor"
+                                    d="M5.186,1.383A.561.561,0,0,0,4.64,1.8l-.9,3.539A2.1,2.1,0,0,1,1.707,6.914H.7a.691.691,0,1,1,0-1.383H1.707a.7.7,0,0,0,.679-.524l.9-3.539a1.967,1.967,0,0,1,3.851.23l1.124,8.877a.564.564,0,0,0,1.1.066l.9-3.539a2.1,2.1,0,0,1,2.037-1.571H13.3a.691.691,0,1,1,0,1.383H12.293a.7.7,0,0,0-.679.524l-.9,3.539a1.967,1.967,0,0,1-3.851-.23L5.744,1.869A.56.56,0,0,0,5.186,1.383Z" />
+                            </svg>
+                            <svg v-else-if="item.icon === 'endingSoon'" xmlns="http://www.w3.org/2000/svg" width="13.5"
+                                height="14" viewBox="0 0 13.5 14" class="custom-svg">
+                                <g transform="translate(-10.135 -9.141)">
+                                    <path fill="currentColor"
+                                        d="M1.385,7A5.569,5.569,0,0,1,6.923,1.4,5.41,5.41,0,0,1,11.2,3.5l-1.163,0a.7.7,0,0,0,0,1.4L12.42,4.9a.682.682,0,0,0,.08,0h.306a.689.689,0,0,0,.491-.2.7.7,0,0,0,.2-.5V1.4a.692.692,0,1,0-1.385,0V2.415A6.775,6.775,0,0,0,6.923,0,6.962,6.962,0,0,0,0,7a6.962,6.962,0,0,0,6.923,7,6.85,6.85,0,0,0,6.158-3.889.7.7,0,0,0-.312-.938.689.689,0,0,0-.928.315A5.467,5.467,0,0,1,6.923,12.6,5.569,5.569,0,0,1,1.385,7Z"
+                                        transform="translate(10.135 9.141)" />
+                                    <path fill="currentColor"
+                                        d="M.692,0a.7.7,0,0,1,.692.7V3.21L2.566,4.405a.706.706,0,0,1,0,.99.687.687,0,0,1-.979,0L.406,4.2A1.408,1.408,0,0,1,0,3.21V.7A.7.7,0,0,1,.692,0Z"
+                                        transform="translate(16.366 12.641)" />
+                                </g>
+                            </svg>
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"
+                                class="custom-svg">
+                                <g transform="translate(-128 -128)" fill="currentColor">
+                                    <path d="M262.439,640h-5.853a.585.585,0,0,0,0,1.171h5.853a.585.585,0,0,0,0-1.171Z"
+                                        transform="translate(-125.675 -502.67)" />
+                                    <path
+                                        d="M259.045,341.33a.593.593,0,0,0-.585.585v1.319l-1.733-1.733a.492.492,0,0,0-.219-.125.569.569,0,0,0-.453,0,.577.577,0,0,0-.312.312.562.562,0,0,0-.016.226v2.732a.585.585,0,1,0,1.171,0v-1.319l1.733,1.733a.57.57,0,0,0,.414.172.593.593,0,0,0,.585-.585v-2.732A.593.593,0,0,0,259.045,341.33Z"
+                                        transform="translate(-125.398 -209.446)" />
+                                    <path
+                                        d="M513.756,341.333h-1.171a.585.585,0,1,0,0,1.171h1.171a.585.585,0,1,0,0-1.171Zm0,2.732h-1.171a.585.585,0,0,0,0,1.171h1.171a.585.585,0,0,0,0-1.171Z"
+                                        transform="translate(-377.005 -209.45)" />
+                                    <path
+                                        d="M141.222,131.111h-1.556v-2.333a.778.778,0,0,0-.778-.778H128.778a.778.778,0,0,0-.778.778v12.444a.778.778,0,0,0,.778.778h12.444a.778.778,0,0,0,.778-.778v-9.333A.778.778,0,0,0,141.222,131.111Zm-2.722,9.722h-9.333V129.167H138.5Zm2.333,0h-1.167v-8.556h1.167Z" />
+                                </g>
+                            </svg>
                         </el-icon>
                         <span class="browse-text">{{ item.label }}</span>
                     </button>
@@ -46,7 +89,11 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Search, Document, TrendCharts, Promotion, Connection, RefreshRight } from '@element-plus/icons-vue'
+import { Search } from '@element-plus/icons-vue'
+import si1 from '@/assets/images/searchIcon01.png'
+import si2 from '@/assets/images/searchIcon02.png'
+import si3 from '@/assets/images/searchIcon03.png'
+import si4 from '@/assets/images/searchIcon04.png'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -59,27 +106,27 @@ const browseItems = computed(() => [
     {
         key: 'latest',
         label: t('searchPage.browseItems.latest'),
-        icon: Document
+        icon: 'latest'
     },
     {
         key: 'trends',
         label: t('searchPage.browseItems.trends'),
-        icon: TrendCharts
+        icon: 'trends'
     },
     {
         key: 'popular',
         label: t('searchPage.browseItems.popular'),
-        icon: Promotion
+        icon: 'popular'
     },
     {
         key: 'liquidity',
         label: t('searchPage.browseItems.liquidity'),
-        icon: Connection
+        icon: 'liquidity'
     },
     {
         key: 'endingSoon',
         label: t('searchPage.browseItems.endingSoon'),
-        icon: RefreshRight
+        icon: 'endingSoon'
     }
 ])
 
@@ -88,22 +135,22 @@ const themeItems = computed(() => [
     {
         key: 'crypto',
         label: t('searchPage.themeItems.crypto'),
-        thumbnail: 'https://picsum.photos/seed/crypto/80/80'
+        thumbnail: si1
     },
     {
         key: 'finance',
         label: t('searchPage.themeItems.finance'),
-        thumbnail: 'https://picsum.photos/seed/finance/80/80'
+        thumbnail: si2
     },
     {
         key: 'sports',
         label: t('searchPage.themeItems.sports'),
-        thumbnail: 'https://picsum.photos/seed/sports/80/80'
+        thumbnail: si3
     },
     {
         key: 'esports',
         label: t('searchPage.themeItems.esports'),
-        thumbnail: 'https://picsum.photos/seed/esports/80/80'
+        thumbnail: si4
     }
 ])
 
@@ -213,6 +260,7 @@ const handleSearchInput = () => {
     margin-bottom: 15px;
 
     .browse-icon {
+        margin-right: 10px;
         font-size: 14px;
         color: var(--bg-opposite);
         transition: color 0.3s ease;
@@ -273,5 +321,4 @@ const handleSearchInput = () => {
         flex: 1;
     }
 }
-
 </style>
