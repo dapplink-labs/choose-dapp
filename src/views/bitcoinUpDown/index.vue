@@ -1,6 +1,6 @@
 <template>
   <div class="bitcoin-up-down-page">
-    <!-- 顶部状态栏：返回 + 成交量 + 收藏 -->
+    <!-- 1. 固定顶部状态栏 -->
     <div class="top-bar">
       <button class="top-btn back-btn" type="button" @click="handleBack">
         <el-icon>
@@ -24,108 +24,179 @@
       </div>
     </div>
 
-    <div class="content-scroller">
-      <!-- 2. 标题区与倒计时 -->
-      <div class="asset-profile">
-        <div class="asset-logo">
-          <svg viewBox="0 0 32 32" width="32" height="32">
-            <path fill="#fff"
-              d="M21.7 14.3c.3-2-1.2-3.1-3.3-3.8l.7-2.7-1.6-.4-.7 2.6c-.4-.1-.9-.2-1.3-.3l.7-2.6-1.6-.4-.7 2.7c-.3-.1-.7-.2-1-.2v-.1l-2.2-.6-.4 1.7s1.2.3 1.2.3c.7.2.8.6.8 1l-.8 3.1c0 0 .1 0 .2.1h-.2l-1.1 4.4c-.1.2-.3.5-.8.4 0 0-1.2-.3-1.2-.3l-.8 1.8 2.1.5c.4.1.8.2 1.2.3l-.7 2.8 1.6.4.7-2.7c.4.1.9.2 1.3.3l-.7 2.7 1.6.4.7-2.8c2.9.5 5.1.3 6-2.3.8-2.1 0-3.3-1.5-4.1 1.1-.2 1.9-1 2.1-2.5zm-3.8 5.3c-.5 2.2-4.2 1-5.4.7l1-3.9c1.2.3 5 .9 4.4 3.2zm.6-5.3c-.5 2-3.5.9-4.5.7l.9-3.5c1 .2 4.1.7 3.6 2.8z" />
-          </svg>
-        </div>
-        <div class="asset-text">
-          <h2>{{ $t('crypto.upOrDown') }}</h2>
-          <p>1月31日 19:00-19:15 UTC+8</p>
-        </div>
-        <div class="timer">
-          <div class="time-block">
-            <span class="unit">01</span>
-            <span class="label">{{ $t('crypto.min') }}</span>
+    <!-- 滚动容器 -->
+    <div class="content-scroller" @scroll="handleScroll">
+
+      <!-- 2. 吸顶标题区与倒计时 -->
+      <div class="asset-profile-wrapper" :class="{ 'is-sticky': isSticky }">
+        <div class="asset-profile">
+          <div class="asset-logo">
+            <svg viewBox="0 0 32 32" width="100%" height="100%">
+              <path fill="#fff"
+                d="M21.7 14.3c.3-2-1.2-3.1-3.3-3.8l.7-2.7-1.6-.4-.7 2.6c-.4-.1-.9-.2-1.3-.3l.7-2.6-1.6-.4-.7 2.7c-.3-.1-.7-.2-1-.2v-.1l-2.2-.6-.4 1.7s1.2.3 1.2.3c.7.2.8.6.8 1l-.8 3.1c0 0 .1 0 .2.1h-.2l-1.1 4.4c-.1.2-.3.5-.8.4 0 0-1.2-.3-1.2-.3l-.8 1.8 2.1.5c.4.1.8.2 1.2.3l-.7 2.8 1.6.4.7-2.7c.4.1.9.2 1.3.3l-.7 2.7 1.6.4.7-2.8c2.9.5 5.1.3 6-2.3.8-2.1 0-3.3-1.5-4.1 1.1-.2 1.9-1 2.1-2.5zm-3.8 5.3c-.5 2.2-4.2 1-5.4.7l1-3.9c1.2.3 5 .9 4.4 3.2zm.6-5.3c-.5 2-3.5.9-4.5.7l.9-3.5c1 .2 4.1.7 3.6 2.8z" />
+            </svg>
           </div>
-          <div class="time-block">
-            <span class="unit">59</span>
-            <span class="label">{{ $t('crypto.sec') }}</span>
+          <div class="asset-text">
+            <h2>以太坊在2月27日上涨还是下跌?</h2>
+          </div>
+          <!-- 选中历史记录时隐藏倒计时 -->
+          <div class="timer" v-show="activeSegmentMode !== 'past'">
+            <div class="time-block">
+              <div class="time-value">
+                <span class="digit-wrapper" v-for="(char, i) in countDown.hours.split('')" :key="'h' + i">
+                  <transition name="fast-roll"><span class="digit unit" :key="char">{{ char }}</span></transition>
+                </span>
+              </div>
+              <span class="label">HRS</span>
+            </div>
+            <div class="time-block">
+              <div class="time-value">
+                <span class="digit-wrapper" v-for="(char, i) in countDown.minutes.split('')" :key="'m' + i">
+                  <transition name="fast-roll"><span class="digit unit" :key="char">{{ char }}</span></transition>
+                </span>
+              </div>
+              <span class="label">MINS</span>
+            </div>
+            <div class="time-block">
+              <div class="time-value">
+                <span class="digit-wrapper" v-for="(char, i) in countDown.seconds.split('')" :key="'s' + i">
+                  <transition name="fast-roll"><span class="digit unit" :key="char">{{ char }}</span></transition>
+                </span>
+              </div>
+              <span class="label">SECS</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- 3. 价格对战看板 -->
+      <!-- 3. 价格看板 -->
       <div class="price-dashboard">
         <div class="price-item">
-          <div class="label">{{ $t('crypto.priceToBeat') }}</div>
-          <div class="value">$82,627.75</div>
+          <div class="label">Price to beat</div>
+          <div class="value">{{ activeSegmentMode === 'future' ? '--' : formatPrice(displayTargetPrice) }}</div>
         </div>
+
         <div class="price-item current">
-          <div class="label">{{ $t('crypto.currentPrice') }} <span class="diff">▲ $39</span></div>
-          <div class="value">$82,666.53</div>
+          <div class="label">
+            {{ activeSegmentMode === 'past' ? 'Final price' : 'Current price' }}
+            <span v-if="activeSegmentMode !== 'future'" :class="['diff', diffData.status]">
+              <span class="svg-icon-wrapper diff-icon" :class="diffData.status">
+                <svg v-if="diffData.status === 'up'" viewBox="0 0 12 12">
+                  <path d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
+                    fill="currentColor" />
+                </svg>
+                <svg v-else viewBox="0 0 12 12">
+                  <path d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
+                    fill="currentColor" />
+                </svg>
+              </span>
+              ${{ diffData.value }}
+            </span>
+          </div>
+          <div class="value price-value">
+            <span class="symbol">$</span>
+            <template v-if="activeSegmentMode === 'past'">
+              <span class="digit-static">{{ selectedPastRecord?.finalPrice.toLocaleString('en-US', {
+                minimumFractionDigits: 2
+              }) }}</span>
+            </template>
+            <template v-else>
+              <template v-for="(char, i) in currentPriceChars" :key="'p'+i">
+                <span v-if="['.', ','].includes(char)" class="symbol">{{ char }}</span>
+                <span v-else class="digit-wrapper">
+                  <transition name="fast-roll">
+                    <span class="digit" :key="char">{{ char }}</span>
+                  </transition>
+                </span>
+              </template>
+            </template>
+          </div>
         </div>
       </div>
 
-      <!-- 4. 高级定制化图表 -->
+      <!-- 4. 图表与工具栏 -->
       <div class="chart-section">
-        <!-- 时间范围选择器 -->
-        <div class="time-range-selector">
-          <button v-for="range in timeRanges" :key="range.value" class="time-range-btn"
-            :class="{ active: selectedTimeRange === range.value }" @click="handleTimeRangeChange(range.value)">
-            {{ range.label }}
-          </button>
-        </div>
-
         <div class="chart-container">
-          <!-- 侧边数值变动显示 -->
-          <div class="chart-overlays">
-            <span class="delta-tag pink">+$3</span>
-            <span class="delta-tag neon">+$200</span>
-            <span class="delta-tag pink">+$2</span>
-            <span class="delta-tag pink">+$10</span>
-          </div>
           <div ref="chartRef" class="main-chart" style="touch-action: none;"></div>
-
-          <!-- Vue 渲染的高性能浮窗 -->
-          <div v-show="showInfoBox" class="info-popover" :style="infoBoxStyle">
-            <div class="info-price">${{ currentPrice.toLocaleString() }}</div>
-            <div class="info-time">1月31日 19:00-19:15</div>
-            <div class="info-arrow"></div>
-          </div>
         </div>
 
-        <!-- 5. 图表下方控制组件 -->
         <div class="chart-toolbar">
-          <div class="record-capsule">
-            <div class="record-selector">
-              {{ $t('crypto.record') }} <el-icon>
-                <ArrowDown />
-              </el-icon>
+          <!-- 下拉菜单：选择历史记录 -->
+          <el-dropdown trigger="click" placement="bottom-start" @command="selectPastRecord"
+            popper-class="custom-history-dropdown">
+            <div class="record-capsule">
+              <div class="record-selector">
+                过去 <el-icon>
+                  <ArrowDown />
+                </el-icon>
+              </div>
+              <div class="trend-markers">
+                <span v-for="res in lastThreeResults" :key="res.id" class="svg-icon-wrapper" :class="res.result">
+                  <svg v-if="res.result === 'up'" style="width:12px;height:12px" viewBox="0 0 12 12">
+                    <path d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
+                      fill="currentColor" />
+                  </svg>
+                  <svg v-else style="width:12px;height:12px" viewBox="0 0 12 12">
+                    <path d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
+                      fill="currentColor" />
+                  </svg>
+                </span>
+              </div>
             </div>
-            <div class="trend-markers">
-              <span class="tri-down"></span>
-              <span class="tri-up"></span>
-              <span class="tri-up"></span>
-            </div>
-          </div>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item v-for="record in pastRecords" :key="record.id" :command="record">
+                  <div class="drop-item-content">
+                    <span class="svg-icon-wrapper dropdown-icon" :class="record.result">
+                      <svg v-if="record.result === 'up'" style="width:14px;height:14px" viewBox="0 0 12 12">
+                        <path d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
+                          fill="currentColor" />
+                      </svg>
+                      <svg v-else style="width:14px;height:14px" viewBox="0 0 12 12">
+                        <path d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
+                          fill="currentColor" />
+                      </svg>
+                    </span>
+                    {{ record.label }}
+                  </div>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+
+          <!-- 🔥 动态时间轴按钮逻辑 🔥 -->
           <div class="time-segments">
-            <span v-for="time in timeSegments" :key="time" class="time-pill"
-              :class="{ active: activeTimeSegment === time }" @click="activeTimeSegment = time">
-              <i v-if="activeTimeSegment === time" class="dot"></i>{{ time }}
+            <!-- 1. 最左侧：临时生成的历史记录游标 (仅在选择历史且存在时显示) -->
+            <span v-if="activeSegmentMode === 'past' && selectedPastRecord" class="time-pill active past-active">
+              Ended: {{ selectedPastRecord.date }}
+            </span>
+
+            <!-- 2. 中间：常驻实时按钮 (点击清除历史游标) -->
+            <span class="time-pill" :class="{ active: activeSegmentMode === 'live' }" @click="selectLiveSegment">
+              <i class="dot breathing-dot"></i> {{ liveSegment.label }}
+            </span>
+
+            <!-- 3. 右侧：当天未来按钮 (只有一个) -->
+            <span v-for="ft in futureSegments" :key="ft.id" class="time-pill "
+              :class="{ active: activeSegmentMode === 'future' && selectedFutureId === ft.id }"
+              @click="selectFutureSegment(ft)">
+              {{ ft.label }}
             </span>
           </div>
         </div>
       </div>
 
-      <!-- 6. 仓位 Tab 页 -->
+      <!-- 5. 底部业务逻辑 -->
       <div class="business-tabs">
-        <div class="tab-item" :class="{ active: activeTab === 'Positions' }" @click="activeTab = 'Positions'">
-          {{ $t('crypto.positions') }}
-        </div>
-        <div class="tab-item" :class="{ active: activeTab === 'Orders' }" @click="activeTab = 'Orders'">
-          {{ $t('crypto.orders') }}
-        </div>
-        <div class="tab-item" :class="{ active: activeTab === 'History' }" @click="activeTab = 'History'">
-          {{ $t('crypto.history') }}
-        </div>
+        <div class="tab-item" :class="{ active: activeTab === 'Positions' }" @click="activeTab = 'Positions'">{{
+          $t('crypto.positions') }}</div>
+        <div class="tab-item" :class="{ active: activeTab === 'Orders' }" @click="activeTab = 'Orders'">{{
+          $t('crypto.orders')
+        }}</div>
+        <div class="tab-item" :class="{ active: activeTab === 'History' }" @click="activeTab = 'History'">{{
+          $t('crypto.history') }}</div>
       </div>
 
-      <!-- 仓位详细详情卡片 -->
       <div v-if="activeTab === 'Positions'" class="position-content">
         <div class="pos-card">
           <h3 class="pos-title">{{ $t('crypto.upOrDown') }}</h3>
@@ -152,48 +223,6 @@
         </div>
       </div>
 
-      <!-- Orders 订单列表 -->
-      <div v-if="activeTab === 'Orders'" class="orders-content">
-        <div class="orders-header">
-          <span class="orders-title">{{ $t('crypto.openOrders') }}</span>
-          <button class="cancel-all-btn">{{ $t('crypto.cancelAll') }}</button>
-        </div>
-        <div class="orders-list">
-          <div v-for="(order, index) in openOrders" :key="index" class="order-item">
-            <div class="order-left">
-              <div class="order-type">{{ order.type }}</div>
-              <span class="order-tag">{{ order.price }} | {{ order.amount }}</span>
-            </div>
-            <div class="order-right">
-              <div class="order-filled">{{ order.filled }}/{{ order.total }}</div>
-              <div class="order-status">{{ order.status }}</div>
-            </div>
-            <button class="order-close-btn" @click="removeOrder(index)">
-              <svg viewBox="0 0 24 24" width="18" height="18">
-                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- History 历史记录 -->
-      <div v-if="activeTab === 'History'" class="history-content">
-        <div class="history-header">
-          <span class="history-title">{{ $t('crypto.history') }}</span>
-        </div>
-        <div class="history-list">
-          <div v-for="(item, index) in historyList" :key="index" class="history-item">
-            <div class="history-text">
-              Bought <span :class="item.direction === 'Up' ? 'up' : 'down'">{{ item.amount }} {{ item.direction
-              }}</span> at {{ item.price }} <span class="cost">({{ item.cost }})</span>
-            </div>
-            <div class="history-time">{{ item.time }}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 7. 订单簿详情页 -->
       <div class="orderbook-header" @click="isBookOpen = !isBookOpen">
         <span>{{ $t('sports.orderBook') }}</span>
         <div class="header-right">
@@ -204,30 +233,25 @@
         </div>
       </div>
       <div v-if="isBookOpen" class="book-body">
-        <!-- 订单簿 Tab 切换 -->
         <div class="orderbook-tabs">
-          <button class="orderbook-tab" :class="{ active: orderBookTab === 'yes' }" @click="orderBookTab = 'yes'">
-            {{ $t('detail.tradeYes') }}
-          </button>
-          <button class="orderbook-tab" :class="{ active: orderBookTab === 'no' }" @click="orderBookTab = 'no'">
-            {{ $t('detail.tradeNo') }}
-          </button>
+          <button class="orderbook-tab" :class="{ active: orderBookTab === 'yes' }" @click="orderBookTab = 'yes'">{{
+            $t('detail.tradeYes') }}</button>
+          <button class="orderbook-tab" :class="{ active: orderBookTab === 'no' }" @click="orderBookTab = 'no'">{{
+            $t('detail.tradeNo') }}</button>
         </div>
-        <!-- 订单簿表格 -->
         <OrderBookMobile :active-side="orderBookTab" />
       </div>
 
       <div class="rules-footer">
         <h4>{{ $t('detail.rules') }}</h4>
-        <p>The FED interest rates are defined in this market by the upper bound of the target federal funds range. The
-          decisions on the target range are made by the target.</p>
+        <p>The FED interest rates are defined in this market by the upper bound of the target federal funds range.</p>
       </div>
+    </div>
 
-      <!-- 底部预测操作栏 -->
-      <div class="bottom-dock-actions">
-        <button class="trade-btn up">{{ $t('common.buy') }} {{ $t('crypto.up') }} 96 ¢</button>
-        <button class="trade-btn down">{{ $t('common.buy') }} {{ $t('crypto.down') }} 4 ¢</button>
-      </div>
+    <!-- 吸底操作栏 -->
+    <div class="bottom-dock-actions">
+      <button class="trade-btn up">{{ $t('common.buy') }} {{ $t('crypto.up') }} 96 ¢</button>
+      <button class="trade-btn down">{{ $t('common.buy') }} {{ $t('crypto.down') }} 4 ¢</button>
     </div>
   </div>
 </template>
@@ -244,250 +268,257 @@ import { useThemeStore } from '@/stores/theme'
 const { t } = useI18n()
 const router = useRouter()
 const themeStore = useThemeStore()
+
+const handleBack = () => router.back()
 const activeTab = ref('Positions')
 const isBookOpen = ref(false)
 const orderBookTab = ref('yes')
+
+// --- 吸顶逻辑 ---
+const isSticky = ref(false)
+const handleScroll = (e) => {
+  isSticky.value = e.target.scrollTop > 20
+}
+
+// --- 倒计时 ---
+const countDown = ref({ hours: '01', minutes: '10', seconds: '18' })
+let timerInterval = null
+const startCountDown = () => {
+  let totalSeconds = 1 * 3600 + 10 * 60 + 18
+  timerInterval = setInterval(() => {
+    if (totalSeconds <= 0) return clearInterval(timerInterval)
+    totalSeconds--
+    const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0')
+    const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0')
+    const s = (totalSeconds % 60).toString().padStart(2, '0')
+    countDown.value = { hours: h, minutes: m, seconds: s }
+  }, 1000)
+}
+
+// --- 状态机 ---
+const activeSegmentMode = ref('live')
+
+// 模拟历史数据
+const pastRecords = [
+  { id: 1, label: '12 PM ET · Feb 25', date: 'Feb 25', result: 'up', targetPrice: 2047.32, finalPrice: 2062.59 },
+  { id: 2, label: '12 PM ET · Feb 24', date: 'Feb 24', result: 'down', targetPrice: 3168.00, finalPrice: 3136.32 },
+  { id: 3, label: '12 PM ET · Feb 23', date: 'Feb 23', result: 'down', targetPrice: 2100.00, finalPrice: 2080.00 },
+]
+const lastThreeResults = pastRecords.slice(0, 3)
+const selectedPastRecord = ref(null)
+
+// 模拟 Live 数据
+const liveSegment = { label: '12 PM', targetPrice: 2047.32 }
+const livePrice = ref(2062.59)
+
+// 模拟当天未来截点 (仅留一个)
+const futureSegments = [
+  { id: 'today', label: '12 PM Feb 27' }
+]
+const selectedFutureId = ref(null)
+
+// --- 数据衍生 ---
+const displayTargetPrice = computed(() => {
+  if (activeSegmentMode.value === 'past') return selectedPastRecord.value?.targetPrice
+  if (activeSegmentMode.value === 'live') return liveSegment.targetPrice
+  return null
+})
+
+const currentPriceChars = computed(() => {
+  return livePrice.value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).split('')
+})
+
+const diffData = computed(() => {
+  let current, target;
+  if (activeSegmentMode.value === 'past') {
+    current = selectedPastRecord.value.finalPrice
+    target = selectedPastRecord.value.targetPrice
+  } else if (activeSegmentMode.value === 'live') {
+    current = livePrice.value
+    target = liveSegment.targetPrice
+  } else {
+    return { status: '', value: '' }
+  }
+  const diff = current - target
+  return { status: diff >= 0 ? 'up' : 'down', value: Math.abs(diff).toFixed(2) }
+})
+
+const formatPrice = (val) => val ? `$${val.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : ''
+
+// --- Echarts 滑动图表 ---
 const chartRef = ref(null)
 let chartInstance = null
+let chartDataX = []
+let chartDataY = []
+let lastGenTime = 0
 
-// 时间段数据
-const timeSegments = ['19:00', '19:15', '19:30', '19:45', '20:00']
-const activeTimeSegment = ref('19:15')
-
-// 订单数据
-const openOrders = computed(() => [
-  { type: t('crypto.down'), price: '80 ¢', amount: '$40', filled: 0, total: 50, status: t('crypto.untilCancel') },
-  { type: t('crypto.down'), price: '80 ¢', amount: '$40', filled: 0, total: 50, status: t('crypto.untilCancel') }
-])
-
-const removeOrder = (index) => {
-  // openOrders is now computed, so this needs a different approach if needed
-}
-
-// 历史记录数据
-const historyList = ref([
-  { amount: 40, direction: 'Up', price: '80¢', cost: '$32', time: '4分钟前' },
-  { amount: 40, direction: 'Down', price: '80¢', cost: '$32', time: '4分钟前' }
-])
-
-// 图表状态
-const currentPrice = ref(82666.53)
-const showInfoBox = ref(false)
-const infoBoxStyle = ref({ left: '0px', top: '0px' })
-
-// 时间范围选择
-const timeRanges = [
-  { label: '1H', value: '1H' }, { label: '6H', value: '6H' },
-  { label: '1D', value: '1D' }, { label: '1W', value: '1W' },
-  { label: '1M', value: '1M' }, { label: 'ALL', value: 'ALL' }
-]
-const selectedTimeRange = ref('1D')
-
-const handleBack = () => router.back()
-
-// 生成模拟价格数据
-const generatePriceData = () => {
-  let val = 82600
-  return Array.from({ length: 40 }, (_, i) => {
-    val += (Math.random() - 0.45) * 30
-    return Math.max(82580, Math.min(82700, val))
-  })
-}
-let totalData = generatePriceData()
-const handleIndex = ref(totalData.length - 1)
-
-// 更新浮窗位置
-const updateInfoBoxPos = (x, y) => {
-  infoBoxStyle.value = {
-    left: `${x}px`,
-    top: `${y - 70}px`,
-    transform: 'translateX(-50%)'
+const generateMockData = () => {
+  chartDataX = []
+  chartDataY = []
+  if (activeSegmentMode.value === 'past') {
+    let base = selectedPastRecord.value.targetPrice
+    const final = selectedPastRecord.value.finalPrice
+    for (let i = 0; i < 49; i++) {
+      chartDataX.push(`12:${(i + 10).toString().padStart(2, '0')}`)
+      base += (final - base) * 0.1 + (Math.random() - 0.5) * 5
+      chartDataY.push(base)
+    }
+    chartDataX.push(`End`)
+    chartDataY.push(final)
+  } else {
+    let base = 2060.00
+    lastGenTime = new Date().getTime() - 50 * 2000
+    for (let i = 0; i < 50; i++) {
+      const d = new Date(lastGenTime)
+      chartDataX.push(`${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`)
+      base += (Math.random() - 0.45) * 0.5
+      chartDataY.push(base)
+      lastGenTime += 2000
+    }
+    livePrice.value = chartDataY[chartDataY.length - 1]
   }
 }
 
-// 图表颜色配置
 const chartColors = computed(() => ({
-  background: themeStore.isDark ? '#000' : '#FFF',
-  axisLabel: themeStore.isDark ? '#444' : '#888',
-  splitLine: themeStore.isDark ? '#1a1a1a' : '#e0e0e0',
-  primary: themeStore.isDark ? '#BBFF2E' : '#19d96b',
-  primaryLight: themeStore.isDark ? 'rgba(187, 255, 46, 0.15)' : 'rgba(25, 217, 107, 0.15)',
-  primaryGradient: themeStore.isDark ? 'rgba(187, 255, 46, 0.2)' : 'rgba(25, 217, 107, 0.2)',
-  primaryStroke: themeStore.isDark ? 'rgba(187, 255, 46, 0.3)' : 'rgba(25, 217, 107, 0.3)'
+  axisLabel: themeStore.isDark ? '#666' : '#888',
+  splitLine: themeStore.isDark ? '#2a2f34' : '#e0e0e0',
+  primary: '#5073e5',
 }))
 
-// 更新图表
 const updateChart = () => {
   if (!chartInstance) return
-
   const colors = chartColors.value
+  let markLineData = []
+  if (activeSegmentMode.value !== 'future') {
+    markLineData = [{ yAxis: displayTargetPrice.value }]
+  }
 
   const option = {
-    backgroundColor: colors.background,
-    animation: false,
-    grid: { left: '2%', right: '14%', top: '15%', bottom: '12%', containLabel: false },
+    backgroundColor: 'transparent',
+    animation: true,
+    animationDuration: 300,
+    animationDurationUpdate: 2000,
+    animationEasingUpdate: 'linear',
+    grid: { left: '2%', right: '15%', top: '15%', bottom: '12%', containLabel: false },
     xAxis: {
-      type: 'category',
-      data: Array.from({ length: totalData.length }, (_, i) => i),
-      axisLine: { show: false },
-      axisTick: { show: false },
-      axisLabel: {
-        show: true,
-        interval: (idx) => [0, Math.floor(totalData.length / 2), totalData.length - 1].includes(idx),
-        formatter: (v) => {
-          if (v == 0) return '19:00:05'
-          if (v == Math.floor(totalData.length / 2)) return '19:01:05'
-          if (v == totalData.length - 1) return '19:02:05'
-          return ''
-        },
-        color: colors.axisLabel,
-        fontSize: 10
-      }
+      type: 'category', data: chartDataX,
+      axisLine: { show: false }, axisTick: { show: false },
+      axisLabel: { show: true, interval: Math.floor(chartDataX.length / 2), color: colors.axisLabel, fontSize: 10 }
     },
     yAxis: {
-      type: 'value',
-      position: 'right',
-      min: (value) => Math.floor(value.min - 5),
-      max: (value) => Math.ceil(value.max + 5),
-      axisLine: { show: false },
-      axisTick: { show: false },
-      axisLabel: {
-        formatter: (v) => '$' + v.toLocaleString(),
-        color: colors.axisLabel,
-        fontSize: 10
-      },
+      type: 'value', position: 'right', scale: true,
+      axisLine: { show: false }, axisTick: { show: false },
+      axisLabel: { formatter: (v) => '$' + v.toFixed(2), color: colors.axisLabel, fontSize: 10 },
       splitLine: { lineStyle: { color: colors.splitLine } }
     },
     series: [
       {
-        name: 'Background',
-        type: 'line',
-        data: totalData,
-        smooth: 0.4,
-        symbol: 'none',
-        lineStyle: { width: 2.5, color: colors.primaryLight }
-      },
-      {
-        name: 'Progress',
-        type: 'line',
-        data: totalData.slice(0, handleIndex.value + 1),
-        smooth: 0.4,
-        symbol: 'none',
-        lineStyle: { width: 2.5, color: colors.primary },
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: colors.primaryGradient },
-            { offset: 1, color: 'transparent' }
-          ])
+        name: 'PriceLine', type: 'line', data: chartDataY,
+        smooth: 0.3, symbol: 'none',
+        lineStyle: { width: 3, color: colors.primary },
+        markLine: {
+          symbol: ['none', 'none'], label: { show: false },
+          data: markLineData,
+          lineStyle: { type: 'dashed', color: '#888', width: 1, opacity: 0.6 }
         }
       }
     ]
   }
 
-  chartInstance.setOption(option)
-
-  // 绘制可拖拽圆点
-  setTimeout(() => {
-    if (!chartInstance) return
-    const xPix = chartInstance.convertToPixel({ xAxisIndex: 0 }, handleIndex.value)
-    const yPix = chartInstance.convertToPixel({ yAxisIndex: 0 }, totalData[handleIndex.value])
-
-    chartInstance.setOption({
-      graphic: [{
-        type: 'circle',
-        id: 'handle',
-        x: xPix, y: yPix,
-        shape: { r: 8 },
-        style: { fill: colors.primary, stroke: colors.primaryStroke, lineWidth: 12 },
-        draggable: true,
-        z: 100,
-        onmousedown: function () {
-          showInfoBox.value = true
-        },
-        onmouseup: function () {
-          showInfoBox.value = false
-        },
-        ondragstart: function () {
-          showInfoBox.value = true
-        },
-        ondragend: function () {
-          showInfoBox.value = false
-        },
-        ondrag: function () {
-          const dataPos = chartInstance.convertFromPixel({ xAxisIndex: 0 }, this.x)
-          let idx = Math.round(Number(dataPos))
-          idx = Math.max(0, Math.min(totalData.length - 1, idx))
-
-          const snappedX = chartInstance.convertToPixel({ xAxisIndex: 0 }, idx)
-          const snappedY = chartInstance.convertToPixel({ yAxisIndex: 0 }, totalData[idx])
-
-          this.setPosition([snappedX, snappedY])
-
-          handleIndex.value = idx
-          currentPrice.value = totalData[idx]
-          updateInfoBoxPos(snappedX, snappedY)
-
-          chartInstance.setOption({
-            series: [{}, { data: totalData.slice(0, idx + 1) }]
-          }, false)
-        }
-      }]
+  if (activeSegmentMode.value !== 'past') {
+    option.series.push({
+      name: 'PulseDot', type: 'effectScatter', coordinateSystem: 'cartesian2d',
+      data: [[chartDataX[chartDataX.length - 1], chartDataY[chartDataY.length - 1]]],
+      symbolSize: 8, showEffectOn: 'render',
+      rippleEffect: { period: 2, scale: 3, brushType: 'fill' },
+      itemStyle: { color: colors.primary, shadowBlur: 10, shadowColor: colors.primary },
+      zlevel: 1
     })
-    currentPrice.value = totalData[handleIndex.value]
-    updateInfoBoxPos(xPix, yPix)
-  }, 0)
+  }
+  chartInstance.setOption(option, false)
 }
 
-const initChart = () => {
-  if (!chartRef.value) return
-  if (chartInstance) chartInstance.dispose()
-  chartInstance = echarts.init(chartRef.value)
+let wsInterval = null
+const startWebSocketMock = () => {
+  wsInterval = setInterval(() => {
+    if (activeSegmentMode.value !== 'past') {
+      const newPrice = livePrice.value + (Math.random() - 0.48) * 0.3
+      livePrice.value = newPrice
+      const d = new Date(lastGenTime)
+      const newTimeStr = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`
+      chartDataX.push(newTimeStr)
+      chartDataY.push(newPrice)
+      if (chartDataX.length > 50) {
+        chartDataX.shift()
+        chartDataY.shift()
+      }
+      lastGenTime += 2000
+      updateChart()
+    }
+  }, 2000)
+}
+
+// --- 🔥 事件交互：管理左侧历史标签的挂载与销毁 🔥 ---
+const selectPastRecord = (record) => {
+  activeSegmentMode.value = 'past'
+  selectedPastRecord.value = record // 记录存在，模板 v-if 满足，在最左侧挂载该标签
+  generateMockData()
   updateChart()
 }
 
-// 监听主题变化更新图表
-watch(() => themeStore.isDark, () => {
-  updateChart()
-})
-
-const handleTimeRangeChange = (val) => {
-  selectedTimeRange.value = val
-  totalData = generatePriceData()
-  handleIndex.value = totalData.length - 1
+const selectLiveSegment = () => {
+  activeSegmentMode.value = 'live'
+  selectedPastRecord.value = null // 清除记录，模板 v-if 不满足，历史标签销毁！
+  selectedFutureId.value = null
+  generateMockData()
   updateChart()
 }
+
+const selectFutureSegment = (ft) => {
+  activeSegmentMode.value = 'future'
+  selectedFutureId.value = ft.id
+  selectedPastRecord.value = null // 同理销毁
+  generateMockData()
+  updateChart()
+}
+
+watch(() => themeStore.isDark, () => updateChart())
 
 onMounted(() => {
-  nextTick(() => { initChart() })
+  startCountDown()
+  generateMockData()
+  nextTick(() => {
+    chartInstance = echarts.init(chartRef.value)
+    updateChart()
+    startWebSocketMock()
+  })
   window.addEventListener('resize', () => chartInstance?.resize())
 })
-
 onUnmounted(() => {
+  clearInterval(timerInterval)
+  clearInterval(wsInterval)
   chartInstance?.dispose()
 })
 </script>
 
 <style scoped lang="scss">
-/* --- 布局色彩变量 --- */
 $hot-pink: #E44096;
-$orange: #F7931A;
-$bg-dark: #000;
+$neon-green: #19d96b;
+$primary-blue: #5073e5;
 
 .bitcoin-up-down-page {
   background: var(--bg-page-h5);
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding-bottom: 60px;
+  overflow: hidden;
 }
 
-/* 顶部导航栏 - 参考 predictionDetailH5 */
 .top-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
+  position: relative;
+  flex-shrink: 0;
+  z-index: 30;
   background-color: var(--bg-page-h5);
   height: 48px;
   padding: 0 12px;
@@ -536,227 +567,236 @@ $bg-dark: #000;
   font-size: 11px;
 }
 
-.bookmark-btn svg {
-  width: 18px;
-  height: 18px;
-}
-
 .content-scroller {
   flex: 1;
   overflow-y: auto;
-  padding: 68px 16px 20px;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  padding: 0 16px 80px;
+  -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar {
     display: none;
   }
 }
 
-/* 标题卡片 */
+.asset-profile-wrapper {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: var(--bg-page-h5);
+  margin: 0 -16px 24px -16px;
+  padding: 16px 16px 0;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+  &.is-sticky {
+    padding: 10px 16px;
+    background-color: var(--bg-page-h5);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+
+    .asset-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+
+    .asset-text h2 {
+      font-size: 14px;
+    }
+
+    .timer .unit {
+      font-size: 16px;
+    }
+  }
+}
+
 .asset-profile {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
 
   .asset-logo {
-    width: 50px;
-    height: 50px;
-    background: $orange;
+    width: 44px;
+    height: 44px;
+    background: $primary-blue;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    transition: all 0.3s ease;
   }
 
   .asset-text {
     flex: 1;
+    min-width: 0;
+  }
 
-    h2 {
-      font-size: 18px;
-      font-weight: 600;
-      margin: 0;
-      line-height: 1.3;
-    }
-
-    p {
-      font-size: 12px;
-      color: #666;
-      margin-top: 4px;
-    }
+  .asset-text h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.3;
+    color: var(--bg-opposite);
+    transition: font-size 0.3s ease;
   }
 
   .timer {
     display: flex;
-    gap: 6px;
+    gap: 10px;
+    margin-left: auto;
+    flex-shrink: 0;
 
     .time-block {
       display: flex;
       flex-direction: column;
       align-items: center;
+    }
 
-      .unit {
-        font-size: 24px;
-        font-weight: 700;
-        color: $hot-pink;
-        line-height: 1;
-      }
+    .unit {
+      font-size: 20px;
+      font-weight: 700;
+      color: #888;
+      line-height: 1;
+      transition: font-size 0.3s ease;
+    }
 
-      .label {
-        font-size: 10px;
-        color: #555;
-        margin-top: 4px;
-      }
+    .label {
+      font-size: 9px;
+      color: #666;
+      margin-top: 4px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
   }
 }
 
-/* 面板看板 */
+.time-value,
+.price-value {
+  display: flex;
+  align-items: center;
+}
+
+.digit-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  height: 1.2em;
+  width: 1ch;
+}
+
+.symbol {
+  margin: 0 2px;
+  color: inherit;
+}
+
+.digit,
+.digit-static {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+}
+
+.fast-roll-enter-active,
+.fast-roll-leave-active {
+  transition: transform 0.25s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.2s linear;
+}
+
+.fast-roll-enter-from {
+  transform: translateY(-80%);
+  opacity: 0;
+}
+
+.fast-roll-leave-to {
+  transform: translateY(80%);
+  opacity: 0;
+  position: absolute;
+}
+
 .price-dashboard {
   display: flex;
   gap: 40px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 
   .price-item {
     .label {
-      font-size: 12px;
+      font-size: 13px;
       color: #888;
       font-weight: 600;
-      margin-bottom: 8px;
-      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
 
       .diff {
-        color: var(--text-color-y);
-        margin-left: 12px;
+        font-size: 12px;
         font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+
+      .diff.up {
+        color: $neon-green;
+      }
+
+      .diff.down {
+        color: $hot-pink;
+      }
+
+      .diff-icon {
+        width: 10px;
+        height: 10px;
       }
     }
 
     .value {
-      font-family: PingFang SC, PingFang SC;
-      font-weight: 600;
-      font-size: 18px;
-      color: var(--bg-opposite);
+      font-weight: 700;
+      font-size: 26px;
+      color: #888;
     }
 
-    &.current {
-      .label {
-        color: $orange;
-      }
-
-      .value {
-        color: $orange;
-      }
+    &.current .label,
+    &.current .value {
+      color: $primary-blue;
     }
   }
 }
 
-/* 图表区域 */
 .chart-section {
   margin-bottom: 10px;
 }
 
-.time-range-selector {
-  display: flex;
-  gap: 14px;
-  margin-bottom: 8px;
-
-  .time-range-btn {
-    background: transparent;
-    border: none;
-    color: #555;
-    font-size: 12px;
-    cursor: pointer;
-    padding: 4px 0;
-
-    &.active {
-      color: var(--bg-opposite);
-      font-weight: 600;
-    }
-  }
-}
-
 .chart-container {
   position: relative;
-  height: 200px;
+  height: 220px;
+  background: transparent;
+  border-bottom: 1px solid var(--border-color);
 
   .main-chart {
     width: 100%;
     height: 100%;
     -webkit-tap-highlight-color: transparent;
   }
+}
 
-  .chart-overlays {
-    position: absolute;
-    left: 0;
-    bottom: 25px;
-    z-index: 5;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    pointer-events: none;
+.svg-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 
-    .delta-tag {
-      &.pink {
-        color: $hot-pink;
-      }
-
-      &.neon {
-        color: var(--text-color-y);
-      }
-    }
+  svg {
+    width: 100%;
+    height: 100%;
   }
 
-  .info-popover {
-    position: absolute;
-    background: var(--text-color-y);
-    color: #000;
-    padding: 10px 16px;
-    border-radius: 10px;
-    pointer-events: none;
-    z-index: 110;
-    white-space: nowrap;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    text-align: center;
+  &.up {
+    color: $neon-green;
+  }
 
-    .info-price {
-      font-size: 16px;
-      font-weight: 800;
-      line-height: 1.2;
-    }
-
-    .info-time {
-      font-size: 11px;
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.7);
-      margin-top: 2px;
-    }
-
-    .info-arrow {
-      position: absolute;
-      bottom: -14px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 2px;
-      height: 14px;
-      background: var(--text-color-y);
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: -4px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 8px;
-        height: 8px;
-        background: var(--text-color-y);
-        border-radius: 50%;
-      }
-    }
+  &.down {
+    color: $hot-pink;
   }
 }
 
@@ -769,45 +809,32 @@ $bg-dark: #000;
   .record-capsule {
     display: flex;
     align-items: center;
-    background: #222;
+    background: var(--bg-page);
     border-radius: 20px;
-    padding: 8px 10px;
-    gap: 12px;
+    padding: 10px 16px;
+    gap: 8px;
+    border: 1px solid var(--border-color);
     flex-shrink: 0;
-  }
+    cursor: pointer;
 
-  .record-selector {
-    font-size: 13px;
-    color: var(--text-dark-gray);
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    .record-selector {
+      font-size: 13px;
+      color: var(--bg-opposite);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
 
-    .el-icon {
-      font-size: 12px;
-      color: #888;
-    }
-  }
-
-  .trend-markers {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-
-    .tri-up {
-      width: 0;
-      height: 0;
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-bottom: 10px solid var(--text-color-y);
+      .el-icon {
+        font-size: 12px;
+        color: var(--bg-opposite);
+      }
     }
 
-    .tri-down {
-      width: 0;
-      height: 0;
-      border-left: 7px solid transparent;
-      border-right: 7px solid transparent;
-      border-top: 10px solid $hot-pink;
+    .trend-markers {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
   }
 
@@ -825,35 +852,59 @@ $bg-dark: #000;
     }
 
     .time-pill {
-      font-size: 14px;
-      font-weight: 500;
-      background: var(--bg-page);
-      color: var(--text-dark-gray);
-      padding: 8px 13px;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--bg-page-h5);
+      color: var(--bg-opposite);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
       border-radius: 20px;
       display: flex;
       align-items: center;
       gap: 6px;
       flex-shrink: 0;
-      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s;
 
       .dot {
         width: 8px;
         height: 8px;
-        background: $hot-pink;
         border-radius: 50%;
+        background: $hot-pink;
       }
 
       &.active {
         background: var(--bg-opposite);
         color: var(--bg-page-h5);
-        font-weight: 600;
       }
+
+      &.past-active {
+        background: var(--bg-page);
+        color: var(--bg-opposite);
+      }
+
     }
   }
 }
 
-/* 详情区块导航项 */
+@keyframes redPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(228, 64, 150, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 6px rgba(228, 64, 150, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(228, 64, 150, 0);
+  }
+}
+
+.breathing-dot {
+  animation: redPulse 1.5s infinite;
+}
+
 .business-tabs {
   display: flex;
   gap: 50px;
@@ -885,15 +936,13 @@ $bg-dark: #000;
   }
 }
 
-/* 仓位内容样式 */
-.position-content {
+.position-content,
+.orders-content,
+.history-content {
   margin-bottom: 20px;
 }
 
 .pos-card {
-  background: transparent;
-  padding: 0;
-
   .pos-title {
     font-size: 20px;
     font-weight: 600;
@@ -929,10 +978,10 @@ $bg-dark: #000;
         font-size: 18px;
         font-weight: 600;
         color: var(--bg-opposite);
-      }
 
-      .g-val.neon {
-        color: var(--text-color-y);
+        &.neon {
+          color: var(--text-color-y);
+        }
       }
     }
   }
@@ -950,154 +999,6 @@ $bg-dark: #000;
   }
 }
 
-/* Orders 订单列表样式 */
-.orders-content {
-  margin-bottom: 20px;
-}
-
-.orders-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-
-  .orders-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--bg-opposite);
-  }
-
-  .cancel-all-btn {
-    background: transparent;
-    border: none;
-    color: $hot-pink;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-}
-
-.orders-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.order-item {
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--border-color);
-
-  .order-left {
-    flex: 1;
-
-    .order-type {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--bg-opposite);
-      margin-bottom: 6px;
-    }
-
-    .order-tag {
-      display: inline-block;
-      padding: 4px 10px;
-      background: rgba($hot-pink, 0.2);
-      color: $hot-pink;
-      font-size: 13px;
-      font-weight: 600;
-      border-radius: 6px;
-    }
-  }
-
-  .order-right {
-    text-align: right;
-    margin-right: 16px;
-
-    .order-filled {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--bg-opposite);
-      margin-bottom: 4px;
-    }
-
-    .order-status {
-      font-size: 12px;
-      color: var(--text-dark-gray);
-    }
-  }
-
-  .order-close-btn {
-    background: transparent;
-    border: none;
-    color: var(--text-dark-gray);
-    cursor: pointer;
-    padding: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    &:hover {
-      color: var(--bg-opposite);
-    }
-  }
-}
-
-/* History 历史记录样式 */
-.history-content {
-  margin-bottom: 20px;
-}
-
-.history-header {
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border-color);
-
-
-  .history-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--bg-opposite);
-  }
-}
-
-.history-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.history-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--border-color);
-
-  .history-text {
-    font-size: 16px;
-    color: var(--bg-opposite);
-
-    .up {
-      color: var(--text-color-y);
-      font-weight: 600;
-    }
-
-    .down {
-      color: $hot-pink;
-      font-weight: 600;
-    }
-
-    .cost {
-      color: var(--text-dark-gray);
-    }
-  }
-
-  .history-time {
-    font-size: 14px;
-    color: #666;
-  }
-}
-
-/* 折叠逻辑 */
 .orderbook-header {
   display: flex;
   justify-content: space-between;
@@ -1119,12 +1020,11 @@ $bg-dark: #000;
     }
 
     .el-icon {
-      color: var(--text-dark-gray);
       transition: transform 0.2s;
-    }
 
-    .rotate {
-      transform: rotate(180deg);
+      &.rotate {
+        transform: rotate(180deg);
+      }
     }
   }
 }
@@ -1173,19 +1073,17 @@ $bg-dark: #000;
   }
 }
 
-/* 吸底操作 */
-/* 底部操作栏 */
 .bottom-dock-actions {
   width: 100%;
-  position: fixed;
+  position: absolute;
   left: 0;
   bottom: 0;
   padding: 16px;
   box-sizing: border-box;
   display: flex;
   gap: 12px;
-  margin-top: 20px;
   background: var(--bg-page-h5);
+  z-index: 40;
 
   .trade-btn {
     flex: 1;
@@ -1207,6 +1105,39 @@ $bg-dark: #000;
       border: 1.5px solid var(--text-color-n);
       background: var(--button-bg-n);
     }
+  }
+}
+</style>
+
+<style lang="scss">
+.custom-history-dropdown {
+  background: var(--bg-page) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 12px !important;
+
+  .el-dropdown-menu {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .el-dropdown-menu__item {
+    color: var(--bg-opposite) !important;
+    font-size: 14px;
+    padding: 12px 16px;
+    transition: background 0.2s;
+  }
+
+  .drop-item-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+  }
+
+  .el-popper__arrow::before {
+    background: var(--bg-page) !important;
+    border: 1px solid var(--border-color) !important;
   }
 }
 </style>
