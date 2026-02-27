@@ -172,7 +172,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
 
 .grabber {
     position: sticky;
-    top: 0;
+    top: -1px;
     left: 0;
     right: 0;
     width: 100%;
