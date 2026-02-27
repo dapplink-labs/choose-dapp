@@ -338,7 +338,7 @@ const route = useRoute();
 const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
 
 
-const showNotice = ref(true);
+const showNotice = ref(false);
 
 // Use HTML for content to support paragraphs and highlighting
 const noticeContent = `
