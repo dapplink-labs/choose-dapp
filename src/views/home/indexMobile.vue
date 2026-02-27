@@ -184,13 +184,13 @@
                                     <span class="leverage-label">{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxLeverage || "10X"
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <div class="leverage-item">
                                     <span class="leverage-label">{{ $t("home.maxReturn") || "最大回报" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxReturn || "182%"
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
                             <div class="item-actions">
@@ -222,7 +222,7 @@
                                         </el-icon>
                                         <span class="participant-text">{{
                                             item.participantCount.toLocaleString()
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <span class="voi-amount">VOI：${{ item.amount }}</span>
                                 </div>
@@ -253,13 +253,13 @@
                                     <span class="leverage-label">{{ $t("home.maxLeverage") || "最大杠杆倍数" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxLeverage || "10X"
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <div class="leverage-item">
                                     <span class="leverage-label">{{ $t("home.maxReturn") || "最大回报" }}:</span>
                                     <span class="leverage-value">{{
                                         item.maxReturn || "182%"
-                                    }}</span>
+                                        }}</span>
                                 </div>
                             </div>
                             <div class="item-options">
@@ -299,7 +299,7 @@
                                         </el-icon>
                                         <span class="participant-text">{{
                                             item.participantCount.toLocaleString()
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <span class="voi-amount">VOI：${{ item.amount }}</span>
                                 </div>
@@ -309,6 +309,8 @@
                 </div>
             </div>
         </div>
+        <NotificationModal v-model:visible="showNotice" title="【重要通知】 ChooseME 区块奖励
+发放公告" :content="noticeContent" />
     </div>
 </template>
 
@@ -328,12 +330,24 @@ import banner0Img from "@/assets/images/banner0.png";
 import banner2Img from "@/assets/images/banner2.png";
 import linghua1Img from "@/assets/images/linghua1.png";
 import banner4Img from "@/assets/images/banner4.png";
+import NotificationModal from '@/components/NotificationModal.vue';
 import { tagButtons as rawTagButtons, leftList as rawLeftList, rightList as rawRightList } from "./homeData";
 
 const { t } = useI18n();
 const route = useRoute();
 const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
 
+
+const showNotice = ref(true);
+
+// Use HTML for content to support paragraphs and highlighting
+const noticeContent = `
+  <p>亲爱的Choose ME社区伙伴们：</p>
+  <p>感谢大家一路以来的信任与支持！为回馈所有参与者，Choose ME 区块奖励将在<span class="highlight">每日早上 10:00</span> 准时发放，请大家留意到账提醒，及时查看收益。</p>
+  <p>我们保障奖励发放稳定高效，与各位携手共建、共赢共荣。</p>
+  <p>特此公告，望各位知悉！</p>
+  <p style="margin-top: 20px;">Choose ME 运营团队</p>
+`;
 // Swiper 模块
 const swiperModules = [Autoplay, Pagination];
 
