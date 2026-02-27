@@ -831,6 +831,8 @@ export default {
     selectNode: "Select Claim Node",
     selectNodePlaceholder: "Select Node",
     claimAmount: "Claim Amount",
+    inputAmount: "Enter claim amount",
+    exceedMax: "Input amount cannot exceed claimable earnings",
     youWillReceive: "You Will Receive",
     predictedAmount: "My Predicted Amount (20%)",
     confirmClaim: "Confirm Claim",

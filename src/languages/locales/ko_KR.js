@@ -814,6 +814,8 @@ export default {
     selectNode: "수령 노드 선택",
     selectNodePlaceholder: "노드 선택",
     claimAmount: "수령 수량",
+    inputAmount: "수령할 금액을 입력하세요",
+    exceedMax: "입력 금액이 수령 가능한 수익을 초과합니다",
     youWillReceive: "수령 예정 금액",
     predictedAmount: "내 예상 금액(20%)",
     confirmClaim: "수령 확인",

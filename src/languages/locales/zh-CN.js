@@ -831,6 +831,8 @@ export default {
     allNodes: "全部节点",
     claimNote: "可领取全部节点收益，也可以选择领取单个节点收益",
     claimable: "可领取收益",
+    inputAmount: "请输入领取数量",
+    exceedMax: "输入数量超过可领取收益",
   },
   searchPage: {
     searchPlaceholder: "搜索",

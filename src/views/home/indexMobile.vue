@@ -309,8 +309,8 @@
                 </div>
             </div>
         </div>
-        <NotificationModal v-model:visible="showNotice" title="【重要通知】 ChooseME 区块奖励
-发放公告" :content="noticeContent" />
+        <NotificationModal v-model:visible="showNotice" :title="announcement?.title" :content="announcement?.content"
+            :guid="announcement?.guid" />
     </div>
 </template>
 
@@ -332,6 +332,11 @@ import linghua1Img from "@/assets/images/linghua1.png";
 import banner4Img from "@/assets/images/banner4.png";
 import NotificationModal from '@/components/NotificationModal.vue';
 import { tagButtons as rawTagButtons, leftList as rawLeftList, rightList as rawRightList } from "./homeData";
+import { getNoticeData } from "@/api/API";
+import { useAccount } from "@wagmi/vue";
+
+// 获取用户地址
+const { address } = useAccount();
 
 const { t } = useI18n();
 const route = useRoute();
@@ -340,14 +345,22 @@ const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "tru
 
 const showNotice = ref(false);
 
-// Use HTML for content to support paragraphs and highlighting
-const noticeContent = `
-  <p>亲爱的Choose ME社区伙伴们：</p>
-  <p>感谢大家一路以来的信任与支持！为回馈所有参与者，Choose ME 区块奖励将在<span class="highlight">每日早上 10:00</span> 准时发放，请大家留意到账提醒，及时查看收益。</p>
-  <p>我们保障奖励发放稳定高效，与各位携手共建、共赢共荣。</p>
-  <p>特此公告，望各位知悉！</p>
-  <p style="margin-top: 20px;">Choose ME 运营团队</p>
-`;
+// 公告数据
+const announcement = ref();
+
+// 获取公告数据
+async function getNotice() {
+    // 获取当前语言环境
+    const savedLocale = localStorage.getItem('app-locale')
+    const currentLocale = savedLocale || navigator.language || 'en';
+    const response = await getNoticeData({ address: address.value , language: currentLocale });
+    if (response?.data?.announcement) {
+        announcement.value = response.data.announcement;
+        showNotice.value = true;
+    }
+}
+
+
 // Swiper 模块
 const swiperModules = [Autoplay, Pagination];
 
@@ -464,6 +477,11 @@ const handleBookmark = () => {
 const toggleFavorite = (item) => {
     item.isFavorite = !item.isFavorite;
 };
+
+// 页面数据初始化
+onMounted(async () => {
+    getNotice();
+});
 </script>
 
 <style scoped lang="scss">

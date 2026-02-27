@@ -17,7 +17,7 @@ export const getNodeServiceProviders = (data) => {
 
 // 质押节点列表
 export const getNodeStakingList = (data) => {
-    return request.get('/api/v1/staking/nodeStakingList', {params: data})
+    return request.get('/api/v1/staking/nodeStakingList', { params: data })
 }
 
 // 获取质押节点记录
@@ -47,7 +47,7 @@ export const getNodeStakingInfo = (data) => {
 
 // 购买节点
 export const purchaseNode = (data) => {
-    return request.post('/api/v1/staking/nodeServiceProvidersActivate',  data)
+    return request.post('/api/v1/staking/nodeServiceProvidersActivate', data)
 }
 
 // 质押节点激活
@@ -71,16 +71,26 @@ export const getNodeStakingRewardRecords = (data) => {
 }
 
 // 节点收益领取
-export const nodeclaimReward =(data)=>{
+export const nodeclaimReward = (data) => {
     return request.post('/api/v1/node/claimReward', data)
 }
 
 //质押节点收益领取
-export const stakingclaimReward =(data)=>{
+export const stakingclaimReward = (data) => {
     return request.post('/api/v1/staking/claimReward', data)
 }
 
 // 我的收益接口
 export const getMyIncome = (data) => {
     return request.get('/api/v2/person/myIncome', { params: data })
+}
+
+// 获取公告接口
+export const getNoticeData = (data) => {
+    return request.get('/api/v2/announcement/latestAnnouncement', { params: data })
+}
+
+// 记录公告已读接口
+export const markAnnouncementAsRead = (data) => {
+    return request.post('/api/v2/announcement/read', data)
 }

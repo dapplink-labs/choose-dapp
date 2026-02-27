@@ -21,10 +21,10 @@ const i18n = createI18n({
   legacy: false,
   locale: savedLocale, // 使用保存的语言或默认语言
   messages: {
-    'zh-cn': zhCN,
-    'en-us': enUS,
-    'ko-kr': koKR,
-    'ja-jp': jaJP
+    'zh-cn': zhCN,// 中文
+    'en-us': enUS,// 英文
+    'ko-kr': koKR,// 韩文
+    'ja-jp': jaJP// 日文
   }
 })
 

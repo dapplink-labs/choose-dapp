@@ -23,9 +23,12 @@
 </template>
 
 <script setup lang="ts">
-import { } from 'vue';
+import { markAnnouncementAsRead } from '@/api/API';
+import { useAccount } from '@wagmi/vue';
 
-defineProps({
+const { address } = useAccount();
+
+const props = defineProps({
     visible: {
         type: Boolean,
         default: false
@@ -37,12 +40,20 @@ defineProps({
     content: {
         type: String,
         default: ''
+    },
+    guid: {
+        type: String,
+        default: ''
     }
 });
 
 const emit = defineEmits(['update:visible', 'close']);
 
-const close = () => {
+const close = async () => {
+    // 记录已查看公告（若提供了 guid）
+    if (props.guid) markAnnouncementAsRead({ announcement_guid: props.guid, address: address.value });
+
+    // 通知父组件隐藏弹窗并触发 close 回调
     emit('update:visible', false);
     emit('close');
 };

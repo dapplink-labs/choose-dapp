@@ -817,6 +817,8 @@ export default {
     selectNode: "受取ノードを選択",
     selectNodePlaceholder: "ノードを選択",
     claimAmount: "受取数量",
+    inputAmount: "受取数量を入力してください",
+    exceedMax: "入力金額が受取可能な収益を超えています",
     youWillReceive: "受け取る金額",
     predictedAmount: "私の予想額(20%)",
     confirmClaim: "受取を確定",

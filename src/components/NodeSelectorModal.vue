@@ -35,7 +35,7 @@
 
                 <!-- 底部区域 -->
                 <div class="card-footer">
-                    <p class="footer-note">* {{ $t('collectEarnings.claimNote') || '可领取全部节点收益，也可以选择领取单个节点收益' }}</p>
+                    <!-- <p class="footer-note">* {{ $t('collectEarnings.claimNote') || '可领取全部节点收益，也可以选择领取单个节点收益' }}</p> -->
                     <button class="confirm-btn" @click="handleConfirm">
                         {{ $t('common.confirm') || '确认' }}
                     </button>
