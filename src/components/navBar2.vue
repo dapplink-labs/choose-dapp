@@ -45,7 +45,7 @@ import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
-const isProd = import.meta.env.MODE === 'production'
+const isProd = import.meta.env.VITE_IS_COMING_SOON === 'true'
 
 // Props
 const props = defineProps({
