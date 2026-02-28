@@ -53,7 +53,7 @@ import { useI18n } from 'vue-i18n'
 const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
-const isProd = import.meta.env.VITE_IS_COMING_SOON === 'true`'
+const isProd = import.meta.env.VITE_IS_COMING_SOON === 'true'
 
 // 导航项配置
 const navItems = computed(() => [

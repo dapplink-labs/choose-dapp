@@ -580,7 +580,7 @@ $primary-blue: #5073e5;
 
 .asset-profile-wrapper {
   position: sticky;
-  top: 0;
+  top: -1px;
   z-index: 20;
   background-color: var(--bg-page-h5);
   margin: 0 -16px 24px -16px;
