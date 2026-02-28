@@ -5,7 +5,7 @@
     <div class="banner1">
       <h1 class="page-title">
         {{
-          nodeType === 0
+          nodeType && nodeType === 0
             ? $t("myNode.distributedNode")
             : $t("myNode.clusterNode")
         }}
@@ -126,14 +126,8 @@
       </div>
 
       <!-- 一键领取按钮：凌晨 2-3 点禁止领取，显示“收益计算中” -->
-      <button class="claim-all-btn" :disabled="claimLoading || isClaimDisabledByTime" @click="handleClaimReward">
-        {{
-          isClaimDisabledByTime
-            ? $t("myIncome.calculating")
-            : claimLoading
-              ? loadingText
-              : $t("myNode.claimAll")
-        }}
+      <button class="claim-all-btn" :disabled="isClaimDisabledByTime" @click="openClaimPopup">
+        {{ isClaimDisabledByTime ? $t("myIncome.calculating") : $t("myNode.claimAll") }}
       </button>
     </div>
 
@@ -241,6 +235,49 @@
       </div>
     </div>
     <detailsinfo ref="detailsRef" />
+
+    <div v-if="showClaimPopup" class="claim-modal-mask" @click="showClaimPopup = false">
+      <div class="claim-modal-content" @click.stop>
+        <div class="modal-header">
+          <span class="node-name-label"> {{
+            nodeType === 0
+              ? $t("myNode.distributedNode")
+              : $t("myNode.clusterNode")
+          }}</span>
+          <el-icon class="close-icon" @click="showClaimPopup = false">
+            <Close />
+          </el-icon>
+        </div>
+
+        <div class="modal-body">
+          <div class="input-wrapper">
+            <input v-model="claimInputAmount" type="number" :placeholder="$t('myNode.enterClaimAmount')"
+              class="claim-input" />
+            <span class="max-btn" @click="handleMaxAmount">{{ $t('myNode.maxLabel') }}</span>
+            <span class="unit">CHO</span>
+          </div>
+          <p class="available-tip">
+            {{ $t('myNode.pendingIncome') }}: <span>{{ formatAmount(totalAvailableAmount) }} CHO</span>
+          </p>
+
+          <!-- 新增信息汇总区域 -->
+          <div class="claim-summary-info">
+            <div class="summary-row">
+              <span class="label">{{ $t('collectEarnings.youWillReceive') }}</span>
+              <span class="value highlighted">{{ formatAmount(receive80Amount) }} CHO</span>
+            </div>
+            <div class="summary-row">
+              <span class="label dashed-underline">{{ $t('collectEarnings.predictedAmount') }}</span>
+              <span class="value">{{ formatAmount(projected20Amount) }} CHO</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="confirm-claim-btn" :disabled="claimLoading" @click="confirmClaim">
+          {{ claimLoading ? t("common.loading") : $t('myNode.confirmClaimBtn') }}
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -317,6 +354,69 @@ const purchaseTime = ref(0); // 购买时间
 const directed_number = ref(0);
 const target_direct_number = ref(0);
 
+const showClaimPopup = ref(false); // 控制弹窗显示
+const claimInputAmount = ref("");  // 输入框绑定的金额
+const inputNum = ref(0); // 解析后的输入金额（数字类型）
+
+// 你将收到 (80%) - 返回链上原始单位
+const receive80Amount = computed(() => {
+  inputNum.value = parseFloat(String(claimInputAmount.value).replace(/,/g, '')) || 0;
+  // 计算结果乘以 1e6，转为整数（BigInt）供 formatAmount 使用
+  return BigInt(Math.floor(inputNum.value * 0.8 * 1e6));
+});
+
+// 我的预测金额 (20%) - 返回链上原始单位
+const projected20Amount = computed(() => {
+  inputNum.value = parseFloat(String(claimInputAmount.value).replace(/,/g, '')) || 0;
+  // 计算结果乘以 1e6
+  return BigInt(Math.floor(inputNum.value * 0.2 * 1e6));
+});
+
+
+// 计算总共可领取的金额 (所有收益之和)
+const totalAvailableAmount = computed(() => {
+  return (
+    Number(nodeIncome.value) +
+    Number(networkFeeIncome.value) +
+    Number(subCoinFeeIncome.value) +
+    Number(secondaryMarketIncome.value) +
+    Number(directReferralIncome.value) +
+    Number(teamIncome.value) +
+    Number(subCoinIncome.value)
+  );
+});
+
+
+// --- 监听器：限制输入金额 ---
+watch(claimInputAmount, (newVal) => {
+  const maxDisplay = Number(totalAvailableAmount.value) / 1e6; // 转回可显示的金额
+  if (Number(newVal) > maxDisplay) {
+    claimInputAmount.value = String(maxDisplay)
+    Message.warning(t('collectEarnings.exceedMax') || '输入金额不能超过可领取收益')
+  }
+  // newVal为空或者小于0时，重置为0
+  if (newVal === '' || Number(newVal) < 0) {
+    claimInputAmount.value = 0;
+  }
+})
+
+
+
+// 处理最大值点击
+const handleMaxAmount = () => claimInputAmount.value = formatChoAmount(totalAvailableAmount.value).replace(/,/g, '');
+
+// 打开弹窗的函数
+const openClaimPopup = () => {
+  if (isClaimDisabledByTime.value) return;
+  if (totalAvailableAmount.value <= 0) {
+    Message.warning(t("myNode.noIncome"));
+    return;
+  }
+  // 默认填入最大可领取金额，或者清空让用户手动输
+  claimInputAmount.value = formatChoAmount(totalAvailableAmount.value).replace(/,/g, '');
+  showClaimPopup.value = true;
+};
+
 const isActivated = computed(() => {
   return Number(directed_number.value) >= Number(target_direct_number.value);
 });
@@ -326,69 +426,90 @@ function showInfo() {
 }
 
 // 领取收益
-const handleClaimReward = async () => {
-  // 凌晨 2-3 点不允许领取
-  if (isClaimDisabledByTime.value) return;
+const confirmClaim = async () => {
+  // 1. 输入校验
+  const inputVal = String(claimInputAmount.value).replace(/,/g, '');
+  const numValue = parseFloat(inputVal);
 
-  let amount =
-    Number(nodeIncome.value) +
-    Number(networkFeeIncome.value) +
-    Number(subCoinFeeIncome.value) +
-    Number(secondaryMarketIncome.value) +
-    Number(directReferralIncome.value) +
-    Number(teamIncome.value) +
-    Number(subCoinIncome.value);
-  console.log(amount);
-  if (amount <= 0) {
-    Message.warning(t("myNode.noIncome"));
+  if (isNaN(numValue) || numValue <= 0) {
+    Message.warning(t("common.enterValidAmount"));
     return;
   }
-  // claimReward处理重复领取收益
+  if (numValue > totalAvailableAmount.value) {
+    Message.warning(t("myNode.inputExceed"));
+    return;
+  }
+
   if (claimLoading.value) return;
   if (!address.value) {
     Message.error(t("myNode.connectWalletFirst"));
     return;
   }
+
   claimLoading.value = true;
   try {
+    // 2. 检查并切换网络
     if (Number(chainId.value) !== BSC_CHAIN_ID) {
-      // 切换网络
       await switchChain(config, { chainId: BSC_CHAIN_ID });
       await new Promise((r) => setTimeout(r, 500));
     }
 
     const bscNet = networks.find((n) => Number(n.chainId) === BSC_CHAIN_ID);
-    if (!bscNet?.proxyNodeManager) {
-      throw new Error(t("myNode.missingContractAddress"));
-    }
 
+    // 3. 精度转换 (使用 Math.floor 配合 Number 确保整数，最后转 BigInt)
+    const finalRawAmount = BigInt(Math.floor(numValue * 1e6));
+
+    // 4. 调用合约
     const result = await writeContractOptimized({
       abi: nodeManagerABI,
       address: bscNet.proxyNodeManager,
-      functionName: "claimReward",
-      args: [BigInt(amount)],
+      functionName: 'claimReward',
+      args: [finalRawAmount],
       userAddress: address.value,
-      messages: {
-        success: t("myNode.claimSuccess"),
-        failed: t("myNode.claimFailed"),
-        rejected: t("myNode.claimCancelled"),
-      },
-      showErrorToast: false,
+      showErrorToast: false, // 设为 false，由我们在下面统一拦截处理提示
     });
-    if (result.success) {
+
+    // 5. 成功处理
+    if (result && result.success && typeof result.hash === 'string') {
+      // 通知后端
       await nodeclaimReward({
-        raw_amount_token: String(amount),
+        raw_amount_token: String(finalRawAmount),
         request_tx_hash: result.hash,
         user_address: address.value,
       });
-      // 清零操作
-      await init();
+
+      Message.success(t("myNode.claimSuccess"));
+      showClaimPopup.value = false; // 只有成功才关闭弹窗
+      await init(); // 只有成功才刷新数据
+    } else {
+      // 处理 writeContractOptimized 返回 success: false 的情况
+      handleClaimError(result?.message || result?.error || "");
     }
+
   } catch (error) {
-    Message.warning(t("myNode.claimFailed"));
-    console.error("领取失败:", error);
+    // 6. 核心：捕获并拦截合约抛出的业务异常
+    console.error("领取过程发生异常:", error);
+    handleClaimError(error);
   } finally {
     claimLoading.value = false;
+    // 注意：不要在 finally 里关闭弹窗和执行 init，除非你希望无论成败都强制重置页面
+  }
+};
+
+/**
+ * 提取并显示友好的错误信息
+ */
+const handleClaimError = (err) => {
+  const errStr = String(err?.message || err?.details || err || "").toLowerCase();
+
+  if (errStr.includes("price is too low")) {
+    Message.error(t('myNode.priceTooLow'));
+  } else if (errStr.includes("user rejected")) {
+    Message.warning(t("myNode.claimCancelled"));
+  } else if (errStr.includes("insufficient funds")) {
+    Message.error(t('myNode.insufficientBnb'));
+  } else {
+    Message.error(t("myNode.claimFailed"));
   }
 };
 
@@ -453,8 +574,9 @@ const handleInviterAvatarError = (e) => {
 };
 
 // 格式化金额（CHO为6精度，需要先转换）
-const formatAmount = (value) =>
-  formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true });
+const formatAmount = (value) => {
+  return String(formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true }))
+};
 // USDT 金额（18 精度）
 const formatUsdtAmount = (value) => {
   return formatTokenAmount(value, {
@@ -515,7 +637,7 @@ watch(activeTab, () => {
 // 处理中按钮文案国际化：如果没有配置 common.loading，则回退为中文"处理中..."
 const loadingText = computed(() => {
   const v = t("common.loading");
-  return v === "common.loading" ? "处理中..." : v;
+  return v === "common.loading" ? "领取中..." : v;
 });
 
 const goToClaimRecord = () => {
@@ -1301,6 +1423,184 @@ onMounted(async () => {
         }
       }
     }
+  }
+}
+
+/* 弹窗遮罩 */
+.claim-modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  /* 底部对齐 */
+}
+
+/* 弹窗内容 */
+.claim-modal-content {
+  width: 100%;
+  background: var(--bg-page-h5, #fff);
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px;
+  animation: slideUp 0.3s ease-out;
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .node-name-label {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+
+    .close-icon {
+      font-size: 20px;
+      color: #999;
+      cursor: pointer;
+    }
+  }
+
+  .input-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    height: 54px;
+    background: var(--bg-light, #f5f5f5);
+    border-radius: 12px;
+    margin-bottom: 8px;
+
+    .claim-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--text-color);
+    }
+
+    .max-btn {
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--text-color-y);
+      background: rgba(187, 255, 46, 0.1);
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+
+    .unit {
+      font-weight: bold;
+    }
+  }
+
+  .available-tip {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 16px;
+
+    span {
+      color: var(--text-color);
+      font-weight: 500;
+    }
+  }
+
+  .claim-summary-info {
+    margin: 20px 0 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 16px;
+
+      .label {
+        color: #999;
+
+        &.dashed-underline {
+          border-bottom: 1px dashed #666;
+          padding-bottom: 2px;
+        }
+      }
+
+      .value {
+        font-weight: bold;
+        color: var(--text-color);
+
+        &.highlighted {
+          color: #bbff2e !important;
+          font-size: 20px;
+        }
+      }
+    }
+  }
+
+  .confirm-claim-btn {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-radius: 25px;
+    background: var(--text-color-y);
+    font-size: 16px;
+    font-weight: bold;
+    color: #000;
+
+    &:disabled {
+      opacity: 0.6;
+    }
+  }
+}
+
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+
+/* 暗色模式适配 */
+.theme-dark {
+  .max-btn {
+    background: rgba(187, 255, 46, 0.15);
+    color: var(--text-color-y, #bbff2e);
+  }
+
+  .claim-summary-info .value {
+    color: #ffffff;
+  }
+
+  .claim-modal-content {
+    background: #1a1a1a;
+
+    .input-wrapper {
+      background: #2a2a2a;
+    }
+
+    .confirm-claim-btn {
+      color: #000;
+      /* 确认按钮在暗色模式下通常保持亮色背景，黑字比较清晰 */
+    }
+  }
+}
+
+.theme-light {
+  .claim-summary-info .value {
+    color: #1a1a1a;
   }
 }
 </style>

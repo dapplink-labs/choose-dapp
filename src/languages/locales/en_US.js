@@ -277,7 +277,9 @@ export default {
     success: "Successful",
     pending: "Pending",
     copied: "Copied",
-    copyFailed: "Copy failed"
+    copyFailed: "Copy failed",
+    max: "MAX",
+    enterValidAmount: "Please enter valid amount"
   },
   header: {
     searchPlaceholder: "Search ChooseMe",
@@ -628,6 +630,13 @@ export default {
     clusterNode: "Cluster Node",
     tips: "Earnings Calculation Method",
     tipsWarns: "Staking rewards will be updated daily between 02:00-03:00!",
+    enterClaimAmount: "Please enter claim amount",
+    maxLabel: "MAX",
+    confirmClaimBtn: "Confirm Claim",
+    inputExceed: "Entered amount exceeds claimable amount",
+    enterClaimAmount: "Please enter claim amount",
+    confirmClaimBtn: "Confirm Claim",
+    inputExceed: "Entered amount exceeds claimable amount",
     nodeTypes: {
       distributed: "Distributed Node",
       cluster: "Cluster Node",
@@ -650,6 +659,8 @@ export default {
     claimSuccess: "Claim successful",
     claimFailed: "Claim failed",
     claimCancelled: "You cancelled the claim",
+      priceTooLow: "Current token price is too low; must reach 1.1× base price to claim",
+      insufficientBnb: "Wallet BNB balance insufficient to cover transaction fee",
     connectWalletFirst: "Please connect wallet first",
     missingContractAddress: "Missing NodeManager contract address",
     directAddressCount: "Direct Address Count",

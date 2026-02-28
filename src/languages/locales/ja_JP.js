@@ -277,7 +277,9 @@ export default {
     "success": "Successful",
     "pending": "Pending",
     "copied": "コピーしました",
-    "copyFailed": "コピーに失敗しました"
+    "copyFailed": "コピーに失敗しました",
+    "max": "MAX",
+    "enterValidAmount": "有効な金額を入力してください"
   },
   header: {
     searchPlaceholder: "Search ChooseMe",
@@ -622,6 +624,10 @@ export default {
     projectedReturns: "私の予想額",
     earnPromptShort: "収益を獲得",
     pendingIncome: "発行済み報酬",
+    enterClaimAmount: "受け取る金額を入力してください",
+    maxLabel: "MAX",
+    confirmClaimBtn: "受け取りを確認",
+    inputExceed: "入力金額が受取可能額を超えています",
     nodeIncome: "ノード収益",
     networkFeeIncome: "全ネットワーク手数料売買収益",
     subCoinFeeIncome: "サブコイン手数料収益",
@@ -636,6 +642,8 @@ export default {
     claimSuccess: "受取成功",
     claimFailed: "受取失敗",
     claimCancelled: "受取をキャンセルしました",
+    priceTooLow: "現在の通貨価格が低すぎます。基準価格の1.1倍に達する必要があります",
+    insufficientBnb: "ウォレットのBNB残高が手数料を支払うには不足しています",
     connectWalletFirst: "まずウォレットを接続してください",
     missingContractAddress: "NodeManager コントラクトアドレスが不足しています",
     directAddressCount: "直接紹介アドレス数",
@@ -813,6 +821,10 @@ export default {
   },
   collectEarnings: {
     title: "収益受取",
+    enterClaimAmount: "受け取る金額を入力してください",
+    maxLabel: "MAX",
+    confirmClaimBtn: "受け取りを確認",
+    inputExceed: "入力金額が受取可能額を超えています",
     tip: "* 全ノードの収益を受け取るか、単一ノードの収益を選択して受け取ることができます",
     selectNode: "受取ノードを選択",
     selectNodePlaceholder: "ノードを選択",

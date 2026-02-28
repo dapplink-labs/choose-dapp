@@ -37,7 +37,10 @@ export const formatTokenAmount = (
 
     if (!Number.isFinite(num)) return '0'
 
-    const fixed = num.toFixed(Math.max(0, maxFractionDigits))
+    // 截断到指定小数位（不四舍五入）
+    const multiplier = Math.pow(10, Math.max(0, maxFractionDigits))
+    const truncatedNum = Math.trunc(num * multiplier) / multiplier
+    const fixed = truncatedNum.toFixed(Math.max(0, maxFractionDigits))
     const trimmed = fixed.replace(/\.?0+$/, '')
     const [intPart, decimalPart] = trimmed.split('.')
     const intFormatted = useGrouping ? Number(intPart || 0).toLocaleString('en-US') : (intPart || '0')

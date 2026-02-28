@@ -47,12 +47,12 @@
           <b>{{ $t("myIncome.myIncomeCMT") }}</b>
           <p>+{{ formatAmount(currentNodeStakingInfo?.total_reward) }}</p>
         </div>
-        <!-- <div class="item">
-          <b>{{ $t("myIncome.communityIncomeUSDT") }}</b>
+        <div class="item">
+          <b>{{ $t("myNode.projectedReturns") }}</b>
           <p>
-            +{{ formatUsdtAmount(currentNodeStakingInfo?.community_income) }}
+            +{{ formatAmount(currentNodeStakingInfo?.total_prediction_reward) }}
           </p>
-        </div> -->
+        </div>
         <div class="item">
           <b>{{ $t("myIncome.networkIncomeCMT") }}</b>
           <p>+{{ formatAmount(currentNodeStakingInfo?.network_reward) }}</p>
@@ -468,7 +468,7 @@ const currentNodeStakingInfo = ref({});
 
 // CHO 金额（默认 6 精度）
 const formatAmount = (value) => {
-  return formatChoAmount(value, { maxFractionDigits: 2, useGrouping: true });
+  return formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true });
 };
 
 // USDT 金额（18 精度）
