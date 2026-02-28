@@ -53,6 +53,7 @@ import { useI18n } from 'vue-i18n'
 const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
+const isProd = import.meta.env.MODE === 'production'
 
 // 导航项配置
 const navItems = computed(() => [
@@ -98,6 +99,11 @@ onMounted(() => {
 
 // 处理导航点击
 const handleNavClick = (item) => {
+  // 生产环境下禁用路由跳转，仅更新本地激活状态
+  if (isProd) {
+    activeNav.value = item.key || 'home'
+    return
+  }
   if (item.isSearch) {
     // 搜索功能：跳转到首页并滚动到搜索框（如果存在）
     router.push('/').then(() => {

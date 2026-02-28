@@ -45,6 +45,7 @@ import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
+const isProd = import.meta.env.MODE === 'production'
 
 // Props
 const props = defineProps({
@@ -151,6 +152,14 @@ onMounted(() => {
 const handleNavClick = (key) => {
   activeNav.value = key
   emit('nav-click', key)
+
+  // 生产环境只改变本地激活状态，不执行路由跳转
+  if (isProd) {
+    nextTick(() => {
+      focusActiveNav()
+    })
+    return
+  }
 
   const navItem = navItems.find(item => item.key === key)
 
