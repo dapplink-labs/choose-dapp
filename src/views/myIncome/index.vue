@@ -88,14 +88,13 @@
 
       <div class="processDiv">
         <div class="progress-bar-container">
-          <div class="progress-bar">
+          <div class="progress-bar" ref="progressBarRef">
             <div class="progress-fill" :style="{
-              width:
-                (currentNodeStakingInfo?.progressPercent || 0) < 4
-                  ? 4 + '%'
-                  : currentNodeStakingInfo?.progressPercent + '%',
+              width: (currentNodeStakingInfo?.progressPercent || 0) < 4
+                ? currentNodeStakingInfo?.progressPercent + '%'
+                : '4%',
             }"></div>
-            <div class="progress-indicator" :style="{ left: progressIndicatorLeft }"
+            <div class="progress-indicator" ref="progressIndicatorRef" :style="{ left: progressIndicatorLeft }"
               :class="{ 'progress-indicator-left': (currentNodeStakingInfo?.progressPercent || 0) < 20, 'progress-indicator-right': (currentNodeStakingInfo?.progressPercent || 0) >= 90 }">
               {{ $t("myIncome.remainingClaimable") }}：
               <span class="indicator-text">{{
@@ -488,13 +487,18 @@ const formatProgressPercent = (value) => {
   return String(truncated);
 };
 
+const progressIndicatorRef = ref(null);
+const progressBarRef = ref(null);
+
 const progressIndicatorLeft = computed(() => {
   const p = Number(currentNodeStakingInfo.value?.progressPercent) || 0;
-  if (p === 0) return `${p}%`;
-  if (p < 20) return `${p - 4}%`;
-  if (97 >= p && p >= 90) return `${p - 24}%`;
-  if (p > 97) return `${p - 26}%`;
-  return `${p - 14}%`;
+  // 获取progress-indicator标签元素的宽度
+  const width = progressIndicatorRef.value?.offsetWidth || 0;
+  // 获取progress-bar标签元素的宽度
+  const progressBarWidth = progressBarRef.value?.offsetWidth || 0;
+  if (p <= 20) return `${p}%`;
+  if (p >= 90) return `${p - ((width / progressBarWidth) * 100).toFixed(0)}%`;
+  return `${p - Math.max(0, (width / progressBarWidth) * 100 / 2).toFixed(0)}%`;
 });
 // 地址截取：前6位 + ... + 后4位
 const shortAddress = (addr) => {
