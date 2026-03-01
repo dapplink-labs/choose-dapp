@@ -37,6 +37,7 @@ import helpCenter from "../views/helpCenter/index.vue"
 import sportsEventsH5 from "../views/sportsEventsH5/index.vue"
 import sportsDetailH5 from "../views/sportsDetailH5/index.vue"
 import bitcoinUpDown from "../views/bitcoinUpDown/index.vue"
+import feedback from "../views/feedback/index.vue"
 
 
 import claimEarnings from "../views/myIncome/claimEarnings.vue"
@@ -341,6 +342,24 @@ const router = createRouter({
       path: "/sports-detail-h5",
       name: "sportsDetailH5",
       component: sportsDetailH5,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true,
+      },
+    },
+    {
+      path: "/feedback-list",
+      name: "feedbackList",
+      component: () => import("../views/feedback/list.vue"),
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true,
+      },
+    },
+    {
+      path: "/feedback",
+      name: "feedback",
+      component: feedback,
       meta: {
         hideHeader: true,
         hideFooterNav: true,

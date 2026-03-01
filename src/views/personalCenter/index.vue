@@ -351,7 +351,7 @@ const baseSupportItems = computed(() => [
     label: t("userInfo.productFeedback"),
     icon: getIcon("20"),
     iconDark: getIcon("20Dark"),
-    path: "/",
+    path: "/feedback",
   },
   {
     key: "api-management",
@@ -509,6 +509,7 @@ const allowedPaths = [
   // '/leaderboardH5', // 排行榜
   // '/event-pool', // 事件池
   // '/help-center' // 帮助中心
+  "/feedback", // 产品反馈
 ];
 
 // 处理菜单项点击
