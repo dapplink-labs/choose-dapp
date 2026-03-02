@@ -8,7 +8,7 @@
       <div class="avatar-section">
         <div class="avatar-wrapper">
           <img class="avatar-img" :src="userAvatar" alt="avatar" />
-          <button class="avatar-edit" type="button" aria-label="edit avatar">
+          <button class="avatar-edit" type="button" aria-label="edit avatar" @click="handleAvatarClick">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
               <g>
                 <path
@@ -27,6 +27,13 @@
               />
             </svg>
           </button>
+          <input
+            ref="avatarInputRef"
+            class="avatar-file-input"
+            type="file"
+            accept="image/*"
+            @change="handleAvatarChange"
+          />
         </div>
       </div>
 
@@ -148,12 +155,35 @@ const themeStore = useThemeStore()
 const email = ref('')
 const username = ref('')
 const bio = ref('')
+const customAvatar = ref<string | null>(null)
+const avatarInputRef = ref<HTMLInputElement | null>(null)
 
 const userAvatar = computed<string>(() => {
+  if (customAvatar.value) return customAvatar.value
   return address.value
     ? `https://effigy.im/a/${address.value}.svg`
     : 'https://effigy.im/a/default.svg'
 })
+
+const handleAvatarClick = () => {
+  avatarInputRef.value?.click()
+}
+
+let lastObjectUrl: string | null = null
+const handleAvatarChange = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  const file = target.files && target.files[0]
+  if (!file) return
+
+  if (lastObjectUrl) {
+    URL.revokeObjectURL(lastObjectUrl)
+    lastObjectUrl = null
+  }
+
+  const objectUrl = URL.createObjectURL(file)
+  lastObjectUrl = objectUrl
+  customAvatar.value = objectUrl
+}
 
 const handleTwitterConnect = () => {
   message.info?.(t('userInfo.twitterComingSoon') || 'Twitter 绑定功能即将开放')
@@ -193,6 +223,13 @@ onMounted(() => {
       width: 88px;
       height: 88px;
       border-radius: 50%;
+
+        .avatar-file-input {
+          position: absolute;
+          inset: 0;
+          opacity: 0;
+          pointer-events: none;
+        }
 
       .avatar-img {
         width: 100%;

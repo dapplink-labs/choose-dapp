@@ -119,7 +119,7 @@
                     <div v-for="(outcome, index) in outcomes" :key="index" class="outcome-row">
                         <div class="outcome-content" @click="openPredictionDetail(outcome)">
                             <div class="outcome-left">
-                                <div class="outcome-title" :style="{ color: outcome.color }">{{ outcome.title }}</div>
+                                <div class="outcome-title">{{ outcome.title }}</div>
                                 <div class="outcome-volume">{{ outcome.volume }}</div>
                             </div>
                             <div class="outcome-chance">{{ outcome.chance }}%</div>

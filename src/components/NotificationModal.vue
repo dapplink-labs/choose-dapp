@@ -15,7 +15,9 @@
                         <div v-html="content"></div>
                     </div>
 
-                    <button class="confirm-btn" @click="close">知道了</button>
+                    <button class="confirm-btn" @click="close">
+                        {{ $t('notice.btn') || '知道了' }}
+                    </button>
                 </div>
             </div>
         </div>
@@ -82,7 +84,7 @@ const close = async () => {
     background-color: #0d0d0d;
     /* Very dark background */
     border-radius: 20px;
-    padding: 30px 24px;
+    padding: 30px 24px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -90,6 +92,7 @@ const close = async () => {
     position: relative;
     overflow: hidden;
     border: 1px solid #222;
+    max-height: 80vh;
 }
 
 .modal-handle {
@@ -122,6 +125,8 @@ const close = async () => {
     z-index: 1;
     display: flex;
     flex-direction: column;
+    max-height: 100%;
+    min-height: 0;
 }
 
 .title {
@@ -140,8 +145,11 @@ const close = async () => {
     font-size: 14px;
     line-height: 1.8;
     text-align: left;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     //   white-space: pre-wrap;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 
     /* Deep selector for html content */
     :deep(.highlight) {

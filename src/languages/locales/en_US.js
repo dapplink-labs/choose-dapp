@@ -6,7 +6,7 @@ export default {
     bill: "Bill",
     funds: "Funds",
     earnings: "Earnings",
-    fo: "FO",
+    fo: "FOMO",
     assetDistribution: "Asset Distribution",
     overview: "Overview",
     prediction: "Prediction",

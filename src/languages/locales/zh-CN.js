@@ -6,7 +6,7 @@ export default {
     bill: "账单",
     funds: "资金",
     earnings: "收益",
-    fo: "FO",
+    fo: "FOMO",
     assetDistribution: "资产分布",
     overview: "资产总览",
     prediction: "预测",

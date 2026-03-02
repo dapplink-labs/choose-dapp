@@ -1,6 +1,6 @@
 <template>
-  <transition name="sheet-slide">
-    <div v-if="modelValue" class="claim-overlay" @click.self="handleClose">
+  <transition :name="isClaimed ? 'claim-zoom' : 'sheet-slide'">
+  <div v-if="modelValue" :class="['claim-overlay', { 'is-centered': isClaimed }]" @click.self="handleClose">
       <!-- 动态布局：is-full(初始满屏) / is-compact(点击后卡片) -->
       <div class="claim-container" :class="[isClaimed ? 'is-compact' : 'is-full']">
         <!-- 顶部装饰拉条 -->
@@ -111,12 +111,17 @@ const handleClose = () => {
   align-items: center;
 }
 
+.claim-overlay.is-centered {
+  justify-content: center;
+}
+
 .claim-container {
   background: var(--bg-card); // 极深灰，比纯黑更有质感
   color: #ffffff;
   transition: all 0.4s cubic-bezier(0.3, 1.4, 0.6, 1);
   overflow: hidden;
   position: relative;
+  transform-origin: center center;
 }
 
 .claim-container.is-full {
@@ -311,7 +316,7 @@ const handleClose = () => {
   margin: 26px 0;
 }
 
-/* 进场与切换动画 */
+/* 底部滑入动画（未领取时） */
 .sheet-slide-enter-active,
 .sheet-slide-leave-active {
   transition: opacity 0.3s;
@@ -327,6 +332,25 @@ const handleClose = () => {
 
   .claim-container {
     transform: translateY(100%);
+  }
+}
+
+/* 领取完成后的状态：从中间缩放弹出 */
+.claim-zoom-enter-active,
+.claim-zoom-leave-active {
+  transition: opacity 0.25s ease;
+
+  .claim-container {
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.4, 1);
+  }
+}
+
+.claim-zoom-enter-from,
+.claim-zoom-leave-to {
+  opacity: 0;
+
+  .claim-container {
+    transform: scale(0.85);
   }
 }
 </style>

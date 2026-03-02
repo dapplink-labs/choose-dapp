@@ -72,7 +72,7 @@
 
             <!-- 让球盘 -->
             <div class="spread-area">
-                <h2 class="area-title">{{ $t('sports.spread') }}</h2>
+                <h2 class="area-title" @click="toggleSpreadOrderBook">{{ $t('sports.spread') }}</h2>
                 <div class="volume-sub">{{ matchData.volume }} {{ $t('sports.volume') }}</div>
 
                 <!-- 上方两侧盘口按钮 -->
@@ -105,12 +105,12 @@
                 </div>
 
                 <!-- 选中某个让球刻度后展示订单簿 -->
-                <SportsOrderBook v-if="selectedSpreadIndex !== -1" />
+                <SportsOrderBook v-if="showSpreadOrderBook && selectedSpreadIndex !== -1" />
             </div>
 
             <!-- 总比分 -->
             <div class="spread-area total-area">
-                <h2 class="area-title">{{ $t('sports.total') }}</h2>
+                <h2 class="area-title" @click="toggleTotalOrderBook">{{ $t('sports.total') }}</h2>
                 <div class="volume-sub">{{ matchData.volume }} {{ $t('sports.volume') }}</div>
 
                 <!-- 上方两侧盘口按钮 -->
@@ -143,10 +143,13 @@
                 </div>
 
                 <!-- 选中某个总比分刻度后展示订单簿 -->
-                <SportsOrderBook v-if="selectedTotalIndex !== -1" />
+                <SportsOrderBook v-if="showTotalOrderBook && selectedTotalIndex !== -1" />
             </div>
         </div>
     </div>
+
+    <!-- 购买弹窗 -->
+    <PaymentModal v-model="showPayment" />
 </template>
 
 <script setup>
@@ -158,6 +161,7 @@ import tyIcon02 from '@/assets/icon/tyIcon02.png'
 import logoIcon from '@/assets/icon/logoIcon.png'
 import SportsOrderBook from './SportsOrderBook.vue'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
+import PaymentModal from '@/components/PaymentModal.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -182,6 +186,11 @@ const selectedSpreadIndex = ref(-1) // 默认不选中
 const selectedTotalIndex = ref(-1) // 默认不选中
 const selectedSpreadSide = ref('home')
 const selectedTotalSide = ref('over')
+const showSpreadOrderBook = ref(false)
+const showTotalOrderBook = ref(false)
+
+const showPayment = ref(false)
+const selectedBetSide = ref(null)
 
 // 按钮文案使用的盘口数值：未选中时使用默认中间值
 const currentSpread = computed(() => {
@@ -196,6 +205,7 @@ const currentTotal = computed(() => {
 
 const selectSpread = (idx) => {
     selectedSpreadIndex.value = idx
+    showSpreadOrderBook.value = false
 }
 
 const prevSpread = () => {
@@ -205,6 +215,7 @@ const prevSpread = () => {
     } else if (selectedSpreadIndex.value > 0) {
         selectedSpreadIndex.value -= 1
     }
+    showSpreadOrderBook.value = false
 }
 
 const nextSpread = () => {
@@ -214,10 +225,12 @@ const nextSpread = () => {
     } else if (selectedSpreadIndex.value < spreadValues.length - 1) {
         selectedSpreadIndex.value += 1
     }
+    showSpreadOrderBook.value = false
 }
 
 const selectTotal = (idx) => {
     selectedTotalIndex.value = idx
+    showTotalOrderBook.value = false
 }
 
 const prevTotal = () => {
@@ -226,6 +239,7 @@ const prevTotal = () => {
     } else if (selectedTotalIndex.value > 0) {
         selectedTotalIndex.value -= 1
     }
+    showTotalOrderBook.value = false
 }
 
 const nextTotal = () => {
@@ -234,11 +248,22 @@ const nextTotal = () => {
     } else if (selectedTotalIndex.value < totalValues.length - 1) {
         selectedTotalIndex.value += 1
     }
+    showTotalOrderBook.value = false
+}
+
+const toggleSpreadOrderBook = () => {
+    if (selectedSpreadIndex.value === -1) return
+    showSpreadOrderBook.value = !showSpreadOrderBook.value
+}
+
+const toggleTotalOrderBook = () => {
+    if (selectedTotalIndex.value === -1) return
+    showTotalOrderBook.value = !showTotalOrderBook.value
 }
 
 const handleBet = (side) => {
-    // 预留点击处理逻辑
-    console.log('bet side:', side)
+    selectedBetSide.value = side
+    showPayment.value = true
 }
 </script>
 

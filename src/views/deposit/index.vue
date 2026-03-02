@@ -43,10 +43,6 @@
         </div>
       </div>
 
-      <!-- 我已完成充值 -->
-      <button class="completed-btn" @click="handleDepositCompleted">
-        {{ $t('transactionSuccess.depositCompleted') }}
-      </button>
     </div>
 
     <!-- 币种选择弹窗 -->
@@ -139,29 +135,7 @@ const generateQR = async () => {
 
 watch(depositAddress, generateQR, { immediate: true })
 
-const handleDepositCompleted = () => {
-  router.push({
-    path: '/transaction-success',
-    query: {
-      type: 'deposit',
-      amount: '100',
-      currency: selectedCurrency.value,
-      address: depositAddress.value,
-      network: selectedNetwork.value,
-      txId: '8jkj90...798h56',
-      submitTime: new Date().toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      }),
-      referenceNo: String(Math.floor(10000000 + Math.random() * 90000000)),
-      depositAccount: 'ChooseMe 账户'
-    }
-  })
-}
+// 已完成充值按钮逻辑已下线，保留页面展示与地址复制功能
 </script>
 
 <style scoped lang="scss">
@@ -279,25 +253,6 @@ const handleDepositCompleted = () => {
       height: 20px;
       color: var(--text-dark-gray, #909090);
     }
-  }
-}
-
-.completed-btn {
-  width: 100%;
-  height: 48px;
-  margin-top: 24px;
-  background: var(--text-color-y);
-  border: none;
-  border-radius: 12px;
-  font-family: PingFang SC, PingFang SC;
-  font-weight: 500;
-  font-size: 16px;
-  color: #000;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-
-  &:active {
-    opacity: 0.9;
   }
 }
 

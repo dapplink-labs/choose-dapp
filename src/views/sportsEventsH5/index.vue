@@ -68,8 +68,9 @@
                     activeCategory === 'worldcup' || activeCategory === 'football' ? $t('sportsEvents.playerMarket') : $t('sportsEvents.props') }}</button>
             </div>
 
-            <!-- 4. 赛事列表 - NBA/篮球 -->
-            <div v-if="activeCategory === 'nba' || activeCategory === 'basketball'" class="event-list">
+            <!-- 4. 赛事列表 - NBA/篮球（只在“比赛” Tab 下渲染） -->
+            <div v-if="(activeCategory === 'nba' || activeCategory === 'basketball') && activeTab === 'match'"
+                class="event-list">
                 <div v-for="(event, idx) in eventsList" :key="idx" class="event-wrapper">
                     <div v-if="event.month" class="date-label">{{ formatDate(event.month, event.day, event.weekday) }}</div>
 
@@ -160,6 +161,65 @@
             <div v-if="(activeCategory === 'worldcup' || activeCategory === 'football') && activeTab === 'player'"
                 class="player-panel-list">
                 <div v-for="(item, idx) in playerPanelList" :key="idx" class="player-card">
+                    <div class="card-header">
+                        <img :src="item.avatar" class="card-avatar" />
+                        <div class="card-title">{{ item.title }}</div>
+                    </div>
+                    <div class="card-leverage">
+                        <div class="leverage-item">
+                            <span class="label">{{ $t('sportsEvents.maxLeverage') }}:</span>
+                            <span class="value">{{ item.maxLeverage }}</span>
+                        </div>
+                        <div class="leverage-item">
+                            <span class="label">{{ $t('sportsEvents.maxReturn') }}:</span>
+                            <span class="value">{{ item.maxReturn }}</span>
+                        </div>
+                    </div>
+                    <div class="card-options">
+                        <div v-for="(opt, optIdx) in item.options" :key="optIdx" class="option-row">
+                            <div class="option-info">
+                                <span class="option-name">{{ opt.name }}</span>
+                                <span class="option-percent">{{ opt.percent }}</span>
+                            </div>
+                            <div class="option-btns">
+                                <button class="opt-btn yes" @click="openPayment(item, 'yes')">Yes</button>
+                                <button class="opt-btn no" @click="openPayment(item, 'no')">No</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="footer-left">
+                            <span class="time-info">
+                                <svg class="time-icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12"
+                                    height="12" viewBox="0 0 12 12">
+                                    <path
+                                        d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
+                                        transform="translate(-69.818 -69.818)" fill="currentColor" />
+                                </svg>
+                                {{ item.timeRemaining }}
+                            </span>
+                            <span class="participant-info">
+                                <el-icon class="user-icon">
+                                    <Avatar />
+                                </el-icon>
+                                {{ item.participantCount.toLocaleString() }}
+                            </span>
+                            <span class="voi-info">VOI：${{ item.amount }}</span>
+                        </div>
+                        <svg class="bookmark-icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="14"
+                            height="14">
+                            <path
+                                d="M389.461333 85.333333l253.354667 0.021334c5.397333 0.042667 10.602667 0.128 15.616 0.256l14.506667 0.490666 13.482666 0.789334c43.306667 3.072 71.104 10.965333 99.733334 26.282666a197.738667 197.738667 0 0 1 82.005333 82.005334c15.317333 28.629333 23.210667 56.426667 26.282667 99.733333l0.789333 13.482667 0.490667 14.506666 0.149333 7.658667 0.128 16.213333v501.525334a85.333333 85.333333 0 0 1-123.498667 76.330666L518.186667 797.44l-3.2-1.557333-2.965334-1.322667-2.986666 1.322667-257.514667 128.725333A85.333333 85.333333 0 0 1 128 848.298667l0.021333-509.781334c0.042667-5.397333 0.128-10.602667 0.256-15.616l0.490667-14.506666 0.789333-13.482667c3.072-43.306667 10.965333-71.104 26.282667-99.733333a197.738667 197.738667 0 0 1 82.005333-82.005334c28.629333-15.317333 56.426667-23.210667 99.733334-26.282666l13.482666-0.789334 14.506667-0.490666 7.658667-0.149334 16.213333-0.128z m252.16 85.354667H382.378667l-13.184 0.170667-6.122667 0.149333-11.413333 0.426667-10.325334 0.64c-4.906667 0.384-9.493333 0.832-13.76 1.365333l-8.149333 1.173333c-11.712 1.92-21.12 4.650667-29.866667 8.32l-5.76 2.602667c-1.92 0.917333-3.797333 1.877333-5.674666 2.88a112.426667 112.426667 0 0 0-47.018667 47.018667 145.664 145.664 0 0 0-2.88 5.674666l-2.602667 5.76c-3.669333 8.746667-6.4 18.154667-8.32 29.866667l-1.173333 8.149333c-0.533333 4.266667-0.981333 8.832-1.344 13.76l-0.64 10.325334a514.133333 514.133333 0 0 0-0.256 5.546666l-0.341333 11.989334-0.170667 13.184L213.333333 848.277333l256.469334-128.170666c10.965333-5.312 18.112-7.850667 26.88-9.536a80.213333 80.213333 0 0 1 30.634666 0c9.856 1.898667 17.664 4.885333 31.189334 11.648L810.666667 848.298667l-0.021334-508.586667-0.170666-13.226667a709.973333 709.973333 0 0 0-0.149334-6.101333l-0.426666-11.413333-0.64-10.325334c-0.384-4.906667-0.832-9.493333-1.365334-13.76l-1.173333-8.149333a129.984 129.984 0 0 0-8.32-29.866667l-2.602667-5.76a145.664 145.664 0 0 0-2.88-5.674666 112.426667 112.426667 0 0 0-47.018666-47.018667 145.664 145.664 0 0 0-5.674667-2.88l-5.76-2.602667c-8.746667-3.669333-18.154667-6.4-29.866667-8.32l-8.149333-1.173333c-4.266667-0.533333-8.832-0.981333-13.76-1.344l-10.325333-0.64a514.133333 514.133333 0 0 0-5.546667-0.256l-11.989333-0.341333L641.642667 170.666667zM576 298.666667a42.666667 42.666667 0 0 1 3.2 85.226666L576 384h-128a42.666667 42.666667 0 0 1-3.2-85.226667L448 298.666667h128z"
+                                fill="#909090" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 球员盘列表 - NBA/篮球（属性/Props Tab） -->
+            <div v-if="(activeCategory === 'nba' || activeCategory === 'basketball') && activeTab === 'player'"
+                class="player-panel-list">
+                <div v-for="(item, idx) in nbaPlayerPanelList" :key="idx" class="player-card">
                     <div class="card-header">
                         <img :src="item.avatar" class="card-avatar" />
                         <div class="card-title">{{ item.title }}</div>
@@ -400,6 +460,36 @@ const playerPanelList = ref([
         amount: '25.50'
     }
 ])
+
+// NBA / 篮球球员盘示例数据
+const nbaPlayerPanelList = ref([
+    {
+        avatar: tyIcon01,
+        title: 'LeBron James total points vs Knicks',
+        maxLeverage: '5x',
+        maxReturn: '120%',
+        timeRemaining: '4h 21m left',
+        participantCount: 3284,
+        amount: '1.2M',
+        options: [
+            { name: 'Over 28.5 pts', percent: '62% implied' },
+            { name: 'Under 28.5 pts', percent: '38% implied' }
+        ]
+    },
+    {
+        avatar: tyIcon02,
+        title: 'J. Brunson 3-pointers made',
+        maxLeverage: '4x',
+        maxReturn: '95%',
+        timeRemaining: '3h 10m left',
+        participantCount: 1875,
+        amount: '620K',
+        options: [
+            { name: 'Over 3.5 3PM', percent: '44% implied' },
+            { name: 'Under 3.5 3PM', percent: '56% implied' }
+        ]
+    }
+])
 </script>
 
 <style scoped lang="scss">
@@ -503,7 +593,7 @@ const playerPanelList = ref([
 
         &.active {
             .category-icon {
-                background: var(--bg-opposite);
+                // background: var(--bg-opposite);
                 transform: scale(1.05);
             }
 

@@ -6,7 +6,7 @@ export default {
     bill: "明細",
     funds: "資金",
     earnings: "収益",
-    fo: "FO",
+    fo: "FOMO",
     assetDistribution: "資産分布",
     overview: "資産概要",
     prediction: "予測",
