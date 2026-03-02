@@ -3,9 +3,10 @@
         <div class="feedback-header">
             <div class="feedback-header-left" @click="router.back()">
                 <div class="feedback-header-left-icon">
-                     <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="18" height="20">
-            <path d="M723.2 1024l-512-512L716.8 0l70.4 70.4L345.6 512l441.6 448-64 64z" fill="currentColor" />
-          </svg>
+                    <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="18" height="20">
+                        <path d="M723.2 1024l-512-512L716.8 0l70.4 70.4L345.6 512l441.6 448-64 64z"
+                            fill="currentColor" />
+                    </svg>
                 </div>
             </div>
             <div class="feedback-header-title">
@@ -14,11 +15,17 @@
             <div class="feedback-header-right" @click="router.push('/feedback-list')">
                 <div class="history-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M14 2V8H20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M16 13H8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M16 17H8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M10 9H8" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z"
+                            stroke="var(--text-color, #fff)" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M14 2V8H20" stroke="var(--text-color, #fff)" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M16 13H8" stroke="var(--text-color, #fff)" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M16 17H8" stroke="var(--text-color, #fff)" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M10 9H8" stroke="var(--text-color, #fff)" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
                     </svg>
                 </div>
             </div>
@@ -28,26 +35,21 @@
             <div class="form-group">
                 <label class="form-label">{{ t("feedback.type") }} <span class="required">*</span></label>
                 <div class="custom-select-wrapper">
-                    <select v-model="formData.type" class="custom-select">
-                        <option value="" disabled selected>{{ t("feedback.select") }}</option>
-                        <option :value="t('feedback.typeStaking')">{{ t("feedback.typeStaking") }}</option>
-                        <option :value="t('feedback.typeAccount')">{{ t("feedback.typeAccount") }}</option>
-                        <option :value="t('feedback.typeFeature')">{{ t("feedback.typeFeature") }}</option>
-                        <option :value="t('feedback.typeOther')">{{ t("feedback.typeOther") }}</option>
-                    </select>
-                    <div class="select-arrow">▼</div>
+                    <el-select v-model="formData.type" class="custom-select" :placeholder="t('feedback.select')"
+                        :teleported="false" size="large">
+                        <el-option :label="t('feedback.typeStaking')" :value="t('feedback.typeStaking')" />
+                        <el-option :label="t('feedback.typeAccount')" :value="t('feedback.typeAccount')" />
+                        <el-option :label="t('feedback.typeFeature')" :value="t('feedback.typeFeature')" />
+                        <el-option :label="t('feedback.typeOther')" :value="t('feedback.typeOther')" />
+                    </el-select>
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">{{ t("feedback.content") }} <span class="required">*</span></label>
                 <div class="textarea-wrapper">
-                    <textarea 
-                        v-model="formData.content" 
-                        class="custom-textarea" 
-                        :placeholder="t('feedback.contentPlaceholder')"
-                        maxlength="500"
-                    ></textarea>
+                    <textarea v-model="formData.content" class="custom-textarea"
+                        :placeholder="t('feedback.contentPlaceholder')" maxlength="500"></textarea>
                     <span class="char-count">{{ formData.content.length }}/500</span>
                 </div>
             </div>
@@ -55,31 +57,25 @@
             <div class="form-group">
                 <label class="form-label">{{ t("feedback.attachment") }}</label>
                 <p class="upload-tip">{{ t("feedback.attachmentTip") }}</p>
-                
+
                 <div class="upload-grid">
                     <div class="upload-item" v-for="(file, index) in fileList" :key="index">
                         <img v-if="file.type === 'image'" :src="file.url" class="preview-img" />
                         <video v-else :src="file.url" class="preview-video"></video>
                         <div class="delete-btn" @click="removeFile(index)">×</div>
                     </div>
-                    
+
                     <div class="upload-btn" @click="triggerUpload" v-if="fileList.length < 6">
                         <span class="plus">+</span>
-                        <input 
-                            type="file" 
-                            ref="fileInput" 
-                            style="display: none" 
-                            accept="image/*,video/*"
-                            multiple
-                            @change="handleFileChange"
-                        />
+                        <input type="file" ref="fileInput" style="display: none" accept="image/*,video/*" multiple
+                            @change="handleFileChange" />
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="feedback-footer">
-            <button class="submit-btn" @click="handleSubmit" :disabled="submitting">
+            <button class="submit-btn" @click="handleSubmit" :disabled="!isFormValid || submitting">
                 {{ submitting ? t("feedback.submitting") : t("feedback.submit") }}
             </button>
             <p class="footer-tip">{{ t("feedback.footerTip") }}</p>
@@ -88,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue"
+import { ref, reactive, computed } from "vue"
 import { useRouter } from "vue-router"
 import { useI18n } from "vue-i18n"
 import { submitFeedback, uploadFile } from "@/api/feedback"
@@ -105,6 +101,9 @@ const formData = reactive({
 
 const fileList = ref([])
 const submitting = ref(false)
+const isFormValid = computed(() => {
+    return formData.type && formData.content
+})
 
 const triggerUpload = () => {
     fileInput.value.click()
@@ -122,7 +121,7 @@ const handleFileChange = async (event) => {
     for (const file of files) {
         const isImage = file.type.startsWith('image/')
         const isVideo = file.type.startsWith('video/')
-        
+
         if (!isImage && !isVideo) {
             ElMessage.warning(t('feedback.msgInvalidFormat'))
             continue
@@ -130,17 +129,17 @@ const handleFileChange = async (event) => {
 
         // Create local preview URL
         const url = URL.createObjectURL(file)
-        
+
         // TODO: Implement actual file upload to server here if needed
         // For now we just store the file object and local URL
-        
+
         fileList.value.push({
             file,
             url,
             type: isImage ? 'image' : 'video'
         })
     }
-    
+
     // Reset input
     event.target.value = ''
 }
@@ -165,21 +164,21 @@ const handleSubmit = async () => {
         // Prepare data for submission
         // In a real app, you would upload files first, get URLs, then submit the form
         // Or send FormData with files directly
-        
+
         const payload = {
             type: formData.type,
             content: formData.content,
             // files: fileList.value.map(f => f.file) // This depends on API
         }
-        
+
         await submitFeedback(payload)
         ElMessage.success(t('feedback.msgSubmitSuccess'))
-        
+
         // Clear form
         formData.type = ''
         formData.content = ''
         fileList.value = []
-        
+
         // Go to list
         router.push('/feedback-list')
     } catch (error) {
@@ -194,7 +193,7 @@ const handleSubmit = async () => {
 <style scoped lang="scss">
 .feedback {
     min-height: 100vh;
-    background-color: #000;
+    background-color: var(bg-color-010101, #010101);
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -202,17 +201,18 @@ const handleSubmit = async () => {
 
 .feedback-header {
     height: 56px;
-    background-color: #000;
+    background-color: var(bg-color-010101, #010101);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
+    // padding: 0 16px;
     position: sticky;
     top: 0;
     z-index: 10;
 }
 
-.feedback-header-left, .feedback-header-right {
+.feedback-header-left,
+.feedback-header-right {
     width: 40px;
     display: flex;
     align-items: center;
@@ -222,18 +222,22 @@ const handleSubmit = async () => {
 .feedback-header-title {
     font-size: 18px;
     font-weight: 600;
-    color: #fff;
+    color: var(--text-color, #fff);
 }
 
-.feedback-header-left-icon{
+.feedback-header-left-icon {
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.feedback-header-left-icon img {
-    width: 24px;
-    height: 24px;
-  
+
+.feedback-header-left-icon svg {
+    color: var(--text-color, #fff);
+
+}
+
+.history-icon svg {
+    color: var(--text-color, #fff);
 }
 
 .feedback-content {
@@ -250,8 +254,8 @@ const handleSubmit = async () => {
     font-size: 16px;
     font-weight: 500;
     margin-bottom: 12px;
-    color: #fff;
-    
+    color: var(--text-color, #fff);
+
     .required {
         color: #ff4d4f;
         margin-left: 4px;
@@ -260,41 +264,61 @@ const handleSubmit = async () => {
 
 .custom-select-wrapper {
     position: relative;
-    background-color: #1a1a1a;
-    border-radius: 8px;
-    border: 1px solid #333;
 }
 
 .custom-select {
     width: 100%;
-    height: 48px;
-    background: transparent;
-    border: none;
-    color: #fff;
-    padding: 0 16px;
-    appearance: none;
-    font-size: 14px;
-    outline: none;
-    
-    option {
-        background-color: #1a1a1a;
-        color: #fff;
-    }
-}
 
-.select-arrow {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #999;
-    pointer-events: none;
-    font-size: 12px;
+    :deep(.el-select__wrapper) {
+        box-shadow: 0 0 0 1px #333 inset;
+        border-radius: 8px;
+        height: 48px;
+        padding: 0 16px;
+        background-color: transparent;
+    }
+
+    :deep(.el-select__wrapper.is-focused) {
+        box-shadow: 0 0 0 1px #2ecc71 inset;
+    }
+
+    :deep(.el-select__placeholder) {
+        color: #666;
+    }
+
+    :deep(.el-select__selected-item) {
+        color: var(--text-color, #fff);
+
+    }
+
+    :deep(.el-select-dropdown) {
+        background-color: var(--bg-color-010101, #1a1a1a);
+        border: 1px solid #333;
+        border-radius: 8px;
+    }
+
+    :deep(.el-select-dropdown__item) {
+        color: var(--text-color, #fff);
+
+        &.hover,
+        &:hover {
+            background-color: #333;
+        }
+
+        &.is-selected {
+            color: #2ecc71;
+            font-weight: 600;
+            background-color: transparent;
+        }
+    }
+
+    :deep(.el-popper__arrow::before) {
+        background-color: #1a1a1a;
+        border-color: #333;
+    }
 }
 
 .textarea-wrapper {
     position: relative;
-    background-color: #1a1a1a;
     border-radius: 8px;
     border: 1px solid #333;
 }
@@ -309,7 +333,7 @@ const handleSubmit = async () => {
     resize: none;
     font-size: 14px;
     outline: none;
-    
+
     &::placeholder {
         color: #666;
     }
@@ -335,7 +359,8 @@ const handleSubmit = async () => {
     gap: 12px;
 }
 
-.upload-item, .upload-btn {
+.upload-item,
+.upload-btn {
     width: 80px;
     height: 80px;
     border-radius: 8px;
@@ -344,19 +369,21 @@ const handleSubmit = async () => {
 }
 
 .upload-item {
-    .preview-img, .preview-video {
+
+    .preview-img,
+    .preview-video {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
-    
+
     .delete-btn {
         position: absolute;
         top: 0;
         right: 0;
         width: 20px;
         height: 20px;
-        background: rgba(0,0,0,0.5);
+        background: rgba(0, 0, 0, 0.5);
         color: #fff;
         display: flex;
         align-items: center;
@@ -367,13 +394,13 @@ const handleSubmit = async () => {
 }
 
 .upload-btn {
+    margin-top: 1px;
     border: 1px dashed #333;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #1a1a1a;
     cursor: pointer;
-    
+
     .plus {
         font-size: 24px;
         color: #666;
@@ -382,30 +409,33 @@ const handleSubmit = async () => {
 
 .feedback-footer {
     padding: 20px 16px;
-    background-color: #000;
+    background-color: var(bg-color-010101, #010101);
 }
 
 .submit-btn {
     width: 100%;
-    height: 48px;
-    background: linear-gradient(90deg, #2ecc71, #27ae60);
+    height: 50px;
+    background: var(--el-menu-text-color, #010101);
     border: none;
-    border-radius: 24px;
-    color: #fff;
+    border-radius: 8px;
+    color: var(--bg-color-010101, #010101);
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     margin-bottom: 16px;
-    
+    transition: all 0.3s ease;
+
     &:disabled {
-        opacity: 0.7;
+        background: #2F2F2F;
+        color: #888;
         cursor: not-allowed;
+        opacity: 1;
     }
 }
 
 .footer-tip {
     font-size: 12px;
     color: #666;
-    text-align: center;
+    text-align: left;
 }
 </style>

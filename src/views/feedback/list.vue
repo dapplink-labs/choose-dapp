@@ -13,27 +13,15 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="feedback-tabs">
-            <div 
-                class="tab-item" 
-                :class="{ active: activeTab === 'all' }"
-                @click="activeTab = 'all'"
-            >
+            <div class="tab-item" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'">
                 {{ t("feedback.all") }}
             </div>
-            <div 
-                class="tab-item" 
-                :class="{ active: activeTab === 'replied' }"
-                @click="activeTab = 'replied'"
-            >
+            <div class="tab-item" :class="{ active: activeTab === 'replied' }" @click="activeTab = 'replied'">
                 {{ t("feedback.replied") }}
             </div>
-            <div 
-                class="tab-item" 
-                :class="{ active: activeTab === 'pending' }"
-                @click="activeTab = 'pending'"
-            >
+            <div class="tab-item" :class="{ active: activeTab === 'pending' }" @click="activeTab = 'pending'">
                 {{ t("feedback.pendingReply") }}
             </div>
         </div>
@@ -60,7 +48,7 @@
                             {{ item.status === 'replied' ? t("feedback.replied") : t("feedback.submitted") }}
                         </div>
                     </div>
-                    
+
                     <div class="item-type">
                         {{ item.type }}
                     </div>
@@ -70,13 +58,8 @@
                     </div>
 
                     <div class="item-images" v-if="item.images && item.images.length">
-                        <img 
-                            v-for="(img, index) in item.images" 
-                            :key="index" 
-                            :src="img" 
-                            class="feedback-img"
-                            @click="previewImage(img)"
-                        />
+                        <img v-for="(img, index) in item.images" :key="index" :src="img" class="feedback-img"
+                            @click="previewImage(img)" />
                     </div>
 
                     <div class="reply-section" v-if="item.reply">
@@ -176,8 +159,8 @@ onMounted(() => {
 <style scoped lang="scss">
 .feedback-list {
     min-height: 100vh;
-    background-color: #000;
-    color: #fff;
+    background-color: var(--bg-color-010101);
+    color: var(--text-color);
     display: flex;
     flex-direction: column;
 }
@@ -187,21 +170,23 @@ onMounted(() => {
     display: flex;
     align-items: center;
     padding: 0 16px;
-    background-color: #000;
+    background-color: var(--bg-color-010101);
     position: sticky;
     top: 0;
     z-index: 10;
-    
+
     .feedback-header-left {
         display: flex;
         align-items: center;
         cursor: pointer;
-        
-        &-icon svg {
-            width: 24px;
-            height: 24px;
+
+        .feedback-header-left-icon {
+            display: flex;
+            align-items: center;
         }
-        
+
+        &-icon svg {}
+
         &-text {
             margin-left: 12px;
             font-size: 16px;
@@ -209,6 +194,7 @@ onMounted(() => {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: var(--text-color);
         }
     }
 }
@@ -217,20 +203,20 @@ onMounted(() => {
     display: flex;
     padding: 16px;
     gap: 24px;
-    border-bottom: 1px solid #333;
-    background-color: #000;
-    
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-color-010101);
+
     .tab-item {
         font-size: 16px;
-        color: #999;
+        color: var(--text-gray);
         cursor: pointer;
         position: relative;
         padding-bottom: 8px;
-        
+
         &.active {
-            color: #fff;
+            color: var(--text-color);
             font-weight: 500;
-            
+
             &::after {
                 content: '';
                 position: absolute;
@@ -239,7 +225,7 @@ onMounted(() => {
                 transform: translateX(-50%);
                 width: 20px;
                 height: 2px;
-                background-color: #fff;
+                background-color: var(--text-color);
             }
         }
     }
@@ -253,82 +239,82 @@ onMounted(() => {
 
 .feedback-item {
     margin-bottom: 24px;
-    
+
     .item-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 12px;
-        
+
         .user-info {
             display: flex;
             align-items: center;
-            
+
             .avatar {
                 width: 40px;
                 height: 40px;
                 border-radius: 50%;
                 margin-right: 12px;
             }
-            
+
             .user-details {
                 display: flex;
                 flex-direction: column;
-                
+
                 .address {
                     font-size: 16px;
                     font-weight: 500;
-                    color: #fff;
+                    color: var(--text-color);
                 }
-                
+
                 .time {
                     font-size: 12px;
-                    color: #666;
+                    color: var(--text-gray);
                     margin-top: 4px;
                 }
             }
         }
-        
+
         .status-tag {
             padding: 2px 8px;
             border-radius: 4px;
             font-size: 12px;
-            
+
             &.replied {
                 background-color: rgba(46, 204, 113, 0.2);
                 color: #2ecc71;
             }
-            
+
             &.pending {
-                background-color: rgba(255, 255, 255, 0.1);
-                color: #999;
+                background-color: var(--bg-light);
+                color: var(--text-gray);
             }
         }
     }
-    
+
     .item-type {
         display: inline-block;
-        background-color: #333;
+        background-color: var(--bg-light);
         padding: 4px 8px;
         border-radius: 4px;
         font-size: 12px;
-        color: #ccc;
+        color: var(--text-gray);
         margin-bottom: 12px;
     }
-    
+
     .item-content {
         font-size: 14px;
         line-height: 1.5;
-        color: #ddd;
+        color: var(--text-color);
         margin-bottom: 12px;
     }
-    
+
     .item-images {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
         margin-bottom: 16px;
-        
+
         .feedback-img {
             width: 80px;
             height: 80px;
@@ -336,35 +322,35 @@ onMounted(() => {
             border-radius: 8px;
         }
     }
-    
+
     .reply-section {
-        background-color: #1a1a1a;
+        background-color: var(--bg-card);
         border-radius: 12px;
         padding: 16px;
         margin-top: 12px;
-        border: 1px solid #333;
-        
+        border: 1px solid var(--border-color);
+
         .reply-header {
             display: flex;
             align-items: center;
             margin-bottom: 8px;
-            
+
             .reply-avatar {
                 width: 24px;
                 height: 24px;
                 margin-right: 8px;
             }
-            
+
             .reply-name {
                 font-size: 14px;
                 font-weight: 500;
-                color: #fff;
+                color: var(--text-color);
             }
         }
-        
+
         .reply-content {
             font-size: 14px;
-            color: #ccc;
+            color: var(--text-gray);
             line-height: 1.5;
         }
     }
@@ -376,15 +362,15 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
     padding-top: 100px;
-    
+
     img {
         width: 120px;
         margin-bottom: 16px;
         opacity: 0.5;
     }
-    
+
     p {
-        color: #666;
+        color: var(--text-gray);
     }
 }
 </style>
