@@ -351,7 +351,7 @@ const baseSupportItems = computed(() => [
     label: t("userInfo.productFeedback"),
     icon: getIcon("20"),
     iconDark: getIcon("20Dark"),
-    path: "/",
+    path: "/feedback",
   },
   {
     key: "api-management",
