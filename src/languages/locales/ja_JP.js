@@ -80,13 +80,15 @@ export default {
   },
   "bitcoinUpDown": {
     "title": "Bitcoin Up or Down",
-    "priceToBeat": "PRICE TO BEAT",
-    "currentPrice": "CURRENT PRICE",
+    "priceToBeat": "達成価格",
+    "currentPrice": "現在価格",
+    "finalPrice": "最終価格",
     "record": "記録",
     "positions": "Positions",
     "orders": "Orders",
     "history": "History",
     "up": "Up",
+    "down": "Down",
     "shares": "株",
     "avgPrice": "平均価格",
     "cost": "コスト",
@@ -98,7 +100,15 @@ export default {
     "buyUp": "Buy Up",
     "buyDown": "Buy Down",
     "min": "分",
-    "sec": "秒"
+    "sec": "秒",
+    "past": "過去",
+    "ended": "終了",
+    "hrs": "時",
+    "mins": "分",
+    "secs": "秒",
+    "volume": "出来高",
+    "questionTitle": "イーサリアムは2月27日に上昇しますか下降しますか？",
+    "rulesDescription": "本市場におけるFED金利は、フェデラルファンド目標レンジの上限によって定義されています。"
   },
   "link": {
     "titel": "ウォレット接続",
@@ -289,6 +299,9 @@ export default {
     profile: "Profile",
     settingsTitle: "Settings",
     logout: "Logout",
+  },
+  messages: {
+    title: "メッセージ",
   },
   "home": {
     "comingSoon": "予測市場 オープン間近",

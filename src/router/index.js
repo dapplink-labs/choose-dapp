@@ -37,6 +37,7 @@ import helpCenter from "../views/helpCenter/index.vue"
 import sportsEventsH5 from "../views/sportsEventsH5/index.vue"
 import sportsDetailH5 from "../views/sportsDetailH5/index.vue"
 import bitcoinUpDown from "../views/bitcoinUpDown/index.vue"
+import messages from "../views/messages/index.vue"
 
 
 import claimEarnings from "../views/myIncome/claimEarnings.vue"
@@ -152,6 +153,15 @@ const router = createRouter({
       path: "/breaking",
       name: "breaking",
       component: breaking,
+    },
+    {
+      path: "/messages",
+      name: "messages",
+      component: messages,
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true,
+      },
     },
     {
       path: "/accuracy",

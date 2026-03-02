@@ -80,13 +80,15 @@ export default {
   },
   "bitcoinUpDown": {
     "title": "Bitcoin Up or Down",
-    "priceToBeat": "PRICE TO BEAT",
-    "currentPrice": "CURRENT PRICE",
+    "priceToBeat": "目标价格",
+    "currentPrice": "当前价格",
+    "finalPrice": "最终价格",
     "record": "记录",
     "positions": "Positions",
     "orders": "Orders",
     "history": "History",
     "up": "Up",
+    "down": "Down",
     "shares": "股",
     "avgPrice": "均价",
     "cost": "成本",
@@ -98,7 +100,15 @@ export default {
     "buyUp": "Buy Up",
     "buyDown": "Buy Down",
     "min": "分",
-    "sec": "秒"
+    "sec": "秒",
+    "past": "过去",
+    "ended": "结束于",
+    "hrs": "时",
+    "mins": "分",
+    "secs": "秒",
+    "volume": "成交量",
+    "questionTitle": "以太坊在2月27日上涨还是下跌?",
+    "rulesDescription": "本市场中 FED 利率由联邦基金目标区间的上限定义。"
   },
   "link": {
     "titel": "链接钱包",
@@ -287,6 +297,9 @@ export default {
     profile: "个人资料",
     settingsTitle: "个人设置",
     logout: "退出登录",
+  },
+  messages: {
+    title: "消息",
   },
   "home": {
     "comingSoon": "预测市场即将开放",

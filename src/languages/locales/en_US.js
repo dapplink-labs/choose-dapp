@@ -80,13 +80,15 @@ export default {
   },
   bitcoinUpDown: {
     title: "Bitcoin Up or Down",
-    priceToBeat: "PRICE TO BEAT",
-    currentPrice: "CURRENT PRICE",
+    priceToBeat: "Price to beat",
+    currentPrice: "Current price",
+    finalPrice: "Final price",
     record: "Record",
     positions: "Positions",
     orders: "Orders",
     history: "History",
     up: "Up",
+    down: "Down",
     shares: " shares",
     avgPrice: "Avg Price",
     cost: "Cost",
@@ -99,6 +101,14 @@ export default {
     buyDown: "Buy Down",
     min: "min",
     sec: "sec",
+    past: "Past",
+    ended: "Ended",
+    hrs: "HRS",
+    mins: "MINS",
+    secs: "SECS",
+    volume: "Vol.",
+    questionTitle: "Will Ethereum go up or down on Feb 27?",
+    rulesDescription: "The FED interest rates are defined in this market by the upper bound of the target federal funds range."
   },
   link: {
     titel: "Connect Wallet",
@@ -289,6 +299,9 @@ export default {
     profile: "Profile",
     settingsTitle: "Settings",
     logout: "Logout",
+  },
+  messages: {
+    title: "Messages",
   },
   home: {
     comingSoon: "Prediction market coming soon.",

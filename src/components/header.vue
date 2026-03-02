@@ -24,7 +24,8 @@
 
       <div class="right-section">
         <!-- 语言切换下拉菜单 -->
-        <el-dropdown class="language-dropdown" popper-class="language-dropdown-popper" @command="handleLanguageChange" trigger="click">
+        <el-dropdown class="language-dropdown" popper-class="language-dropdown-popper" @command="handleLanguageChange"
+          trigger="click">
           <button class="language-toggle-btn" :title="$t('navbar.language.en') || 'Language'">
             <img src="@/assets/language.png" alt="language" class="language-icon" />
           </button>
@@ -57,6 +58,16 @@
             </el-dropdown-menu>
           </template>
         </el-dropdown>
+
+        <!-- 消息入口 -->
+        <button :class="['message-entry-btn', { 'is-dark': isDark }]" type="button" @click="goMessages" :title="$t('messages.title') || '消息'">
+          <svg class="message-icon" xmlns="http://www.w3.org/2000/svg" width="20.003" height="24"
+            viewBox="0 0 20.003 24" aria-hidden="true">
+            <path fill="currentColor"
+              d="M184.288,117h-18a1,1,0,0,1-.8-1.6l2.238-3.026V106.5a7.567,7.567,0,0,1,15.133,0v5.879l2.238,3.026a1,1,0,0,1-.8,1.6Zm-16.018-2H182.3l-1.255-1.7a1,1,0,0,1-.2-.594V106.5a5.566,5.566,0,0,0-11.132,0v6.208a1,1,0,0,1-.2.594Zm9.519,5h-5a1,1,0,0,1,0-2h5a1,1,0,0,1,0,2Zm-2-22h-1a1,1,0,1,1,0-2h1a1,1,0,1,1,0,2Z"
+              transform="translate(-165.286 -96)" />
+          </svg>
+        </button>
 
         <!-- 关灯按钮 -->
         <button class="theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
@@ -101,8 +112,20 @@
       </div>
 
       <div class="h5-user-section">
+        <!-- 消息入口 -->
+        <button class="h5-message-entry-btn" type="button" @click="goMessages" :title="$t('messages.title') || '消息'">
+          <svg class="message-icon" xmlns="http://www.w3.org/2000/svg" width="20.003" height="24"
+            viewBox="0 0 20.003 24" aria-hidden="true">
+            <path fill="currentColor"
+              d="M184.288,117h-18a1,1,0,0,1-.8-1.6l2.238-3.026V106.5a7.567,7.567,0,0,1,15.133,0v5.879l2.238,3.026a1,1,0,0,1-.8,1.6Zm-16.018-2H182.3l-1.255-1.7a1,1,0,0,1-.2-.594V106.5a5.566,5.566,0,0,0-11.132,0v6.208a1,1,0,0,1-.2.594Zm9.519,5h-5a1,1,0,0,1,0-2h5a1,1,0,0,1,0,2Zm-2-22h-1a1,1,0,1,1,0-2h1a1,1,0,1,1,0,2Z"
+              transform="translate(-165.286 -96)" />
+          </svg>
+        </button>
+
+
         <!-- 语言切换下拉菜单 -->
-        <el-dropdown class="h5-language-dropdown" popper-class="language-dropdown-popper" @command="handleLanguageChange" trigger="click">
+        <el-dropdown class="h5-language-dropdown" popper-class="language-dropdown-popper"
+          @command="handleLanguageChange" trigger="click">
           <div class="h5-language-toggle-btn" :title="$t('navbar.language.en') || 'Language'">
             <img :src="languageIcon" alt="language" class="h5-language-icon" />
           </div>
@@ -356,7 +379,7 @@ const handleLanguageChange = (command) => {
   if (!command) return
   locale.value = command
   if (locale.value) {
-  document.documentElement.setAttribute("data-lang", locale.value)
+    document.documentElement.setAttribute("data-lang", locale.value)
   }
   // 保存语言选择到 localStorage
   localStorage.setItem('app-locale', command)
@@ -417,6 +440,10 @@ const handleLogoClick = () => { }
 const handleSearch = () => { }
 const handleDeposit = () => { }
 
+const goMessages = () => {
+  router.push('/messages')
+}
+
 const toggleUserMenu = () => {
   showUserMenu.value = !showUserMenu.value
 }
@@ -458,7 +485,7 @@ const handleLogout = async () => {
     closeUserMenu()
   } catch (error) {
     console.error('断开连接失败:', error)
-  closeUserMenu()
+    closeUserMenu()
   }
 }
 
@@ -737,6 +764,24 @@ onBeforeUnmount(() => {
     flex-shrink: 0;
   }
 
+  /* 消息入口样式（根据主题适配） */
+  .message-entry-btn,
+  .h5-message-entry-btn {
+    background: transparent;
+    border: none;
+    padding: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .message-entry-btn .message-icon,
+  .h5-message-entry-btn .message-icon {
+    color: var(--text-color, #FFFFFF);
+    transition: color 0.2s ease;
+  }
+
   // 语言切换按钮
   .language-dropdown {
     .language-toggle-btn {
@@ -828,6 +873,26 @@ onBeforeUnmount(() => {
 
     .theme-icon {
       font-size: 18px;
+    }
+  }
+
+  // 消息入口按钮
+  .message-entry-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    color: var(--bg-opposite);
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+
+    .message-icon {
+      width: 18px;
+      height: 20px;
+      display: block;
     }
   }
 
@@ -1018,23 +1083,28 @@ onBeforeUnmount(() => {
   background-color: var(--bg-page, #1E1E1E) !important;
   border: 1px solid var(--border-color, #3A3A3A) !important;
 }
+
 /* Element Plus 会按 placement 把部分边框色设为 transparent，这里需要逐方向覆盖 */
 :global(.language-dropdown-popper.el-popper[data-popper-placement^='bottom'] > .el-popper__arrow::before) {
   border-bottom-color: var(--border-color, #3A3A3A) !important;
   border-right-color: var(--border-color, #3A3A3A) !important;
 }
+
 :global(.language-dropdown-popper.el-popper[data-popper-placement^='top'] > .el-popper__arrow::before) {
   border-top-color: var(--border-color, #3A3A3A) !important;
   border-left-color: var(--border-color, #3A3A3A) !important;
 }
+
 :global(.language-dropdown-popper.el-popper[data-popper-placement^='left'] > .el-popper__arrow::before) {
   border-left-color: var(--border-color, #3A3A3A) !important;
   border-bottom-color: var(--border-color, #3A3A3A) !important;
 }
+
 :global(.language-dropdown-popper.el-popper[data-popper-placement^='right'] > .el-popper__arrow::before) {
   border-right-color: var(--border-color, #3A3A3A) !important;
   border-top-color: var(--border-color, #3A3A3A) !important;
 }
+
 /* 兜底：其他下拉保持透明箭头，不影响 */
 :global(.el-dropdown__popper.el-popper > .el-popper__arrow::before) {
   border-color: transparent;
@@ -1251,11 +1321,6 @@ onBeforeUnmount(() => {
     height: 52px;
     background-color: var(--bg-page-h5, #fff);
 
-    // PC端头部在移动端隐藏
-    .header-container {
-      // display: none;
-    }
-
     // 移动端头部显示
     .header-h5 {
       // display: flex;
@@ -1318,6 +1383,28 @@ onBeforeUnmount(() => {
             width: 26px;
             height: 26px;
           }
+        }
+      }
+
+      .h5-message-entry-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: transparent;
+        color: var(--bg-opposite);
+        transition: all 0.2s;
+        flex-shrink: 0;
+        background-color: transparent;
+        padding: 0;
+
+        &:active {
+          transform: scale(0.95);
+        }
+
+        .message-icon {
+          width: 18px;
+          height: 20px;
+          display: block;
         }
       }
     }

@@ -80,13 +80,15 @@ export default {
   },
   bitcoinUpDown: {
     title: "Bitcoin Up or Down",
-    priceToBeat: "PRICE TO BEAT",
-    currentPrice: "CURRENT PRICE",
+    priceToBeat: "목표 가격",
+    currentPrice: "현재 가격",
+    finalPrice: "최종 가격",
     record: "기록",
     positions: "Positions",
     orders: "Orders",
     history: "History",
     up: "Up",
+    down: "Down",
     shares: "주",
     avgPrice: "평균가",
     cost: "비용",
@@ -99,6 +101,14 @@ export default {
     buyDown: "Buy Down",
     min: "분",
     sec: "초",
+    past: "과거",
+    ended: "종료",
+    hrs: "시",
+    mins: "분",
+    secs: "초",
+    volume: "거래량",
+    questionTitle: "이더리움이 2월 27일에 오를까요 내릴까요?",
+    rulesDescription: "본 시장의 FED 금리는 연방기금 목표 범위 상한선으로 정의됩니다."
   },
   link: {
     titel: "지갑 연결",
@@ -289,6 +299,9 @@ export default {
     profile: "Profile",
     settingsTitle: "Settings",
     logout: "Logout",
+  },
+  messages: {
+    title: "메시지",
   },
   home: {
     comingSoon: "예측 시장 오픈 임박",

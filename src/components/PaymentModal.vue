@@ -28,7 +28,7 @@
                         <div class="target-row">
                             <div class="outcome-badge"
                                 :class="{ 'outcome-yes': outcomeBadge === 'yes', 'outcome-no': outcomeBadge === 'no' }">
-                                尼克斯队 | No
+                                尼克斯队 | {{ outcomeBadge === 'yes' ? 'Yes' : 'No' }}
                                 <span class="icon" aria-hidden="true" style="display: inline-flex;"
                                     @click="outcomeBadge = outcomeBadge === 'no' ? 'yes' : 'no'">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="11.997"

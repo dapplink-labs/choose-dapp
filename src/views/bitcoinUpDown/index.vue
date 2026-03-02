@@ -12,7 +12,7 @@
           <el-icon class="trophy-icon">
             <Trophy />
           </el-icon>
-          <span class="top-volume">$153,642,644 Vol.</span>
+          <span class="top-volume">$153,642,644 {{ $t('bitcoinUpDown.volume') }}</span>
         </div>
         <button class="top-btn bookmark-btn" type="button">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -37,7 +37,7 @@
             </svg>
           </div>
           <div class="asset-text">
-            <h2>以太坊在2月27日上涨还是下跌?</h2>
+            <h2>{{ $t('bitcoinUpDown.questionTitle') }}</h2>
           </div>
           <!-- 选中历史记录时隐藏倒计时 -->
           <div class="timer" v-show="activeSegmentMode !== 'past'">
@@ -47,7 +47,7 @@
                   <transition name="fast-roll"><span class="digit unit" :key="char">{{ char }}</span></transition>
                 </span>
               </div>
-              <span class="label">HRS</span>
+              <span class="label">{{ $t('bitcoinUpDown.hrs') }}</span>
             </div>
             <div class="time-block">
               <div class="time-value">
@@ -55,7 +55,7 @@
                   <transition name="fast-roll"><span class="digit unit" :key="char">{{ char }}</span></transition>
                 </span>
               </div>
-              <span class="label">MINS</span>
+              <span class="label">{{ $t('bitcoinUpDown.mins') }}</span>
             </div>
             <div class="time-block">
               <div class="time-value">
@@ -63,7 +63,7 @@
                   <transition name="fast-roll"><span class="digit unit" :key="char">{{ char }}</span></transition>
                 </span>
               </div>
-              <span class="label">SECS</span>
+              <span class="label">{{ $t('bitcoinUpDown.secs') }}</span>
             </div>
           </div>
         </div>
@@ -72,13 +72,13 @@
       <!-- 3. 价格看板 -->
       <div class="price-dashboard">
         <div class="price-item">
-          <div class="label">Price to beat</div>
+          <div class="label">{{ $t('bitcoinUpDown.priceToBeat') }}</div>
           <div class="value">{{ activeSegmentMode === 'future' ? '--' : formatPrice(displayTargetPrice) }}</div>
         </div>
 
         <div class="price-item current">
           <div class="label">
-            {{ activeSegmentMode === 'past' ? 'Final price' : 'Current price' }}
+            {{ activeSegmentMode === 'past' ? $t('bitcoinUpDown.finalPrice') : $t('bitcoinUpDown.currentPrice') }}
             <span v-if="activeSegmentMode !== 'future'" :class="['diff', diffData.status]">
               <span class="svg-icon-wrapper diff-icon" :class="diffData.status">
                 <svg v-if="diffData.status === 'up'" viewBox="0 0 12 12">
@@ -126,7 +126,7 @@
             popper-class="custom-history-dropdown">
             <div class="record-capsule">
               <div class="record-selector">
-                过去 <el-icon>
+                {{ $t('bitcoinUpDown.past') }} <el-icon>
                   <ArrowDown />
                 </el-icon>
               </div>
@@ -168,7 +168,7 @@
           <div class="time-segments">
             <!-- 1. 最左侧：临时生成的历史记录游标 (仅在选择历史且存在时显示) -->
             <span v-if="activeSegmentMode === 'past' && selectedPastRecord" class="time-pill active past-active">
-              Ended: {{ selectedPastRecord.date }}
+              {{ $t('bitcoinUpDown.ended') }}: {{ selectedPastRecord.date }}
             </span>
 
             <!-- 2. 中间：常驻实时按钮 (点击清除历史游标) -->
@@ -197,6 +197,7 @@
           $t('crypto.history') }}</div>
       </div>
 
+      <!-- Positions -->
       <div v-if="activeTab === 'Positions'" class="position-content">
         <div class="pos-card">
           <h3 class="pos-title">{{ $t('crypto.upOrDown') }}</h3>
@@ -223,6 +224,62 @@
         </div>
       </div>
 
+      <!-- Orders -->
+      <div v-else-if="activeTab === 'Orders'" class="orders-content">
+        <div class="orders-header-row">
+          <div class="orders-title">{{ $t('crypto.openOrders') }}</div>
+          <button class="cancel-all-btn" type="button" v-if="openOrders.length" @click="handleCancelAllOrders">
+            {{ $t('crypto.cancelAll') }}
+          </button>
+        </div>
+
+        <div v-if="openOrders.length">
+          <div v-for="order in openOrders" :key="order.id" class="order-row">
+            <div class="order-left">
+              <div class="order-side" :class="order.side">
+                {{ $t('common.buy') }}
+                <span class="side-text">{{ order.side === 'up' ? $t('crypto.up') : $t('crypto.down') }}</span>
+              </div>
+              <div :class="['order-chip', order.side === 'up' ? 'up' : 'down']">
+                <span class="chip-price">{{ order.price }} ¢</span>
+                <span class="chip-sep">|</span>
+                <span class="chip-cost">${{ order.cost }}</span>
+              </div>
+            </div>
+            <div class="order-right">
+              <div>
+                <div class="order-progress">{{ order.filled }}/{{ order.total }}</div>
+                <div class="order-until" v-if="order.untilCancel">{{ $t('crypto.untilCancel') }}</div>
+              </div>
+              <button class="order-cancel-btn" type="button" @click="handleCancelOrder(order.id)" aria-label="cancel">
+                ✕
+              </button>
+            </div>
+          </div>
+        </div>
+        <div v-else class="orders-empty">{{ $t('common.noData') || '暂无数据...' }}</div>
+      </div>
+
+      <!-- History -->
+      <div v-else-if="activeTab === 'History'" class="history-content">
+        <div class="history-header">{{ $t('crypto.history') }}</div>
+        <div v-if="orderHistory.length">
+          <div v-for="item in orderHistory" :key="item.id" class="history-row">
+            <div class="history-main">
+              <div class="history-text">
+                {{ $t('common.buy') }}
+                <span class="history-side" :class="item.side">
+                  {{ item.shares }} {{ item.side === 'up' ? $t('crypto.up') : $t('crypto.down') }}
+                </span>
+                at {{ item.price }}¢ <span class="muted">(${{ item.notional }})</span>
+              </div>
+            </div>
+            <div class="history-time">{{ item.timeAgo }}</div>
+          </div>
+        </div>
+        <div v-else class="orders-empty">{{ $t('common.noData') || '暂无数据...' }}</div>
+      </div>
+
       <div class="orderbook-header" @click="isBookOpen = !isBookOpen">
         <span>{{ $t('sports.orderBook') }}</span>
         <div class="header-right">
@@ -232,6 +289,7 @@
           </el-icon>
         </div>
       </div>
+
       <div v-if="isBookOpen" class="book-body">
         <div class="orderbook-tabs">
           <button class="orderbook-tab" :class="{ active: orderBookTab === 'yes' }" @click="orderBookTab = 'yes'">{{
@@ -244,15 +302,21 @@
 
       <div class="rules-footer">
         <h4>{{ $t('detail.rules') }}</h4>
-        <p>The FED interest rates are defined in this market by the upper bound of the target federal funds range.</p>
+        <p>{{ $t('bitcoinUpDown.rulesDescription') }}</p>
       </div>
     </div>
 
     <!-- 吸底操作栏 -->
     <div class="bottom-dock-actions">
-      <button class="trade-btn up">{{ $t('common.buy') }} {{ $t('crypto.up') }} 96 ¢</button>
-      <button class="trade-btn down">{{ $t('common.buy') }} {{ $t('crypto.down') }} 4 ¢</button>
+      <button class="trade-btn up" type="button" @click="openPayment('up')">
+        {{ $t('common.buy') }} {{ $t('crypto.up') }} 96 ¢
+      </button>
+      <button class="trade-btn down" type="button" @click="openPayment('down')">
+        {{ $t('common.buy') }} {{ $t('crypto.down') }} 4 ¢
+      </button>
     </div>
+
+    <PaymentModal v-model="showPayment" />
   </div>
 </template>
 
@@ -263,6 +327,7 @@ import { useI18n } from 'vue-i18n'
 import { ArrowLeft, ArrowDown, Trophy } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import OrderBookMobile from '@/components/OrderBookMobile.vue'
+import PaymentModal from '@/components/PaymentModal.vue'
 import { useThemeStore } from '@/stores/theme'
 
 const { t } = useI18n()
@@ -273,6 +338,31 @@ const handleBack = () => router.back()
 const activeTab = ref('Positions')
 const isBookOpen = ref(false)
 const orderBookTab = ref('yes')
+
+const openOrders = ref([
+  { id: 1, side: 'down', price: 80, cost: 40, filled: 0, total: 50, untilCancel: true },
+  { id: 2, side: 'down', price: 80, cost: 40, filled: 0, total: 50, untilCancel: true }
+])
+
+const orderHistory = ref([
+  { id: 1, side: 'up', shares: 40, price: 80, notional: 32, timeAgo: '4分钟前' },
+  { id: 2, side: 'down', shares: 40, price: 80, notional: 32, timeAgo: '4分钟前' }
+])
+
+const handleCancelAllOrders = () => {
+  openOrders.value = []
+}
+
+const handleCancelOrder = (id) => {
+  openOrders.value = openOrders.value.filter(o => o.id !== id)
+}
+
+const showPayment = ref(false)
+const selectedTradeSide = ref(null) // 'up' | 'down'
+const openPayment = (side) => {
+  selectedTradeSide.value = side
+  showPayment.value = true
+}
 
 // --- 吸顶逻辑 ---
 const isSticky = ref(false)
@@ -502,8 +592,8 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
-$hot-pink: #E44096;
-$neon-green: #19d96b;
+$hot-pink: var(--text-color-n);
+$neon-green: var(--text-color-y);
 $primary-blue: #5073e5;
 
 .bitcoin-up-down-page {
@@ -940,6 +1030,175 @@ $primary-blue: #5073e5;
 .orders-content,
 .history-content {
   margin-bottom: 20px;
+}
+
+.orders-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+
+  .orders-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--bg-opposite);
+  }
+
+  .cancel-all-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-color-n);
+    font-size: 13px;
+    cursor: pointer;
+  }
+}
+
+.order-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-color);
+
+  .order-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .order-side {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--bg-opposite);
+  }
+
+  .order-chip {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--button-bg-n);
+    color: var(--text-color-n);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .order-right {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-direction: row;
+    font-size: 12px;
+    color: var(--text-dark-gray);
+  }
+
+  .order-progress {
+    font-weight: 500;
+  }
+
+  .order-until {
+    white-space: nowrap;
+  }
+
+  .order-cancel-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-dark-gray);
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  /* stacked progress block on right */
+  .order-right>div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    margin-right: 6px;
+  }
+
+  .order-chip.up {
+    background: $neon-green;
+    color: #000;
+  }
+
+  .order-chip.down {
+    background: $hot-pink;
+    color: #fff;
+  }
+
+  .order-chip .chip-price,
+  .order-chip .chip-cost {
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .order-chip .chip-sep {
+    margin: 0 6px;
+    opacity: 0.9;
+  }
+
+  // History 方向高亮颜色（只给 Up/Down 文案上色）
+  .history-side.up {
+    color: $neon-green;
+  }
+
+  .history-side.down {
+    color: $hot-pink;
+  }
+
+}
+
+.orders-empty {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-dark-gray);
+  padding: 24px 0;
+}
+
+.history-header {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--bg-opposite);
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.history-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-color);
+
+  .history-text {
+    font-size: 14px;
+    color: var(--bg-opposite);
+  }
+
+  .history-side {
+    font-weight: 600;
+    margin-right: 4px;
+
+    &.up {
+      color: var(--text-color-y);
+    }
+
+    &.down {
+      color: var(--text-color-n);
+    }
+  }
+
+  .history-time {
+    font-size: 12px;
+    color: var(--text-dark-gray);
+    white-space: nowrap;
+  }
+}
+
+// 括号内金额灰色（提高优先级，且放在最后保证覆盖）
+.history-row .history-text .muted {
+  color: var(--text-dark-gray);
 }
 
 .pos-card {
