@@ -50,8 +50,8 @@
                 <div class="textarea-wrapper">
                     <textarea v-model="formData.content" class="custom-textarea"
                         :placeholder="t('feedback.contentPlaceholder')" maxlength="500"></textarea>
-                    <span class="char-count">{{ formData.content.length }}/500</span>
                 </div>
+                <span class="char-count">{{ formData.content.length }}/500</span>
             </div>
 
             <div class="form-group">
@@ -247,6 +247,7 @@ const handleSubmit = async () => {
 
 .form-group {
     margin-bottom: 24px;
+    position: relative;
 }
 
 .form-label {
@@ -328,11 +329,12 @@ const handleSubmit = async () => {
     height: 160px;
     background: transparent;
     border: none;
-    color: #fff;
+    color: var(--text-color, #fff);
     padding: 16px;
     resize: none;
     font-size: 14px;
     outline: none;
+    box-sizing: border-box;
 
     &::placeholder {
         color: #666;
@@ -342,7 +344,6 @@ const handleSubmit = async () => {
 .char-count {
     position: absolute;
     right: 16px;
-    bottom: 16px;
     font-size: 12px;
     color: #666;
 }
