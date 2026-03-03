@@ -33,6 +33,8 @@ export default {
     claimSuccessTitle: "おめでとうございます",
     withdrawFee: "出金手数料(1%)",
     winnerFee: "勝者手数料(3%)",
+    lost: "未的中",
+    claimed: "受取済み",
   },
   "withdraw": {
     "title": "出金",
@@ -197,6 +199,10 @@ export default {
       "We are working hard to build new features and bring you an even better experience",
     soon: "Stay tuned · Exciting things coming soon",
     btn: "Got it",
+  },
+  messages: {
+    title: "メッセージ",
+    detailTitle: "メッセージ詳細",
   },
   teamTree: {
     pathHeader: "Me → Direct → Indirect",

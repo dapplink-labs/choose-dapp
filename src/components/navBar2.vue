@@ -66,7 +66,8 @@ const navItems = [
   { key: 'esports', label: '电子竞技', path: null },
   { key: 'sports', label: '体育', path: '/sports-events-h5' }, 
   { key: 'finance', label: '经济', path: null }, 
-  { key: 'crypto', label: '加密货币', path: '/bitcoin-up-down' },
+  // 加密货币：作为 /home 的一个筛选场景，由 query.nav=crypto 控制
+  { key: 'crypto', label: '加密货币', path: null },
   { key: 'company', label: '公司', path: null },
   { key: 'popularCulture', label: '流行文化', path: null },
   { key: 'technology', label: '技术', path: null },
@@ -173,13 +174,24 @@ const handleNavClick = (key) => {
     return
   }
 
-  // 筛选按钮：通过路由 query 控制页面状态（目前只按需处理电子竞技）
+  // 筛选按钮：通过路由 query 控制页面状态（目前处理电子竞技与加密货币）
   if (key === 'esports') {
     router.push({
       path: '/home',
       query: { nav: 'esports' },
     })
     // 聚焦到选中的按钮
+    nextTick(() => {
+      focusActiveNav()
+    })
+    return
+  }
+
+  if (key === 'crypto') {
+    router.push({
+      path: '/home',
+      query: { nav: 'crypto' },
+    })
     nextTick(() => {
       focusActiveNav()
     })

@@ -165,6 +165,15 @@ const router = createRouter({
       },
     },
     {
+      path: "/message-detail",
+      name: "messageDetail",
+      component: () => import("../views/messagesDetail/index.vue"),
+      meta: {
+        hideHeader: true,
+        hideFooterNav: true,
+      },
+    },
+    {
       path: "/accuracy",
       name: "accuracy",
       component: accuracy,

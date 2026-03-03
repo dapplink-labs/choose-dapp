@@ -212,11 +212,21 @@ function openDatePicker() {
 }
 
 function handleDateConfirm(payload) {
+    if (!payload) return
     selectedDateRange.value = payload
-    // 仅用日期部分作为标签，例如：2026/01/01-2026/01/30
-    const start = payload.startDateStr.split(' ')[0]
-    const end = payload.endDateStr.split(' ')[0]
-    customDateLabel.value = `${start}-${end}`
+    // 仅用日期部分作为标签；兼容 startDateStr/endDateStr 或 startDate/endDate
+    const startStr = payload.startDateStr ?? (payload.startDate ? formatDateForLabel(payload.startDate) : '')
+    const endStr = payload.endDateStr ?? (payload.endDate ? formatDateForLabel(payload.endDate) : '')
+    const start = startStr ? startStr.split(' ')[0] : ''
+    const end = endStr ? endStr.split(' ')[0] : ''
+    customDateLabel.value = start && end ? `${start}-${end}` : customDateLabel.value
+}
+
+function formatDateForLabel(date) {
+    const d = date instanceof Date ? date : new Date(date)
+    if (isNaN(d.getTime())) return ''
+    const f = (n) => String(n).padStart(2, '0')
+    return `${d.getFullYear()}/${f(d.getMonth() + 1)}/${f(d.getDate())}`
 }
 
 function handleClickOutside(event) {

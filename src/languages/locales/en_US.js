@@ -33,6 +33,8 @@ export default {
     claimSuccessTitle: "Congratulations",
     withdrawFee: "Withdrawal fee (1%)",
     winnerFee: "Winner rake (3%)",
+    lost: "Lost",
+    claimed: "Claimed",
   },
   withdraw: {
     title: "Withdraw",
@@ -197,6 +199,10 @@ export default {
       "We are working hard to build new features and bring you an even better experience",
     soon: "Stay tuned · Exciting things coming soon",
     btn: "Got it",
+  },
+  messages: {
+    title: "Messages",
+    detailTitle: "Message Detail",
   },
   teamTree: {
     pathHeader: "Me → Direct → Indirect",

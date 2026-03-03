@@ -33,6 +33,8 @@ export default {
     claimSuccessTitle: "축하합니다",
     withdrawFee: "출금 수수료(1%)",
     winnerFee: "승자 수수료(3%)",
+    lost: "미적중",
+    claimed: "수령함",
   },
   withdraw: {
     title: "출금",
@@ -197,6 +199,10 @@ export default {
       "We are working hard to build new features and bring you an even better experience",
     soon: "Stay tuned · Exciting things coming soon",
     btn: "Got it",
+  },
+  messages: {
+    title: "메시지",
+    detailTitle: "메시지 상세",
   },
   teamTree: {
     pathHeader: "Me → Direct → Indirect",

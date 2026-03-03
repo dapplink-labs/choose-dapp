@@ -33,6 +33,8 @@ export default {
     claimSuccessTitle: "恭喜获得",
     withdrawFee: "提现手续费(1%)",
     winnerFee: "赢家抽水(3%)",
+    lost: "未中",
+    claimed: "已领取",
   },
   "withdraw": {
     "title": "提币",
@@ -300,6 +302,7 @@ export default {
   },
   messages: {
     title: "消息",
+    detailTitle: "消息详情",
   },
   "home": {
     "comingSoon": "预测市场即将开放",

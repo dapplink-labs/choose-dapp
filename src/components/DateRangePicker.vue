@@ -303,7 +303,9 @@ function handleConfirm() {
   triggerHaptic()
   emit('confirm', {
     startDate: startDate.value,
-    endDate: endDate.value
+    endDate: endDate.value,
+    startDateStr: formatDisplayDate(startDate.value),
+    endDateStr: formatDisplayDate(endDate.value)
   })
   handleClose()
 }

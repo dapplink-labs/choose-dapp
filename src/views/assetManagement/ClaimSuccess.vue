@@ -72,7 +72,7 @@ const { t } = useI18n()
 
 const props = defineProps({
   modelValue: Boolean,
-  amount: { type: String, default: '1000.26' },
+  amount: { type: [String, Number], default: '1000.26' },
   tokenSymbol: { type: String, default: 'USDT' }
 })
 
