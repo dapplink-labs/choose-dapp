@@ -3,7 +3,7 @@ import { defineConfig } from 'vite'
 import { fileURLToPath, URL } from 'node:url'
 // https://vitejs.dev/config/
 export default defineConfig({
-  base:"./",
+  base: "./",
   plugins: [vue()],
   server: {
     host: '0.0.0.0', // 允许外部访问，通常用于 Docker 或云环境
@@ -12,10 +12,16 @@ export default defineConfig({
     cors: true, // 允许跨域请求
     proxy: {
       "/api": {
-        target: "https://bridge-api-testnet.cpchain.com/api",
+        target: "https://eventapi.roothashpay.com",
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
+      },
+      "/eventapi": {
+        target: "https://eventapi.roothashpay.com",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/eventapi/, ""),
       }
     },
   },
