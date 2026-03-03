@@ -28,7 +28,7 @@
                         <div class="target-row">
                             <div class="outcome-badge"
                                 :class="{ 'outcome-yes': outcomeBadge === 'yes', 'outcome-no': outcomeBadge === 'no' }">
-                                尼克斯队 | {{ outcomeBadge === 'yes' ? 'Yes' : 'No' }}
+                                尼克斯队 | {{ outcomeBadge === 'yes' ? $t('common.yes') : $t('common.no') }}
                                 <span class="icon" aria-hidden="true" style="display: inline-flex;"
                                     @click="outcomeBadge = outcomeBadge === 'no' ? 'yes' : 'no'">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="11.997"
@@ -111,7 +111,7 @@
 
                     <!-- 7. 执行按钮 -->
                     <button class="execute-btn" @click="handleConfirm">
-                        {{ $t('payment.buyNo') }}
+                        {{ executeLabel }}
                     </button>
                 </div>
             </div>
@@ -128,16 +128,27 @@ const { t } = useI18n()
 const props = defineProps({ modelValue: Boolean })
 const emit = defineEmits(['update:modelValue'])
 
-const activeSide = ref('buy')
+const activeSide = ref('buy') // 'buy' | 'sell'
 const orderType = ref('limit')
 const price = ref(48)
 const shares = ref(100)
 const leverage = ref(2)
-const outcomeBadge = ref('no') // 'yes' or 'no'
+const outcomeBadge = ref('no') // 'yes' | 'no'
 
 const totalCost = computed(() => ((price.value * shares.value) / 100).toFixed(2))
 const potentialGain = computed(() => shares.value.toFixed(2))
 const averagePrice = computed(() => price.value)
+
+// 执行按钮文案：buy yes / buy no / sell yes / sell no
+const executeLabel = computed(() => {
+    const sideText = activeSide.value === 'buy'
+        ? (t('payment.buy') || t('common.buy') || 'Buy')
+        : (t('payment.sell') || t('common.sell') || 'Sell')
+    const ynText = outcomeBadge.value === 'yes'
+        ? (t('common.yes') || 'Yes')
+        : (t('common.no') || 'No')
+    return `${sideText} ${ynText}`
+})
 
 function adjustShares(val) {
     shares.value = Math.max(0, shares.value + val)
@@ -166,7 +177,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
     color: var(--bg-opposite);
     font-family: sans-serif;
     overflow-y: auto;
-    max-height: 70vh;
+    max-height: 80vh;
     position: relative;
 }
 

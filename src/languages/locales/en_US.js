@@ -288,6 +288,8 @@ export default {
     price: "Price",
     time: "Time",
     resolve: "Resolve",
+    yes: "Yes",
+    no: "No",
     amount: "Amount",
     all: "All",
     success: "Successful",

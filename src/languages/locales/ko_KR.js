@@ -288,6 +288,8 @@ export default {
     price: "가격",
     time: "Time",
     resolve: "해결",
+    yes: "Yes",
+    no: "No",
     amount: "Amount",
     all: "All",
     success: "Successful",

@@ -94,3 +94,8 @@ export const getNoticeData = (data) => {
 export const markAnnouncementAsRead = (data) => {
     return request.post('/api/v2/announcement/read', data)
 }
+
+// 获取首页轮播图
+export const getHomeBanner = (data) => {
+    return request.get('/api/v1/banner/list', { params: data })
+}
