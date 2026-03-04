@@ -97,6 +97,30 @@
                         <p class="leverage-tip">{{ $t('payment.maxLeverageTip') }}</p>
                     </div>
 
+                    <!-- 5.1 设置过期时间 -->
+                    <div class="input-section expiry-section">
+                        <div class="expiry-header">
+                            <label class="input-label">{{ $t('payment.expiration') }}</label>
+                            <button type="button" class="expiry-switch" :class="{ on: enableExpiry }"
+                                @click="enableExpiry = !enableExpiry" aria-label="toggle expiration">
+                                <span class="knob" />
+                            </button>
+                        </div>
+
+                        <div v-if="enableExpiry" class="expiry-pills">
+                            <button v-for="opt in expiryOptions" :key="opt.key" type="button" class="expiry-pill"
+                                :class="{ active: expiryPreset === opt.key }" @click="expiryPreset = opt.key">
+                                {{ opt.label }}
+                            </button>
+                        </div>
+
+                        <div v-if="enableExpiry && expiryPreset === 'custom'" class="expiry-custom">
+                            <input v-model.number="customExpiryMinutes" type="number" min="1" step="1"
+                                class="expiry-input" />
+                            <span class="expiry-unit">{{ $t('payment.expiryMinutes') }}</span>
+                        </div>
+                    </div>
+
                     <!-- 6. 结算汇总 -->
                     <div class="summary-section">
                         <div class="summary-row">
@@ -134,6 +158,18 @@ const price = ref(48)
 const shares = ref(100)
 const leverage = ref(2)
 const outcomeBadge = ref('no') // 'yes' | 'no'
+const enableExpiry = ref(false)
+const expiryPreset = ref('5m') // '5m' | '1h' | '12h' | '24h' | 'eod' | 'custom'
+const customExpiryMinutes = ref(5)
+
+const expiryOptions = computed(() => ([
+    { key: '5m', label: t('payment.expiry5m') || '5m' },
+    { key: '1h', label: t('payment.expiry1h') || '1h' },
+    { key: '12h', label: t('payment.expiry12h') || '12h' },
+    { key: '24h', label: t('payment.expiry24h') || '24h' },
+    { key: 'eod', label: t('payment.expiryEod') || 'EOD' },
+    { key: 'custom', label: t('payment.expiryCustom') || 'Custom' },
+]))
 
 const totalCost = computed(() => ((price.value * shares.value) / 100).toFixed(2))
 const potentialGain = computed(() => shares.value.toFixed(2))
@@ -331,7 +367,6 @@ function handleConfirm() { console.log('Trade Confirmed') }
     flex-wrap: wrap; // 方便提示文字换行
 
     .input-label {
-        width: 50px;
         font-size: 15px;
         font-weight: bold;
         color: var(--text-dark-gray);
@@ -472,6 +507,108 @@ function handleConfirm() { console.log('Trade Confirmed') }
     width: 100%;
     flex-basis: 100%; // 在 flex 容器中独占一整行
     border-bottom: 1px solid var(--border-color);
+}
+
+/* 过期时间 */
+.expiry-section {
+    margin-top: 14px;
+}
+
+.expiry-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.expiry-switch {
+    width: 52px;
+    height: 30px;
+    border-radius: 999px;
+    border: none;
+    background: #2F2F2F;
+    position: relative;
+    padding: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    .knob {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 24px;
+        height: 24px;
+        border-radius: 999px;
+        background: #ffffff;
+        transition: transform 0.2s ease;
+    }
+
+    &.on {
+        background: var(--text-color-y);
+        .knob {
+            transform: translateX(22px);
+        }
+    }
+}
+
+.expiry-pills {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.expiry-pill {
+    min-width: 60px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #2F2F2F;
+    color: var(--text-dark-gray);
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0.8;
+    cursor: pointer;
+
+    &.active {
+        background: var(--button-bg-y);
+        color: var(--text-color-y);
+        opacity: 1;
+    }
+}
+
+.expiry-custom {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.expiry-input {
+    width: 96px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--bg-opposite);
+    text-align: right;
+    padding: 0 10px;
+    font-size: 14px;
+    outline: none;
+}
+
+.expiry-unit {
+    font-size: 12px;
+    color: var(--text-dark-gray);
 }
 
 /* 汇总 */

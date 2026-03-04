@@ -124,6 +124,9 @@
                             </div>
                             <div class="outcome-chance">{{ outcome.chance }}%</div>
                         </div>
+                        <div class="outcome-divider">
+                            <span class="no">No 10 ·98.7 ¢</span>
+                        </div>
                         <div class="outcome-actions">
                             <button class="outcome-btn yes-btn" :class="{ active: outcome.selected === 'yes' }"
                                 @click="selectOutcome(index, 'yes')">
@@ -160,7 +163,7 @@
                             </div>
                             <span class="view-results-status">{{ item.result === 'yes' ? $t('detail.resultYes') :
                                 $t('detail.resultNo')
-                                }}</span>
+                            }}</span>
                         </div>
                     </div>
                 </transition>
@@ -746,6 +749,24 @@ onUnmounted(() => { clearInterval(countdownTimer); chartInstance.value?.dispose(
             .outcome-chance {
                 font-size: 18px;
                 font-weight: 800;
+            }
+        }
+
+        .outcome-divider {
+            font-size: 12px;
+            margin-bottom: 12px;
+
+            span{
+                padding: 2px 6px;
+                border-radius: 6px;
+            }
+            span.yes {
+                color: var(--text-color-y);
+                background: var(--button-bg-y);
+            }
+            span.no {
+                color: var(--text-color-n);
+                background: var(--button-bg-n);
             }
         }
 

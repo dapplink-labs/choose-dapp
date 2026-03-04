@@ -349,8 +349,8 @@ async function getNotice() {
 
 // 获取首页轮播图
 async function getHomeBannerList() {
-    const response = await getHomeBanner({ language: currentLocale, limit: 4 });
-    console.log(response);
+    // const response = await getHomeBanner({ language: currentLocale, limit: 4 });
+    // console.log(response);
 }
 
 
