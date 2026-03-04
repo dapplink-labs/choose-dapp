@@ -298,7 +298,7 @@ const baseOthersItems = computed(() => [
     label: t("userInfo.github"),
     icon: getIcon("17"),
     iconDark: getIcon("17Dark"),
-    path: "https://github.com/Prediction333/event-contracts",
+    href: "https://github.com/Prediction333/event-contracts",
   },
   {
     key: "technical-support",
