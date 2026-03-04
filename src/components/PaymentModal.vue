@@ -200,7 +200,7 @@ function handleConfirm() { console.log('Trade Confirmed') }
     inset: 0;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
-    z-index: 2000;
+    z-index: 3000;
     display: flex;
     align-items: flex-end;
 }

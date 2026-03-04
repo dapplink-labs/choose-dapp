@@ -105,9 +105,15 @@
         </div>
         <!-- 底部预测操作栏 -->
         <div class="bottom-dock-actions">
-            <button class="trade-btn up">{{ $t('common.buy') }} {{ $t('crypto.up') }} 96 ¢</button>
-            <button class="trade-btn down">{{ $t('common.buy') }} {{ $t('crypto.down') }} 4 ¢</button>
+            <button class="trade-btn up" type="button" @click="openPaymentModal('up')">
+                {{ $t('common.buy') }} {{ $t('crypto.up') }} 96 ¢
+            </button>
+            <button class="trade-btn down" type="button" @click="openPaymentModal('down')">
+                {{ $t('common.buy') }} {{ $t('crypto.down') }} 4 ¢
+            </button>
         </div>
+
+        <PaymentModal v-model="paymentModalVisible" />
     </div>
 </template>
 
@@ -119,6 +125,7 @@ import { ArrowLeft, Trophy } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import logoIcon from '@/assets/icon/logoIcon.png'
 import OrderBookMobile from '@/components/OrderBookMobile.vue'
+import PaymentModal from '@/components/PaymentModal.vue'
 import { useThemeStore } from '@/stores/theme'
 
 const { t } = useI18n()
@@ -241,6 +248,9 @@ const showHighlightBubble = ref(true)
 const infoBoxStyle = ref({ display: 'none' })
 const currentPrice = ref(95.4)
 const handleIndex = ref(0)
+
+const paymentModalVisible = ref(false)
+const lastTradeDirection = ref('up') // 'up' | 'down' (预留：后续可传给 PaymentModal)
 
 // 图表颜色配置
 const chartColors = computed(() => ({
@@ -461,6 +471,11 @@ onUnmounted(() => {
 
 const handleBack = () => {
     router.back()
+}
+
+const openPaymentModal = (direction) => {
+    lastTradeDirection.value = direction
+    paymentModalVisible.value = true
 }
 </script>
 
