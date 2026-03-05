@@ -15,126 +15,136 @@
         </div>
 
         <div class="feedback-tabs">
-            <div class="tab-item" :class="{ active: activeTab === 'all' }" @click="activeTab = 'all'">
+            <div class="tab-item" :class="{ active: activeTab === 'all' }" @click="changeTab('all')">
                 {{ t("feedback.all") }}
             </div>
-            <div class="tab-item" :class="{ active: activeTab === 'replied' }" @click="activeTab = 'replied'">
+            <div class="tab-item" :class="{ active: activeTab === 'replied' }" @click="changeTab('replied')">
                 {{ t("feedback.replied") }}
             </div>
-            <div class="tab-item" :class="{ active: activeTab === 'pending' }" @click="activeTab = 'pending'">
+            <div class="tab-item" :class="{ active: activeTab === 'submitted' }" @click="changeTab('submitted')">
                 {{ t("feedback.pendingReply") }}
             </div>
         </div>
 
-        <div class="feedback-content">
-            <div v-if="loading" class="loading-state">
-                Loading...
-            </div>
-            <div v-else-if="filteredList.length === 0" class="empty-state">
+        <div class="feedback-content" v-infinite-scroll="loadMore" :infinite-scroll-disabled="loading || finished"
+            :infinite-scroll-distance="10">
+            <div v-if="list.length === 0 && !loading" class="empty-state">
                 <img src="@/assets/images/empty.png" alt="empty" />
                 <p>{{ t("feedback.noData") }}</p>
             </div>
             <div v-else class="list-container">
-                <div v-for="item in filteredList" :key="item.id" class="feedback-item">
+                <div v-for="item in list" :key="item.guid" class="feedback-item">
                     <div class="item-header">
                         <div class="user-info">
                             <img class="avatar" src="@/assets/icon/LP1.png" alt="avatar" />
                             <div class="user-details">
-                                <span class="address">{{ shortenAddress(item.address) }}</span>
-                                <span class="time">{{ item.createTime }}</span>
+                                <span class="address">{{ shortenAddress(item.user_address) }}</span>
+                                <span class="time">{{ formatDate(item.created) }}</span>
                             </div>
                         </div>
-                        <div class="status-tag" :class="item.status === 'replied' ? 'replied' : 'pending'">
-                            {{ item.status === 'replied' ? t("feedback.replied") : t("feedback.submitted") }}
+                        <div class="status-tag" :class="item.reply_status === 'replied' ? 'replied' : 'pending'">
+                            {{ item.reply_status === 'replied' ? t("feedback.replied") : t("feedback.submitted") }}
                         </div>
                     </div>
 
                     <div class="item-type">
-                        {{ item.type }}
+                        {{ item.feedback_type }}
                     </div>
 
                     <div class="item-content">
                         {{ item.content }}
                     </div>
 
-                    <div class="item-images" v-if="item.images && item.images.length">
-                        <img v-for="(img, index) in item.images" :key="index" :src="img" class="feedback-img"
-                            @click="previewImage(img)" />
+                    <div class="item-images" v-if="item.attachments && item.attachments.length">
+                        <img v-for="(img, index) in item.attachments" :key="index" :src="img.image_url"
+                            class="feedback-img" @click="previewImage(img.image_url)" />
                     </div>
 
-                    <div class="reply-section" v-if="item.reply">
+                    <div class="reply-section" v-if="item.replies && item.replies.length">
                         <div class="reply-header">
                             <img src="@/assets/icon/LP1.png" class="reply-avatar" />
                             <span class="reply-name">{{ t("feedback.adminName") }}</span>
                         </div>
-                        <div class="reply-content">
-                            {{ item.reply }}
+                        <div v-for="(reply, rIndex) in item.replies" :key="rIndex" class="reply-content">
+                            {{ reply.content }}
+                            <div class="reply-time">{{ formatDate(reply.created) }}</div>
                         </div>
                     </div>
                 </div>
+                <div v-if="loading" class="loading-more">Loading...</div>
+                <div v-if="finished && list.length > 0" class="no-more">No more data</div>
             </div>
         </div>
+        <el-image-viewer v-if="showViewer" @close="closeViewer" :url-list="previewUrlList"
+            :initial-index="initialIndex" />
     </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue"
+import { ref, computed, onMounted, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useI18n } from "vue-i18n"
-import { getFeedbackList } from "@/api/feedback"
+import { getFeedbackListV2 } from "@/api/feedback"
+import { useAccount } from '@wagmi/vue'
+import dayjs from 'dayjs'
 
 const router = useRouter()
 const { t } = useI18n()
+const { address } = useAccount()
 
 const activeTab = ref('all')
 const list = ref([])
 const loading = ref(false)
+const finished = ref(false)
+const page = ref(1)
+const pageSize = ref(20)
 
-// Mock data for testing if API fails
-const mockData = [
-    {
-        id: 1,
-        address: '0xb574...4c7d',
-        createTime: '2025-09-01 10:23',
-        status: 'replied',
-        type: '质押收益',
-        content: '我的团队收益一直显示为0，直推收益也是一样，速度帮我查看下，到底是什么原因',
-        images: [
-            // Add some placeholder images if needed
-        ],
-        reply: '您好，质押收益采用周期结算机制，并非实时发放。当前产品为 T+1 结算模式，收益将在每日结算后自动发放至您的账户余额，请您耐心等待。如超过结算时间仍未到账，请联系客服进一步核查。'
-    },
-    {
-        id: 2,
-        address: '0xb574...4c7d',
-        createTime: '2025-09-01 10:23',
-        status: 'pending',
-        type: '质押收益',
-        content: '我的团队收益一直显示为0，直推收益也是一样，速度帮我查看下，到底是什么原因',
-        images: []
-    }
-]
+// Image preview
+const showViewer = ref(false)
+const previewUrlList = ref([])
+const initialIndex = ref(0)
 
-const filteredList = computed(() => {
-    if (activeTab.value === 'all') return list.value
-    if (activeTab.value === 'replied') return list.value.filter(item => item.status === 'replied')
-    if (activeTab.value === 'pending') return list.value.filter(item => item.status !== 'replied')
-    return list.value
-})
+const changeTab = (tab) => {
+    if (activeTab.value === tab) return
+    activeTab.value = tab
+    page.value = 1
+    list.value = []
+    finished.value = false
+    loading.value = false // Reset loading state
+    loadMore()
+}
 
-const fetchData = async () => {
+const loadMore = async () => {
+    if (loading.value || finished.value) return
     loading.value = true
+
     try {
-        const res = await getFeedbackList()
-        if (res.code === 200) {
-            list.value = res.data || []
+        const params = {
+            address: address.value,
+            reply_status: activeTab.value,
+            page: page.value,
+            page_size: pageSize.value
+        }
+        
+        const res = await getFeedbackListV2(params)
+        
+        if (res.data && res.data.success) {
+            const newList = res.data.data.list || []
+            if (newList.length < pageSize.value) {
+                finished.value = true
+            }
+            if (page.value === 1) {
+                list.value = newList
+            } else {
+                list.value = list.value.concat(newList)
+            }
+            page.value++
         } else {
-            // Fallback to mock for demo
-            list.value = mockData
+            finished.value = true
         }
     } catch (error) {
         console.error(error)
-        list.value = mockData
+        finished.value = true
     } finally {
         loading.value = false
     }
@@ -146,13 +156,35 @@ const shortenAddress = (addr) => {
     return addr.slice(0, 6) + '...' + addr.slice(-4)
 }
 
-const previewImage = (url) => {
-    // Implement preview logic
-    // Usually open a modal or use a library like el-image-viewer
+const formatDate = (timestamp) => {
+    if (!timestamp) return ''
+    return dayjs(timestamp * 1000).format('YYYY-MM-DD HH:mm')
 }
 
+const previewImage = (url) => {
+    previewUrlList.value = [url]
+    initialIndex.value = 0
+    showViewer.value = true
+}
+
+const closeViewer = () => {
+    showViewer.value = false
+}
+
+// Watch address change to reload
+watch(address, (newAddr) => {
+    if (newAddr) {
+        page.value = 1
+        list.value = []
+        finished.value = false
+        loadMore()
+    }
+})
+
 onMounted(() => {
-    fetchData()
+    // Initial load handled by v-infinite-scroll immediate-check (default true)
+    // Or call loadMore manually if needed, but usually v-infinite-scroll triggers it
+    // loadMore()
 })
 </script>
 
@@ -352,8 +384,28 @@ onMounted(() => {
             font-size: 14px;
             color: var(--text-gray);
             line-height: 1.5;
+            margin-bottom: 8px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            .reply-time {
+                font-size: 12px;
+                color: #666;
+                margin-top: 4px;
+                text-align: right;
+            }
         }
     }
+}
+
+.loading-more,
+.no-more {
+    text-align: center;
+    padding: 16px;
+    color: var(--text-gray);
+    font-size: 14px;
 }
 
 .empty-state {
