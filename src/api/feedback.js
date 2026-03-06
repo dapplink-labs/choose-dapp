@@ -19,7 +19,8 @@ export const uploadFile = (data) => {
     })
 }
 
-// Get feedback types (optional)
-export const getFeedbackTypes = () => {
-    return request.get('/api/v1/feedback/types')
+// Get feedback types V2
+export const getFeedbackTypesV2 = (params) => {
+    return request.get('/api/v2/feedback/types', { params })
 }
+

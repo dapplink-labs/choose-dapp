@@ -48,7 +48,7 @@
                     </div>
 
                     <div class="item-type">
-                        {{ item.feedback_type }}
+                        {{ getFeedbackTypeName(item.feedback_type) }}
                     </div>
 
                     <div class="item-content">
@@ -84,12 +84,12 @@
 import { ref, computed, onMounted, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useI18n } from "vue-i18n"
-import { getFeedbackListV2 } from "@/api/feedback"
+import { getFeedbackListV2, getFeedbackTypesV2 } from "@/api/feedback"
 import { useAccount } from '@wagmi/vue'
 import dayjs from 'dayjs'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { address } = useAccount()
 
 const activeTab = ref('all')
@@ -98,6 +98,32 @@ const loading = ref(false)
 const finished = ref(false)
 const page = ref(1)
 const pageSize = ref(20)
+
+// Feedback types
+const feedbackTypes = ref({})
+
+const fetchFeedbackTypes = async () => {
+    try {
+        const lang = (locale.value || 'zh-cn').toLowerCase()
+        const res = await getFeedbackTypesV2({ language_code: lang })
+        if (res.data && res.data.success) {
+            // Convert array to object for easy lookup: { code: name }
+            const types = {}
+            if (Array.isArray(res.data.data)) {
+                res.data.data.forEach(item => {
+                    types[item.code] = item.name
+                })
+            }
+            feedbackTypes.value = types
+        }
+    } catch (error) {
+        console.error('Failed to fetch feedback types:', error)
+    }
+}
+
+const getFeedbackTypeName = (code) => {
+    return feedbackTypes.value[code] || code
+}
 
 // Image preview
 const showViewer = ref(false)
@@ -182,9 +208,8 @@ watch(address, (newAddr) => {
 })
 
 onMounted(() => {
+    fetchFeedbackTypes()
     // Initial load handled by v-infinite-scroll immediate-check (default true)
-    // Or call loadMore manually if needed, but usually v-infinite-scroll triggers it
-    // loadMore()
 })
 </script>
 

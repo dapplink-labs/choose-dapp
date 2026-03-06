@@ -37,10 +37,8 @@
                 <div class="custom-select-wrapper">
                     <el-select v-model="formData.type" class="custom-select" :placeholder="t('feedback.select')"
                         :teleported="false" size="large">
-                        <el-option :label="t('feedback.typeStaking')" :value="'pledge'" />
-                        <el-option :label="t('feedback.typeAccount')" :value="'prediction'" />
-                        <el-option :label="t('feedback.typeFeature')" :value="'fund_management'" />
-                        <el-option :label="t('feedback.typeOther')" :value="'other'" />
+                        <el-option v-for="item in feedbackTypes" :key="item.code" :label="item.name"
+                            :value="item.code" />
                     </el-select>
                 </div>
             </div>
@@ -84,21 +82,35 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from "vue"
+import { ref, reactive, computed, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { useI18n } from "vue-i18n"
-import { submitFeedbackV2, uploadFile } from "@/api/feedback"
+import { submitFeedbackV2, uploadFile, getFeedbackTypesV2 } from "@/api/feedback"
 import { ElMessage } from "element-plus"
 import { useAccount } from '@wagmi/vue'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { address } = useAccount()
 const fileInput = ref(null)
 
 const formData = reactive({
     type: '',
     content: ''
+})
+
+const feedbackTypes = ref([])
+
+onMounted(async () => {
+    try {
+        const lang = (locale.value || 'zh-cn').toLowerCase()
+        const res = await getFeedbackTypesV2({ language_code: lang })
+        if (res.data && res.data.success) {
+            feedbackTypes.value = res.data.data
+        }
+    } catch (error) {
+        console.error('Failed to fetch feedback types:', error)
+    }
 })
 
 const fileList = ref([])
