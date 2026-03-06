@@ -1,95 +1,64 @@
 import axios from "axios"
 
-// 根据环境变量设置 baseURL
-// 开发环境：使用相对路径，由 vite proxy 处理
-// 生产环境：如果配置了 VITE_API_BASE_URL，使用该值；否则使用相对路径（需要 nginx 代理）
-const getBaseURL = () => {
-  // 如果配置了环境变量，优先使用环境变量
-  if (import.meta.env.VITE_API_BASE_URL_EVENT) {
-    return import.meta.env.VITE_API_BASE_URL_EVENT
+// 使用反向代理：统一走相对路径前缀，由 Vite/Nginx 转发到 Event API
+// - 开发环境：vite.config.ts 的 server.proxy 将 /eventapi 转发到后端
+// - 生产环境：需要 Nginx（或网关）配置同样的 /eventapi 反向代理
+const getBaseURL = () => '/event-api'
+
+function safeParseSignatureInfo() {
+  try {
+    const raw = window.sessionStorage.getItem('signatureInfo')
+    if (!raw) return null
+    return JSON.parse(raw)
+  } catch (e) {
+    return null
   }
-  // 生产环境且没有配置 baseURL，使用相对路径（需要 nginx 代理）
-  if (import.meta.env.PROD) {
-    return '' // 使用相对路径，依赖 nginx 反向代理
-  }
-  // 开发环境使用相对路径，由 vite proxy 处理
-  return ''
 }
 
 // create an axios instance
 const serive = axios.create({
   baseURL: getBaseURL(),
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 30000  // request timeout (30 seconds)
+  timeout: 30000, // request timeout (30 seconds)
 })
-// 添加请求头
-serive.interceptors.request.use((config) => {
-  config.headers = config.headers || {}
-  config.headers["X-Signature-Message"] = JSON.parse(window.sessionStorage.getItem('signatureInfo')).timestamp || ''
-  config.headers["X-Signature"] = JSON.parse(window.sessionStorage.getItem('signatureInfo')).signature || ''
-  return config
-})
-// serive.interceptors.request.use((config) => {
-//   config.headers = config.headers || {}
 
-//   // 只有存在 address 才传
-//   const address = localStorage.getItem('address')
-//   if (address) {
-//     config.headers.address = address
-//   }
+// 事件接口专用拦截器：走反代理并附带签名 + 授权
+serive.interceptors.request.use(
+  (config) => {
+    config.headers = config.headers || {}
 
-//   return config
-// })
-// Add a request interceptor
-// serive.interceptors.request.use((config)=> {
-//     // Do something before request is sent
-//     config.headers['address'] = localStorage.getItem('address') || ''
+    // 签名信息（如果存在）
+    const signatureInfo = safeParseSignatureInfo()
+    if (signatureInfo?.timestamp) config.headers["X-Signature-Message"] = signatureInfo.timestamp
+    if (signatureInfo?.signature) config.headers["X-Signature"] = signatureInfo.signature
 
-//     // 禁用请求缓存 - 确保联调时不会使用缓存
-//     config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-//     config.headers['Pragma'] = 'no-cache'
-//     config.headers['Expires'] = '0'
+    // 登录 token：后端需要 Authorization 头
+    const token = window.sessionStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
 
-//     if(config.method === 'post'){
-//       if(!config.data){
-//         config.data = {}
-//       }
-//       // config.data.language = localStorage.getItem('language') || 'zh'
-//     }else if(config.method === 'get'){
-//       if(!config.params){
-//         config.params = {}
-//       }
-//       // config.params.language = localStorage.getItem('language') || 'zh'
-//       // GET 请求添加时间戳参数，防止缓存
-//       config.params = {
-//         ...config.params,
-//         _t: Date.now()
-//       }
-//     }
+    // 只有存在 address 才传
+    const address = localStorage.getItem('address')
+    if (address) {
+      config.headers.address = address
+    }
 
-//     return config
-//   }, error=>{
-//     // Do something with request error
-//     return Promise.reject(error);
-//   });
+    // 禁用缓存 & GET 请求增加时间戳
+    config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    config.headers['Pragma'] = 'no-cache'
+    config.headers['Expires'] = '0'
 
-// Add a response interceptor
-// serive.interceptors.response.use(function (response) {
-//     // Any status code that lie within the range of 2xx cause this function to trigger
-//     // Do something with response data
-//     return response
-//   }, function (error) {
-//     // Any status codes that falls outside the range of 2xx cause this function to trigger
-//     // Do something with response error
-//     // var state = error.response
-//     // if(state===404){
+    if (config.method === 'get') {
+      config.params = {
+        ...(config.params || {}),
+        _t: Date.now(),
+      }
+    }
 
-//     // }else if (state===500) {
-
-//     // }else if (state===502) {
-
-//     // }
-//     return Promise.reject(error);
-//   });
+    return config
+  },
+  (error) => Promise.reject(error),
+)
 
 export default serive

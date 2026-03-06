@@ -52,6 +52,9 @@ import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
 import logoLight from '@/assets/icon/logo.png'
 import logoDark from '@/assets/icon/logoDark.png'
 import { UserRejectedRequestError } from 'viem'
+
+import { userLogin } from '@/api/APIEvent'
+
 // 基础配置
 const { t } = useI18n()
 const BSC_CHAIN_ID = 56
@@ -62,7 +65,7 @@ const router = useRouter()
 const route = useRoute()
 const { connect, connectors, connectAsync } = useConnect()
 const chainId = useChainId()
-console.log(chainId)
+// console.log(chainId)
 const { status, address } = useAccount()
 const { disconnect } = useDisconnect()
 const themeStore = useThemeStore()
@@ -188,10 +191,11 @@ onMounted(async () => {
   setTimeout(async () => {
     disconnect()
     window.sessionStorage.clear()
-    console.log("--------------------------------------------------")
+    //保存token
+    await userLogin().then(res => {
+      window.sessionStorage.setItem('token', res?.data?.data?.token)
+    })
   }, 500)
-
-
 
 })
 </script>

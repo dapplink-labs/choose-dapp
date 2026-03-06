@@ -39,9 +39,10 @@
                     <div class="filter-container">
                         <!-- 标签按钮行 -->
                         <div class="tag-scroll-wrapper">
-                            <div class="tag-scroll-container" :class="{ 'is-esports-search': showDateFilter }">
-                                <!-- 电子竞技选中：隐藏标签按钮，替换为搜索输入框 -->
-                                <div v-if="showDateFilter" class="esports-search">
+                            <div class="tag-scroll-container"
+                                :class="{ 'is-esports-search': (!ecosystemList || ecosystemList.length === 0) }">
+                                <!-- 当二级分类列表为空时，展示搜索框 -->
+                                <div v-if="!ecosystemList || ecosystemList.length === 0" class="esports-search">
                                     <svg class="esports-search-icon" viewBox="0 0 24 24" fill="none"
                                         xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                         <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"
@@ -53,14 +54,16 @@
                                         @focus="handleEsportsSearch" />
                                 </div>
                                 <template v-else>
-                                    <button v-for="tag in tagButtons" :key="tag.value" class="tag-btn"
+                                    <!-- 二级分类不为空时，展示二级分类数据 -->
+                                    <button v-for="tag in ecosystemList" :key="tag.value" class="tag-btn"
                                         :class="{ active: activeTag === tag.value }" @click="handleTagClick(tag.value)">
                                         {{ tag.label }}
                                     </button>
                                 </template>
                             </div>
                             <!-- 右侧渐变遮罩 -->
-                            <div class="gradient-mask gradient-mask-right" v-if="!showDateFilter"></div>
+                            <div class="gradient-mask gradient-mask-right"
+                                v-if="ecosystemList && ecosystemList.length > 0"></div>
                         </div>
 
                         <!-- 右侧操作按钮 -->
@@ -149,12 +152,17 @@
 
                 <!-- 列表：根据 item.cardType 展示大卡片或小卡片 -->
                 <div class="main-list-section">
-                    <div class="card-list">
+                    <!-- 列表为空 -->
+                    <div v-if="!cardList.length" class="list-empty">
+                        <p class="list-empty-text">{{ $t('home.listEmpty') || '暂无事件' }}</p>
+                    </div>
+                    <div v-else class="card-list">
                         <template v-for="(item, index) in cardList" :key="'card-' + index">
                             <!-- 大卡片 -->
                             <div v-if="item.cardType === 'large'" class="list-item large-item">
                                 <div class="item-header">
-                                    <img :src="item.avatar" :alt="$t('common.userAvatar')" class="user-avatar" />
+                                    <img :src="item.avatar" :alt="$t('common.userAvatar')" class="user-avatar"
+                                        @error="(e) => (e.target.src = fallbackListImg)" />
                                     <div class="item-meta">
                                         <div class="item-title" @click="navigateToDetail(item)">
                                             {{ item.title }}
@@ -205,7 +213,7 @@
                                                     d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
                                                     transform="translate(-69.818 -69.818)" fill="currentColor" />
                                             </svg>
-                                            <span class="time-text">{{ item.timeRemaining }}</span>
+                                            <span class="time-text">{{ getCountdown(item.closeTime) }}</span>
                                         </div>
                                         <div class="participant-info">
                                             <el-icon class="participant-icon">
@@ -229,7 +237,8 @@
                             <!-- 小卡片 -->
                             <div v-else class="list-item small-item">
                                 <div class="item-header">
-                                    <img :src="item.avatar" :alt="$t('common.userAvatar')" class="user-avatar" />
+                                    <img :src="item.avatar" :alt="$t('common.userAvatar')" class="user-avatar"
+                                        @error="(e) => (e.target.src = fallbackListImg)" />
                                     <div class="item-meta">
                                         <div class="item-title" @click="navigateToDetail(item)">{{ item.title }}</div>
                                     </div>
@@ -270,7 +279,7 @@
                                                     d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
                                                     transform="translate(-69.818 -69.818)" fill="currentColor" />
                                             </svg>
-                                            <span class="time-text">{{ item.timeRemaining }}</span>
+                                            <span class="time-text">{{ getCountdown(item.closeTime) }}</span>
                                         </div>
                                         <div class="participant-info">
                                             <el-icon class="participant-icon">
@@ -291,6 +300,12 @@
                                 </div>
                             </div>
                         </template>
+                        <!-- 上拉加载：触底哨兵 + 底部状态 -->
+                        <div ref="loadMoreSentinel" class="load-more-sentinel" aria-hidden="true"></div>
+                        <div class="load-more-footer">
+                            <span v-if="loadingMore" class="load-more-text">{{ $t('home.loadingMore') || '加载中...' }}</span>
+                            <span v-else-if="cardList.length && !hasMore" class="load-more-text">{{ $t('home.noMore') || '没有更多了' }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -301,7 +316,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import NavBar2 from "@/components/navBar2.vue";
 import { Avatar, ArrowDownBold } from "@element-plus/icons-vue";
 import router from "@/router";
@@ -316,22 +331,20 @@ import banner0Img from "@/assets/images/banner0.png";
 import banner2Img from "@/assets/images/banner2.png";
 import linghua1Img from "@/assets/images/linghua1.png";
 import banner4Img from "@/assets/images/banner4.png";
+import fallbackListImg from "@/assets/icon/LP1.png";
 import NotificationModal from '@/components/NotificationModal.vue';
-import { tagButtons as rawTagButtons, cardList as rawCardList } from "./homeData";
 import { getNoticeData } from "@/api/API";
-import { getHomeBanner } from "@/api/APIEvent";
+import { getHomeBanner, getEcosystemList, getEventList } from "@/api/APIEvent";
 import { useAccount } from "@wagmi/vue";
 
 // 获取用户地址
 const { address } = useAccount();
 // 获取当前语言环境
-const savedLocale = localStorage.getItem('app-locale')
-const currentLocale = savedLocale || navigator.language || 'en';
-
+const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en';
 const { t } = useI18n();
 const route = useRoute();
 const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
-
+const language = currentLocale.split('-')[0];
 
 const showNotice = ref(false);
 
@@ -346,11 +359,32 @@ async function getNotice() {
         showNotice.value = true;
     }
 }
+// 监听URL category_id变化，获取对应分类数据（如果需要）
+watch(() => route.query, (data) => {
+    const newCategoryId = data.category_guid;
+    getEcosystemListData(newCategoryId);
+}, { immediate: true });
+
+// 获取生态列表（用于后续标签筛选）通过分类ID查询生态列表
+const ecosystemList = ref([]);
+async function getEcosystemListData(categoryId) {
+    if (!categoryId) {
+        ecosystemList.value = [];
+        return;
+    }
+    const response = await getEcosystemList({ language_label: language, category_guid: categoryId });
+    const data = response?.data?.data?.ecosystems || [];
+    console.log("分类列表数据：", data);
+    ecosystemList.value = data.map(item => ({
+        label: item.name,
+        value: item.ecosystem_guid
+    }));
+}
 
 // 获取首页轮播图
 async function getHomeBannerList() {
-    const response = await getHomeBanner({ language: currentLocale, limit: 4 });
-    console.log(response);
+    const response = await getHomeBanner({ language, limit: 10 });
+    const data = response?.data?.data?.events || [];
 }
 
 
@@ -361,7 +395,7 @@ const swiperModules = [Autoplay, Pagination];
 const bannerList = ref([
     {
         img: bannerImg,
-        href: "https://web.chooseme.vip/",
+        href: "/home",
     },
     {
         img: banner0Img,
@@ -369,7 +403,7 @@ const bannerList = ref([
     },
     {
         img: banner2Img,
-        href: "https://web.chooseme.vip/",
+        href: "/bitcoin-up-down",// 跳转到加密货币详情页面
     },
     {
         img: linghua1Img,
@@ -377,7 +411,7 @@ const bannerList = ref([
     },
     {
         img: banner4Img,
-        href: "https://web.chooseme.vip/",
+        href: "/home",
     },
 ]);
 
@@ -388,9 +422,6 @@ function goHref(item) {
         router.push(item.href);
     }
 }
-
-// 标签按钮数据
-const tagButtons = ref(rawTagButtons);
 
 // 当前激活的标签
 const activeTag = ref("all");
@@ -430,11 +461,119 @@ const totalDateCount = computed(() =>
 
 const handleDateClick = (key) => {
     activeDateKey.value = key;
-    // TODO: 根据日期筛选列表数据
 };
 
-// 合并后的卡片列表，通过 item.cardType === 'large' | 'small' 控制展示大卡片或小卡片
-const cardList = ref(rawCardList);
+// 事件列表：通过 item.cardType === 'large' | 'small' 控制展示大卡片或小卡片
+const cardList = ref([]);
+const eventPage = ref(1);
+const eventTotalPages = ref(1);
+const loadingMore = ref(false);
+const PAGE_SIZE = 20;
+const hasMore = computed(() => eventPage.value <= eventTotalPages.value);
+
+// 根据路由 nav 映射事件类型
+const getEventTypeFromNav = (nav) => {
+    if (nav === 'trends') return 0;
+    if (nav === 'breaking') return 1;
+    if (nav === 'news') return 2;
+    return undefined;
+};
+
+// 将接口返回的事件结构映射到页面卡片结构
+const mapEventToCard = (e) => {
+    const subEvents = Array.isArray(e.sub_events) ? e.sub_events : [];
+
+    const volumeNum = Number(e.trade_volume);
+    const amount =
+        Number.isFinite(volumeNum) && !Number.isNaN(volumeNum)
+            ? volumeNum.toFixed(2)
+            : '0.00';
+
+    return {
+        id: e.event_guid,
+        // 直播中（is_live === 1）为大卡片
+        cardType: e.is_live === 1 ? 'large' : 'small',
+        avatar: e.logo || '',
+        title: e.title || '',
+        // 暂无胜率字段，用占位字符串保持布局
+        percentage: e.cluster_score ? `${e.cluster_score}%` : '0%',
+        maxLeverage: '--',
+        maxReturn: '-- %',
+        closeTime: e.close_time || '', // "2026-01-25 14:00:00" 用于倒计时
+        isTimeUrgent: e.is_live === 1,
+        participantCount: 0,
+        amount,
+        isFavorite: false,
+        options: subEvents.map((sub) => ({
+            text: sub.title || '',
+        })),
+    };
+};
+
+// 当前时间戳，每秒更新一次，用于倒计时
+const now = ref(Date.now());
+let countdownTimer = null;
+
+// 根据 close_time 计算距结束的倒计时（时分秒），已过期显示 --
+const getCountdown = (closeTime) => {
+    if (!closeTime) return '--';
+    const end = new Date(closeTime.replace(' ', 'T'));
+    const diff = end.getTime() - now.value;
+    if (diff <= 0) return '--';
+    const totalSec = Math.floor(diff / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    return [h, m, s].map((x) => String(x).padStart(2, '0')).join(':');
+};
+
+// 获取事件列表，append=true 时追加分页数据
+const fetchEventList = async (append = false) => {
+    if (!append) {
+        eventPage.value = 1;
+        cardList.value = [];
+    }
+    if (append && loadingMore.value) return;
+    if (append && eventPage.value > eventTotalPages.value) return;
+
+    if (append) loadingMore.value = true;
+    try {
+        const query = route.query || {};
+        const params = {
+            language_label: language,
+            include_sub_events: true,
+            page: eventPage.value,
+            page_size: PAGE_SIZE,
+        };
+        if (query.category_guid) params.category_guid = query.category_guid;
+        if (activeTag.value && activeTag.value !== 'all') params.ecosystem_guid = activeTag.value;
+        const eventType = getEventTypeFromNav(query.nav);
+        if (eventType !== undefined) params.event_type = eventType;
+
+        const res = await getEventList(params);
+        const data = res?.data?.data || {};
+        const list = data.events || [];
+        const totalPages = data.total_pages ?? 1;
+
+        eventTotalPages.value = totalPages;
+        const mapped = list.map(mapEventToCard);
+        if (append) {
+            cardList.value = cardList.value.concat(mapped);
+        } else {
+            cardList.value = mapped;
+        }
+        eventPage.value += 1;
+    } catch (err) {
+        console.error('Fetch event list failed', err);
+        if (!append) cardList.value = [];
+    } finally {
+        loadingMore.value = false;
+    }
+};
+
+// 上拉加载：触底时加载下一页
+const loadMoreSentinel = ref(null);
+let loadMoreObserver = null;
 
 // 跳转到详情页面
 const navigateToDetail = (item, choice) => {
@@ -464,7 +603,6 @@ const handleTagClick = (tagValue) => {
     activeTag.value = tagValue;
 };
 
-
 // 处理筛选按钮点击
 const handleFilter = () => {
     showFilterPanel.value = !showFilterPanel.value;
@@ -480,10 +618,51 @@ const toggleFavorite = (item) => {
     item.isFavorite = !item.isFavorite;
 };
 
+// 监听筛选条件变化，获取事件列表
+watch(
+    () => [route.query, activeTag.value],
+    () => {
+        fetchEventList();
+    },
+    { deep: true, immediate: true },
+);
+
+// 上拉加载：IntersectionObserver 监听触底
+function setupLoadMoreObserver() {
+    if (typeof IntersectionObserver === 'undefined') return;
+    loadMoreObserver = new IntersectionObserver(
+        (entries) => {
+            const el = entries[0];
+            if (!el?.isIntersecting || loadingMore.value || !hasMore.value) return;
+            fetchEventList(true);
+        },
+        { root: null, rootMargin: '100px', threshold: 0 }
+    );
+}
+watch(
+    () => cardList.value.length,
+    (len) => {
+        nextTick(() => {
+            if (!loadMoreObserver) setupLoadMoreObserver();
+            if (len > 0 && loadMoreSentinel.value) loadMoreObserver?.observe(loadMoreSentinel.value);
+        });
+    },
+    { flush: 'post' }
+);
+
 // 页面数据初始化
 onMounted(async () => {
     getNotice();
     getHomeBannerList();
+    countdownTimer = setInterval(() => {
+        now.value = Date.now();
+    }, 1000);
+    setupLoadMoreObserver();
+});
+
+onUnmounted(() => {
+    if (countdownTimer) clearInterval(countdownTimer);
+    loadMoreObserver?.disconnect?.();
 });
 </script>
 
@@ -844,10 +1023,42 @@ $gradient-mask-right: linear-gradient(to right,
             flex-direction: column;
             gap: 10px;
 
+            .list-empty {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 48px 24px;
+                text-align: center;
+
+
+                .list-empty-text {
+                    margin: 0;
+                    font-size: 14px;
+                    color: var(--text-gray, #999);
+                }
+            }
+
             .card-list {
                 display: flex;
                 flex-direction: column;
                 gap: 12px;
+            }
+
+            .load-more-sentinel {
+                height: 1px;
+                width: 100%;
+                pointer-events: none;
+                visibility: hidden;
+            }
+
+            .load-more-footer {
+                padding: 16px 0 24px;
+                text-align: center;
+                .load-more-text {
+                    font-size: 12px;
+                    color: var(--text-gray, #999);
+                }
             }
 
             .list-item {

@@ -1,37 +1,34 @@
 <template>
   <div class="navbar2">
     <div class="navbar-container">
-      <!-- 导航链接区域 -->
       <div class="nav-section" ref="navSectionRef">
-        <template v-for="(item, index) in navItems" :key="item.key">
+        <template v-for="item in navItems" :key="item.key">
           <div class="nav-item" :class="{ active: activeNav === item.key }"
             :ref="el => { if (el) navItemRefs[item.key] = el }" :tabindex="activeNav === item.key ? 0 : -1"
-            @click="handleNavClick(item.key)" @keydown.enter="handleNavClick(item.key)"
-            @keydown.space.prevent="handleNavClick(item.key)">
-            <!-- 趋势图标使用自定义 SVG -->
-            <svg v-if="item.key === 'trends'" class="nav-icon trends-icon" viewBox="0 0 1024 1024" version="1.1"
-              xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+            @click="handleNavClick(item)">
+            <!-- 趋势图标 -->
+            <svg v-if="item.key === 'trends'" class="nav-icon trends-icon" viewBox="0 0 1024 1024" width="16"
+              height="16">
               <path
                 d="M928 361.6v182.4c0 19.2 12.8 32 32 32s32-12.8 32-32v-224c0-35.2-28.8-64-64-64h-224c-19.2 0-32 12.8-32 32s12.8 32 32 32h176l-272 272-204.8-204.8c-6.4-6.4-16-9.6-22.4-9.6-9.6 0-16 3.2-22.4 9.6l-316.8 316.8c-12.8 12.8-12.8 32 0 44.8 12.8 12.8 32 12.8 44.8 0l294.4-294.4 204.8 204.8c6.4 6.4 16 9.6 22.4 9.6 9.6 0 16-3.2 22.4-9.6l297.6-297.6z"
                 fill="currentColor"></path>
             </svg>
-            <!-- 突发图标使用自定义 SVG -->
-            <svg v-else-if="item.key === 'breaking'" class="nav-icon breaking-icon" viewBox="0 0 1024 1024"
-              version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+            <!-- 突发图标 -->
+            <svg v-else-if="item.key === 'breaking'" class="nav-icon breaking-icon" viewBox="0 0 1024 1024" width="16"
+              height="16">
               <path
                 d="M837.330851 679.796364l-48.221091-48.128a408.669091 408.669091 0 0 0-4.654545-582.050909l47.662545-48.872728a476.718545 476.718545 0 0 1 5.445818 679.098182h-0.232727zM168.705396 0l47.383273 49.012364a408.576 408.576 0 0 0-6.050909 581.911272l-48.407273 47.988364-5.911272-6.423273C-25.808058 483.002182-19.989876 182.365091 168.705396 0z m148.107637 141.172364l45.800727 50.362181a204.427636 204.427636 0 0 0-2.420364 300.45091l-46.592 49.710545a272.570182 272.570182 0 0 1 3.211637-400.523636z m368.128 401.826909l-46.359273-50.222546a204.334545 204.334545 0 0 0-3.444364-303.290182l44.823273-51.2a272.430545 272.430545 0 0 1 4.980364 404.666182zM499.922851 445.114182a102.4 102.4 0 1 1 0.139636-204.660364 102.4 102.4 0 0 1-0.186182 204.613818l0.046546 0.046546z m0-68.096a34.024727 34.024727 0 1 0-0.046546-0.046546l0.046546 0.046546z m16.896 238.592h-33.605818l-97.186909 340.107636h227.84l-97.047273-340.107636z m-84.992-68.328727h136.331636L704.11776 1024H295.634851l136.238545-476.718545z"
                 fill="currentColor"></path>
             </svg>
-            <!-- 新闻图标使用自定义 SVG -->
-            <svg v-else-if="item.key === 'news'" class="nav-icon news-icon" viewBox="0 0 1024 1024" version="1.1"
-              xmlns="http://www.w3.org/2000/svg" width="16" height="16">
+            <!-- 新闻图标 -->
+            <svg v-else-if="item.key === 'news'" class="nav-icon news-icon" viewBox="0 0 1024 1024" width="16"
+              height="16">
               <path
                 d="M896 981.333333H96a53.393333 53.393333 0 0 1-53.333333-53.333333V96a53.393333 53.393333 0 0 1 53.333333-53.333333h704a53.393333 53.393333 0 0 1 53.333333 53.333333v117.333333h74.666667a53.393333 53.393333 0 0 1 53.333333 53.333334v629.333333a85.426667 85.426667 0 0 1-85.333333 85.333333z m-42.666667-725.333333v640a42.666667 42.666667 0 0 0 85.333334 0V266.666667a10.666667 10.666667 0 0 0-10.666667-10.666667zM96 85.333333a10.666667 10.666667 0 0 0-10.666667 10.666667v832a10.666667 10.666667 0 0 0 10.666667 10.666667h726.12a84.82 84.82 0 0 1-11.453333-42.666667V96a10.666667 10.666667 0 0 0-10.666667-10.666667z m565.333333 725.333334H234.666667a21.333333 21.333333 0 0 1 0-42.666667h426.666666a21.333333 21.333333 0 0 1 0 42.666667z m0-170.666667H234.666667a21.333333 21.333333 0 0 1 0-42.666667h426.666666a21.333333 21.333333 0 0 1 0 42.666667z m0-213.333333H533.333333a21.333333 21.333333 0 0 1 0-42.666667h128a21.333333 21.333333 0 0 1 0 42.666667z m0-170.666667H533.333333a21.333333 21.333333 0 0 1 0-42.666667h128a21.333333 21.333333 0 0 1 0 42.666667zM412.393333 468.133333A21.333333 21.333333 0 0 0 426.666667 448V234.666667a21.333333 21.333333 0 0 0-42.666667 0v152.52L251.333333 221.333333a21.333333 21.333333 0 0 0-38 13.333334v213.333333a21.333333 21.333333 0 0 0 42.666667 0V295.48L388.666667 461.333333a21.333333 21.333333 0 0 0 23.72 6.806667z"
                 fill="currentColor"></path>
             </svg>
-            <span class="nav-text">{{ $t(`navbar2.nav.${item.key}`) || item.label }}</span>
+            <span class="nav-text">{{ item.label }}</span>
           </div>
-          <!-- 添加竖杠分隔符 -->
           <div class="nav-divider" v-if="item.key === 'news'"></div>
         </template>
       </div>
@@ -42,162 +39,142 @@
 <script setup>
 import { ref, watch, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { getCategoryList } from '@/api/APIEvent'
+// 获取当前语言环境
+const language = (localStorage.getItem('app-locale') || navigator.language).split('-')[0];
+
 
 const router = useRouter()
 const route = useRoute()
-const isProd = import.meta.env.VITE_IS_COMING_SOON === 'true'
 
-// Props
-const props = defineProps({
-  activeNav: {
-    type: String,
-    default: ''
+// 状态管理
+const activeNav = ref('')
+const navItemRefs = ref({})
+const navSectionRef = ref(null)
+
+// 基础导航配置
+const navItems = ref([
+  { key: 'trends', label: '趋势', query: { nav: 'trends' } },
+  { key: 'breaking', label: '热点', query: { nav: 'breaking' } },
+  { key: 'news', label: '最新', query: { nav: 'news' } },
+])
+
+/**
+ * 初始化及获取服务端分类
+ */
+async function getCategoryListData() {
+  try {
+    const response = await getCategoryList({ language_label: language });
+    const categories = response?.data?.data?.categories || [];
+
+    const dynamicItems = categories.map(c => {
+      const code = c.code;
+      const query = {
+        category_guid: c.guid
+      };
+
+      if (code) {
+        query.nav = code;
+      }
+
+      return {
+        key: code || `category_guid=${c.guid}`,
+        label: c.name || c.title,
+        query
+      };
+    });
+
+    // 过滤重复并插入
+    const existingKeys = new Set(navItems.value.map(i => i.key));
+    const toAdd = dynamicItems.filter(i => !existingKeys.has(i.key));
+    if (toAdd.length) {
+      navItems.value.splice(3, 0, ...toAdd);
+    }
+
+    // 分类加载后再次同步一次激活状态
+    updateActiveNavFromRoute();
+  } catch (err) {
+    console.error('Fetch categories failed', err);
   }
-})
-
-// Emits
-const emit = defineEmits(['nav-click'])
-
-// 导航项配置
-const navItems = [
-  { key: 'trends', label: '趋势', path: '/home' }, // 使用自定义 SVG
-  { key: 'breaking', label: '热点', path: '/home' }, // 使用自定义 SVG  breaking
-  { key: 'news', label: '最新', path: '/home' }, // 使用自定义 SVG
-  { key: 'esports', label: '电子竞技', path: null },
-  { key: 'sports', label: '体育', path: '/sports-events-h5' }, 
-  { key: 'finance', label: '经济', path: null }, 
-  // 加密货币：作为 /home 的一个筛选场景，由 query.nav=crypto 控制
-  { key: 'crypto', label: '加密货币', path: null },
-  { key: 'company', label: '公司', path: null },
-  { key: 'popularCulture', label: '流行文化', path: null },
-  { key: 'technology', label: '技术', path: null },
-  { key: 'ai', label: '人工智能', path: null }
-]
-
-// 路由到导航key的映射（不含带 query 的电子竞技）
-const routeToNavKey = {
-  '/home': 'trends',
-  '/breaking': 'breaking',
-  '/news': 'news',
-  '/sports-events-h5': 'sports',
-  '/bitcoin-up-down': 'crypto',
 }
 
-// 当前激活的导航项
-const activeNav = ref(props.activeNav || '')
+/**
+ * 核心逻辑：从路由同步激活状态
+ */
+const updateActiveNavFromRoute = () => {
+  // 1. 优先根据 nav 参数（包含固定项和带 code 的分类）
+  if (route.query.nav) {
+    activeNav.value = String(route.query.nav);
+    return;
+  }
 
-// Refs
-const navSectionRef = ref(null)
-const navItemRefs = ref({})
-
-// 聚焦到选中的按钮
-const focusActiveNav = async () => {
-  await nextTick()
-  const activeKey = activeNav.value
-  if (activeKey && navItemRefs.value[activeKey]) {
-    const activeElement = navItemRefs.value[activeKey]
-    // 滚动到可视区域
-    activeElement.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-      inline: 'center'
-    })
-    // 聚焦元素（用于键盘导航）
-    if (activeElement.focus) {
-      activeElement.focus({ preventScroll: true })
+  // 2. 如果只有 category_guid，尝试匹配对应的分类项
+  if (route.query.category_guid) {
+    const matchedItem = navItems.value.find(
+      i => i?.query?.category_guid === route.query.category_guid
+    );
+    if (matchedItem) {
+      activeNav.value = matchedItem.key;
+      return;
     }
   }
-}
 
-// 根据当前路由自动设置激活的导航项
-const updateActiveNavFromRoute = () => {
-  const currentPath = route.path
-
-  // 在 /home 页面上，优先使用 query.nav（用于电子竞技等筛选按钮）
-  if (currentPath === '/home' && route.query.nav) {
-    activeNav.value = String(route.query.nav)
-    return
-  }
-
-  const navKey = routeToNavKey[currentPath] || ''
-  if (navKey) {
-    activeNav.value = navKey
+  // 3. 默认兜底：如果是 /home 且无参数，默认高亮趋势
+  if (route.path === '/home') {
+    activeNav.value = 'trends';
   }
 }
 
-// 监听路由变化
-watch(() => route.path, () => {
-  updateActiveNavFromRoute()
-})
+/**
+ * 点击处理
+ */
+const handleNavClick = (item) => {
+  const query = item.query || {};
 
-// 监听 query.nav 变化（用于电子竞技等筛选按钮）
-watch(() => route.query.nav, () => {
-  updateActiveNavFromRoute()
-})
+  // 特殊分类：体育赛事，跳转到体育赛事 H5 页面
+  if (query.nav === 'sports-events') {
+    router.push({
+      path: '/sports-events-h5',
+      query
+    });
+    return;
+  }
 
-// 监听 activeNav 变化，自动聚焦
+  // 其他分类统一通过 /home + query 驱动
+  router.push({
+    path: '/home',
+    query
+  });
+}
+
+/**
+ * 滚动聚焦逻辑
+ */
+const focusActiveNav = async () => {
+  await nextTick();
+  const el = navItemRefs.value[activeNav.value];
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+}
+
+// 监听路由 query 变化（这是最关键的一环）
+watch(() => route.query, () => {
+  updateActiveNavFromRoute();
+}, { deep: true });
+
+// 监听激活项变化触发滚动
 watch(activeNav, () => {
-  focusActiveNav()
-})
+  focusActiveNav();
+});
 
-// 组件挂载时设置激活状态
-onMounted(() => {
-  updateActiveNavFromRoute()
-  // 延迟聚焦，确保 DOM 已渲染
-  setTimeout(() => {
-    focusActiveNav()
-  }, 100)
-})
-
-// 方法
-const handleNavClick = (key) => {
-  activeNav.value = key
-  emit('nav-click', key)
-
-  // 生产环境只改变本地激活状态，不执行路由跳转
-  if (isProd) {
-    nextTick(() => {
-      focusActiveNav()
-    })
-    return
-  }
-
-  const navItem = navItems.find(item => item.key === key)
-
-  // 普通导航：直接跳转到对应 path
-  if (navItem && navItem.path !== null) {
-    router.push(navItem.path)
-    // 聚焦到选中的按钮
-    nextTick(() => {
-      focusActiveNav()
-    })
-    return
-  }
-
-  // 筛选按钮：通过路由 query 控制页面状态（目前处理电子竞技与加密货币）
-  if (key === 'esports') {
-    router.push({
-      path: '/home',
-      query: { nav: 'esports' },
-    })
-    // 聚焦到选中的按钮
-    nextTick(() => {
-      focusActiveNav()
-    })
-    return
-  }
-
-  if (key === 'crypto') {
-    router.push({
-      path: '/home',
-      query: { nav: 'crypto' },
-    })
-    nextTick(() => {
-      focusActiveNav()
-    })
-  }
-}
+onMounted(async () => {
+  updateActiveNavFromRoute();
+  await getCategoryListData();
+  setTimeout(focusActiveNav, 150);
+});
 </script>
+
 
 <style scoped lang="scss">
 .navbar2 {

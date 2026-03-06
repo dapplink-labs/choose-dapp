@@ -8,29 +8,33 @@
                 <!-- 1. 顶部切换栏 -->
                 <div class="trade-nav">
                     <div class="side-tabs">
-                        <button :class="['nav-tab', { active: activeSide === 'buy' }]" @click="activeSide = 'buy'">{{
-                            $t('payment.buy') }}</button>
-                        <button :class="['nav-tab', { active: activeSide === 'sell' }]" @click="activeSide = 'sell'">{{
-                            $t('payment.sell') }}</button>
+                        <button :class="['nav-tab', { active: activeSide === 'buy' }]"
+                            @click="switchSide('buy')">{{
+                                $t('payment.buy') }}</button>
+                        <button :class="['nav-tab', { active: activeSide === 'sell' }]"
+                            @click="switchSide('sell')">{{
+                                $t('payment.sell') }}</button>
                     </div>
                     <div class="type-pills">
-                        <button :class="['pill', { active: orderType === 'market' }]" @click="orderType = 'market'">{{
-                            $t('payment.marketOrder') }}</button>
-                        <button :class="['pill', { active: orderType === 'limit' }]" @click="orderType = 'limit'">{{
-                            $t('payment.limitOrder') }}</button>
+                        <button :class="['pill', { active: orderType === 'market' }]"
+                            @click="switchOrderType('market')">{{
+                                $t('payment.marketOrder') }}</button>
+                        <button :class="['pill', { active: orderType === 'limit' }]"
+                            @click="switchOrderType('limit')">{{
+                                $t('payment.limitOrder') }}</button>
                     </div>
                 </div>
 
                 <div class="trade-body">
                     <!-- 2. 标题与余额 -->
                     <div class="target-info">
-                        <h3 class="target-title">尼克斯队对阵湖人队</h3>
+                        <h3 class="target-title">{{ eventTitle }}</h3>
                         <div class="target-row">
                             <div class="outcome-badge"
-                                :class="{ 'outcome-yes': outcomeBadge === 'yes', 'outcome-no': outcomeBadge === 'no' }">
-                                尼克斯队 | {{ outcomeBadge === 'yes' ? $t('common.yes') : $t('common.no') }}
+                                :class="{ 'outcome-yes': outcomeBadge === 'YES', 'outcome-no': outcomeBadge === 'NO' }">
+                                {{ outcomeTitle }} | {{ outcomeBadge === 'YES' ? $t('common.yes') : $t('common.no') }}
                                 <span class="icon" aria-hidden="true" style="display: inline-flex;"
-                                    @click="outcomeBadge = outcomeBadge === 'no' ? 'yes' : 'no'">
+                                    @click="toggleOutcome">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="11.997"
                                         viewBox="0 0 12 11.997">
                                         <path fill="currentColor"
@@ -42,14 +46,15 @@
                             <div class="balance-info">
                                 <el-icon>
                                     <Wallet />
-                                </el-icon> {{ $t('payment.balance') }} $1000.03
+                                </el-icon> {{ $t('payment.balance') }}
+                                {{ balanceLoading ? '...' : `$${userBalance}` }}
                             </div>
                         </div>
                     </div>
 
                     <div class="divider" />
 
-                    <!-- 3. 限价输入 -->
+                    <!-- 3. 限价输入（仅限价单显示） -->
                     <div class="input-section" v-if="orderType === 'limit'">
                         <label class="input-label">{{ $t('payment.limitPrice') }}</label>
                         <div class="stepper-box">
@@ -61,31 +66,56 @@
                         </div>
                     </div>
 
-                    <!-- 4. 股数输入 -->
+                    <!-- 4. 市价买入 → 金额输入；其他 → 份数输入 -->
                     <div class="input-section" style="margin-bottom: 10px;">
-                        <label class="input-label">{{ $t('payment.shares') }}</label>
+                        <label class="input-label">
+                            {{ isMarketBuy ? $t('payment.amount') || 'Amount' : $t('payment.shares') }}
+                        </label>
                         <div class="stepper-box">
                             <div class="input-box">
-                                <input v-model.number="shares" type="number" class="main-input" />
+                                <input v-model="inputValue" type="number" class="main-input"
+                                    :placeholder="isMarketBuy ? '0.00' : '0'"
+                                    @input="onInputChange" />
                             </div>
                         </div>
                     </div>
-                    <!-- 股数快捷加减，单独占一整行 -->
+                    <!-- 快捷加减按钮 -->
                     <div class="quick-shares-row">
                         <div class="quick-shares">
-                            <button v-for="val in [-100, -10, 10, 100]" :key="val" class="quick-share-btn"
-                                @click="adjustShares(val)">
+                            <button v-for="val in quickAdjustValues" :key="val" class="quick-share-btn"
+                                @click="adjustInput(val)">
                                 {{ val > 0 ? '+' + val : val }}
                             </button>
                         </div>
                     </div>
-                    <!-- 市价单平均价格 -->
-                    <div v-if="orderType === 'market'" class="avg-price-row">
-                        <span class="avg-price-text">{{ $t('payment.avgPrice') }}：{{ averagePrice }}¢</span>
+
+                    <!-- 市价单预览信息 -->
+                    <div v-if="orderType === 'market'" class="preview-info-row">
+                        <div v-if="previewLoading" class="preview-loading">
+                            {{ $t('payment.calculating') || 'Calculating...' }}
+                        </div>
+                        <template v-else-if="previewData">
+                            <div v-if="isMarketBuy" class="preview-details">
+                                <span class="preview-text">
+                                    {{ $t('payment.avgPrice') }}：{{ previewData.avg_price || '--' }} USDT
+                                </span>
+                                <span class="preview-text">
+                                    {{ $t('payment.estimatedShares') || 'Est. Shares' }}：{{ previewData.shares || '--' }}
+                                </span>
+                            </div>
+                            <div v-else class="preview-details">
+                                <span class="preview-text">
+                                    {{ $t('payment.avgPrice') }}：{{ previewData.avg_price || '--' }} USDT
+                                </span>
+                                <span class="preview-text">
+                                    {{ $t('payment.estimatedProfit') || 'Est. Profit' }}：{{ previewData.profit || '--' }} USDT
+                                </span>
+                            </div>
+                        </template>
                     </div>
 
-                    <!-- 5. 杠杆 -->
-                    <div class="input-section">
+                    <!-- 5. 杠杆（暂不对接） -->
+                    <div class="input-section" style="opacity: 0.4; pointer-events: none;">
                         <label class="input-label">{{ $t('payment.leverage') }}</label>
                         <div class="leverage-group">
                             <button :class="['lev-btn', { active: leverage === 2 }]" @click="leverage = 2">x 2</button>
@@ -97,21 +127,46 @@
                         <p class="leverage-tip">{{ $t('payment.maxLeverageTip') }}</p>
                     </div>
 
+                    <!-- 5.1 设置过期时间（暂不对接） -->
+                    <div class="input-section expiry-section" style="opacity: 0.4; pointer-events: none;">
+                        <div class="expiry-header">
+                            <label class="input-label">{{ $t('payment.expiration') }}</label>
+                            <button type="button" class="expiry-switch" :class="{ on: enableExpiry }"
+                                @click="enableExpiry = !enableExpiry" aria-label="toggle expiration">
+                                <span class="knob" />
+                            </button>
+                        </div>
+
+                        <div v-if="enableExpiry" class="expiry-pills">
+                            <button v-for="opt in expiryOptions" :key="opt.key" type="button" class="expiry-pill"
+                                :class="{ active: expiryPreset === opt.key }" @click="expiryPreset = opt.key">
+                                {{ opt.label }}
+                            </button>
+                        </div>
+
+                        <div v-if="enableExpiry && expiryPreset === 'custom'" class="expiry-custom">
+                            <input v-model.number="customExpiryMinutes" type="number" min="1" step="1"
+                                class="expiry-input" />
+                            <span class="expiry-unit">{{ $t('payment.expiryMinutes') }}</span>
+                        </div>
+                    </div>
+
                     <!-- 6. 结算汇总 -->
                     <div class="summary-section">
                         <div class="summary-row">
                             <span class="s-label">{{ $t('payment.total') }}</span>
-                            <span class="s-value">${{ totalCost }}</span>
+                            <span class="s-value">{{ displayTotal }}</span>
                         </div>
                         <div class="summary-row">
                             <span class="s-label">{{ $t('payment.potentialGain') }}</span>
-                            <span class="s-value-gain">💵 +${{ potentialGain }}</span>
+                            <span class="s-value-gain">💵 +{{ displayGain }}</span>
                         </div>
                     </div>
 
                     <!-- 7. 执行按钮 -->
-                    <button class="execute-btn" @click="handleConfirm">
-                        {{ executeLabel }}
+                    <button class="execute-btn" :disabled="submitting || !canSubmit" @click="handleConfirm">
+                        <span v-if="submitting">{{ $t('payment.submitting') || 'Submitting...' }}</span>
+                        <span v-else>{{ executeLabel }}</span>
                     </button>
                 </div>
             </div>
@@ -120,42 +175,285 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Wallet } from '@element-plus/icons-vue'
+import { getUserBalances, previewBuyOrder, previewSellOrder, makeOrder } from '@/api/APIEvent'
+import { ElMessage } from 'element-plus'
 
 const { t } = useI18n()
-const props = defineProps({ modelValue: Boolean })
-const emit = defineEmits(['update:modelValue'])
 
-const activeSide = ref('buy') // 'buy' | 'sell'
-const orderType = ref('limit')
+const props = defineProps({
+    modelValue: Boolean,
+    // 事件标题（父事件）
+    eventTitle: { type: String, default: '' },
+    // 子事件标题（outcome 名称）
+    outcomeTitle: { type: String, default: '' },
+    // 事件 GUID
+    eventGuid: { type: String, default: '' },
+    // 子事件 GUID
+    subEventGuid: { type: String, default: '' },
+    // 初始方向 YES / NO
+    initialOutcome: { type: String, default: 'YES' },
+    // 初始交易动作 buy / sell
+    initialSide: { type: String, default: 'buy' },
+})
+const emit = defineEmits(['update:modelValue', 'order-success'])
+
+// ===================== 基础状态 =====================
+const activeSide = ref('buy')
+const orderType = ref('market')
 const price = ref(48)
-const shares = ref(100)
+const inputValue = ref('')
 const leverage = ref(2)
-const outcomeBadge = ref('no') // 'yes' | 'no'
+const outcomeBadge = ref('YES')
+const enableExpiry = ref(false)
+const expiryPreset = ref('5m')
+const customExpiryMinutes = ref(5)
 
-const totalCost = computed(() => ((price.value * shares.value) / 100).toFixed(2))
-const potentialGain = computed(() => shares.value.toFixed(2))
-const averagePrice = computed(() => price.value)
+// ===================== 异步状态 =====================
+const userBalance = ref('0.00')
+const balanceLoading = ref(false)
+const previewData = ref(null)
+const previewLoading = ref(false)
+const submitting = ref(false)
 
-// 执行按钮文案：buy yes / buy no / sell yes / sell no
+// 防抖定时器
+let previewTimer = null
+
+// ===================== 计算属性 =====================
+const isMarketBuy = computed(() => activeSide.value === 'buy' && orderType.value === 'market')
+
+// 快捷加减值：市价买入用金额步进，其余用份数步进
+const quickAdjustValues = computed(() =>
+    isMarketBuy.value ? [-100, -10, 10, 100] : [-100, -10, 10, 100]
+)
+
+const expiryOptions = computed(() => ([
+    { key: '5m', label: t('payment.expiry5m') || '5m' },
+    { key: '1h', label: t('payment.expiry1h') || '1h' },
+    { key: '12h', label: t('payment.expiry12h') || '12h' },
+    { key: '24h', label: t('payment.expiry24h') || '24h' },
+    { key: 'eod', label: t('payment.expiryEod') || 'EOD' },
+    { key: 'custom', label: t('payment.expiryCustom') || 'Custom' },
+]))
+
+// 汇总展示
+const displayTotal = computed(() => {
+    if (orderType.value === 'market') {
+        if (isMarketBuy.value) {
+            // 市价买入：用户输入的就是金额
+            return inputValue.value ? `$${Number(inputValue.value).toFixed(2)}` : '$0.00'
+        }
+        // 市价卖出：预览返回 total_amount
+        return previewData.value?.total_amount ? `$${Number(previewData.value.total_amount).toFixed(2)}` : '$0.00'
+    }
+    // 限价单：price * shares / 100
+    const p = Number(price.value) || 0
+    const s = Number(inputValue.value) || 0
+    return `$${((p * s) / 100).toFixed(2)}`
+})
+
+const displayGain = computed(() => {
+    if (orderType.value === 'market' && !isMarketBuy.value && previewData.value?.profit) {
+        return `$${Number(previewData.value.profit).toFixed(2)}`
+    }
+    if (orderType.value === 'market' && isMarketBuy.value && previewData.value?.shares) {
+        // 买入潜在收益 = 份数（结算时每份=1 USDT）
+        return `$${Number(previewData.value.shares).toFixed(2)}`
+    }
+    // 限价单潜在收益 = shares
+    const s = Number(inputValue.value) || 0
+    return `$${s.toFixed(2)}`
+})
+
+const canSubmit = computed(() => {
+    const val = Number(inputValue.value)
+    return val > 0 && props.eventGuid && props.subEventGuid
+})
+
+// 执行按钮文案
 const executeLabel = computed(() => {
     const sideText = activeSide.value === 'buy'
-        ? (t('payment.buy') || t('common.buy') || 'Buy')
-        : (t('payment.sell') || t('common.sell') || 'Sell')
-    const ynText = outcomeBadge.value === 'yes'
+        ? (t('payment.buy') || 'Buy')
+        : (t('payment.sell') || 'Sell')
+    const ynText = outcomeBadge.value === 'YES'
         ? (t('common.yes') || 'Yes')
         : (t('common.no') || 'No')
     return `${sideText} ${ynText}`
 })
 
-function adjustShares(val) {
-    shares.value = Math.max(0, shares.value + val)
+// ===================== 方法 =====================
+function toggleOutcome() {
+    outcomeBadge.value = outcomeBadge.value === 'YES' ? 'NO' : 'YES'
+    resetPreview()
+    triggerPreview()
 }
 
-function handleClose() { emit('update:modelValue', false) }
-function handleConfirm() { console.log('Trade Confirmed') }
+function switchSide(side) {
+    if (activeSide.value === side) return
+    activeSide.value = side
+    resetPreview()
+    inputValue.value = ''
+}
+
+function switchOrderType(type) {
+    if (orderType.value === type) return
+    orderType.value = type
+    resetPreview()
+    inputValue.value = ''
+}
+
+function adjustInput(val) {
+    const current = Number(inputValue.value) || 0
+    inputValue.value = String(Math.max(0, current + val))
+    triggerPreview()
+}
+
+function onInputChange() {
+    triggerPreview()
+}
+
+function resetPreview() {
+    previewData.value = null
+    if (previewTimer) {
+        clearTimeout(previewTimer)
+        previewTimer = null
+    }
+}
+
+// 防抖触发预览查询
+function triggerPreview() {
+    if (previewTimer) clearTimeout(previewTimer)
+    const val = Number(inputValue.value)
+    if (!val || val <= 0 || orderType.value !== 'market') {
+        previewData.value = null
+        return
+    }
+    previewTimer = setTimeout(() => fetchPreview(), 500)
+}
+
+// ===================== API 调用 =====================
+async function fetchBalance() {
+    balanceLoading.value = true
+    try {
+        const address = localStorage.getItem('address') || ''
+        const res = await getUserBalances({ address })
+        const data = res?.data?.data
+        if (data) {
+            userBalance.value = data.cash || data.portfolio || '0.00'
+        }
+    } catch (err) {
+        console.error('Fetch balance failed', err)
+    } finally {
+        balanceLoading.value = false
+    }
+}
+
+async function fetchPreview() {
+    const val = Number(inputValue.value)
+    if (!val || val <= 0) return
+    if (!props.eventGuid || !props.subEventGuid) return
+
+    previewLoading.value = true
+    try {
+        if (isMarketBuy.value) {
+            // 市价买入预览
+            const res = await previewBuyOrder({
+                amount: String(val),
+                event_guid: props.eventGuid,
+                sub_event_guid: props.subEventGuid,
+                outcome: outcomeBadge.value,
+            })
+            if (res?.data?.code === 200) {
+                previewData.value = res.data.data
+            } else {
+                console.warn('Preview buy failed:', res?.data?.message)
+                previewData.value = null
+            }
+        } else if (activeSide.value === 'sell' && orderType.value === 'market') {
+            // 市价卖出预览
+            const res = await previewSellOrder({
+                shares: String(val),
+                event_guid: props.eventGuid,
+                sub_event_guid: props.subEventGuid,
+                outcome: outcomeBadge.value,
+            })
+            if (res?.data?.code === 200) {
+                previewData.value = res.data.data
+            } else {
+                console.warn('Preview sell failed:', res?.data?.message)
+                previewData.value = null
+            }
+        }
+    } catch (err) {
+        console.error('Fetch preview failed', err)
+        previewData.value = null
+    } finally {
+        previewLoading.value = false
+    }
+}
+
+async function handleConfirm() {
+    if (submitting.value || !canSubmit.value) return
+
+    submitting.value = true
+    try {
+        const orderParams = {
+            event_guid: props.eventGuid,
+            sub_event_guid: props.subEventGuid,
+            outcome: outcomeBadge.value,
+            side: activeSide.value,
+            order_type: orderType.value,
+        }
+
+        if (orderType.value === 'market') {
+            if (activeSide.value === 'buy') {
+                // 市价买入：传 amount
+                orderParams.amount = String(inputValue.value)
+            } else {
+                // 市价卖出：传 shares
+                orderParams.shares = String(inputValue.value)
+            }
+        } else {
+            // 限价单：传 price + shares
+            orderParams.price = String(Number(price.value) / 100) // ¢ → USDT
+            orderParams.shares = String(inputValue.value)
+        }
+
+        const res = await makeOrder(orderParams)
+        if (res?.data?.code === 200) {
+            ElMessage.success(res.data.message || t('payment.orderSuccess') || 'Order created successfully')
+            emit('order-success', res.data.data)
+            handleClose()
+        } else {
+            ElMessage.error(res?.data?.message || t('payment.orderFailed') || 'Order failed')
+        }
+    } catch (err) {
+        console.error('Make order failed', err)
+        ElMessage.error(t('payment.orderFailed') || 'Order failed')
+    } finally {
+        submitting.value = false
+    }
+}
+
+function handleClose() {
+    resetPreview()
+    emit('update:modelValue', false)
+}
+
+// ===================== 生命周期 & Watch =====================
+// 弹窗打开时：初始化状态 & 获取余额
+watch(() => props.modelValue, (val) => {
+    if (val) {
+        activeSide.value = props.initialSide || 'buy'
+        outcomeBadge.value = (props.initialOutcome || 'YES').toUpperCase()
+        orderType.value = 'market'
+        inputValue.value = ''
+        previewData.value = null
+        fetchBalance()
+    }
+})
 </script>
 
 <style scoped lang="scss">
@@ -331,7 +629,6 @@ function handleConfirm() { console.log('Trade Confirmed') }
     flex-wrap: wrap; // 方便提示文字换行
 
     .input-label {
-        width: 50px;
         font-size: 15px;
         font-weight: bold;
         color: var(--text-dark-gray);
@@ -439,6 +736,30 @@ function handleConfirm() { console.log('Trade Confirmed') }
     }
 }
 
+/* 预览信息区 */
+.preview-info-row {
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+
+    .preview-loading {
+        font-size: 12px;
+        color: var(--text-dark-gray);
+    }
+
+    .preview-details {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+
+        .preview-text {
+            font-size: 12px;
+            color: var(--text-dark-gray);
+        }
+    }
+}
+
 /* 杠杆 */
 .leverage-group {
     flex: 0.8;
@@ -472,6 +793,108 @@ function handleConfirm() { console.log('Trade Confirmed') }
     width: 100%;
     flex-basis: 100%; // 在 flex 容器中独占一整行
     border-bottom: 1px solid var(--border-color);
+}
+
+/* 过期时间 */
+.expiry-section {
+    margin-top: 14px;
+}
+
+.expiry-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.expiry-switch {
+    width: 52px;
+    height: 30px;
+    border-radius: 999px;
+    border: none;
+    background: #2F2F2F;
+    position: relative;
+    padding: 0;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    .knob {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 24px;
+        height: 24px;
+        border-radius: 999px;
+        background: #ffffff;
+        transition: transform 0.2s ease;
+    }
+
+    &.on {
+        background: var(--text-color-y);
+        .knob {
+            transform: translateX(22px);
+        }
+    }
+}
+
+.expiry-pills {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.expiry-pill {
+    min-width: 60px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #2F2F2F;
+    color: var(--text-dark-gray);
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0.8;
+    cursor: pointer;
+
+    &.active {
+        background: var(--button-bg-y);
+        color: var(--text-color-y);
+        opacity: 1;
+    }
+}
+
+.expiry-custom {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.expiry-input {
+    width: 96px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--bg-opposite);
+    text-align: right;
+    padding: 0 10px;
+    font-size: 14px;
+    outline: none;
+}
+
+.expiry-unit {
+    font-size: 12px;
+    color: var(--text-dark-gray);
 }
 
 /* 汇总 */
@@ -518,6 +941,15 @@ function handleConfirm() { console.log('Trade Confirmed') }
 
     &:active {
         transform: scale(0.98);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+
+        &:active {
+            transform: none;
+        }
     }
 }
 
