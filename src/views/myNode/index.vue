@@ -1452,6 +1452,7 @@ onMounted(async () => {
   border-radius: 20px 20px 0 0;
   padding: 24px 20px;
   animation: slideUp 0.3s ease-out;
+  box-sizing: border-box;
 
   .modal-header {
     display: flex;
