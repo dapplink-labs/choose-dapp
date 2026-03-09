@@ -220,7 +220,7 @@ const handleSubmit = async () => {
 <style scoped lang="scss">
 .feedback {
     min-height: 100vh;
-    background-color: var(bg-color-010101, #010101);
+    background-color: var(--bg-color-010101, #010101);
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -228,7 +228,7 @@ const handleSubmit = async () => {
 
 .feedback-header {
     height: 56px;
-    background-color: var(bg-color-010101, #010101);
+    background-color: var(--bg-color-010101, #010101);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -437,7 +437,7 @@ const handleSubmit = async () => {
 
 .feedback-footer {
     padding: 20px 16px;
-    background-color: var(bg-color-010101, #010101);
+    background-color: var(--bg-color-010101, #010101);
 }
 
 .submit-btn {
