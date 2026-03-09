@@ -36,7 +36,7 @@
                 <div v-for="item in list" :key="item.guid" class="feedback-item">
                     <div class="item-header">
                         <div class="user-info">
-                            <img class="avatar" src="@/assets/icon/LP1.png" alt="avatar" />
+                            <img class="avatar" :src="userAvatar" alt="avatar" />
                             <div class="user-details">
                                 <span class="address">{{ shortenAddress(item.user_address) }}</span>
                                 <span class="time">{{ formatDate(item.created) }}</span>
@@ -98,6 +98,9 @@ const loading = ref(false)
 const finished = ref(false)
 const page = ref(1)
 const pageSize = ref(20)
+const userAvatar = computed(() => {
+    return address.value ? `https://effigy.im/a/${address.value}.svg` : '@/assets/icon/LP1.png'
+})
 
 // Feedback types
 const feedbackTypes = ref({})
@@ -151,9 +154,9 @@ const loadMore = async () => {
             page: page.value,
             page_size: pageSize.value
         }
-        
+
         const res = await getFeedbackListV2(params)
-        
+
         if (res.data && res.data.success) {
             const newList = res.data.data.list || []
             if (newList.length < pageSize.value) {
@@ -396,6 +399,7 @@ onMounted(() => {
                 width: 24px;
                 height: 24px;
                 margin-right: 8px;
+                border-radius: 50%;
             }
 
             .reply-name {
