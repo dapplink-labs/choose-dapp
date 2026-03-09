@@ -282,7 +282,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from "vue";
+import { onMounted, onUpdated, ref, computed, watch, nextTick } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useThemeStore } from "@/stores/theme";
 import { useI18n } from "vue-i18n";
@@ -659,13 +659,29 @@ const formatProgressPercent = (value) => {
 const progressIndicatorRef = ref(null);
 const progressBarRef = ref(null);
 
+
+const indicatorWidth = ref(0);
+const barWidth = ref(0);
+
+const updateWidths = () => {
+  indicatorWidth.value = progressIndicatorRef.value?.offsetWidth || 0;
+  barWidth.value = progressBarRef.value?.offsetWidth || 0;
+};
+
+onMounted(() => {
+  nextTick(updateWidths);
+});
+
+onUpdated(updateWidths);
+
 const progressIndicatorLeft = computed(() => {
   const p = Number(progressPercent.value) || 0;
-  // 获取progress-indicator标签元素的宽度
-  const width = progressIndicatorRef.value?.offsetWidth || 0;
-  // 获取progress-bar标签元素的宽度
-  const progressBarWidth = progressBarRef.value?.offsetWidth || 0;
+  // Use reactive widths
+  const width = indicatorWidth.value;
+  const progressBarWidth = barWidth.value;
+
   if (p <= 20) return `${p}%`;
+  if (!progressBarWidth) return `${p}%`;
   if (p >= 90) return `${p - ((width / progressBarWidth) * 100).toFixed(0)}%`;
   return `${p - Math.max(0, (width / progressBarWidth) * 100 / 2).toFixed(0)}%`;
 });
