@@ -407,11 +407,11 @@ const handleMaxAmount = () => claimInputAmount.value = formatChoAmount(totalAvai
 
 // 打开弹窗的函数
 const openClaimPopup = () => {
-  if (isClaimDisabledByTime.value) return;
-  if (totalAvailableAmount.value <= 0) {
-    Message.warning(t("myNode.noIncome"));
-    return;
-  }
+  // if (isClaimDisabledByTime.value) return;
+  // if (totalAvailableAmount.value <= 0) {
+  //   Message.warning(t("myNode.noIncome"));
+  //   return;
+  // }
   // 默认填入最大可领取金额，或者清空让用户手动输
   claimInputAmount.value = formatChoAmount(totalAvailableAmount.value).replace(/,/g, '');
   showClaimPopup.value = true;
@@ -1490,6 +1490,7 @@ onMounted(async () => {
   }
 
   .input-wrapper {
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     padding: 0 16px;
@@ -1497,15 +1498,16 @@ onMounted(async () => {
     background: var(--bg-light, #f5f5f5);
     border-radius: 12px;
     margin-bottom: 8px;
+    width: 100%;
 
     .claim-input {
-      flex: 1;
       border: none;
       outline: none;
       background: transparent;
       font-size: 20px;
       font-weight: bold;
       color: var(--text-color);
+      width: 100%;
     }
 
     .max-btn {
@@ -1517,6 +1519,8 @@ onMounted(async () => {
       border-radius: 6px;
       cursor: pointer;
       margin-right: 8px;
+      box-sizing: border-box;
+
     }
 
     .unit {
