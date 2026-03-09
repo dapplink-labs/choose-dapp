@@ -298,7 +298,7 @@ const baseOthersItems = computed(() => [
     label: t("userInfo.github"),
     icon: getIcon("17"),
     iconDark: getIcon("17Dark"),
-    path: "/",
+    href: "https://github.com/Prediction333/event-contracts",
   },
   {
     key: "technical-support",
@@ -516,6 +516,10 @@ const allowedPaths = [
 const handleMenuClick = (item) => {
   if (item.key === "inviteShare") {
     showShareModal.value = true;
+    return;
+  }
+  if (item.key === "github") {
+    goHref(item);
     return;
   }
   // 菜单项的路由跳转

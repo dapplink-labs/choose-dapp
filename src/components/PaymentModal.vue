@@ -127,8 +127,8 @@
                         <p class="leverage-tip">{{ $t('payment.maxLeverageTip') }}</p>
                     </div>
 
-                    <!-- 5.1 设置过期时间（暂不对接） -->
-                    <div class="input-section expiry-section" style="opacity: 0.4; pointer-events: none;">
+                    <!-- 5.1 设置过期时间 -->
+                    <div class="input-section expiry-section">
                         <div class="expiry-header">
                             <label class="input-label">{{ $t('payment.expiration') }}</label>
                             <button type="button" class="expiry-switch" :class="{ on: enableExpiry }"
@@ -206,10 +206,19 @@ const orderType = ref('market')
 const price = ref(48)
 const inputValue = ref('')
 const leverage = ref(2)
-const outcomeBadge = ref('YES')
+const outcomeBadge = ref('no') // 'yes' | 'no'
 const enableExpiry = ref(false)
-const expiryPreset = ref('5m')
+const expiryPreset = ref('5m') // '5m' | '1h' | '12h' | '24h' | 'eod' | 'custom'
 const customExpiryMinutes = ref(5)
+
+const expiryOptions = computed(() => ([
+    { key: '5m', label: t('payment.expiry5m') || '5m' },
+    { key: '1h', label: t('payment.expiry1h') || '1h' },
+    { key: '12h', label: t('payment.expiry12h') || '12h' },
+    { key: '24h', label: t('payment.expiry24h') || '24h' },
+    { key: 'eod', label: t('payment.expiryEod') || 'EOD' },
+    { key: 'custom', label: t('payment.expiryCustom') || 'Custom' },
+]))
 
 // ===================== 异步状态 =====================
 const userBalance = ref('0.00')
@@ -462,7 +471,7 @@ watch(() => props.modelValue, (val) => {
     inset: 0;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
-    z-index: 2000;
+    z-index: 3000;
     display: flex;
     align-items: flex-end;
 }

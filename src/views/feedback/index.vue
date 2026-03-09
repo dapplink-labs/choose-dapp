@@ -37,10 +37,8 @@
                 <div class="custom-select-wrapper">
                     <el-select v-model="formData.type" class="custom-select" :placeholder="t('feedback.select')"
                         :teleported="false" size="large">
-                        <el-option :label="t('feedback.typeStaking')" :value="t('feedback.typeStaking')" />
-                        <el-option :label="t('feedback.typeAccount')" :value="t('feedback.typeAccount')" />
-                        <el-option :label="t('feedback.typeFeature')" :value="t('feedback.typeFeature')" />
-                        <el-option :label="t('feedback.typeOther')" :value="t('feedback.typeOther')" />
+                        <el-option v-for="item in feedbackTypes" :key="item.code" :label="item.name"
+                            :value="item.code" />
                     </el-select>
                 </div>
             </div>
@@ -84,19 +82,35 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from "vue"
+import { ref, reactive, computed, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { useI18n } from "vue-i18n"
-import { submitFeedback, uploadFile } from "@/api/feedback"
+import { submitFeedbackV2, uploadFile, getFeedbackTypesV2 } from "@/api/feedback"
 import { ElMessage } from "element-plus"
+import { useAccount } from '@wagmi/vue'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const { address } = useAccount()
 const fileInput = ref(null)
 
 const formData = reactive({
     type: '',
     content: ''
+})
+
+const feedbackTypes = ref([])
+
+onMounted(async () => {
+    try {
+        const lang = (locale.value || 'zh-cn').toLowerCase()
+        const res = await getFeedbackTypesV2({ language_code: lang })
+        if (res.data && res.data.success) {
+            feedbackTypes.value = res.data.data
+        }
+    } catch (error) {
+        console.error('Failed to fetch feedback types:', error)
+    }
 })
 
 const fileList = ref([])
@@ -161,26 +175,39 @@ const handleSubmit = async () => {
 
     submitting.value = true
     try {
-        // Prepare data for submission
-        // In a real app, you would upload files first, get URLs, then submit the form
-        // Or send FormData with files directly
-
-        const payload = {
-            type: formData.type,
-            content: formData.content,
-            // files: fileList.value.map(f => f.file) // This depends on API
+        const uploadedUrls = []
+        if (fileList.value.length > 0) {
+            for (const item of fileList.value) {
+                const fd = new FormData()
+                fd.append('file', item.file)
+                const res = await uploadFile(fd)
+                if (res.data && res.data.success && res.data.data && res.data.data.url) {
+                    uploadedUrls.push(res.data.data.url)
+                }
+            }
         }
 
-        await submitFeedback(payload)
-        ElMessage.success(t('feedback.msgSubmitSuccess'))
+        const payload = {
+            content: formData.content,
+            feedback_type: formData.type,
+            image_urls: uploadedUrls,
+            user_address: address.value || ''
+        }
 
-        // Clear form
-        formData.type = ''
-        formData.content = ''
-        fileList.value = []
+        const res = await submitFeedbackV2(payload)
+        if (res.data && res.data.success) {
+            ElMessage.success(t('feedback.msgSubmitSuccess'))
 
-        // Go to list
-        router.push('/feedback-list')
+            // Clear form
+            formData.type = ''
+            formData.content = ''
+            fileList.value = []
+
+            // Go to list
+            router.push('/feedback-list')
+        } else {
+            ElMessage.error(res.data?.message || t('feedback.msgSubmitFail'))
+        }
     } catch (error) {
         console.error(error)
         ElMessage.error(t('feedback.msgSubmitFail'))

@@ -383,8 +383,8 @@ async function getEcosystemListData(categoryId) {
 
 // 获取首页轮播图
 async function getHomeBannerList() {
-    const response = await getHomeBanner({ language, limit: 10 });
-    const data = response?.data?.data?.events || [];
+    // const response = await getHomeBanner({ language: currentLocale, limit: 4 });
+    // console.log(response);
 }
 
 
