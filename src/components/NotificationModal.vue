@@ -12,7 +12,7 @@
                     <h2 class="title">{{ title }}</h2>
 
                     <div class="message-body">
-                        <div v-html="content"></div>
+                        <div v-html="content" class="message-content"></div>
                     </div>
 
                     <button class="confirm-btn" @click="close">
@@ -146,7 +146,7 @@ const close = async () => {
     line-height: 1.8;
     text-align: left;
     margin-bottom: 20px;
-    //   white-space: pre-wrap;
+
     flex: 1;
     min-height: 0;
     overflow-y: auto;
@@ -160,6 +160,10 @@ const close = async () => {
 
     :deep(p) {
         margin-bottom: 1em;
+    }
+
+    .message-content {
+        white-space: pre-wrap;
     }
 }
 
