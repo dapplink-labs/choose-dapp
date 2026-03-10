@@ -282,7 +282,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUpdated, ref, computed, watch, nextTick } from "vue";
+import { onMounted, onUpdated, ref, computed, watch, nextTick, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useThemeStore } from "@/stores/theme";
 import { useI18n } from "vue-i18n";
@@ -398,6 +398,15 @@ watch(claimInputAmount, (newVal) => {
   if (newVal === '' || Number(newVal) < 0) {
     claimInputAmount.value = 0;
   }
+})
+
+// 监听弹窗显示，禁止页面滚动
+watch(showClaimPopup, (val) => {
+  document.body.style.overflow = val ? 'hidden' : '';
+})
+
+onUnmounted(() => {
+  document.body.style.overflow = '';
 })
 
 
