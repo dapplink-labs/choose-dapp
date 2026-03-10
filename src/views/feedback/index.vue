@@ -35,11 +35,18 @@
             <div class="form-group">
                 <label class="form-label">{{ t("feedback.type") }} <span class="required">*</span></label>
                 <div class="custom-select-wrapper">
-                    <el-select v-model="formData.type" class="custom-select" :placeholder="t('feedback.select')"
-                        :teleported="false" size="large">
-                        <el-option v-for="item in feedbackTypes" :key="item.code" :label="item.name"
-                            :value="item.code" />
-                    </el-select>
+                    <div class="custom-select-trigger" @click="showTypeSheet = true">
+                        <span :class="{ 'placeholder': !formData.type }">
+                            {{ selectedTypeName || t('feedback.select') }}
+                        </span>
+                        <div class="arrow-icon" :class="{ 'is-active': showTypeSheet }">
+                            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="12" height="12">
+                                <path
+                                    d="M831.872 340.864 512 652.672 192.128 340.864a30.592 30.592 0 0 0-42.752 0 29.12 29.12 0 0 0 0 41.6L489.664 714.24a32 32 0 0 0 44.672 0l340.288-331.712a29.12 29.12 0 0 0 0-41.728 30.592 30.592 0 0 0-42.752 0z"
+                                    fill="currentColor"></path>
+                            </svg>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -78,6 +85,35 @@
             </button>
             <p class="footer-tip">{{ t("feedback.footerTip") }}</p>
         </div>
+
+        <el-drawer v-model="showTypeSheet" direction="btt" :with-header="false" size="45%" class="type-drawer"
+            :show-close="false">
+            <div class="type-sheet">
+                <div class="type-sheet-header">
+                    <div class="type-sheet-title">{{ t("feedback.type") }}</div>
+                    <div class="type-sheet-close" @click="showTypeSheet = false">
+                        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+                            <path
+                                d="M512 452.267l226.133-226.134a42.667 42.667 0 0 1 60.334 60.334L572.267 512l226.2 226.133a42.667 42.667 0 0 1-60.333 60.334L512 572.267l-226.133 226.2a42.667 42.667 0 0 1-60.334-60.334L451.733 512 225.533 285.867a42.667 42.667 0 0 1 60.334-60.334L512 451.733z"
+                                fill="currentColor"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div class="type-list">
+                    <div v-for="item in feedbackTypes" :key="item.code" class="type-item"
+                        :class="{ active: formData.type === item.code }" @click="selectType(item.code)">
+                        <div class="type-name">{{ item.name }}</div>
+                        <div class="type-check" v-if="formData.type === item.code">
+                            <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="20" height="20">
+                                <path
+                                    d="M384 723.2 166.4 505.6a42.667 42.667 0 0 0-60.33 60.33l248 248a42.667 42.667 0 0 0 60.33 0l512-512a42.667 42.667 0 0 0-60.33-60.33L384 723.2z"
+                                    fill="currentColor"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </el-drawer>
     </div>
 </template>
 
@@ -115,6 +151,17 @@ onMounted(async () => {
 
 const fileList = ref([])
 const submitting = ref(false)
+const showTypeSheet = ref(false)
+const selectedTypeName = computed(() => {
+    const found = feedbackTypes.value.find(item => item.code === formData.type)
+    return found ? found.name : ''
+})
+
+const selectType = (code) => {
+    formData.type = code
+    showTypeSheet.value = false
+}
+
 const isFormValid = computed(() => {
     return formData.type && formData.content
 })
@@ -294,54 +341,112 @@ const handleSubmit = async () => {
     position: relative;
 }
 
-.custom-select {
+.custom-select-trigger {
     width: 100%;
+    box-shadow: 0 0 0 1px #333 inset;
+    border-radius: 8px;
+    height: 48px;
+    padding: 0 16px;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    color: var(--text-color, #fff);
+    box-sizing: border-box;
 
-    :deep(.el-select__wrapper) {
-        box-shadow: 0 0 0 1px #333 inset;
-        border-radius: 8px;
-        height: 48px;
-        padding: 0 16px;
-        background-color: transparent;
-    }
-
-    :deep(.el-select__wrapper.is-focused) {
-        box-shadow: 0 0 0 1px #2ecc71 inset;
-    }
-
-    :deep(.el-select__placeholder) {
+    .placeholder {
         color: #666;
     }
 
-    :deep(.el-select__selected-item) {
-        color: var(--text-color, #fff);
+    .arrow-icon {
+        color: #666;
+        display: flex;
+        align-items: center;
+        transition: transform 0.3s;
 
-    }
-
-    :deep(.el-select-dropdown) {
-        background-color: var(--bg-color-010101, #1a1a1a);
-        border: 1px solid #333;
-        border-radius: 8px;
-    }
-
-    :deep(.el-select-dropdown__item) {
-        color: var(--text-color, #fff);
-
-        &.hover,
-        &:hover {
-            background-color: #333;
-        }
-
-        &.is-selected {
-            color: #2ecc71;
-            font-weight: 600;
-            background-color: transparent;
+        &.is-active {
+            transform: rotate(180deg);
         }
     }
+}
 
-    :deep(.el-popper__arrow::before) {
-        background-color: #1a1a1a;
-        border-color: #333;
+:deep(.type-drawer) {
+    background-color: var(--bg-color-010101, #1a1a1a) !important;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+
+    .el-drawer__body {
+        padding: 0;
+        background-color: transparent;
+    }
+}
+
+.type-sheet {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 70vh;
+}
+
+.type-sheet-header {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    // justify-content: center;
+    position: relative;
+    // border-bottom: 1px solid #333;
+    flex-shrink: 0;
+    padding-left: 16px;
+
+    .type-sheet-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-color, #fff);
+    }
+
+    .type-sheet-close {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #999;
+        display: flex;
+        align-items: center;
+    }
+}
+
+.type-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.type-item {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 16px;
+    color: var(--text-color, #fff);
+    cursor: pointer;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &.active {
+        background-color: var(--text-dark-gray, #222);
+    }
+
+
+
+    .type-check {
+        // color: #2ecc71;
+        display: flex;
+        align-items: center;
     }
 }
 
