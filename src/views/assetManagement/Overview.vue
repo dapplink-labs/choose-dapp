@@ -133,6 +133,9 @@
           <div class="header-value">{{ $t('assetManagement.value') }}</div>
         </div>
         <!-- 数据行 -->
+        <div v-if="!assetList.length" class="distribution-empty">
+          {{ $t('common.noData') || '暂无数据' }}
+        </div>
         <div v-for="asset in assetList" :key="asset.name" class="distribution-item">
           <div class="asset-info">
             <img :src="asset.icon" :alt="asset.name" class="asset-icon" />
@@ -147,12 +150,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAccount } from '@wagmi/vue'
 import { useThemeStore } from '@/stores/theme'
 import { View, Hide } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { getUserBalances } from '@/api/APIEvent'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -164,33 +168,15 @@ const isDark = computed(() => themeStore.isDark)
 const showAssets = ref(true)
 
 // 资产数据
-const totalAssets = ref(329263.23)
-const funds = ref(140000.00)
-const earnings = ref(140000) // CHO数量
-const earningsValue = ref(140.00) // CHO对应的USD价值
-const fo = ref(14000.00)
+const loadingAssets = ref(false)
+const totalAssets = ref(0)
+const funds = ref(0)
+const earnings = ref(0) // CHO数量（接口若不返回则为 0）
+const earningsValue = ref(0) // CHO对应的USD价值（接口若不返回则为 0）
+const fo = ref(0)
 
 // 资产列表
-const assetList = ref([
-  {
-    name: 'USDT',
-    icon: 'https://effigy.im/a/USDT.svg',
-    quantity: 100.00,
-    value: 100.00
-  },
-  {
-    name: 'CHO',
-    icon: 'https://effigy.im/a/CHO.svg',
-    quantity: 100.00,
-    value: 100.00
-  },
-  {
-    name: 'MEME',
-    icon: 'https://effigy.im/a/MEME.svg',
-    quantity: 100.00,
-    value: 100.00
-  }
-])
+const assetList = ref([])
 
 // 切换资产显示/隐藏
 const toggleAssetsVisibility = () => {
@@ -233,19 +219,54 @@ const fetchAssets = async () => {
   if (!address.value) return
 
   try {
-    // TODO: 调用API获取实际资产数据
-    // const response = await getAssetData(address.value)
-    // totalAssets.value = response.totalAssets
-    // funds.value = response.funds
-    // earnings.value = response.earnings
-    // fo.value = response.fo
-    // assetList.value = response.assetList
+    loadingAssets.value = true
+    const res = await getUserBalances({ address: address.value })
+    const data = res?.data?.data || {}
+
+    const toNum = (v) => {
+      const n = Number(v)
+      return Number.isFinite(n) ? n : 0
+    }
+
+    // 目前项目其他地方（PaymentModal）优先用 cash / portfolio
+    const cash = toNum(data.cash)
+    const portfolio = toNum(data.portfolio)
+    const total = toNum(data.total_assets ?? data.totalAssets) || (cash + portfolio)
+
+    totalAssets.value = total
+    funds.value = cash
+
+    // 可选字段（后端不一定返回）
+    earnings.value = toNum(data.earnings ?? data.cho)
+    earningsValue.value = toNum(data.earnings_value ?? data.cho_value)
+    fo.value = toNum(data.fo)
+
+    // 资产分布（若后端返回列表则渲染，否则为空）
+    const list = Array.isArray(data.assets) ? data.assets : Array.isArray(data.asset_list) ? data.asset_list : []
+    assetList.value = list.map((a) => ({
+      name: a.symbol || a.name || '',
+      icon: a.icon || (a.symbol ? `https://effigy.im/a/${a.symbol}.svg` : ''),
+      quantity: toNum(a.quantity ?? a.amount),
+      value: toNum(a.value ?? a.usdt_value ?? a.usd_value),
+    })).filter(v => v.name)
   } catch (error) {
     console.error('获取资产数据失败:', error)
+    totalAssets.value = 0
+    funds.value = 0
+    earnings.value = 0
+    earningsValue.value = 0
+    fo.value = 0
+    assetList.value = []
+  } finally {
+    loadingAssets.value = false
   }
 }
 
 onMounted(() => {
+  fetchAssets()
+})
+
+watch(() => address.value, () => {
   fetchAssets()
 })
 </script>
@@ -464,6 +485,13 @@ onMounted(() => {
 
   .distribution-list {
     overflow: hidden;
+
+    .distribution-empty {
+      padding: 18px 0;
+      text-align: center;
+      color: var(--text-gray, rgba(255, 255, 255, 0.5));
+      font-size: 14px;
+    }
 
     .distribution-header {
       display: flex;

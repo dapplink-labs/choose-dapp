@@ -80,16 +80,17 @@ const props = defineProps({
     lastTradePrice: { type: String, default: '' },
     // 是否加载中
     loading: { type: Boolean, default: false },
+    // 是否允许在无数据时回退到 mock
+    useMockFallback: { type: Boolean, default: true },
 })
 
 const { t } = useI18n()
 
-// 卖单（asks）从大到小排序，保留前 5 条
+// 卖单（asks）从大到小排序（保留全部，超出 10 条用滚动）
 const sellOrders = computed(() => {
-    const list = props.asks.length ? props.asks : MOCK_SELL
+    const list = props.asks.length ? props.asks : (props.useMockFallback ? MOCK_SELL : [])
     return [...list]
         .sort((a, b) => Number(b.price) - Number(a.price))
-        .slice(0, 5)
         .map(o => ({
             price: Number(o.price).toFixed(4),
             shares: Number(o.quantity),
@@ -97,12 +98,11 @@ const sellOrders = computed(() => {
         }))
 })
 
-// 买单（bids）从大到小排序，保留前 5 条
+// 买单（bids）从大到小排序（保留全部，超出 10 条用滚动）
 const buyOrders = computed(() => {
-    const list = props.bids.length ? props.bids : MOCK_BUY
+    const list = props.bids.length ? props.bids : (props.useMockFallback ? MOCK_BUY : [])
     return [...list]
         .sort((a, b) => Number(b.price) - Number(a.price))
-        .slice(0, 5)
         .map(o => ({
             price: Number(o.price).toFixed(4),
             shares: Number(o.quantity),
@@ -189,6 +189,8 @@ const MOCK_BUY = [
 
 .obm-rows {
     border-top: 1px solid var(--border-color);
+    max-height: 300px; /* 30px * 10 行 */
+    overflow-y: auto;
 }
 
 .obm-row {

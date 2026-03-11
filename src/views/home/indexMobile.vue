@@ -359,12 +359,6 @@ async function getNotice() {
         showNotice.value = true;
     }
 }
-// 监听URL category_id变化，获取对应分类数据（如果需要）
-watch(() => route.query, (data) => {
-    const newCategoryId = data.category_guid;
-    getEcosystemListData(newCategoryId);
-}, { immediate: true });
-
 // 获取生态列表（用于后续标签筛选）通过分类ID查询生态列表
 const ecosystemList = ref([]);
 async function getEcosystemListData(categoryId) {
@@ -380,6 +374,16 @@ async function getEcosystemListData(categoryId) {
         value: item.ecosystem_guid
     }));
 }
+
+// 监听URL category_id变化，获取对应分类数据（如果需要）
+watch(
+    () => route.query,
+    (data) => {
+        const newCategoryId = data.category_guid;
+        getEcosystemListData(newCategoryId);
+    },
+    { immediate: true },
+);
 
 // 获取首页轮播图
 async function getHomeBannerList() {
@@ -578,7 +582,7 @@ let loadMoreObserver = null;
 // 跳转到详情页面
 const navigateToDetail = (item, choice) => {
     // 如果当前通过导航条处于“加密货币”场景，则进入加密货币详情页
-    if (route.query.nav === 'crypto') {
+    if (route.query.nav === 'crypto' || route.query.nav === 'crypto-chinese') {
         router.push({
             path: '/bitcoin-up-down',
             query: {

@@ -83,12 +83,16 @@ import { useI18n } from 'vue-i18n'
 import { useThemeStore } from '@/stores/theme'
 import { View, Hide } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
+import { useAccount } from '@wagmi/vue'
 import PositionList from './PositionList.vue'
 import ClaimSuccess from './ClaimSuccess.vue'
+import { claimOrder, getUserPnl, getUserStat } from '@/api/APIEvent'
+import { ElMessage } from 'element-plus'
 
 const { t } = useI18n()
 const themeStore = useThemeStore()
 const isDark = computed(() => themeStore.isDark)
+const { address } = useAccount()
 
 // 根据主题切换图表用到的颜色（注意：ECharts 不支持 CSS 变量，这里用真实颜色值）
 const chartColors = computed(() => {
@@ -126,12 +130,22 @@ const timePeriods = computed(() => [
 const selectedPeriod = ref('all')
 
 // 收益金额
-const profitAmount = ref(329263.23)
+const profitAmount = ref(0)
+const pnlLoading = ref(false)
+const pnlPoints = ref([])
+const statLoading = ref(false)
+const statSummary = ref(null)
 
 // 奖励数据
 const rewardData = ref({
   winnings: 2,
-  amount: 1000.26
+  amount: 1000.26,
+  // 以下字段用于对接 /api/v1/order/claim
+  // 实际项目中应由“可领取奖励/已结算持仓”接口返回
+  asset_guid: window.sessionStorage.getItem('stable_asset_guid') || '',
+  event_guid: '',
+  sub_event_guid: '',
+  outcome: 'YES',
 })
 
 // 领取成功弹窗
@@ -147,10 +161,9 @@ const toggleProfitVisibility = () => {
 }
 
 // 选择时间周期
-const selectPeriod = (value) => {
+const selectPeriod = async (value) => {
   selectedPeriod.value = value
-  // TODO: 根据选择的时间周期更新图表数据
-  updateChart()
+  await refreshPredictionData()
 }
 
 // 格式化货币
@@ -167,25 +180,94 @@ const initChart = () => {
   updateChart()
 }
 
+const toNumber = (v) => {
+  const n = Number(v)
+  return Number.isFinite(n) ? n : 0
+}
+
+const formatXAxisLabel = (isoLike) => {
+  const d = new Date(isoLike)
+  if (Number.isNaN(d.getTime())) return ''
+  const pad = (n) => String(n).padStart(2, '0')
+  if (selectedPeriod.value === '1d') return `${pad(d.getHours())}:${pad(d.getMinutes())}`
+  return `${pad(d.getMonth() + 1)}/${pad(d.getDate())}`
+}
+
+const fetchPnlAndRender = async () => {
+  const user_guid = window.sessionStorage.getItem('user_guid') || ''
+  const addr = address?.value || ''
+  if (!addr && !user_guid) return
+
+  pnlLoading.value = true
+  try {
+    const res = await getUserPnl({
+      address: addr || undefined,
+      user_guid: user_guid || undefined,
+      range: selectedPeriod.value,
+    })
+    const code = res?.data?.code
+    if (!(code === 0 || code === 200 || code === 2000)) {
+      throw new Error(res?.data?.message || 'fetch pnl failed')
+    }
+
+    const data = res?.data?.data || {}
+    const pts = Array.isArray(data.data_points) ? data.data_points : []
+    pnlPoints.value = pts
+
+    const last = pts.length ? pts[pts.length - 1] : null
+    const statProfitLost = toNumber(statSummary.value?.profit_lost)
+    if (selectedPeriod.value === 'all' && statProfitLost !== 0) {
+      profitAmount.value = statProfitLost
+    } else {
+      profitAmount.value = last ? toNumber(last.profit_lost) : 0
+    }
+    updateChart()
+  } catch (e) {
+    pnlPoints.value = []
+    profitAmount.value = 0
+    updateChart()
+    ElMessage.error(e?.message || 'fetch pnl failed')
+  } finally {
+    pnlLoading.value = false
+  }
+}
+
+const fetchUserStat = async () => {
+  const user_guid = window.sessionStorage.getItem('user_guid') || ''
+  const addr = address?.value || ''
+  if (!addr && !user_guid) return
+
+  statLoading.value = true
+  try {
+    const res = await getUserStat({
+      address: addr || undefined,
+      user_guid: user_guid || undefined,
+    })
+    const code = res?.data?.code
+    if (!(code === 0 || code === 200 || code === 2000)) {
+      throw new Error(res?.data?.message || 'fetch stat failed')
+    }
+    statSummary.value = res?.data?.data || null
+  } catch (e) {
+    statSummary.value = null
+    ElMessage.error(e?.message || 'fetch stat failed')
+  } finally {
+    statLoading.value = false
+  }
+}
+
+const refreshPredictionData = async () => {
+  await fetchUserStat()
+  await fetchPnlAndRender()
+}
+
 // 更新图表
 const updateChart = () => {
   if (!myChart) return
 
-  // 模拟数据 - 根据图片描述，有正负值的柱状图
-  const data = [
-    { value: 116220, color: '#2FBC87' },
-    { value: 85000, color: '#2FBC87' },
-    { value: -80000, color: '#E44096' },
-    { value: 180000, color: '#2FBC87' },
-    { value: 150000, color: '#2FBC87' },
-    { value: -180000, color: '#E44096' },
-    { value: 200000, color: '#2FBC87' },
-    { value: 378160, color: '#2FBC87' },
-    { value: 430000, color: '#2FBC87' },
-    { value: 116220, color: '#2FBC87' },
-    { value: 180000, color: '#2FBC87' },
-    { value: 116220, color: '#2FBC87' }
-  ]
+  const points = pnlPoints.value
+  const values = points.map(p => toNumber(p?.profit_lost))
+  const labels = points.map(p => formatXAxisLabel(p?.timestamp))
 
   const colors = chartColors.value
 
@@ -200,7 +282,7 @@ const updateChart = () => {
     },
     xAxis: {
       type: 'category',
-      data: data.map((_, index) => ''),
+      data: labels,
       axisLine: {
         show: false
       },
@@ -208,7 +290,7 @@ const updateChart = () => {
         show: false
       },
       axisLabel: {
-        show: false
+        show: false,
       }
     },
     yAxis: {
@@ -244,11 +326,11 @@ const updateChart = () => {
     series: [
       {
         type: 'bar',
-        data: data.map(item => ({
-          value: item.value,
+        data: values.map(v => ({
+          value: v,
           itemStyle: {
-            color: item.value >= 0 ? '#2FBC87' : '#E44096',
-            borderRadius: item.value >= 0 ? [3, 3, 0, 0] : [0, 0, 3, 3]
+            color: v >= 0 ? '#2FBC87' : '#E44096',
+            borderRadius: v >= 0 ? [3, 3, 0, 0] : [0, 0, 3, 3]
           }
         })),
         barWidth: '50%',
@@ -279,10 +361,45 @@ const updateChart = () => {
 }
 
 // 处理领取奖励
-const handleClaim = () => {
+const handleClaim = async () => {
   if (rewardData.value.winnings === 0) return
-  // 实际项目中这里应该先调领取接口，成功后再弹窗
-  showClaimSuccess.value = true
+
+  const user_guid = window.sessionStorage.getItem('user_guid') || ''
+  const payload = {
+    amount: String(rewardData.value.winnings ?? ''),
+    asset_guid: rewardData.value.asset_guid,
+    event_guid: rewardData.value.event_guid,
+    outcome: String(rewardData.value.outcome || '').toUpperCase(),
+    sub_event_guid: rewardData.value.sub_event_guid,
+    user_guid,
+  }
+
+  const missing = ['amount', 'asset_guid', 'event_guid', 'sub_event_guid', 'user_guid'].filter(
+    (k) => !payload[k],
+  )
+  if (missing.length) {
+    ElMessage.error(`Claim 参数缺失：${missing.join(', ')}`)
+    return
+  }
+  if (payload.outcome !== 'YES' && payload.outcome !== 'NO') {
+    ElMessage.error('Claim 参数错误：outcome 必须是 YES 或 NO')
+    return
+  }
+
+  try {
+    const res = await claimOrder(payload)
+    const code = res?.data?.code
+    if (!(code === 0 || code === 200 || code === 2000)) {
+      throw new Error(res?.data?.message || 'Claim failed')
+    }
+
+    // 成功后：弹窗 + 清空可领取数量（具体策略可按产品调整）
+    showClaimSuccess.value = true
+    rewardData.value.winnings = 0
+    ElMessage.success(res?.data?.message || 'Claim success')
+  } catch (e) {
+    ElMessage.error(e?.message || 'Claim failed')
+  }
 }
 
 // 窗口大小改变时调整图表
@@ -294,6 +411,7 @@ const handleResize = () => {
 
 onMounted(() => {
   initChart()
+  refreshPredictionData()
   window.addEventListener('resize', handleResize)
 })
 
@@ -309,6 +427,10 @@ watch(() => themeStore.isDark, () => {
   if (myChart) {
     updateChart()
   }
+})
+
+watch(() => address?.value, () => {
+  refreshPredictionData()
 })
 </script>
 

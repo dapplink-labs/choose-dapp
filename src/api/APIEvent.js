@@ -75,11 +75,72 @@ export const makeOrder = (data) => {
   return request.post('/api/v1/order/make', data)
 }
 
+// 取消挂单（委托单撤销）
+export const cancelOrder = (data) => {
+  return request.post('/api/v1/order/cancel', data)
+}
+
+// Claim 操作（单边赎回）
+export const claimOrder = (data) => {
+  return request.post('/api/v1/order/claim', data)
+}
+
+// 获取用户挂单列表（委托仓位）
+export const getOpenOrders = (data) => {
+  return request.post('/api/v1/order/open', data)
+}
+
+// 获取用户盈亏数据（用于图表展示）
+// user_guid 或 address 二选一必填，range: 1d/1w/1m/all
+export const getUserPnl = (data) => {
+  return request.post('/api/v1/user/pnl', data)
+}
+
+// 获取用户统计摘要（包括持仓价值、最大盈利、预测次数等）
+// user_guid 或 address 二选一必填
+export const getUserStat = (data) => {
+  return request.post('/api/v1/user/stat', data)
+}
+
+// 获取历史订单（历史仓位）
+export const getOrderHistory = (data) => {
+  return request.post('/api/v1/order/history', data)
+}
+
+// 充值
+export const recharge = (data) => {
+  return request.post('/api/v1/user/recharge', {
+    amount: "10000",
+    currency_code: "USD",
+    user_guid: "41f83791b601426896bcb39f45e2fd12"
+  })
+}
+
+// 获取账单/资金流水（充值+提现）
+export const getFundsHistory = (data) => {
+  return request.post('/api/v1/user/funds-history', data)
+}
+
+// 获取资金变动记录（账单）
+export const getTransactionHistory = (data) => {
+  return request.post('/api/v1/user/transaction-history', data)
+}
+
+// 获取用户持仓
+export const getUserPositions = (data) => {
+  return request.post('/api/v1/user/positions', data)
+}
+
+// 法币提现（出金）
+export const fiatWithdraw = (data) => {
+  return request.post('/api/v1/user/fiat/withdraw', data)
+}
+
 // 用户登录接口 - 使用死数据登录
 export const userLogin = () => {
   return request.post('/api/v1/login', {
     login_type: 'password',
-    email: 'hg01@example.com',
+    email: 'seek10@example.com',
     password: '123456'
   })
 }

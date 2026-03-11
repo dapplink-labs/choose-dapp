@@ -109,7 +109,7 @@
             </div>
 
             <!-- 3. 结果预测列表 (已增加到4条数据) -->
-            <div class="outcome-prediction-section">
+            <div class="outcome-prediction-section" v-if="outcomes.length > 0">
                 <div class="section-title">{{ $t('detail.whatDoYouPredict') }}</div>
                 <div class="section-header">
                     <div class="header-label outcome-label">{{ $t('detail.outcome') }}</div>
@@ -164,7 +164,7 @@
                             </div>
                             <span class="view-results-status">{{ item.result === 'yes' ? $t('detail.resultYes') :
                                 $t('detail.resultNo')
-                            }}</span>
+                                }}</span>
                         </div>
                     </div>
                 </transition>
@@ -249,10 +249,16 @@
                             </div>
                         </div>
                     </div>
+                    <div v-if="!commentsData.length" class="empty-state">
+                        {{ $t('common.noData') || '暂无数据' }}
+                    </div>
                 </div>
 
                 <!-- 持仓列表 -->
                 <div v-if="activeListTab === 'holds'" class="tab-pane holds-grid">
+                    <div v-if="!yesHolders.length && !noHolders.length" class="empty-state">
+                        {{ $t('common.noData') || '暂无数据' }}
+                    </div>
                     <div class="hold-col">
                         <div class="hold-title">Yes Holders</div>
                         <div v-for="h in yesHolders" :key="h.rank" class="holder-row">
@@ -283,6 +289,9 @@
 
                 <!-- 活动列表 -->
                 <div v-if="activeListTab === 'activity'" class="tab-pane">
+                    <div v-if="!activityData.length" class="empty-state">
+                        {{ $t('common.noData') || '暂无数据' }}
+                    </div>
                     <div v-for="(act, index) in activityData" :key="index" class="activity-item">
                         <img :src="act.avatar" class="user-avatar" />
                         <div class="activity-info">
@@ -298,13 +307,9 @@
             </div>
 
             <!-- 支付模态框 -->
-            <PaymentModal v-model="showPayment"
-                :event-title="detailData.title"
-                :outcome-title="paymentOutcomeTitle"
-                :event-guid="currentEventGuid"
-                :sub-event-guid="paymentSubEventGuid"
-                :initial-outcome="paymentInitialOutcome"
-                :initial-side="paymentInitialSide"
+            <PaymentModal v-model="showPayment" :event-title="detailData.title" :outcome-title="paymentOutcomeTitle"
+                :event-guid="currentEventGuid" :sub-event-guid="paymentSubEventGuid"
+                :initial-outcome="paymentInitialOutcome" :initial-side="paymentInitialSide"
                 @order-success="onOrderSuccess" />
         </div>
     </div>
@@ -320,7 +325,7 @@ import PaymentModal from '@/components/PaymentModal.vue'
 import NavBar2 from '@/components/navBar2.vue'
 import { useDark } from '@vueuse/core'
 import router from '@/router'
-import { getEventDetailItem, getEventActivity, getEventTopHolders, getEventCommentList, getEventPriceHistory } from '@/api/APIEvent'
+import { getEventDetailItem, getEventActivity, getEventTopHolders, getEventCommentList, getEventPriceHistory, getSubEventDetail } from '@/api/APIEvent'
 import fallbackAvatar from '@/assets/icon/LP1.png'
 
 const route = useRoute()
@@ -330,7 +335,7 @@ const isDarkMode = useDark()
 // --- 基础数据 ---
 const detailData = ref({
     title: 'U.S. forces seize anotherVenezuela- linked oil ship by...?',
-    avatar: 'https://picsum.photos/seed/oil/60/60',
+    avatar: fallbackAvatar,
     volume: '$153,642,644 Vol.',
     closeDate: 'Dec 10, 2025',
     maxLeverage: '10X',
@@ -339,13 +344,8 @@ const detailData = ref({
 
 const PALETTE = [isDarkMode ? '#2EBE69' : '#BBFF2E', '#E44096', '#3B82F6', '#F59E0B']
 
-// 预测列表数据（从事件详情的 sub_events 映射，初始化为占位）
-const outcomes = ref([
-    { title: '50+ bps decrease', volume: '$37.7M Vol.', chance: 92.5, yesPrice: '92.5', noPrice: '7.5', color: PALETTE[0], selected: null },
-    { title: '25+ bps decrease', volume: '$12.2M Vol.', chance: 7.01, yesPrice: '7.0', noPrice: '93.0', color: PALETTE[1], selected: null },
-    { title: 'No change', volume: '$5.8M Vol.', chance: 1.68, yesPrice: '1.7', noPrice: '98.3', color: PALETTE[2], selected: null },
-    { title: 'Increase 25+ bps', volume: '$0.5M Vol.', chance: 0.24, yesPrice: '0.2', noPrice: '99.8', color: PALETTE[3], selected: null }
-])
+// 预测列表数据（完全依赖接口返回的 sub_events，不再使用本地假数据）
+const outcomes = ref([])
 
 const viewResults = ref([
     { title: '50+ bps decrease', volume: '$37,755,917 Vol.', result: 'no' },
@@ -424,6 +424,12 @@ const mapSubEventsToOutcomes = (subEvents = []) => {
         const chanceNum = Number(first.chance ?? 0)
         const yesPrice = first.new_bid_price || first.new_ask_price || '0'
         const noPrice = first.new_ask_price || first.new_bid_price || '0'
+        const subEventGuid =
+            sub.sub_event_guid ||
+            sub.subEventGuid ||
+            sub.guid ||
+            sub.id ||
+            ''
 
         return {
             title: sub.title || first.title || first.name || '',
@@ -433,7 +439,8 @@ const mapSubEventsToOutcomes = (subEvents = []) => {
             noPrice: String(noPrice),
             color: PALETTE[idx % PALETTE.length],
             selected: null,
-            sub_event_guid: sub.sub_event_guid || sub.guid || ''
+            sub_event_guid: subEventGuid,
+            subEventGuid,
         }
     })
 }
@@ -525,19 +532,6 @@ const fetchActivity = async (append = false) => {
         activityTotalPages.value = totalPages
         const mapped = list.map(mapActivityItem)
         activityData.value = append ? activityData.value.concat(mapped) : mapped
-
-        // 没有真实数据时，填充一条假数据
-        if (!activityData.value.length) {
-            activityData.value = [
-                mapActivityItem({
-                    user_name: 'Demo User',
-                    outcome: 'Yes',
-                    cost: '100',
-                    timestamp: '2026-03-05 10:00:00',
-                    avatar: fallbackAvatar
-                })
-            ]
-        }
 
         activityPage.value += 1
     } catch (err) {
@@ -634,11 +628,6 @@ const fetchComments = async (append = false) => {
         const mapped = list.map(mapCommentItem)
         commentsData.value = append ? commentsData.value.concat(mapped) : mapped
 
-        // 没有真实数据时，填充几条更贴近 UI 的假评论
-        if (!commentsData.value.length) {
-            commentsData.value = createMockComments()
-        }
-
         commentPage.value += 1
     } catch (err) {
         console.error('Fetch comments failed', err)
@@ -684,29 +673,6 @@ const fetchTopHolders = async () => {
 
         yesHolders.value = yesList.map(mapHolderItem)
         noHolders.value = noList.map(mapHolderItem)
-
-        // 没有真实数据时，各补一条假持仓
-        if (!yesHolders.value.length) {
-            yesHolders.value = [
-                mapHolderItem({
-                    rank: 1,
-                    user_name: 'Demo Yes',
-                    position_value: '0',
-                    avatar: fallbackAvatar
-                })
-            ]
-        }
-
-        if (!noHolders.value.length) {
-            noHolders.value = [
-                mapHolderItem({
-                    rank: 1,
-                    user_name: 'Demo No',
-                    position_value: '0',
-                    avatar: fallbackAvatar
-                })
-            ]
-        }
     } catch (err) {
         console.error('Fetch top holders failed', err)
     }
@@ -971,12 +937,55 @@ const handleTimeRangeChange = async (v) => {
 }
 const selectOutcome = (i, type) => {
     const outcome = outcomes.value[i]
-    outcome.selected = type
-    paymentSubEventGuid.value = outcome.sub_event_guid || ''
-    paymentOutcomeTitle.value = outcome.title || ''
-    paymentInitialOutcome.value = type === 'yes' ? 'YES' : 'NO'
-    paymentInitialSide.value = 'buy'
-    showPayment.value = true
+    if (!outcome) return
+
+    // 优先使用已经解析好的 subEventGuid
+    let subGuid = outcome.subEventGuid || outcome.sub_event_guid || ''
+
+    const ensureSubGuid = async () => {
+        if (subGuid) return subGuid
+
+        const eventGuid = currentEventGuid.value
+        if (!eventGuid) return ''
+
+        try {
+            const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
+            const language = currentLocale.split('-')[0]
+            const res = await getSubEventDetail({
+                event_guid: eventGuid,
+                language_label: language,
+            })
+            const data = res?.data?.data || {}
+            const subEvents = Array.isArray(data.sub_events) ? data.sub_events : []
+
+            // 1) 先按索引匹配
+            let sub = subEvents[i]
+            // 2) 再按标题兜底匹配
+            if (!sub && outcome.title) {
+                sub = subEvents.find(s => s.title === outcome.title)
+            }
+            const resolved = sub?.sub_event_guid || ''
+            if (resolved) {
+                outcome.subEventGuid = resolved
+                outcome.sub_event_guid = resolved
+            }
+            return resolved
+        } catch (err) {
+            console.error('Resolve sub_event_guid failed', err)
+            return ''
+        }
+    }
+
+    ensureSubGuid().then((resolvedGuid) => {
+        subGuid = resolvedGuid || subGuid
+
+        outcome.selected = type
+        paymentSubEventGuid.value = subGuid
+        paymentOutcomeTitle.value = outcome.title || ''
+        paymentInitialOutcome.value = type === 'yes' ? 'YES' : 'NO'
+        paymentInitialSide.value = 'buy'
+        showPayment.value = true
+    })
 }
 
 const onOrderSuccess = (orderData) => {
@@ -1258,14 +1267,16 @@ onUnmounted(() => {
             font-size: 12px;
             margin-bottom: 12px;
 
-            span{
+            span {
                 padding: 2px 6px;
                 border-radius: 6px;
             }
+
             span.yes {
                 color: var(--text-color-y);
                 background: var(--button-bg-y);
             }
+
             span.no {
                 color: var(--text-color-n);
                 background: var(--button-bg-n);
@@ -1416,6 +1427,13 @@ onUnmounted(() => {
 
     .tab-pane {
         padding-bottom: 40px;
+    }
+
+    .empty-state {
+        padding: 28px 0;
+        text-align: center;
+        font-size: 13px;
+        color: var(--text-dark-gray);
     }
 
     .comment-item {

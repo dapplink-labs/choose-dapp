@@ -8,18 +8,18 @@
                 <!-- 1. 顶部切换栏 -->
                 <div class="trade-nav">
                     <div class="side-tabs">
-                        <button :class="['nav-tab', { active: activeSide === 'buy' }]"
+                        <button type="button" :class="['nav-tab', { active: activeSide === 'buy' }]"
                             @click="switchSide('buy')">{{
                                 $t('payment.buy') }}</button>
-                        <button :class="['nav-tab', { active: activeSide === 'sell' }]"
+                        <button type="button" :class="['nav-tab', { active: activeSide === 'sell' }]"
                             @click="switchSide('sell')">{{
                                 $t('payment.sell') }}</button>
                     </div>
                     <div class="type-pills">
-                        <button :class="['pill', { active: orderType === 'market' }]"
+                        <button type="button" :class="['pill', { active: orderType === 'market' }]"
                             @click="switchOrderType('market')">{{
                                 $t('payment.marketOrder') }}</button>
-                        <button :class="['pill', { active: orderType === 'limit' }]"
+                        <button type="button" :class="['pill', { active: orderType === 'limit' }]"
                             @click="switchOrderType('limit')">{{
                                 $t('payment.limitOrder') }}</button>
                     </div>
@@ -46,8 +46,8 @@
                             <div class="balance-info">
                                 <el-icon>
                                     <Wallet />
-                                </el-icon> {{ $t('payment.balance') }}
-                                {{ balanceLoading ? '...' : `$${userBalance}` }}
+                                </el-icon>
+                                <span>{{ $t('payment.balance') }}{{ balanceLoading ? '...' : `$${userBalance}` }}</span>
                             </div>
                         </div>
                     </div>
@@ -74,8 +74,7 @@
                         <div class="stepper-box">
                             <div class="input-box">
                                 <input v-model="inputValue" type="number" class="main-input"
-                                    :placeholder="isMarketBuy ? '0.00' : '0'"
-                                    @input="onInputChange" />
+                                    :placeholder="isMarketBuy ? '0.00' : '0'" @input="onInputChange" />
                             </div>
                         </div>
                     </div>
@@ -100,7 +99,8 @@
                                     {{ $t('payment.avgPrice') }}：{{ previewData.avg_price || '--' }} USDT
                                 </span>
                                 <span class="preview-text">
-                                    {{ $t('payment.estimatedShares') || 'Est. Shares' }}：{{ previewData.shares || '--' }}
+                                    {{ $t('payment.estimatedShares') || 'Est. Shares' }}：{{ previewData.shares || '--'
+                                    }}
                                 </span>
                             </div>
                             <div v-else class="preview-details">
@@ -108,7 +108,8 @@
                                     {{ $t('payment.avgPrice') }}：{{ previewData.avg_price || '--' }} USDT
                                 </span>
                                 <span class="preview-text">
-                                    {{ $t('payment.estimatedProfit') || 'Est. Profit' }}：{{ previewData.profit || '--' }} USDT
+                                    {{ $t('payment.estimatedProfit') || 'Est. Profit' }}：{{ previewData.profit || '--'
+                                    }} USDT
                                 </span>
                             </div>
                         </template>
@@ -238,15 +239,6 @@ const quickAdjustValues = computed(() =>
     isMarketBuy.value ? [-100, -10, 10, 100] : [-100, -10, 10, 100]
 )
 
-const expiryOptions = computed(() => ([
-    { key: '5m', label: t('payment.expiry5m') || '5m' },
-    { key: '1h', label: t('payment.expiry1h') || '1h' },
-    { key: '12h', label: t('payment.expiry12h') || '12h' },
-    { key: '24h', label: t('payment.expiry24h') || '24h' },
-    { key: 'eod', label: t('payment.expiryEod') || 'EOD' },
-    { key: 'custom', label: t('payment.expiryCustom') || 'Custom' },
-]))
-
 // 汇总展示
 const displayTotal = computed(() => {
     if (orderType.value === 'market') {
@@ -278,7 +270,8 @@ const displayGain = computed(() => {
 
 const canSubmit = computed(() => {
     const val = Number(inputValue.value)
-    return val > 0 && props.eventGuid && props.subEventGuid
+    // 提交按钮只依赖本地输入是否有效，其余校验在提交时处理
+    return val > 0
 })
 
 // 执行按钮文案
@@ -359,6 +352,20 @@ async function fetchBalance() {
     }
 }
 
+const isRespSuccess = (res) => {
+    const code = res?.data?.code
+    return code === 200 || code === 2000
+}
+
+const isOrderSuccess = (res) => {
+    const code = res?.data?.code
+    const msg = String(res?.data?.message || '').toLowerCase()
+    // 后端目前有多种成功码：0 / 200 / 2000，且 message="order created successfully"
+    if (code === 0 || code === 200 || code === 2000) return true
+    if (msg.includes('order created successfully') || msg === 'success') return true
+    return false
+}
+
 async function fetchPreview() {
     const val = Number(inputValue.value)
     if (!val || val <= 0) return
@@ -374,10 +381,13 @@ async function fetchPreview() {
                 sub_event_guid: props.subEventGuid,
                 outcome: outcomeBadge.value,
             })
-            if (res?.data?.code === 200) {
+            if (isRespSuccess(res)) {
                 previewData.value = res.data.data
             } else {
-                console.warn('Preview buy failed:', res?.data?.message)
+                const msg = res?.data?.message
+                if (msg && String(msg).toLowerCase() !== 'success') {
+                    console.warn('Preview buy failed:', msg)
+                }
                 previewData.value = null
             }
         } else if (activeSide.value === 'sell' && orderType.value === 'market') {
@@ -388,10 +398,13 @@ async function fetchPreview() {
                 sub_event_guid: props.subEventGuid,
                 outcome: outcomeBadge.value,
             })
-            if (res?.data?.code === 200) {
+            if (isRespSuccess(res)) {
                 previewData.value = res.data.data
             } else {
-                console.warn('Preview sell failed:', res?.data?.message)
+                const msg = res?.data?.message
+                if (msg && String(msg).toLowerCase() !== 'success') {
+                    console.warn('Preview sell failed:', msg)
+                }
                 previewData.value = null
             }
         }
@@ -405,6 +418,11 @@ async function fetchPreview() {
 
 async function handleConfirm() {
     if (submitting.value || !canSubmit.value) return
+
+    if (!props.eventGuid || !props.subEventGuid) {
+        ElMessage.error(t('payment.missingIds') || 'Missing event or sub-event id')
+        return
+    }
 
     submitting.value = true
     try {
@@ -431,16 +449,21 @@ async function handleConfirm() {
         }
 
         const res = await makeOrder(orderParams)
-        if (res?.data?.code === 200) {
-            ElMessage.success(res.data.message || t('payment.orderSuccess') || 'Order created successfully')
+        if (!res || !res.data) {
+            ElMessage.error(t('payment.tradeFailed') || t('payment.orderFailed') || 'Trade failed')
+            return
+        }
+
+        if (isOrderSuccess(res)) {
             emit('order-success', res.data.data)
-            handleClose()
+            ElMessage.success(t('payment.tradeSuccess') || t('payment.orderSuccess') || 'Trade successful')
+            fetchBalance() // 交易成功后刷新用户余额
         } else {
-            ElMessage.error(res?.data?.message || t('payment.orderFailed') || 'Order failed')
+            ElMessage.error(res.data.message || t('payment.tradeFailed') || t('payment.orderFailed') || 'Trade failed')
         }
     } catch (err) {
         console.error('Make order failed', err)
-        ElMessage.error(t('payment.orderFailed') || 'Order failed')
+        ElMessage.error(t('payment.tradeFailed') || t('payment.orderFailed') || 'Trade failed')
     } finally {
         submitting.value = false
     }
@@ -471,7 +494,7 @@ watch(() => props.modelValue, (val) => {
     inset: 0;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
-    z-index: 3000;
+    z-index: 2001;
     display: flex;
     align-items: flex-end;
 }
@@ -497,6 +520,7 @@ watch(() => props.modelValue, (val) => {
     z-index: 1;
     height: 30px;
     background: var(--bg-page);
+    pointer-events: none;
 
     &::after {
         content: '';
@@ -584,6 +608,7 @@ watch(() => props.modelValue, (val) => {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 20px;
     }
 
     .outcome-badge {
@@ -619,6 +644,14 @@ watch(() => props.modelValue, (val) => {
         display: flex;
         align-items: center;
         gap: 4px;
+
+        span {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--text-dark-gray);
+            // 禁止折行
+            white-space: nowrap;
+        }
     }
 }
 
@@ -842,6 +875,7 @@ watch(() => props.modelValue, (val) => {
 
     &.on {
         background: var(--text-color-y);
+
         .knob {
             transform: translateX(22px);
         }

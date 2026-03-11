@@ -35,6 +35,16 @@ export default {
     winnerFee: "勝者手数料(3%)",
     lost: "未的中",
     claimed: "受取済み",
+    completed: "完了",
+    cancelled: "キャンセル",
+    cancelOrder: "注文をキャンセル",
+    cancelOrderConfirm: "この注文をキャンセルしますか？",
+    cancelSuccess: "キャンセルしました",
+    cancelAllOrders: "すべてキャンセル",
+    cancelAllOrdersConfirm: "すべての未約定注文をキャンセルしますか？",
+    noOpenOrdersToCancel: "キャンセルできる未約定注文がありません",
+    cancelAllSuccess: "{n}件の注文をキャンセルしました",
+    cancelAllFailed: "{n}件の注文のキャンセルに失敗しました",
   },
   "withdraw": {
     "title": "出金",
@@ -105,6 +115,7 @@ export default {
     "sec": "秒",
     "past": "過去",
     "ended": "終了",
+    "eventEnded": "イベント終了",
     "hrs": "時",
     "mins": "分",
     "secs": "秒",
@@ -269,7 +280,9 @@ export default {
   },
   "common": {
     "skip": "スキップ",
+    "tip": "ヒント",
     "confirm": "確定",
+    "cancel": "キャンセル",
     "loading": "読み込み中...",
     "continue": "続ける",
     "search": "検索",
@@ -281,6 +294,7 @@ export default {
     "close": "Close",
     "share": "共有",
     "noData": "データがありません...",
+    "noMoreData": "これ以上データはありません",
     "address": "アドレス",
     "userAvatar": "User Avatar",
     "settings": "Settings",
@@ -957,6 +971,9 @@ export default {
   "payment": {
     "buy": "買い",
     "sell": "売り",
+    "sellSuccess": "売却が成功しました",
+    "tradeSuccess": "取引が成功しました",
+    "tradeFailed": "取引に失敗しました",
     "marketOrder": "成行",
     "limitOrder": "指値",
     "balance": "残高",
@@ -983,7 +1000,8 @@ export default {
     "orderSuccess": "注文が作成されました",
     "orderFailed": "注文に失敗しました",
     "buyNo": "Buy No",
-    "buyYes": "Buy Yes"
+    "buyYes": "Buy Yes",
+    "missingIds": "イベントIDまたはサブイベントIDが不足しています"
   },
   "datePicker": {
     "title": "日付範囲で絞り込み",

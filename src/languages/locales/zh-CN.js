@@ -35,6 +35,16 @@ export default {
     winnerFee: "赢家抽水(3%)",
     lost: "未中",
     claimed: "已领取",
+    completed: "已完成",
+    cancelled: "已取消",
+    cancelOrder: "取消挂单",
+    cancelOrderConfirm: "确认取消该挂单？",
+    cancelSuccess: "取消成功",
+    cancelAllOrders: "取消所有挂单",
+    cancelAllOrdersConfirm: "确认取消所有挂单？",
+    noOpenOrdersToCancel: "暂无可取消的挂单",
+    cancelAllSuccess: "已取消 {n} 个挂单",
+    cancelAllFailed: "{n} 个挂单取消失败",
   },
   "withdraw": {
     "title": "提币",
@@ -105,6 +115,7 @@ export default {
     "sec": "秒",
     "past": "过去",
     "ended": "结束于",
+    "eventEnded": "活动已结束",
     "hrs": "时",
     "mins": "分",
     "secs": "秒",
@@ -263,7 +274,9 @@ export default {
   },
   "common": {
     "skip": "跳过",
+    "tip": "提示",
     "confirm": "确定",
+    "cancel": "取消",
     "loading": "加载中...",
     "continue": "继续",
     "search": "搜索",
@@ -275,6 +288,7 @@ export default {
     "close": "关闭",
     "share": "分享",
     "noData": "暂无数据...",
+    "noMoreData": "没有更多数据了",
     "address": "地址",
     "userAvatar": "用户头像",
     "settings": "设置",
@@ -958,6 +972,9 @@ export default {
   "payment": {
     "buy": "买入",
     "sell": "卖出",
+    "sellSuccess": "卖出成功",
+    "tradeSuccess": "交易成功",
+    "tradeFailed": "交易失败",
     "marketOrder": "市价单",
     "limitOrder": "限价单",
     "balance": "余额",
@@ -984,7 +1001,8 @@ export default {
     "orderSuccess": "下单成功",
     "orderFailed": "下单失败",
     "buyNo": "Buy No",
-    "buyYes": "Buy Yes"
+    "buyYes": "Buy Yes",
+    "missingIds": "缺少事件或子事件ID"
   },
   "datePicker": {
     "title": "按日期范围筛选",

@@ -12,7 +12,7 @@
           <el-icon class="trophy-icon">
             <Trophy />
           </el-icon>
-          <span class="top-volume">$153,642,644 {{ $t('bitcoinUpDown.volume') }}</span>
+          <span class="top-volume">{{ topVolumeText }}</span>
         </div>
         <button class="top-btn bookmark-btn" type="button">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -37,7 +37,7 @@
             </svg>
           </div>
           <div class="asset-text">
-            <h2>{{ $t('bitcoinUpDown.questionTitle') }}</h2>
+            <h2>{{ detailData.title || $t('bitcoinUpDown.questionTitle') }}</h2>
           </div>
           <!-- 选中历史记录时隐藏倒计时 -->
           <div class="timer" v-show="activeSegmentMode !== 'past'">
@@ -199,29 +199,30 @@
 
       <!-- Positions -->
       <div v-if="activeTab === 'Positions'" class="position-content">
-        <div class="pos-card">
-          <h3 class="pos-title">{{ $t('crypto.upOrDown') }}</h3>
-          <span class="pos-tag">{{ $t('crypto.up') }} | 100 {{ $t('sports.shares') }}</span>
+        <div v-if="activePosition" class="pos-card">
+          <h3 class="pos-title">{{ activePosition.title }}</h3>
+          <span class="pos-tag">{{ activePosition.tagLabel }}</span>
           <div class="pos-grid">
             <div class="grid-item">
               <div class="g-label">{{ $t('crypto.avgPrice') }}</div>
-              <div class="g-val">40 ¢</div>
+              <div class="g-val">{{ activePosition.avgPrice }}</div>
             </div>
             <div class="grid-item">
               <div class="g-label">{{ $t('crypto.cost') }}</div>
-              <div class="g-val">$40</div>
+              <div class="g-val">{{ activePosition.cost }}</div>
             </div>
             <div class="grid-item">
               <div class="g-label">{{ $t('crypto.current') }}</div>
-              <div class="g-val">$80</div>
+              <div class="g-val">{{ activePosition.current }}</div>
             </div>
             <div class="grid-item">
               <div class="g-label">{{ $t('crypto.profit') }}</div>
-              <div class="g-val neon">+$40(+100%)</div>
+              <div class="g-val" :class="{ neon: activePosition.profitPositive }">{{ activePosition.profit }}</div>
             </div>
           </div>
-          <button class="withdraw-hero-btn">{{ $t('crypto.withdraw') }}</button>
+          <button class="withdraw-hero-btn" type="button" @click="handlePositionWithdraw">{{ $t('crypto.withdraw') }}</button>
         </div>
+        <div v-else class="orders-empty">{{ $t('common.noData') || '暂无数据...' }}</div>
       </div>
 
       <!-- Orders -->
@@ -233,7 +234,7 @@
           </button>
         </div>
 
-        <div v-if="openOrders.length">
+        <div v-if="openOrders.length" class="orders-list">
           <div v-for="order in openOrders" :key="order.id" class="order-row">
             <div class="order-left">
               <div class="order-side" :class="order.side">
@@ -263,7 +264,7 @@
       <!-- History -->
       <div v-else-if="activeTab === 'History'" class="history-content">
         <div class="history-header">{{ $t('crypto.history') }}</div>
-        <div v-if="orderHistory.length">
+        <div v-if="orderHistory.length" class="history-list">
           <div v-for="item in orderHistory" :key="item.id" class="history-row">
             <div class="history-main">
               <div class="history-text">
@@ -283,7 +284,7 @@
       <div class="orderbook-header" @click="isBookOpen = !isBookOpen">
         <span>{{ $t('sports.orderBook') }}</span>
         <div class="header-right">
-          <span class="vol">$35.4K</span>
+          <span class="vol">{{ orderBookVolumeText }}</span>
           <el-icon :class="{ rotate: isBookOpen }">
             <ArrowDown />
           </el-icon>
@@ -297,175 +298,621 @@
           <button class="orderbook-tab" :class="{ active: orderBookTab === 'no' }" @click="orderBookTab = 'no'">{{
             $t('detail.tradeNo') }}</button>
         </div>
-        <OrderBookMobile :active-side="orderBookTab" />
+        <OrderBookMobile :active-side="orderBookTab" :asks="currentOrderBook.asks" :bids="currentOrderBook.bids"
+          :last-trade-price="currentOrderBook.last_trade_price" :loading="orderBookLoading" :use-mock-fallback="false" />
       </div>
 
       <div class="rules-footer">
         <h4>{{ $t('detail.rules') }}</h4>
-        <p>{{ $t('bitcoinUpDown.rulesDescription') }}</p>
+        <p>{{ detailData.rulesDescription || $t('bitcoinUpDown.rulesDescription') }}</p>
       </div>
     </div>
 
     <!-- 吸底操作栏 -->
     <div class="bottom-dock-actions">
-      <button class="trade-btn up" type="button" @click="openPayment('up')">
-        {{ $t('common.buy') }} {{ $t('crypto.up') }} 96 ¢
-      </button>
-      <button class="trade-btn down" type="button" @click="openPayment('down')">
-        {{ $t('common.buy') }} {{ $t('crypto.down') }} 4 ¢
-      </button>
+      <!-- 事件未结束时显示购买按钮 -->
+      <template v-if="!isEventEnded">
+        <button class="trade-btn up" type="button" @click="openPayment('up')">
+          {{ $t('common.buy') }} {{ $t('crypto.up') }} {{ upTradePriceText }}
+        </button>
+        <button class="trade-btn down" type="button" @click="openPayment('down')">
+          {{ $t('common.buy') }} {{ $t('crypto.down') }} {{ downTradePriceText }}
+        </button>
+      </template>
+      <!-- 事件已结束时显示提示 -->
+      <div v-else class="event-ended-tip">
+        {{ $t('bitcoinUpDown.eventEnded') }}
+      </div>
     </div>
 
-    <PaymentModal v-model="showPayment" />
+    <PaymentModal v-model="showPayment" :event-title="detailData.eventTitle || detailData.title"
+      :outcome-title="paymentOutcomeTitle" :event-guid="currentEventGuid" :sub-event-guid="resolvedSubEventGuid"
+      :initial-outcome="paymentInitialOutcome" :initial-side="paymentInitialSide" @order-success="onOrderSuccess" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ArrowLeft, ArrowDown, Trophy } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
+import { ElMessage } from 'element-plus'
+import { createIotMqttClient, hasWebCrypto } from '@/utils/mqttClient'
 import OrderBookMobile from '@/components/OrderBookMobile.vue'
 import PaymentModal from '@/components/PaymentModal.vue'
 import { useThemeStore } from '@/stores/theme'
+import {
+  cancelOrder,
+  fiatWithdraw,
+  getEventDetailItem,
+  getEventPriceHistory,
+  getOpenOrders,
+  getOrderBook,
+  getOrderHistory,
+  getSubEventDetail,
+  getUserPositions,
+} from '@/api/APIEvent'
 
 const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const themeStore = useThemeStore()
 
+const FALLBACK_USER_GUID = '41f83791b601426896bcb39f45e2fd12'
+
 const handleBack = () => router.back()
+const goWithdraw = () => router.push({ name: 'withdraw' })
+const currentEventGuid = computed(() => route.query.id || route.query.event_guid || '')
+const requestedSubEventGuid = computed(() => route.query.sub_event_guid || '')
 const activeTab = ref('Positions')
 const isBookOpen = ref(false)
 const orderBookTab = ref('yes')
 
-const openOrders = ref([
-  { id: 1, side: 'down', price: 80, cost: 40, filled: 0, total: 50, untilCancel: true },
-  { id: 2, side: 'down', price: 80, cost: 40, filled: 0, total: 50, untilCancel: true }
-])
-
-const orderHistory = ref([
-  { id: 1, side: 'up', shares: 40, price: 80, notional: 32, timeAgo: '4分钟前' },
-  { id: 2, side: 'down', shares: 40, price: 80, notional: 32, timeAgo: '4分钟前' }
-])
-
-const handleCancelAllOrders = () => {
-  openOrders.value = []
+const getUserGuid = () => window.sessionStorage.getItem('user_guid') || FALLBACK_USER_GUID
+const isRespSuccess = (res) => {
+  const code = res?.data?.code
+  return code === 0 || code === 200 || code === 2000
 }
 
-const handleCancelOrder = (id) => {
-  openOrders.value = openOrders.value.filter(o => o.id !== id)
+// 图表与时间按钮统一使用用户本地时区
+const formatTimeLocal = (dateOrStr, opts = {}) => {
+  const date = dateOrStr instanceof Date ? dateOrStr : new Date(String(dateOrStr || '').replace(' ', 'T'))
+  if (Number.isNaN(date.getTime())) return ''
+  return new Intl.DateTimeFormat('en-CA', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: opts.seconds ? '2-digit' : undefined,
+    hour12: false,
+    // 不传 timeZone，使用用户浏览器本地时区
+  }).format(date)
 }
 
+// --- MQTT (AWS IoT Core) 实时数据 ---
+// IoT Region 用于指定 AWS 区域
+const IOT_REGION = import.meta.env.VITE_IOT_REGION || 'ap-southeast-1'
+// IoT Endpoint 用于指定 AWS IoT 端点
+const IOT_ENDPOINT = import.meta.env.VITE_IOT_ENDPOINT || 'a3awip9q9thtco-ats.iot.ap-southeast-1.amazonaws.com'
+// Cognito Identity Pool ID 用于指定 AWS Cognito 身份池 ID
+const COGNITO_IDENTITY_POOL_ID =
+  import.meta.env.VITE_COGNITO_IDENTITY_POOL_ID || 'ap-southeast-1:ec400695-b709-4af1-a19b-455cded69acf'
+
+/** @type {ReturnType<import('@/utils/mqttClient').createIotMqttClient>|null} */
+let iotMqtt = null
+let mqttDestroyed = false
+
+const shouldUseMqtt = computed(() => !!IOT_ENDPOINT && !!COGNITO_IDENTITY_POOL_ID && hasWebCrypto())
+
+// ── 事件结束状态 ──
+// 通过 API 状态字段或倒计时归零两种途径判断事件是否已结束
+const eventEnded = ref(false)
+const isEventEnded = computed(() => {
+  if (eventEnded.value) return true
+  const status = String(detailData.value.eventStatus || '').toLowerCase()
+  return ['settled', 'ended', 'closed', 'resolved', 'expired', 'finished', 'completed'].includes(status)
+})
+
+// ═══════════════════════════════════════════════════════
+// ■ 数据格式化工具函数
+// ═══════════════════════════════════════════════════════
+const formatCompactNumber = (value) => {
+  const num = Number(value)
+  if (!Number.isFinite(num)) return '0'
+  if (num >= 1_000_000_000) return `${(num / 1_000_000_000).toFixed(1)}B`
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`
+  if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`
+  return num.toFixed(2)
+}
+
+const formatMoney = (value, digits = 2) => {
+  const num = Number(value)
+  if (!Number.isFinite(num)) return '--'
+  return `$${num.toLocaleString('en-US', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  })}`
+}
+
+const formatPrice = (value) => {
+  const num = Number(value)
+  if (!Number.isFinite(num)) return '--'
+  return formatMoney(num)
+}
+
+const formatPriceNumber = (value, digits = 2) => {
+  const num = Number(value)
+  if (!Number.isFinite(num)) return '--'
+  return num.toLocaleString('en-US', {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  })
+}
+
+const formatCentText = (value) => {
+  const num = Number(value)
+  if (!Number.isFinite(num)) return '--'
+  if (num > 0 && num <= 1) {
+    return `${(num * 100).toFixed(0)} ¢`
+  }
+  return `${num.toFixed(2)}`
+}
+
+const formatCentValue = (value) => {
+  const num = Number(value)
+  if (!Number.isFinite(num)) return '--'
+  if (num > 0 && num <= 1) {
+    return (num * 100).toFixed(0)
+  }
+  return num.toFixed(2)
+}
+
+const formatVolumeText = (value) => {
+  const num = Number(value)
+  if (!Number.isFinite(num)) return `$0 ${t('bitcoinUpDown.volume')}`
+  return `$${formatCompactNumber(num)} ${t('bitcoinUpDown.volume')}`
+}
+
+const formatAgo = (value) => {
+  if (!value) return ''
+  const date = new Date(String(value).replace(' ', 'T'))
+  const ts = date.getTime()
+  if (Number.isNaN(ts)) return String(value)
+  const diffSeconds = Math.max(0, Math.floor((Date.now() - ts) / 1000))
+  const minutes = Math.floor(diffSeconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+  if (days > 0) return `${days}d ago`
+  if (hours > 0) return `${hours}h ago`
+  if (minutes > 0) return `${minutes}m ago`
+  return 'Just now'
+}
+
+const firstFinite = (...values) => {
+  for (const value of values.flat()) {
+    const num = Number(value)
+    if (Number.isFinite(num)) return num
+  }
+  return null
+}
+
+const outcomeToTrend = (value) => {
+  const text = String(value || '').toLowerCase()
+  return text === 'no' || text === 'down' ? 'down' : 'up'
+}
+
+// ═══════════════════════════════════════════════════════
+// ■ 响应式状态 & 派生数据
+// ═══════════════════════════════════════════════════════
+const detailData = ref({
+  eventTitle: '',
+  title: '',
+  tradeVolume: 0,
+  rulesDescription: '',
+  closeTime: '',
+  targetPrice: null,
+  currentPrice: null,
+  yesAskPrice: '--',
+  noAskPrice: '--',
+  yesBidPrice: '--',
+  noBidPrice: '--',
+  subEventGuidResolved: '',
+  eventStatus: '',  // 事件状态（settled/ended/closed 等表示已结束）
+})
+
+// 已解析的子事件 GUID
+const resolvedSubEventGuid = computed(() => detailData.value.subEventGuidResolved || requestedSubEventGuid.value || '')
+// 顶部成交量文本
+const topVolumeText = computed(() => formatVolumeText(detailData.value.tradeVolume))
+// 买入 UP 价格文本
+const upTradePriceText = computed(() => detailData.value.yesAskPrice || '--')
+// 买入 DOWN 价格文本
+const downTradePriceText = computed(() => detailData.value.noAskPrice || '--')
+
+// 持仓列表
+const positions = ref([])
+// 活跃持仓
+const activePosition = computed(() => positions.value[0] || null)
+// 挂单列表
+const openOrders = ref([])
+// 历史订单列表
+const orderHistory = ref([])
+// 订单簿加载状态
+const orderBookLoading = ref(false)
+// 订单簿 YES 方向
+const orderBookYes = ref({ asks: [], bids: [], last_trade_price: '' })
+// 订单簿 NO 方向
+const orderBookNo = ref({ asks: [], bids: [], last_trade_price: '' })
+// 当前订单簿
+const currentOrderBook = computed(() => (orderBookTab.value === 'yes' ? orderBookYes.value : orderBookNo.value))
+// 订单簿成交量文本
+const orderBookVolumeText = computed(() => {
+  const current = currentOrderBook.value || {}
+  const rows = [...(current.asks || []), ...(current.bids || [])]
+  const notional = rows.reduce((sum, row) => sum + (Number(row.price) || 0) * (Number(row.quantity) || 0), 0)
+  if (!notional) return formatMoney(detailData.value.tradeVolume || 0, 0)
+  return `$${formatCompactNumber(notional)}`
+})
+
+// 支付弹窗标题
+const paymentOutcomeTitle = ref('')
+// 支付弹窗初始 outcome
+const paymentInitialOutcome = ref('YES')
+// 支付弹窗初始 side
+const paymentInitialSide = ref('buy')
+// 支付弹窗显示状态
 const showPayment = ref(false)
-const selectedTradeSide = ref(null) // 'up' | 'down'
+
+// ═══════════════════════════════════════════════════════
+// ■ 支付弹窗
+// ═══════════════════════════════════════════════════════
+
+// 打开支付弹窗，根据方向设置初始 outcome
 const openPayment = (side) => {
-  selectedTradeSide.value = side
+  paymentOutcomeTitle.value = detailData.value.title || detailData.value.eventTitle || ''
+  paymentInitialOutcome.value = side === 'up' ? 'YES' : 'NO'
+  paymentInitialSide.value = 'buy'
   showPayment.value = true
 }
 
-// --- 吸顶逻辑 ---
+// 下单成功后刷新所有相关数据
+const onOrderSuccess = async () => {
+  await Promise.allSettled([
+    fetchDetail(),
+    fetchPositions(),
+    fetchOpenOrders(),
+    fetchOrderHistory(),
+    fetchOrderBook(),
+  ])
+}
+
+// ═══════════════════════════════════════════════════════
+// ■ 持仓 / 订单 / 历史 数据处理
+// ═══════════════════════════════════════════════════════
+
+// 将服务端持仓数据映射为页面展示格式
+const mapPositionCard = (item) => {
+  const outcome = outcomeToTrend(item?.outcome)
+  const shares = Number(item?.position_size ?? item?.size ?? item?.quantity ?? 0)
+  const costNum = firstFinite(item?.bet_amount, item?.dealed_cost, item?.cost, item?.position_value) || 0
+  const currentNum = firstFinite(item?.position_value, item?.current_value, item?.bet_amount) || 0
+  const profitNum = firstFinite(item?.profit_loss, item?.profit) || 0
+  const profitPct = costNum ? (profitNum / costNum) * 100 : 0
+  return {
+    id: item?.guid || item?.position_guid || item?.sub_event_guid || `${item?.event_guid || 'pos'}-${item?.outcome || 'yes'}`,
+    title: item?.sub_event_title || item?.event_name || detailData.value.title || t('crypto.upOrDown'),
+    tagLabel: `${outcome === 'up' ? t('crypto.up') : t('crypto.down')} | ${shares || 0} ${t('sports.shares')}`,
+    avgPrice: formatCentText(item?.avg_price ?? item?.current_price),
+    cost: formatMoney(costNum),
+    current: formatMoney(currentNum),
+    profit: `${profitNum >= 0 ? '+' : '-'}${formatMoney(Math.abs(profitNum)).replace('$', '$')}${costNum ? `(${profitPct >= 0 ? '+' : ''}${profitPct.toFixed(2)}%)` : ''}`,
+    profitPositive: profitNum >= 0,
+    raw: item,
+  }
+}
+
+// 持仓提现：读取当前持仓金额，调用法币提现接口
+const handlePositionWithdraw = async () => {
+  const pos = activePosition.value
+  const raw = pos?.raw || {}
+  const amountPicked = firstFinite([
+    raw?.withdraw_amount,
+    raw?.amount,
+    raw?.position_value,
+    raw?.current_value,
+    raw?.profit_loss,
+    raw?.profit,
+  ])
+  const amount = Number.isFinite(amountPicked) && amountPicked > 0 ? String(amountPicked) : null
+  const currency_code = raw?.currency_code || raw?.currency || 'USD'
+  const user_guid = getUserGuid()
+
+  const missing = ['amount', 'currency_code', 'user_guid'].filter((k) => !({ amount, currency_code, user_guid }[k]))
+  if (missing.length) {
+    ElMessage.error(`Withdraw 参数缺失：${missing.join(', ')}`)
+    return
+  }
+
+  try {
+    const res = await fiatWithdraw({ amount, currency_code, user_guid })
+    if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Withdraw failed')
+    ElMessage.success(res?.data?.message || 'Withdraw success')
+    await Promise.allSettled([fetchPositions(), fetchOpenOrders(), fetchOrderHistory()])
+  } catch (e) {
+    ElMessage.error(e?.message || 'Withdraw failed')
+  }
+}
+
+// 将服务端挂单数据映射为页面展示格式
+const mapOpenOrder = (item) => ({
+  id: item?.guid || item?.order_guid || '',
+  orderGuid: item?.guid || item?.order_guid || '',
+  side: outcomeToTrend(item?.outcome),
+  price: formatCentValue(item?.price),
+  cost: Number(firstFinite(item?.cost, item?.dealed_cost) || 0).toFixed(2),
+  filled: Number(firstFinite(item?.dealed_size) || 0).toFixed(0),
+  total: Number(firstFinite(item?.size) || 0).toFixed(0),
+  untilCancel: !item?.expire_at,
+})
+
+// 将服务端历史订单数据映射为页面展示格式
+const mapOrderHistoryItem = (item) => ({
+  id: item?.order_guid || item?.guid || '',
+  side: outcomeToTrend(item?.outcome),
+  shares: Number(firstFinite(item?.dealed_size, item?.size) || 0).toFixed(0),
+  price: formatCentValue(item?.dealed_price ?? item?.price),
+  notional: Number(firstFinite(item?.dealed_cost, item?.cost) || 0).toFixed(2),
+  timeAgo: formatAgo(item?.dealed_at || item?.created_at),
+})
+
+// 拉取当前用户在本事件下的持仓列表
+const fetchPositions = async () => {
+  if (!currentEventGuid.value) {
+    positions.value = []
+    return
+  }
+  try {
+    const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
+    const languageLabel = currentLocale.split('-')[0]
+    const res = await getUserPositions({
+      user_guid: getUserGuid(),
+      status: 'holding',
+      page: 1,
+      page_size: 20,
+      language_label: languageLabel,
+    })
+    if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Fetch positions failed')
+    const list = Array.isArray(res?.data?.data?.list) ? res.data.data.list : []
+    positions.value = list
+      .filter(item => !currentEventGuid.value || item?.event_guid === currentEventGuid.value)
+      .map(mapPositionCard)
+  } catch (error) {
+    console.error('Fetch positions failed', error)
+    positions.value = []
+  }
+}
+
+// 拉取当前用户在本事件下的挂单列表
+const fetchOpenOrders = async () => {
+  if (!currentEventGuid.value) {
+    openOrders.value = []
+    return
+  }
+  try {
+    const res = await getOpenOrders({
+      user_guid: getUserGuid(),
+      page: 1,
+      page_size: 20,
+      event_guid: currentEventGuid.value,
+      sub_event_guid: resolvedSubEventGuid.value || undefined,
+      order_type: 'all',
+      side: 'all',
+    })
+    if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Fetch open orders failed')
+    const list = Array.isArray(res?.data?.data?.orders) ? res.data.data.orders : []
+    openOrders.value = list.map(mapOpenOrder)
+  } catch (error) {
+    console.error('Fetch open orders failed', error)
+    openOrders.value = []
+  }
+}
+
+// 拉取当前用户在本事件下的历史订单列表
+const fetchOrderHistory = async () => {
+  if (!currentEventGuid.value) {
+    orderHistory.value = []
+    return
+  }
+  try {
+    const res = await getOrderHistory({
+      user_guid: getUserGuid(),
+      page: 1,
+      page_size: 20,
+      status: '',
+      is_settled: '',
+      event_guid: currentEventGuid.value,
+      sub_event_guid: resolvedSubEventGuid.value || undefined,
+    })
+    if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Fetch order history failed')
+    const list = Array.isArray(res?.data?.data?.orders) ? res.data.data.orders : []
+    orderHistory.value = list.map(mapOrderHistoryItem)
+  } catch (error) {
+    console.error('Fetch order history failed', error)
+    orderHistory.value = []
+  }
+}
+
+// 取消单笔挂单
+const handleCancelOrder = async (id) => {
+  const order = openOrders.value.find(item => item.id === id)
+  if (!order?.orderGuid) return
+  try {
+    const res = await cancelOrder({ order_guid: order.orderGuid })
+    if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Cancel failed')
+    ElMessage.success(t('assetManagement.cancelSuccess') || 'Canceled')
+    await fetchOpenOrders()
+  } catch (error) {
+    ElMessage.error(error?.message || 'Cancel failed')
+  }
+}
+
+// 批量取消所有挂单
+const handleCancelAllOrders = async () => {
+  const orderGuids = openOrders.value.map(item => item.orderGuid).filter(Boolean)
+  if (!orderGuids.length) return
+  try {
+    await Promise.all(orderGuids.map(orderGuid => cancelOrder({ order_guid: orderGuid })))
+    ElMessage.success(t('assetManagement.cancelSuccess') || 'Canceled')
+    await fetchOpenOrders()
+  } catch (error) {
+    ElMessage.error(error?.message || 'Cancel failed')
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ■ 页面滚动吸顶 & 倒计时
+// ═══════════════════════════════════════════════════════
 const isSticky = ref(false)
 const handleScroll = (e) => {
   isSticky.value = e.target.scrollTop > 20
 }
 
 // --- 倒计时 ---
-const countDown = ref({ hours: '01', minutes: '10', seconds: '18' })
+const targetTime = ref(0)
+const countDown = ref({ hours: '00', minutes: '00', seconds: '00' })
 let timerInterval = null
+// 启动倒计时（每秒刷新）
 const startCountDown = () => {
-  let totalSeconds = 1 * 3600 + 10 * 60 + 18
-  timerInterval = setInterval(() => {
-    if (totalSeconds <= 0) return clearInterval(timerInterval)
-    totalSeconds--
-    const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0')
-    const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0')
-    const s = (totalSeconds % 60).toString().padStart(2, '0')
-    countDown.value = { hours: h, minutes: m, seconds: s }
-  }, 1000)
+  clearInterval(timerInterval)
+  updateCountDown()
+  timerInterval = setInterval(updateCountDown, 1000)
 }
 
-// --- 状态机 ---
+// 当倒计时归零且目标时间有效时，标记事件为已结束
+const updateCountDown = () => {
+  const diff = Math.max(0, Math.floor((targetTime.value - Date.now()) / 1000))
+  const hours = Math.floor(diff / 3600).toString().padStart(2, '0')
+  const minutes = Math.floor((diff % 3600) / 60).toString().padStart(2, '0')
+  const seconds = (diff % 60).toString().padStart(2, '0')
+  countDown.value = { hours, minutes, seconds }
+  if (diff === 0 && targetTime.value > 0 && Date.now() > targetTime.value) {
+    eventEnded.value = true
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ■ 时间轴状态机（实时 / 历史 / 未来）
+// ═══════════════════════════════════════════════════════
 const activeSegmentMode = ref('live')
 
-// 模拟历史数据
-const pastRecords = [
-  { id: 1, label: '12 PM ET · Feb 25', date: 'Feb 25', result: 'up', targetPrice: 2047.32, finalPrice: 2062.59 },
-  { id: 2, label: '12 PM ET · Feb 24', date: 'Feb 24', result: 'down', targetPrice: 3168.00, finalPrice: 3136.32 },
-  { id: 3, label: '12 PM ET · Feb 23', date: 'Feb 23', result: 'down', targetPrice: 2100.00, finalPrice: 2080.00 },
-]
-const lastThreeResults = pastRecords.slice(0, 3)
+const pastRecords = ref([])
+const lastThreeResults = computed(() => pastRecords.value.slice(0, 3))
 const selectedPastRecord = ref(null)
 
-// 模拟 Live 数据
-const liveSegment = { label: '12 PM', targetPrice: 2047.32 }
-const livePrice = ref(2062.59)
-
-// 模拟当天未来截点 (仅留一个)
-const futureSegments = [
-  { id: 'today', label: '12 PM Feb 27' }
-]
+const liveSegment = computed(() => {
+  if (!detailData.value.closeTime) return { label: 'Live', targetPrice: detailData.value.targetPrice }
+  const label = formatTimeLocal(detailData.value.closeTime)
+  if (!label) return { label: 'Live', targetPrice: detailData.value.targetPrice }
+  return {
+    label,
+    targetPrice: detailData.value.targetPrice,
+  }
+})
+const futureSegments = computed(() => [])
 const selectedFutureId = ref(null)
+const livePrice = ref(null)
 
 // --- 数据衍生 ---
 const displayTargetPrice = computed(() => {
   if (activeSegmentMode.value === 'past') return selectedPastRecord.value?.targetPrice
-  if (activeSegmentMode.value === 'live') return liveSegment.targetPrice
+  if (activeSegmentMode.value === 'live') return liveSegment.value.targetPrice
   return null
 })
 
 const currentPriceChars = computed(() => {
+  if (!Number.isFinite(livePrice.value)) return ['-', '-']
   return livePrice.value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).split('')
 })
 
 const diffData = computed(() => {
-  let current, target;
+  let current
+  let target
   if (activeSegmentMode.value === 'past') {
-    current = selectedPastRecord.value.finalPrice
-    target = selectedPastRecord.value.targetPrice
+    current = selectedPastRecord.value?.finalPrice
+    target = selectedPastRecord.value?.targetPrice
   } else if (activeSegmentMode.value === 'live') {
     current = livePrice.value
-    target = liveSegment.targetPrice
+    target = liveSegment.value.targetPrice
   } else {
-    return { status: '', value: '' }
+    return { status: '', value: '--' }
   }
+  if (!Number.isFinite(current) || !Number.isFinite(target)) return { status: '', value: '--' }
   const diff = current - target
   return { status: diff >= 0 ? 'up' : 'down', value: Math.abs(diff).toFixed(2) }
 })
 
-const formatPrice = (val) => val ? `$${val.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : ''
-
-// --- Echarts 滑动图表 ---
+// ═══════════════════════════════════════════════════════
+// ■ ECharts 价格走势图
+// ═══════════════════════════════════════════════════════
+// 图表引用
 const chartRef = ref(null)
+// 图表实例
 let chartInstance = null
+// 图表 X 轴数据
 let chartDataX = []
+// 图表 Y 轴数据
 let chartDataY = []
-let lastGenTime = 0
+// 实时价格点队列
+let liveSeriesPoints = []
 
-const generateMockData = () => {
-  chartDataX = []
-  chartDataY = []
-  if (activeSegmentMode.value === 'past') {
-    let base = selectedPastRecord.value.targetPrice
-    const final = selectedPastRecord.value.finalPrice
-    for (let i = 0; i < 49; i++) {
-      chartDataX.push(`12:${(i + 10).toString().padStart(2, '0')}`)
-      base += (final - base) * 0.1 + (Math.random() - 0.5) * 5
-      chartDataY.push(base)
-    }
-    chartDataX.push(`End`)
-    chartDataY.push(final)
-  } else {
-    let base = 2060.00
-    lastGenTime = new Date().getTime() - 50 * 2000
-    for (let i = 0; i < 50; i++) {
-      const d = new Date(lastGenTime)
-      chartDataX.push(`${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`)
-      base += (Math.random() - 0.45) * 0.5
-      chartDataY.push(base)
-      lastGenTime += 2000
-    }
-    livePrice.value = chartDataY[chartDataY.length - 1]
+// 设置图表点数据
+const setChartPoints = (points) => {
+  chartDataX = points.map(point => point.label)
+  chartDataY = points.map(point => point.value)
+}
+
+// 同步实时图表
+const syncLiveChart = () => {
+  setChartPoints(liveSeriesPoints)
+  updateChart()
+}
+
+// 将 API 返回的历史价格数据解析为图表所需的 [{label, value, timestamp}] 格式
+const buildChartPointsFromHistory = (priceHistoryData) => {
+  console.log('[Chart]', 'buildChartPointsFromHistory 历史价格', priceHistoryData)
+  const points = Array.isArray(priceHistoryData?.data_points) ? priceHistoryData.data_points : []
+  if (!points.length) return []
+  const pickedPoint = points.find(item => Array.isArray(item?.history) && item.history.length) || points[0]
+  const histories = Array.isArray(pickedPoint?.history) ? pickedPoint.history : []
+  const pickedHistory = histories.find(item => (item?.outcome || '').toLowerCase() === 'yes') || histories[0]
+  const rows = Array.isArray(pickedHistory?.data) ? pickedHistory.data : []
+  const result = rows
+    .map(row => {
+      const price = Number(row?.p)
+      if (!Number.isFinite(price)) return null
+      const label = formatTimeLocal(row?.t) || String(row?.t || '')
+      return { label, value: price, timestamp: row?.t || '' }
+    })
+    .filter(Boolean)
+    .slice(-50)
+  // if (result.length) console.log('[Chart]', 'buildChartPointsFromHistory 历史价格', { count: result.length, latest: result[result.length - 1] })
+  return result
+}
+
+// 将新的实时价格点追加到走势图数据队列（最多保留 50 个点）
+const pushPricePoint = (price, ts) => {
+  const num = Number(price)
+  if (!Number.isFinite(num)) return
+  const label = formatTimeLocal(ts || new Date(), { seconds: true }) || new Date().toLocaleTimeString('en-US', { hour12: false })
+  const point = { label, value: num, timestamp: (ts ? new Date(ts) : new Date()).toISOString() }
+  liveSeriesPoints.push(point)
+  console.log('[Chart]', 'pushPricePoint 实时价格', { price: num, timestamp: point.timestamp, label, totalPoints: liveSeriesPoints.length })
+  if (liveSeriesPoints.length > 50) {
+    liveSeriesPoints = liveSeriesPoints.slice(-50)
+  }
+  livePrice.value = num
+  detailData.value.currentPrice = num
+  if (activeSegmentMode.value === 'live') {
+    syncLiveChart()
   }
 }
 
@@ -475,11 +922,12 @@ const chartColors = computed(() => ({
   primary: '#5073e5',
 }))
 
+// 将当前数据渲染到 ECharts 实例（含目标价参考线和实时脉冲点）
 const updateChart = () => {
   if (!chartInstance) return
   const colors = chartColors.value
   let markLineData = []
-  if (activeSegmentMode.value !== 'future') {
+  if (activeSegmentMode.value !== 'future' && Number.isFinite(displayTargetPrice.value)) {
     markLineData = [{ yAxis: displayTargetPrice.value }]
   }
 
@@ -528,65 +976,444 @@ const updateChart = () => {
   chartInstance.setOption(option, false)
 }
 
-let wsInterval = null
-const startWebSocketMock = () => {
-  wsInterval = setInterval(() => {
-    if (activeSegmentMode.value !== 'past') {
-      const newPrice = livePrice.value + (Math.random() - 0.48) * 0.3
-      livePrice.value = newPrice
-      const d = new Date(lastGenTime)
-      const newTimeStr = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`
-      chartDataX.push(newTimeStr)
-      chartDataY.push(newPrice)
-      if (chartDataX.length > 50) {
-        chartDataX.shift()
-        chartDataY.shift()
-      }
-      lastGenTime += 2000
-      updateChart()
-    }
-  }, 2000)
+// ═══════════════════════════════════════════════════════
+// ■ 订单簿（Order Book）
+// ═══════════════════════════════════════════════════════
+
+// 标准化订单簿单侧数据，兼容 quantity/size/shares/qty 多种字段名
+const normalizeOrderBookSide = (book = {}) => ({
+  asks: Array.isArray(book?.asks)
+    ? book.asks.map((l) => ({
+      ...l,
+      quantity: l?.quantity ?? l?.size ?? l?.shares ?? l?.qty,
+    }))
+    : [],
+  bids: Array.isArray(book?.bids)
+    ? book.bids.map((l) => ({
+      ...l,
+      quantity: l?.quantity ?? l?.size ?? l?.shares ?? l?.qty,
+    }))
+    : [],
+  last_trade_price: String(book?.last_trade_price ?? book?.lastPrice ?? ''),
+})
+
+// 将 MQTT 或 REST 推送的订单簿数据应用到响应式状态
+const applyOrderBookPayload = (payload, outcome = '') => {
+  if (!payload || typeof payload !== 'object') return
+  const yesKey = payload.yes || payload.YES
+  const noKey = payload.no || payload.NO
+  if (yesKey || noKey) {
+    if (yesKey) orderBookYes.value = normalizeOrderBookSide(yesKey)
+    if (noKey) orderBookNo.value = normalizeOrderBookSide(noKey)
+    console.log('[OrderBook]', 'applyOrderBookPayload 订单簿', {
+      yes: { asks: orderBookYes.value.asks?.length, bids: orderBookYes.value.bids?.length, last_trade_price: orderBookYes.value.last_trade_price },
+      no: { asks: orderBookNo.value.asks?.length, bids: orderBookNo.value.bids?.length, last_trade_price: orderBookNo.value.last_trade_price },
+    })
+    return
+  }
+  if (!Array.isArray(payload.asks) && !Array.isArray(payload.bids)) return
+  const side = outcome === 'no' ? 'no' : 'yes'
+  if (side === 'yes') {
+    orderBookYes.value = normalizeOrderBookSide(payload)
+  } else {
+    orderBookNo.value = normalizeOrderBookSide(payload)
+  }
+  console.log('[OrderBook]', 'applyOrderBookPayload 单侧订单簿', { side, asks: payload.asks?.length, bids: payload.bids?.length })
 }
 
-// --- 🔥 事件交互：管理左侧历史标签的挂载与销毁 🔥 ---
+// ── API 获取：订单簿快照（含最新成交价和成交量）──
+const fetchOrderBook = async () => {
+  if (!currentEventGuid.value || !resolvedSubEventGuid.value) {
+    orderBookYes.value = { asks: [], bids: [], last_trade_price: '' }
+    orderBookNo.value = { asks: [], bids: [], last_trade_price: '' }
+    return
+  }
+  orderBookLoading.value = true
+  try {
+    const res = await getOrderBook({
+      event_guid: currentEventGuid.value,
+      sub_event_guid: resolvedSubEventGuid.value,
+      outcome: 'all',
+    })
+    if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Fetch order book failed')
+    const data = res?.data?.data || {}
+    applyOrderBookPayload(data)
+    const volFromBook = firstFinite(data?.trade_volume, data?.total_volume, data?.yes?.trade_volume, data?.no?.trade_volume)
+    if (Number.isFinite(volFromBook) && volFromBook > 0) {
+      detailData.value.tradeVolume = volFromBook
+      console.log('[Amount]', 'fetchOrderBook tradeVolume', { tradeVolume: volFromBook })
+    }
+    const latest = firstFinite(data?.yes?.last_trade_price, data?.no?.last_trade_price)
+    if (Number.isFinite(latest) && !Number.isFinite(livePrice.value)) {
+      livePrice.value = latest
+      detailData.value.currentPrice = latest
+    }
+  } catch (error) {
+    console.error('Fetch order book failed', error)
+    orderBookYes.value = { asks: [], bids: [], last_trade_price: '' }
+    orderBookNo.value = { asks: [], bids: [], last_trade_price: '' }
+  } finally {
+    orderBookLoading.value = false
+  }
+}
+
+// ── API 获取：历史价格走势数据（初始化图表）──
+const fetchPriceHistory = async () => {
+  if (!currentEventGuid.value) return
+  try {
+    const res = await getEventPriceHistory({
+      event_guid: currentEventGuid.value,
+      sub_event_guid: resolvedSubEventGuid.value || undefined,
+      interval: '5m',
+      range: '1d',
+    })
+    if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Fetch price history failed')
+    liveSeriesPoints = buildChartPointsFromHistory(res?.data?.data?.data || res?.data?.data || {})
+    if (liveSeriesPoints.length) {
+      const latest = liveSeriesPoints[liveSeriesPoints.length - 1]
+      livePrice.value = latest.value
+      detailData.value.currentPrice = latest.value
+      if (activeSegmentMode.value === 'live') {
+        syncLiveChart()
+      }
+    }
+  } catch (error) {
+    console.error('Fetch price history failed', error)
+    liveSeriesPoints = []
+    setChartPoints([])
+    updateChart()
+  }
+}
+
+// ── API 获取：事件详情（标题、目标价、关闭时刱00、方向价格、成交量）──
+const fetchDetail = async () => {
+  if (!currentEventGuid.value) return
+  try {
+    const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
+    const language = currentLocale.split('-')[0]
+    const [detailRes, subRes] = await Promise.all([
+      getEventDetailItem({ event_guid: currentEventGuid.value, language_label: language }),
+      getSubEventDetail({ event_guid: currentEventGuid.value, language_label: language }),
+    ])
+    const eventData = detailRes?.data?.data || {}
+    const subData = subRes?.data?.data || {}
+    const eventItem = Array.isArray(eventData.events) ? eventData.events[0] : null
+    const subEvents = Array.isArray(subData.sub_events)
+      ? subData.sub_events
+      : Array.isArray(eventItem?.sub_events)
+        ? eventItem.sub_events
+        : []
+    const subEvent = requestedSubEventGuid.value
+      ? subEvents.find(item => item.sub_event_guid === requestedSubEventGuid.value) || subEvents[0]
+      : subEvents[0]
+    const directions = Array.isArray(subEvent?.directions) ? subEvent.directions : []
+    const yesDirection = directions.find(item => (item?.outcome || '').toLowerCase() === 'yes') || directions[0] || {}
+    const noDirection = directions.find(item => (item?.outcome || '').toLowerCase() === 'no') || directions[1] || {}
+
+    const targetPrice = firstFinite(
+      subEvent?.target_price,
+      subEvent?.reference_price,
+      subEvent?.strike_price,
+      eventItem?.target_price,
+      route.query.target_price,
+    )
+    const currentPrice = firstFinite(
+      subEvent?.current_price,
+      subEvent?.last_price,
+      yesDirection?.last_price,
+      yesDirection?.new_bid_price,
+      yesDirection?.new_ask_price,
+    )
+    const closeTime = subEvent?.close_time || eventItem?.close_time || ''
+    if (closeTime) {
+      const closeTs = new Date(String(closeTime).replace(' ', 'T')).getTime()
+      if (!Number.isNaN(closeTs)) {
+        targetTime.value = closeTs
+        updateCountDown()
+      }
+    }
+
+    // 解析事件状态（多种字段名兼容）
+    const rawStatus = subEvent?.status || subEvent?.event_status || eventItem?.status || eventItem?.event_status || ''
+    const isSettled = subEvent?.is_settled === true || subEvent?.is_settled === 1
+      || eventItem?.is_settled === true || eventItem?.is_settled === 1
+    const ENDED_STATUSES = ['settled', 'ended', 'closed', 'resolved', 'expired', 'finished', 'completed']
+    if (ENDED_STATUSES.includes(String(rawStatus).toLowerCase()) || isSettled) {
+      // API 明确标记为已结束，直接设置标志（不依赖倒计时）
+      eventEnded.value = true
+    }
+
+    detailData.value = {
+      eventTitle: eventItem?.title || subEvent?.title || '',
+      title: subEvent?.title || eventItem?.title || '',
+      tradeVolume: firstFinite(
+        subEvent?.trade_volume, subEvent?.total_volume, subEvent?.bet_volume, subEvent?.total_bet_amount,
+        eventItem?.trade_volume, eventItem?.total_volume,
+      ) || 0,
+      rulesDescription: eventItem?.description || eventItem?.rule_description || '',
+      closeTime,
+      targetPrice,
+      currentPrice,
+      yesAskPrice: formatCentText(yesDirection?.new_ask_price || yesDirection?.new_bid_price),
+      noAskPrice: formatCentText(noDirection?.new_ask_price || noDirection?.new_bid_price),
+      yesBidPrice: formatCentText(yesDirection?.new_bid_price),
+      noBidPrice: formatCentText(noDirection?.new_bid_price),
+      subEventGuidResolved: subEvent?.sub_event_guid || requestedSubEventGuid.value || '',
+      eventStatus: rawStatus,
+    }
+
+    if (Number.isFinite(currentPrice)) {
+      livePrice.value = currentPrice
+    }
+  } catch (error) {
+    console.error('Fetch detail failed', error)
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ■ MQTT 实时业务消息处理
+// ═══════════════════════════════════════════════════════
+
+// 将 MQTT 推送的订单合并到本地挂单/历史订单列表
+const mergeOpenOrderFromPush = (order) => {
+  const next = mapOpenOrder(order)
+  console.log('[Amount]', 'mergeOpenOrderFromPush 订单', { id: next?.id, price: next?.price, cost: next?.cost, total: next?.total, filled: next?.filled, side: next?.side })
+  // 如果订单没有 ID，则不进行合并
+  if (!next?.id) return
+  const idx = openOrders.value.findIndex((x) => x.id === next.id)
+  const status = String(order?.status || '').toUpperCase()
+  // 如果订单状态为已成交、已取消、已拒绝、已过期，则从挂单列表中移除，并添加到历史订单列表
+  if (['FILLED', 'CANCELED', 'CANCELLED', 'REJECTED', 'EXPIRED'].includes(status)) {
+    if (idx >= 0) openOrders.value.splice(idx, 1)
+    orderHistory.value = [mapOrderHistoryItem(order), ...orderHistory.value].filter((x) => x?.id).slice(0, 50)
+    return
+  }
+  // 如果订单在挂单列表中存在，则更新挂单列表
+  if (idx >= 0) openOrders.value.splice(idx, 1, next)
+  // 如果订单在挂单列表中不存在，则添加到挂单列表
+  else openOrders.value = [next, ...openOrders.value].slice(0, 50)
+}
+
+// 根据 MQTT 消息类型分发处理逻辑
+const handleMqttBusinessMessage = (data, topic) => {
+  if (!data || typeof data !== 'object') return
+  const type = data.type
+  // ── price_update：实时价格推送，更新走势图表与底部按钮价格 ──
+  if (type === 'price_update' && data.prices) {
+    const yesPoints = Array.isArray(data.prices?.YES) ? data.prices.YES : []
+    const noPoints = Array.isArray(data.prices?.NO) ? data.prices.NO : []
+    const picked = yesPoints[yesPoints.length - 1] || noPoints[noPoints.length - 1]
+    if (picked?.p) pushPricePoint(picked.p, picked.t)
+    const latestYes = yesPoints[yesPoints.length - 1]
+    const latestNo = noPoints[noPoints.length - 1]
+    if (latestYes?.p) detailData.value.yesAskPrice = formatCentText(latestYes.p)
+    if (latestNo?.p) detailData.value.noAskPrice = formatCentText(latestNo.p)
+    console.log('[Chart][Amount]', 'price_update', { yesPick: latestYes, noPick: latestNo, yesAskPrice: detailData.value.yesAskPrice, noAskPrice: detailData.value.noAskPrice })
+    return
+  }
+  if (type === 'orderbook') {
+    applyOrderBookPayload(data)
+    const pickBestAsk = (asks = []) => {
+      const prices = (Array.isArray(asks) ? asks : [])
+        .map((l) => firstFinite(l?.price))
+        .filter((v) => Number.isFinite(v))
+      if (!prices.length) return null
+      return Math.min(...prices)
+    }
+    const pickBestBid = (bids = []) => {
+      const prices = (Array.isArray(bids) ? bids : [])
+        .map((l) => firstFinite(l?.price))
+        .filter((v) => Number.isFinite(v))
+      if (!prices.length) return null
+      return Math.max(...prices)
+    }
+
+    const yesBook = data?.YES || data?.yes
+    const noBook = data?.NO || data?.no
+    const yesBestAsk = pickBestAsk(yesBook?.asks)
+    const noBestAsk = pickBestAsk(noBook?.asks)
+    const yesBestBid = pickBestBid(yesBook?.bids)
+    const noBestBid = pickBestBid(noBook?.bids)
+
+    if (Number.isFinite(yesBestAsk)) detailData.value.yesAskPrice = formatCentText(yesBestAsk)
+    if (Number.isFinite(noBestAsk)) detailData.value.noAskPrice = formatCentText(noBestAsk)
+    if (Number.isFinite(yesBestBid)) detailData.value.yesBidPrice = formatCentText(yesBestBid)
+    if (Number.isFinite(noBestBid)) detailData.value.noBidPrice = formatCentText(noBestBid)
+    const vol = firstFinite(data?.trade_volume, data?.total_volume, data?.volume)
+    if (Number.isFinite(vol) && vol > 0) detailData.value.tradeVolume = vol
+    console.log('[OrderBook][Amount]', 'orderbook', {
+      yesAskPrice: detailData.value.yesAskPrice, noAskPrice: detailData.value.noAskPrice,
+      tradeVolume: detailData.value.tradeVolume, yesCount: (data?.YES || data?.yes)?.asks?.length, noCount: (data?.NO || data?.no)?.asks?.length,
+    })
+    return
+  }
+  // ── trade：成交推送，更新订单簿最新成交价，并将成交价推入走势图表 ──
+  if (type === 'trade' && Array.isArray(data.trades) && data.trades.length) {
+    console.log('[Chart][OrderBook]', 'trade', { trades: data.trades, count: data.trades.length })
+    data.trades.forEach((tr) => {
+      const price = firstFinite(tr?.price)
+      if (!Number.isFinite(price)) return
+      orderBookYes.value.last_trade_price = String(price)
+      orderBookNo.value.last_trade_price = String(price)
+      if (!tr?.outcome || tr.outcome.toUpperCase() === 'YES') {
+        const tradeTs = tr?.trade_time ? new Date(tr.trade_time * 1000).toISOString() : undefined
+        pushPricePoint(price, tradeTs)
+      }
+    })
+    return
+  }
+  if (type === 'user_position' && Array.isArray(data.positions)) {
+    const list = data.positions
+      .filter((p) => (!currentEventGuid.value || p?.event_guid === currentEventGuid.value) && (!resolvedSubEventGuid.value || p?.sub_event_guid === resolvedSubEventGuid.value))
+      .map(mapPositionCard)
+    positions.value = list
+    return
+  }
+  if (type === 'user_order' && data.order) {
+    const o = data.order
+    if (currentEventGuid.value && o?.event_guid && o.event_guid !== currentEventGuid.value) return
+    if (resolvedSubEventGuid.value && o?.sub_event_guid && o.sub_event_guid !== resolvedSubEventGuid.value) return
+    mergeOpenOrderFromPush(o)
+    return
+  }
+
+  if (typeof topic === 'string' && topic.startsWith('orders/')) {
+    if (data?.order) mergeOpenOrderFromPush(data.order)
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ■ MQTT 连接管理
+// ═══════════════════════════════════════════════════════
+
+// 销毁当前 MQTT 客户端并清理资源
+const stopMqttStream = () => {
+  if (!iotMqtt) return
+  iotMqtt.destroy()
+  iotMqtt = null
+}
+
+// 初始化并启动 MQTT 连接，订阅当前事件相关 topic
+const startMqttStream = async () => {
+  if (mqttDestroyed) return
+  if (!shouldUseMqtt.value) return
+  if (isEventEnded.value) return  // 事件已结束，不启动 MQTT 实时推送
+  if (!currentEventGuid.value || !resolvedSubEventGuid.value) return
+  if (iotMqtt) return
+
+  const userGuid = getUserGuid()
+  const topics = [
+    `price/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
+    `orderbook/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
+    `trade/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
+    `orders/${userGuid}`,
+    `user/${userGuid}/positions`,
+  ]
+
+  iotMqtt = createIotMqttClient({
+    region: IOT_REGION,
+    endpoint: IOT_ENDPOINT,
+    identityPoolId: COGNITO_IDENTITY_POOL_ID,
+  })
+
+  iotMqtt.on('connect', () => {
+    iotMqtt.subscribe(topics)
+  })
+
+  iotMqtt.on('message', (topic, data) => {
+    if (mqttDestroyed) return
+    console.log('[MQTT] Message received 收到 MQTT 消息', topic, data)
+    handleMqttBusinessMessage(data, topic)
+  })
+
+  try {
+    await iotMqtt.connect()
+  } catch (e) {
+    console.error('[MQTT] 连接失败 连接 MQTT 失败', e)
+    iotMqtt?.destroy()
+    iotMqtt = null
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ■ 时间轴交互（实时 / 历史 / 未来切换）
+// ═══════════════════════════════════════════════════════
+
+// 切换到历史记录视图，展示过去的价格走势
 const selectPastRecord = (record) => {
+  if (!record?.points?.length) return
   activeSegmentMode.value = 'past'
-  selectedPastRecord.value = record // 记录存在，模板 v-if 满足，在最左侧挂载该标签
-  generateMockData()
+  selectedPastRecord.value = record
+  setChartPoints(record.points)
   updateChart()
 }
 
+// 切换回实时视图，清除历史/未来游标
 const selectLiveSegment = () => {
   activeSegmentMode.value = 'live'
-  selectedPastRecord.value = null // 清除记录，模板 v-if 不满足，历史标签销毁！
+  selectedPastRecord.value = null
   selectedFutureId.value = null
-  generateMockData()
-  updateChart()
+  syncLiveChart()
 }
 
+// 切换到未来时段视图
 const selectFutureSegment = (ft) => {
   activeSegmentMode.value = 'future'
   selectedFutureId.value = ft.id
-  selectedPastRecord.value = null // 同理销毁
-  generateMockData()
+  selectedPastRecord.value = null
   updateChart()
 }
 
+// ═══════════════════════════════════════════════════════
+// ■ 五器 & 生命周期
+// ═══════════════════════════════════════════════════════
+
+// 主题切换时重绘图表
 watch(() => themeStore.isDark, () => updateChart())
 
-onMounted(() => {
+const resizeHandler = () => chartInstance?.resize()
+
+watch(resolvedSubEventGuid, async (subEventGuid, prevSubEventGuid) => {
+  if (!subEventGuid) return
+  // 首次赋值（prevSubEventGuid 为空）由 onMounted 统一处理，避免重复拉取
+  if (!prevSubEventGuid) return
+  // sub_event_guid 切换时：重新加载行情数据并重连 MQTT
+  await Promise.allSettled([fetchPriceHistory(), fetchOrderBook(), fetchOpenOrders(), fetchOrderHistory()])
+  stopMqttStream()
+  // 仅事件未结束时才重连 MQTT
+  if (shouldUseMqtt.value && !isEventEnded.value) startMqttStream()
+})
+
+// 事件进行中途结束（倒计时归零）时，主动断开 MQTT
+watch(isEventEnded, (ended) => {
+  if (ended) stopMqttStream()
+})
+
+onMounted(async () => {
   startCountDown()
-  generateMockData()
+  await fetchDetail()
   nextTick(() => {
     chartInstance = echarts.init(chartRef.value)
     updateChart()
-    startWebSocketMock()
   })
-  window.addEventListener('resize', () => chartInstance?.resize())
+  await Promise.allSettled([
+    fetchPriceHistory(),
+    fetchOrderBook(),
+    fetchPositions(),
+    fetchOpenOrders(),
+    fetchOrderHistory(),
+  ])
+  if (activeSegmentMode.value === 'live') {
+    syncLiveChart()
+  }
+  if (shouldUseMqtt.value) startMqttStream()
+  window.addEventListener('resize', resizeHandler)
 })
 onUnmounted(() => {
+  mqttDestroyed = true
   clearInterval(timerInterval)
-  clearInterval(wsInterval)
+  stopMqttStream()
+  window.removeEventListener('resize', resizeHandler)
   chartInstance?.dispose()
 })
 </script>
@@ -1053,6 +1880,12 @@ $primary-blue: #5073e5;
   }
 }
 
+/* 订单列表：超过 10 条时出现滚动条 */
+.orders-list {
+  max-height: 520px;
+  overflow-y: auto;
+}
+
 .order-row {
   display: flex;
   align-items: center;
@@ -1154,6 +1987,12 @@ $primary-blue: #5073e5;
   font-size: 13px;
   color: var(--text-dark-gray);
   padding: 24px 0;
+}
+
+/* 历史列表：超过 10 条时出现滚动条 */
+.history-list {
+  max-height: 560px;
+  overflow-y: auto;
 }
 
 .history-header {
@@ -1343,6 +2182,16 @@ $primary-blue: #5073e5;
   gap: 12px;
   background: var(--bg-page-h5);
   z-index: 40;
+
+  .event-ended-tip {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-dark-gray);
+    padding: 12px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+  }
 
   .trade-btn {
     flex: 1;

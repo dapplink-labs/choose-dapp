@@ -3,7 +3,7 @@
         <!-- 顶部 Tab -->
         <div class="position-tabs">
             <div v-for="tab in tabs" :key="tab.value"
-                :class="['position-tab-item', { active: activeTab === tab.value }]" @click="activeTab = tab.value">
+                :class="['position-tab-item', { active: activeTab === tab.value }]" @click="switchTab(tab.value)">
                 {{ tab.label }}
             </div>
         </div>
@@ -14,7 +14,8 @@
                 <el-icon class="search-icon">
                     <Search />
                 </el-icon>
-                <input v-model="searchKeyword" type="text" class="search-input" :placeholder="t('assetManagement.search')" />
+                <input v-model="searchKeyword" type="text" class="search-input"
+                    :placeholder="t('assetManagement.search')" />
             </div>
 
             <div class="filter-pill" @click="toggleTypeDropdown">
@@ -31,7 +32,17 @@
                 </div>
             </div>
 
-            <div class="filter-pill" @click="toggleMonthDropdown">
+            <button
+                v-if="activeTab === 'pending'"
+                type="button"
+                class="filter-pill filter-action-btn"
+                :disabled="cancelAllLoading"
+                @click.stop="onCancelAllPending"
+            >
+                {{ cancelAllLoading ? (t('common.loading') || 'Loading...') : (t('assetManagement.cancelAllOrders') || 'Cancel all') }}
+            </button>
+
+            <div v-else class="filter-pill" @click="toggleMonthDropdown">
                 <span>{{ currentMonthLabel }}</span>
                 <el-icon class="arrow">
                     <ArrowDownBold />
@@ -48,80 +59,106 @@
 
         <!-- 列表 -->
         <div class="position-list-content">
-            <div v-for="item in filteredList" :key="item.id" class="position-item">
-                <div class="position-left">
-                    <div class="token-icon" :style="{ backgroundColor: item.iconBg }">
-                        <span class="token-text">{{ item.tokenSymbol.slice(0, 1) }}</span>
+            <template v-for="item in filteredList" :key="item.id">
+                <div class="position-item">
+                    <div class="position-left">
+                        <div class="token-icon" :style="{ backgroundColor: item.iconBg }">
+                            <span class="token-text">{{ item.tokenSymbol.slice(0, 1) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="position-middle">
+                        <div class="title-row">
+                            <span class="title-text">{{ item.title }}</span>
+                            <!-- 仓位事件：显示价格；历史仓位事件：显示盈亏金额 -->
+                            <span v-if="activeTab === 'open'" class="price-text">
+                                ${{ item.price }}
+                            </span>
+                            <span v-else-if="activeTab === 'history'" class="price-text"
+                                :class="item.resultAmount > 0 ? 'pnl-positive' : 'pnl-negative'">
+                                {{ item.resultAmount > 0 ? '+' : '' }}${{ Math.abs(item.resultAmount) }}
+                            </span>
+                        </div>
+
+                        <div class="meta-row">
+                            <span class="side-tag" :class="String(item.side || '').toLowerCase()">
+                                {{ item.side === 'SELL' ? t('assetManagement.sell') : t('assetManagement.buy') }}
+                            </span>
+                            <span class="odds-tag" :class="item.oddsType || 'no'">
+                                {{ item.oddsLabel }}
+                            </span>
+
+                            <!-- 仓位事件：显示盈亏百分比 -->
+                            <template v-if="activeTab === 'open'">
+                                <span class="pnl-text" :class="item.pnl > 0 ? 'pnl-positive' : 'pnl-negative'">
+                                    {{ item.pnl > 0 ? '+' : '' }}{{ item.pnl }}%
+                                </span>
+                            </template>
+
+                            <!-- 委托仓位：显示进度 -->
+                            <template v-else-if="activeTab === 'pending'">
+                                <button
+                                    type="button"
+                                    class="cancel-btn"
+                                    :disabled="cancelingId === item.id"
+                                    @click.stop="onCancelPending(item)"
+                                >
+                                    {{ cancelingId === item.id ? (t('common.loading') || 'Loading...') : (t('assetManagement.cancelOrder') || 'Cancel') }}
+                                </button>
+                            </template>
+
+                            <!-- 历史仓位事件：显示状态图标 -->
+                            <template v-else-if="activeTab === 'history'">
+                                <span class="status-pill status-right"
+                                    :class="item.status === 'lost' ? 'status-lost' : 'status-claimed'">
+                                    <el-icon class="status-icon">
+                                        <CloseBold v-if="item.status === 'lost'" />
+                                        <Select v-else />
+                                    </el-icon>
+                                    <span class="status-text">{{ item.status }}</span>
+                                </span>
+                            </template>
+                        </div>
+
+                        <div class="sub-row">
+                            <span class="value-text">{{ t('assetManagement.valueLabel') }}: ${{ item.value }}</span>
+                            <span class="time-text">{{ item.time }}</span>
+                        </div>
                     </div>
                 </div>
+            </template>
 
-                <div class="position-middle">
-                    <div class="title-row">
-                        <span class="title-text">{{ item.title }}</span>
-                        <!-- 右侧金额：
-                             - 仓位事件(open)：显示价格
-                             - 历史仓位事件(history)：显示盈亏金额
-                             - 委托仓位(pending)：不显示任何金额 -->
-                        <span v-if="activeTab === 'open'" class="price-text">
-                            ${{ item.price }}
-                        </span>
-                        <span v-else-if="activeTab === 'history'" class="price-text"
-                            :class="item.resultAmount > 0 ? 'pnl-positive' : 'pnl-negative'">
-                            {{ item.resultAmount > 0 ? '+' : '' }}${{ Math.abs(item.resultAmount) }}
-                        </span>
-                    </div>
+            <!-- 上拉加载哨兵 -->
+            <div ref="loadMoreSentinel" class="load-more-sentinel" aria-hidden="true"></div>
 
-                    <div class="meta-row">
-                        <span class="side-tag" :class="item.side.toLowerCase()">
-                            {{ item.side }}
-                        </span>
-                        <span class="odds-tag" :class="item.oddsType || 'no'">
-                            {{ item.oddsLabel || 'No 10 · 98.7 ¢' }}
-                        </span>
+            <!-- 底部加载 / 无更多 文案 -->
+            <div v-if="filteredList.length > 0" class="load-more-footer">
+                <span v-if="loading && hasMore" class="load-more-text">
+                    {{ t('common.loading') || 'Loading...' }}
+                </span>
+                <span v-else-if="!loading && !hasMore" class="load-more-text">
+                    {{ t('common.noMoreData') || 'No more data' }}
+                </span>
+            </div>
 
-                        <template v-if="activeTab === 'open'">
-                            <span class="pnl-text" :class="item.pnl > 0 ? 'pnl-positive' : 'pnl-negative'">
-                                {{ item.pnl > 0 ? '+' : '' }}{{ item.pnl }}%
-                            </span>
-                        </template>
-
-                        <template v-else-if="activeTab === 'pending'">
-                            <span class="limit-text">
-                                0/5
-                            </span>
-                        </template>
-
-                        <!-- 历史仓位事件：仅展示状态，不再在中间行重复金额 -->
-                        <template v-else>
-                            <span
-                                class="status-pill status-right"
-                                :class="item.status === 'lost' ? 'status-lost' : 'status-claimed'"
-                            >
-                                <el-icon class="status-icon">
-                                    <CloseBold v-if="item.status === 'lost'" />
-                                    <Select v-else />
-                                </el-icon>
-                                <span class="status-text">{{ t(`assetManagement.${item.status}`) }}</span>
-                            </span>
-                        </template>
-                    </div>
-
-                    <div class="sub-row">
-                        <span class="value-text">{{ t('assetManagement.valueLabel') }}: $1.55</span>
-                        <span class="time-text">2026-01-01 12:12</span>
-                    </div>
-                </div>
+            <!-- 为空态 -->
+            <div v-if="!loading && filteredList.length === 0" class="list-empty">
+                {{ t('common.noData') || 'No data' }}
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ArrowDownBold, CloseBold, Select, Search } from '@element-plus/icons-vue'
+import { useAccount } from '@wagmi/vue'
+import { getOpenOrders, getOrderHistory, getUserPositions, cancelOrder } from '@/api/APIEvent'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const { t } = useI18n()
+const { address } = useAccount()
 
 const tabs = computed(() => [
     { label: t('assetManagement.positionEvents'), value: 'open' },
@@ -133,18 +170,44 @@ const activeTab = ref('open')
 
 const searchKeyword = ref('')
 const filterType = ref('all')
-const filterMonth = ref('2026-01')
+const filterMonth = ref('')
 
-const typeOptions = computed(() => [
-    { value: 'all', label: t('assetManagement.all') },
-    { value: 'buy', label: t('assetManagement.buy') },
-    { value: 'sell', label: t('assetManagement.sell') }
-])
+const typeOptions = computed(() => {
+    if (activeTab.value === 'history') {
+        // 历史仓位：按订单状态筛选
+        return [
+            { value: 'all', label: t('assetManagement.all') },
+            { value: 'COMPLETED', label: t('assetManagement.completed') || 'COMPLETED' },
+            { value: 'CANCELLED', label: t('assetManagement.cancelled') || 'CANCELLED' },
+        ]
+    }
+    // 仓位事件：目前只有 Buy 持仓
+    if (activeTab.value === 'open') {
+        return [
+            { value: 'all', label: t('assetManagement.all') },
+            { value: 'BUY', label: t('assetManagement.buy') || 'Buy' }
+        ]
+    }
+    // 委托仓位：按 Buy / Sell 筛选
+    return [
+        { value: 'all', label: t('assetManagement.all') },
+        { value: 'BUY', label: t('assetManagement.buy') || 'Buy' },
+        { value: 'SELL', label: t('assetManagement.sell') || 'Sell' },
+    ]
+})
 
-const monthOptions = [
-    { value: '2026-01', label: '2026-01' },
-    { value: '2025-12', label: '2025-12' }
-]
+const monthOptions = computed(() => {
+    const now = new Date()
+    const list = []
+    for (let i = 0; i < 6; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const y = d.getFullYear()
+        const m = String(d.getMonth() + 1).padStart(2, '0')
+        const ym = `${y}-${m}`
+        list.push({ value: ym, label: ym })
+    }
+    return list
+})
 
 const showTypeDropdown = ref(false)
 const showMonthDropdown = ref(false)
@@ -154,128 +217,319 @@ const currentTypeLabel = computed(() => {
 })
 
 const currentMonthLabel = computed(() => {
-    return monthOptions.find(v => v.value === filterMonth.value)?.label ?? '2026-01'
+    return monthOptions.value.find(v => v.value === filterMonth.value)?.label ?? (t('common.all') || 'All')
 })
 
-const openList = [
-    {
-        id: 1,
-        tokenSymbol: 'BTC',
-        title: '以太坊在12月28日的价格—？',
-        price: '0.74',
-        side: 'Buy',
-        iconBg: '#F7931A',
-        pnl: -28,
-        oddsType: 'no',
-        oddsLabel: 'No 10 · 98.7 ¢'
-    },
-    {
-        id: 2,
-        tokenSymbol: 'BTC',
-        title: '1月7日，比特币的价格会落在…',
-        price: '0.74',
-        side: 'Buy',
-        iconBg: '#C1FFB3',
-        pnl: 28,
-        oddsType: 'no',
-        oddsLabel: 'No 10 · 98.7 ¢'
-    },
-    {
-        id: 3,
-        tokenSymbol: 'XRP',
-        title: '以太坊在12月28日的价格—？',
-        price: '0.74',
-        side: 'Buy',
-        iconBg: '#1D61FF',
-        pnl: 100.52,
-        oddsType: 'no',
-        oddsLabel: 'No 10 · 98.7 ¢'
-    }
-]
+const list = ref([])
+const loading = ref(false)
+const page = ref(1)
+const totalPages = ref(1)
+const hasMore = computed(() => page.value <= totalPages.value)
+const PAGE_SIZE = 20
 
-const pendingList = [
-    {
-        id: 4,
-        tokenSymbol: 'ETH',
-        title: '以太坊在12月28日的价格—？',
-        price: '0.74',
-        side: 'Buy',
-        iconBg: '#4C6FFF',
-        oddsType: 'yes',
-        oddsLabel: 'yes 98.7 ¢'
-    },
-    {
-        id: 5,
-        tokenSymbol: 'F',
-        title: '以太坊在12月28日的价格—？',
-        price: '0.74',
-        side: 'Buy',
-        iconBg: '#111827',
-        oddsType: 'yes',
-        oddsLabel: 'yes 98.7 ¢'
-    },
-    {
-        id: 6,
-        tokenSymbol: 'A',
-        title: '以太坊在12月28日的价格—？',
-        price: '0.74',
-        side: 'Buy',
-        iconBg: '#111827',
-        oddsType: 'yes',
-        oddsLabel: 'yes 98.7 ¢'
-    }
-]
+const getUserGuid = () => window.sessionStorage.getItem('user_guid') || '41f83791b601426896bcb39f45e2fd12'
+const isRespSuccess = (res) => {
+    const code = res?.data?.code
+    return code === 0 || code === 200 || code === 2000
+}
 
-const historyList = [
-    {
-        id: 7,
-        tokenSymbol: 'ALT',
-        title: '以太坊在12月28日的价格—？',
-        price: '0.74',
-        side: 'Buy',
-        iconBg: '#FFD600',
-        resultAmount: -0.74,
-        status: 'lost',
-        oddsType: 'no',
-        oddsLabel: 'No 10 · 98.7 ¢'
-    },
-    {
-        id: 8,
-        tokenSymbol: 'IV',
-        title: '1月7日，比特币的价格会落在…',
-        price: '0.74',
-        side: 'Sell',
-        iconBg: '#7C3AED',
-        resultAmount: 0.74,
-        status: 'claimed',
-        oddsType: 'no',
-        oddsLabel: 'No 10 · 98.7 ¢'
-    },
-    {
-        id: 9,
-        tokenSymbol: 'TG',
-        title: '以太坊在12月28日的价格—？',
-        price: '0.74',
-        side: 'Buy',
-        iconBg: '#111827',
-        resultAmount: 0.74,
-        status: 'claimed',
-        oddsType: 'no',
-        oddsLabel: 'No 10 · 98.7 ¢'
-    }
-]
+const cancelingId = ref('')
+const cancelAllLoading = ref(false)
 
-const baseList = computed(() => {
-    if (activeTab.value === 'open') return openList
-    if (activeTab.value === 'pending') return pendingList
-    return historyList
-})
+const onCancelPending = async (item) => {
+    if (activeTab.value !== 'pending') return
+    const order_guid = item?.id || item?.raw?.guid || ''
+    if (!order_guid) {
+        ElMessage.error('Missing order guid')
+        return
+    }
+
+    try {
+        await ElMessageBox.confirm(
+            t('assetManagement.cancelOrderConfirm') || 'Confirm cancel this order?',
+            t('common.tip') || 'Tip',
+            {
+                confirmButtonText: t('common.confirm') || 'Confirm',
+                cancelButtonText: t('common.cancel') || 'Cancel',
+                type: 'warning',
+                customClass: 'cancel-order-confirm',
+            },
+        )
+    } catch {
+        return
+    }
+
+    if (cancelingId.value) return
+    cancelingId.value = order_guid
+    try {
+        const res = await cancelOrder({
+            order_guid,
+        })
+        if (!isRespSuccess(res)) {
+            throw new Error(res?.data?.message || 'Cancel failed')
+        }
+        ElMessage.success(res?.data?.data?.message || res?.data?.message || (t('assetManagement.cancelSuccess') || 'Canceled'))
+        resetAndFetch()
+    } catch (e) {
+        ElMessage.error(e?.message || 'Cancel failed')
+    } finally {
+        cancelingId.value = ''
+    }
+}
+
+const fetchAllOpenOrderGuids = async () => {
+    const guids = []
+    let p = 1
+    let total = 1
+    while (p <= total) {
+        const res = await getOpenOrders({
+            user_guid: getUserGuid(),
+            page: p,
+            page_size: 100,
+            event_guid: undefined,
+            sub_event_guid: undefined,
+            order_type: 'all',
+            side: getSideFilterParam(),
+        })
+        if (!isRespSuccess(res)) {
+            throw new Error(res?.data?.message || 'fetch open orders failed')
+        }
+        const data = res?.data?.data || {}
+        total = Number(data.total_pages) || 1
+        const orders = Array.isArray(data.orders) ? data.orders : []
+        for (const o of orders) {
+            const guid = o?.guid || o?.order_guid || ''
+            if (guid) guids.push(guid)
+        }
+        p += 1
+    }
+    return Array.from(new Set(guids))
+}
+
+const onCancelAllPending = async () => {
+    if (activeTab.value !== 'pending') return
+    if (cancelAllLoading.value) return
+
+    try {
+        await ElMessageBox.confirm(
+            t('assetManagement.cancelAllOrdersConfirm') || 'Cancel all open orders?',
+            t('common.tip') || 'Tip',
+            {
+                confirmButtonText: t('common.confirm') || 'Confirm',
+                cancelButtonText: t('common.cancel') || 'Cancel',
+                type: 'warning',
+                customClass: 'cancel-order-confirm',
+            },
+        )
+    } catch {
+        return
+    }
+
+    cancelAllLoading.value = true
+    try {
+        const guids = await fetchAllOpenOrderGuids()
+        if (!guids.length) {
+            ElMessage.info(t('assetManagement.noOpenOrdersToCancel') || 'No open orders')
+            return
+        }
+
+        let successCount = 0
+        let failCount = 0
+        for (const order_guid of guids) {
+            try {
+                const res = await cancelOrder({ order_guid })
+                if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Cancel failed')
+                successCount += 1
+            } catch {
+                failCount += 1
+            }
+        }
+
+        if (successCount > 0) {
+            ElMessage.success(
+                t('assetManagement.cancelAllSuccess', { n: successCount }) || `Canceled ${successCount}`,
+            )
+        }
+        if (failCount > 0) {
+            ElMessage.warning(
+                t('assetManagement.cancelAllFailed', { n: failCount }) || `Failed ${failCount}`,
+            )
+        }
+        resetAndFetch()
+    } catch (e) {
+        ElMessage.error(e?.message || 'Cancel failed')
+    } finally {
+        cancelAllLoading.value = false
+    }
+}
+
+const tabToStatus = (tab) => {
+    if (tab === 'open') return 'holding'
+    if (tab === 'pending') return 'closed'
+    return 'settled'
+}
+
+const toYMD = (d) => {
+    const date = d instanceof Date ? d : new Date(d)
+    if (Number.isNaN(date.getTime())) return ''
+    const f = (n) => String(n).padStart(2, '0')
+    return `${date.getFullYear()}-${f(date.getMonth() + 1)}-${f(date.getDate())}`
+}
+
+const monthToRange = (ym) => {
+    if (!ym) return null
+    const [y, m] = String(ym).split('-').map(v => Number(v))
+    if (!y || !m) return null
+    const start = new Date(y, m - 1, 1)
+    const end = new Date(y, m, 0)
+    return { start_date: toYMD(start), end_date: toYMD(end) }
+}
+
+const parsePct = (v) => {
+    const n = Number(v)
+    if (!Number.isFinite(n)) return null
+    return n <= 1 ? n * 100 : n
+}
+
+const formatNum = (v, digits = 2) => {
+    const n = Number(v)
+    if (!Number.isFinite(n)) return '0'
+    return n.toFixed(digits)
+}
+
+const formatPriceToCentText = (v) => {
+    const n = Number(v)
+    if (!Number.isFinite(n)) return '--'
+    // 常见价格为 0~1 之间的小数，展示为 ¢
+    if (n > 0 && n <= 1) return `${(n * 100).toFixed(1)} ¢`
+    return `${formatNum(n, 2)} USDT`
+}
+
+const getSideFilterParam = () => {
+    if (activeTab.value === 'open') return 'all'
+    if (filterType.value === 'BUY' || filterType.value === 'SELL') return filterType.value
+    return 'all'
+}
+
+const getStatusFilterParam = () => {
+    if (activeTab.value !== 'history') return ''
+    if (filterType.value === 'COMPLETED' || filterType.value === 'CANCELLED') return filterType.value
+    return ''
+}
+
+const mapPositionToRow = (p) => {
+    const title = p?.event_name || ''
+    const outcome = String(p?.outcome || '').toUpperCase() || 'YES'
+    const chancePct = parsePct(p?.chance)
+    const oddsType = outcome === 'NO' ? 'no' : 'yes'
+    const price = Number(p?.current_price ?? p?.avg_price)
+    const priceText = Number.isFinite(price) ? formatNum(price, 2) : '--'
+
+    const bet = Number(p?.bet_amount)
+    const pnlAbs = Number(p?.profit_loss)
+    const pnlPct = (Number.isFinite(bet) && bet !== 0 && Number.isFinite(pnlAbs))
+        ? (pnlAbs / bet) * 100
+        : Number(p?.lost_rate) * 100
+
+    const positionValue = Number(p?.position_value)
+    const time = (p?.trade_at || p?.updated_at || p?.created_at || '').replace('T', ' ').replace('Z', '')
+
+    return {
+        id: p?.guid || '',
+        tokenSymbol: title ? title.slice(0, 1).toUpperCase() : 'P',
+        title,
+        // 右上角显示当前价格（USDT）
+        price: priceText,
+        // 左侧标签显示 Buy（目前接口无 side 字段，统一视为买入持仓）
+        side: 'BUY',
+        outcome,
+        iconBg: outcome === 'NO' ? '#E44096' : '#2FBC87',
+        // 中间行右侧显示盈亏百分比
+        pnl: Number.isFinite(pnlPct) ? Number(pnlPct.toFixed(2)) : 0,
+        oddsType,
+        // 中间粉/绿标签：Buy/Sell + 价格（¢）
+        oddsLabel: `${outcome === 'NO' ? 'Sell' : 'Buy'} ${formatPriceToCentText(price)}`,
+        // 底部右上角状态和历史复用字段
+        resultAmount: Number.isFinite(pnlAbs) ? Number(pnlAbs.toFixed(2)) : 0,
+        status: (Number(pnlAbs) < 0) ? 'lost' : 'claimed',
+        // 底部“价值”使用 position_value
+        value: Number.isFinite(positionValue) ? positionValue.toFixed(2) : '0.00',
+        time,
+        raw: p,
+    }
+}
+
+const mapOpenOrderToRow = (o) => {
+    const title = o?.event_title || ''
+    const outcome = String(o?.outcome || '').toUpperCase() || 'YES'
+    const tradeSide = String(o?.side || '').toUpperCase() || 'BUY' // BUY / SELL
+    const dealedSizeNum = Number(o?.dealed_size)
+    const sizeNum = Number(o?.size)
+    const progressText = (Number.isFinite(dealedSizeNum) && Number.isFinite(sizeNum) && sizeNum > 0)
+        ? `${formatNum(dealedSizeNum, 2)}/${formatNum(sizeNum, 2)}`
+        : (o?.progress ? `${o.progress}%` : '--')
+
+    const priceNum = Number(o?.price)
+    const time = (o?.expire_at || o?.updated_at || o?.created_at || '').replace('T', ' ').replace('Z', '')
+
+    const costNum = Number(o?.cost)
+    const valueText = Number.isFinite(costNum) ? costNum.toFixed(2) : (o?.cost || '0.00')
+
+    return {
+        id: o?.guid || '',
+        tokenSymbol: title ? title.slice(0, 1).toUpperCase() : 'O',
+        title,
+        price: Number.isFinite(priceNum) ? formatNum(priceNum, 2) : '--',
+        side: tradeSide, // BUY/SELL（pending tab 左侧标签）
+        outcome,
+        iconBg: outcome === 'NO' ? '#E44096' : '#2FBC87',
+        pnl: 0,
+        oddsType: outcome === 'NO' ? 'no' : 'yes',
+        oddsLabel: `${tradeSide === 'SELL' ? 'Sell' : 'Buy'} ${formatPriceToCentText(priceNum)}`,
+        resultAmount: 0,
+        status: String(o?.status || '').toLowerCase(),
+        value: valueText,
+        time,
+        progressText,
+        raw: o,
+    }
+}
+
+const mapOrderHistoryToRow = (o) => {
+    const title = o?.event_title || o?.event_guid || ''
+    const outcome = String(o?.outcome || '').toUpperCase() || 'YES'
+    const tradeSide = String(o?.side || '').toUpperCase() || 'BUY' // BUY/SELL
+
+    const priceNum = Number(o?.dealed_price ?? o?.price)
+    const principalNum = Number(o?.dealed_cost)
+    const pnlAbs = Number(o?.profit)
+    const pnlPct = (Number.isFinite(principalNum) && principalNum !== 0 && Number.isFinite(pnlAbs))
+        ? (pnlAbs / principalNum) * 100
+        : 0
+
+    const time = (o?.dealed_at || o?.created_at || '').replace('T', ' ').replace('Z', '')
+
+    return {
+        id: o?.order_guid || o?.guid || '',
+        tokenSymbol: title ? title.slice(0, 1).toUpperCase() : 'H',
+        title,
+        price: Number.isFinite(priceNum) ? formatNum(priceNum, 2) : '--',
+        side: tradeSide, // BUY/SELL（history tab）
+        outcome,
+        iconBg: outcome === 'NO' ? '#E44096' : '#2FBC87',
+        pnl: Number.isFinite(pnlPct) ? Number(pnlPct.toFixed(2)) : 0,
+        oddsType: outcome === 'NO' ? 'no' : 'yes',
+        oddsLabel: `${o?.sub_event_title || outcome} · ${formatPriceToCentText(priceNum)}`,
+        resultAmount: Number.isFinite(pnlAbs) ? Number(pnlAbs.toFixed(2)) : 0,
+        status: (Number.isFinite(pnlAbs) && pnlAbs < 0) ? 'lost' : 'claimed',
+        value: Number.isFinite(principalNum) ? principalNum.toFixed(2) : (o?.dealed_cost || '0.00'),
+        time,
+        raw: o,
+    }
+}
 
 const filteredList = computed(() => {
-    return baseList.value.filter(item => {
-        if (filterType.value === 'buy' && item.side !== 'Buy') return false
-        if (filterType.value === 'sell' && item.side !== 'Sell') return false
-
+    return list.value.filter(item => {
         if (searchKeyword.value.trim()) {
             const kw = searchKeyword.value.trim().toLowerCase()
             if (
@@ -308,12 +562,144 @@ const toggleMonthDropdown = (event) => {
 const selectType = (val) => {
     filterType.value = val
     showTypeDropdown.value = false
+    resetAndFetch()
 }
 
 const selectMonth = (val) => {
     filterMonth.value = val
     showMonthDropdown.value = false
+    resetAndFetch()
 }
+
+const fetchPositions = async (append = false) => {
+    if (loading.value) return
+    if (append && !hasMore.value) return
+    if (!address.value && !getUserGuid()) return
+
+    loading.value = true
+    try {
+        const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
+        const language_label = currentLocale.split('-')[0]
+
+        let res
+        if (activeTab.value === 'pending') {
+            // 委托仓位（挂单）
+            res = await getOpenOrders({
+                user_guid: getUserGuid(),
+                page: page.value,
+                page_size: PAGE_SIZE,
+                event_guid: undefined,
+                sub_event_guid: undefined,
+                order_type: 'all',
+                side: getSideFilterParam(),
+            })
+        } else if (activeTab.value === 'history') {
+            // 历史仓位订单
+            const range = monthToRange(filterMonth.value)
+            res = await getOrderHistory({
+                user_guid: getUserGuid(),
+                page: page.value,
+                page_size: PAGE_SIZE,
+                start_date: range?.start_date,
+                end_date: range?.end_date,
+                status: getStatusFilterParam(),
+                is_settled: '',
+                event_guid: undefined,
+                sub_event_guid: undefined,
+            })
+        } else {
+            const status = tabToStatus(activeTab.value)
+            const range = monthToRange(filterMonth.value)
+            res = await getUserPositions({
+                address: address.value || undefined,
+                user_guid: !address.value ? getUserGuid() : undefined,
+                status,
+                page: page.value,
+                page_size: PAGE_SIZE,
+                language_label,
+                start_date: range?.start_date,
+                end_date: range?.end_date,
+            })
+        }
+
+        if (!isRespSuccess(res)) {
+            throw new Error(res?.data?.message || 'fetch positions failed')
+        }
+
+        const data = res?.data?.data || {}
+        const rows = activeTab.value === 'pending'
+            ? (Array.isArray(data.orders) ? data.orders : []).map(mapOpenOrderToRow)
+            : activeTab.value === 'history'
+                ? (Array.isArray(data.orders) ? data.orders : []).map(mapOrderHistoryToRow)
+                : (Array.isArray(data.list) ? data.list : []).map(mapPositionToRow)
+        totalPages.value = Number(data.total_pages) || 1
+        list.value = append ? list.value.concat(rows) : rows
+        page.value += 1
+    } catch (e) {
+        console.error('Fetch positions failed:', e)
+        if (!append) list.value = []
+        totalPages.value = page.value - 1
+    } finally {
+        loading.value = false
+    }
+}
+
+const resetAndFetch = () => {
+    page.value = 1
+    totalPages.value = 1
+    list.value = []
+    fetchPositions(false)
+}
+
+const switchTab = (tab) => {
+    if (activeTab.value === tab) return
+    activeTab.value = tab
+    filterType.value = 'all' // 切换 tab 时重置筛选类型
+    resetAndFetch()
+}
+
+// 上拉加载：IntersectionObserver 监听触底
+const loadMoreSentinel = ref(null)
+let loadMoreObserver = null
+
+const setupLoadMoreObserver = () => {
+    if (typeof IntersectionObserver === 'undefined') return
+    loadMoreObserver = new IntersectionObserver(
+        (entries) => {
+            const entry = entries[0]
+            if (!entry?.isIntersecting || loading.value || !hasMore.value) return
+            fetchPositions(true)
+        },
+        {
+            root: null,
+            rootMargin: '100px',
+            threshold: 0,
+        },
+    )
+}
+
+watch(
+    () => filteredList.value.length,
+    (len) => {
+        nextTick(() => {
+            if (!loadMoreObserver) setupLoadMoreObserver()
+            if (len > 0 && loadMoreSentinel.value) {
+                loadMoreObserver.observe(loadMoreSentinel.value)
+            }
+        })
+    },
+    { flush: 'post' },
+)
+
+onMounted(() => {
+    // 默认月份为本月
+    if (!filterMonth.value) filterMonth.value = monthOptions.value[0]?.value || ''
+    resetAndFetch()
+})
+
+watch(() => address.value, () => {
+    resetAndFetch()
+})
 
 // 点击页面其它地方关闭下拉
 if (typeof window !== 'undefined') {
@@ -322,10 +708,19 @@ if (typeof window !== 'undefined') {
         showMonthDropdown.value = false
     })
 }
+
+onBeforeUnmount(() => {
+    loadMoreObserver?.disconnect?.()
+})
 </script>
 
 <style scoped lang="scss">
 .position-list {
+    margin-top: 20px;
+}
+
+.load-more-footer{
+    text-align: center;
     margin-top: 20px;
 }
 
@@ -421,6 +816,18 @@ if (typeof window !== 'undefined') {
     }
 }
 
+.filter-action-btn {
+    background: rgba(255, 75, 130, 0.12);
+    border-color: rgba(255, 75, 130, 0.35);
+    color: #FF4B82;
+    font-weight: 600;
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
 .dropdown-menu {
     position: absolute;
     top: calc(100% + 6px);
@@ -429,6 +836,7 @@ if (typeof window !== 'undefined') {
     border-radius: 10px;
     padding: 6px 0;
     border: 1px solid var(--border-color);
+    background-color: var(--bg-page-h5);
     z-index: 10;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
@@ -449,7 +857,15 @@ if (typeof window !== 'undefined') {
 .position-list-content {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+}
+
+.list-loading,
+.list-no-more,
+.list-empty {
+    text-align: center;
+    padding: 18px 0;
+    font-size: 13px;
+    color: var(--text-gray, #888);
 }
 
 .position-item {
@@ -489,7 +905,6 @@ if (typeof window !== 'undefined') {
         font-family: PingFang SC, PingFang SC;
         font-weight: 600;
         font-size: 14px;
-        color: #FFFFFF;
         color: var(--text-color, #fff);
         padding-right: 12px;
     }
@@ -520,6 +935,7 @@ if (typeof window !== 'undefined') {
         padding: 4px 10px;
         border-radius: 4px;
         font-weight: 600;
+        max-width: 50%;
 
         &.no {
             background: rgba(255, 75, 130, 0.2);
@@ -532,8 +948,7 @@ if (typeof window !== 'undefined') {
         }
     }
 
-    .pnl-text,
-    .result-amount {
+    .pnl-text {
         margin-left: auto;
         font-size: 13px;
         font-weight: 600;
@@ -547,12 +962,22 @@ if (typeof window !== 'undefined') {
         color: #FF4B82;
     }
 
-    .limit-text {
+    .cancel-btn {
         margin-left: auto;
         font-family: PingFang SC, PingFang SC;
         font-weight: 600;
         font-size: 14px;
-        color: var(--text-color, #999);
+        color: #FF4B82;
+        background: rgba(255, 75, 130, 0.12);
+        border: 1px solid rgba(255, 75, 130, 0.35);
+        border-radius: 8px;
+        padding: 4px 10px;
+        cursor: pointer;
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     }
 
     .status-pill {
@@ -604,6 +1029,33 @@ if (typeof window !== 'undefined') {
 
     .value-text {
         margin-right: 8px;
+    }
+}
+</style>
+
+<style lang="scss">
+.cancel-order-confirm {
+    width: min(380px, calc(100vw - 48px));
+    border-radius: 14px;
+
+    .el-message-box__title {
+        line-height: 1.2;
+    }
+
+    .el-message-box__content {
+        padding-top: 10px;
+        padding-bottom: 6px;
+        line-height: 1.35;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    .el-message-box__btns {
+        gap: 10px;
+    }
+
+    .el-button {
+        min-width: 108px;
     }
 }
 </style>

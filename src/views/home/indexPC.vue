@@ -234,10 +234,12 @@ import { ref, computed } from "vue";
 import NavBar2 from "@/components/navBar2.vue";
 import { Search, Avatar } from "@element-plus/icons-vue";
 import router from "@/router";
+import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { tagButtons as rawTagButtons, leftList as rawLeftList, rightList as rawRightList } from "./homeData";
 
 const { t } = useI18n();
+const route = useRoute();
 const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
 
 // 搜索相关（PC 顶部栏）
@@ -268,6 +270,17 @@ const navigateToEarnings = () => {
 
 // 跳转到详情页面
 const navigateToDetail = (item, choice) => {
+    // 如果当前通过导航条处于“加密货币”场景，则进入加密货币详情页
+    if (route.query.nav === 'crypto' || route.query.nav === 'crypto-chinese') {
+        router.push({
+            path: '/bitcoin-up-down',
+            query: {
+                id: item.id || item.title,
+            },
+        });
+        return;
+    }
+
     router.push({
         path: "/detail",
         query: {

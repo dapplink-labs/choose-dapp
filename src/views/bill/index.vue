@@ -32,7 +32,7 @@
                     <transition name="fade-dropdown">
                         <div v-if="showAssetDropdown" class="dropdown-menu">
                             <div v-for="opt in assetOptions" :key="opt.value" class="dropdown-item"
-                                :class="{ active: filterAsset === opt.value }" @click="selectAsset(opt.value)">
+                                :class="{ active: filterCurrency === opt.value }" @click="selectAsset(opt.value)">
                                 {{ opt.label }}
                             </div>
                         </div>
@@ -56,11 +56,13 @@
                     <img class="bill-icon-img" src="@/assets/icon/TIcon.png" alt="USDT" />
                 </div>
                 <div class="bill-content">
-                    <div class="bill-type">{{ $t(item.typeLabelKey) }}</div>
+                    <div class="bill-type">
+                        {{ item.typeLabelKey ? $t(item.typeLabelKey) : item.type }}
+                    </div>
                     <div class="bill-time">{{ item.time }}</div>
                 </div>
                 <div class="bill-amount" :class="item.amount >= 0 ? 'inflow' : 'outflow'">
-                    {{ item.amount >= 0 ? '+' : '' }}{{ item.amountFormatted }} USDT
+                    {{ item.amount >= 0 ? '+' : '' }}{{ item.amountFormatted }} {{ item.currency_code || 'USD' }}
                 </div>
             </div>
             <div v-if="isLoading" class="loading-more">
@@ -83,24 +85,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import { ArrowDownBold } from '@element-plus/icons-vue'
 import { useThemeStore } from '@/stores/theme'
 import DateRangePicker from '@/components/DateRangePicker.vue'
+import { getTransactionHistory } from '@/api/APIEvent'
 
 const { t } = useI18n()
 const themeStore = useThemeStore()
 
-const filterType = ref('recharge')
-const filterAsset = ref('USDT')
+// 后端类型：all / FIAT_DEPOSIT / FIAT_WITHDRAW / ...
+const filterType = ref('all')
+const filterCurrency = ref('all')
 const filterDate = ref(30)
 
 const showTypeDropdown = ref(false)
 const showAssetDropdown = ref(false)
 const typeFilterRef = ref(null)
 const assetFilterRef = ref(null)
+const listRef = ref(null)
 
 // 日期范围弹层 & 显示文案
 const showDateRangePicker = ref(false)
@@ -109,17 +114,27 @@ const selectedDateRange = ref(null)
 
 const typeOptions = computed(() => [
     { value: 'all', label: t('bill.typeAll') },
-    { value: 'recharge', label: t('bill.typeRecharge') },
-    { value: 'withdraw', label: t('bill.typeWithdraw') },
-    { value: 'purchase', label: t('bill.typePurchase') },
-    { value: 'sell', label: t('bill.typeSell') }
+    { value: 'FIAT_DEPOSIT', label: t('bill.typeRecharge') },
+    { value: 'FIAT_WITHDRAW', label: t('bill.typeWithdraw') }
 ])
 
-const assetOptions = computed(() => [
-    { value: 'all', label: t('bill.assetAll') },
-    { value: 'USDT', label: 'USDT' },
-    { value: 'CHO', label: 'CHO' }
-])
+const assetOptions = computed(() => {
+    const base = [{ value: 'all', label: t('bill.assetAll') }]
+    const uniq = new Map()
+    list.value.forEach((it) => {
+        const code = it.currency_code || ''
+        const symbol = it.currency_symbol || ''
+        if (!code) return
+        const key = code
+        if (!uniq.has(key)) {
+            uniq.set(key, {
+                value: key,
+                label: symbol ? `${symbol} ${key}` : key,
+            })
+        }
+    })
+    return base.concat(Array.from(uniq.values()))
+})
 
 const dateOptions = computed(() => [
     { value: 7, label: t('bill.date7') },
@@ -133,8 +148,12 @@ const currentTypeLabel = computed(() => {
 })
 
 const currentAssetLabel = computed(() => {
-    const opt = assetOptions.value.find(o => o.value === filterAsset.value)
-    return opt ? opt.label : filterAsset.value
+    if (filterCurrency.value === 'all') {
+        const opt = assetOptions.value.find(o => o.value === 'all')
+        return opt ? opt.label : ''
+    }
+    const opt = assetOptions.value.find(o => o.value === filterCurrency.value)
+    return opt ? opt.label : filterCurrency.value
 })
 
 const currentDateLabel = computed(() => {
@@ -148,14 +167,23 @@ const currentDateLabel = computed(() => {
 const list = ref([])
 const isLoading = ref(false)
 const hasMore = ref(true)
+const page = ref(1)
+const totalPages = ref(1)
+const PAGE_SIZE = 20
+
+// 目前项目未存 user_guid，先与充值接口的默认用户保持一致（token 也来自该账户）
+const getUserGuid = () => window.sessionStorage.getItem('user_guid') || '41f83791b601426896bcb39f45e2fd12'
+
+const isRespSuccess = (res) => {
+    const code = res?.data?.code
+    return code === 0 || code === 200 || code === 2000
+}
 
 const filteredList = computed(() => {
     let items = list.value
-    if (filterType.value !== 'all') {
-        items = items.filter(item => item.type === filterType.value)
-    }
-    if (filterAsset.value !== 'all') {
-        items = items.filter(item => item.asset === filterAsset.value)
+    // 资产筛选（前端兜底：按 currency_code 过滤当前已拉取数据）
+    if (filterCurrency.value !== 'all') {
+        items = items.filter(item => item.currency_code === filterCurrency.value)
     }
     return items
 })
@@ -173,38 +201,126 @@ function toggleAssetDropdown() {
 function selectType(value) {
     filterType.value = value
     showTypeDropdown.value = false
+    resetAndFetch()
 }
 
 function selectAsset(value) {
-    filterAsset.value = value
+    filterCurrency.value = value
     showAssetDropdown.value = false
+    resetAndFetch()
 }
 
-function loadMockData() {
-    const types = [
-        { type: 'recharge', labelKey: 'bill.typeRecharge' },
-        { type: 'withdraw', labelKey: 'bill.typeWithdraw' },
-        { type: 'purchase', labelKey: 'bill.typePurchase' },
-        { type: 'sell', labelKey: 'bill.typeSell' }
-    ]
-    const now = new Date()
-    const items = []
-    for (let i = 0; i < 20; i++) {
-        const typeInfo = types[i % 4]
-        const amount = (i % 2 === 0 ? 1 : -1) * (300 + Math.floor(Math.random() * 1000))
-        const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
-        const timeStr = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-        items.push({
-            id: `bill-${i}`,
-            type: typeInfo.type,
-            typeLabelKey: typeInfo.labelKey,
-            asset: 'USDT',
-            amount,
-            amountFormatted: Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }),
-            time: timeStr
-        })
+const formatTime = (item) => item?.created_at || ''
+
+const TYPE_LABEL_KEY_MAP = {
+    FIAT_DEPOSIT: 'bill.typeRecharge',
+    FIAT_WITHDRAW: 'bill.typeWithdraw',
+}
+
+const getSignedAmount = (tx) => {
+    const n = Number(tx?.amount)
+    const amt = Number.isFinite(n) ? n : 0
+    const type = String(tx?.type || '').toUpperCase()
+    // 充值为流入，提现为流出；其它类型默认按正数展示（可后续补映射）
+    if (type === 'FIAT_WITHDRAW') return -Math.abs(amt)
+    if (type === 'FIAT_DEPOSIT') return Math.abs(amt)
+    return amt
+}
+
+const mapTxToRow = (tx) => {
+    const signed = getSignedAmount(tx)
+    const type = String(tx?.type || '').toUpperCase()
+    const code = tx?.currency_code || ''
+    const symbol = tx?.currency_symbol || ''
+    return {
+        id: tx?.guid || tx?.ref_order_guid || '',
+        type,
+        typeLabelKey: TYPE_LABEL_KEY_MAP[type] || '',
+        currency_code: code,
+        currency_symbol: symbol,
+        amount: signed,
+        amountFormatted: Math.abs(signed).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 6 }),
+        time: formatTime(tx),
+        status: tx?.status || '',
+        remark: tx?.remark || '',
+        raw: tx,
     }
-    list.value = items
+}
+
+const toYMD = (dateLike) => {
+    const d = dateLike instanceof Date ? dateLike : new Date(dateLike)
+    if (Number.isNaN(d.getTime())) return ''
+    const f = (n) => String(n).padStart(2, '0')
+    return `${d.getFullYear()}-${f(d.getMonth() + 1)}-${f(d.getDate())}`
+}
+
+const getDateRangeParams = () => {
+    const payload = selectedDateRange.value
+    if (payload?.startDate && payload?.endDate) {
+        return { start_date: toYMD(payload.startDate), end_date: toYMD(payload.endDate) }
+    }
+    if (payload?.startDateStr && payload?.endDateStr) {
+        // 兼容 "YYYY/MM/DD" 或含时间的字符串
+        return {
+            start_date: String(payload.startDateStr).slice(0, 10).replaceAll('/', '-'),
+            end_date: String(payload.endDateStr).slice(0, 10).replaceAll('/', '-'),
+        }
+    }
+    return {}
+}
+
+const fetchTransactionHistory = async (append = false) => {
+    if (isLoading.value) return
+    if (append && (!hasMore.value || page.value > totalPages.value)) return
+
+    isLoading.value = true
+    try {
+        const type = filterType.value === 'all' ? 'all' : filterType.value
+        const { start_date, end_date } = getDateRangeParams()
+        const res = await getTransactionHistory({
+            user_guid: getUserGuid(),
+            type, // all / FIAT_DEPOSIT / FIAT_WITHDRAW / ...
+            start_date: start_date || undefined,
+            end_date: end_date || undefined,
+            page: page.value,
+            page_size: PAGE_SIZE,
+        })
+        if (!isRespSuccess(res)) {
+            throw new Error(res?.data?.message || 'fetch transaction history failed')
+        }
+
+        const data = res?.data?.data || {}
+        const txs = Array.isArray(data.list) ? data.list : []
+        const mapped = txs.map(mapTxToRow)
+
+        totalPages.value = Number(data.total_pages) || 1
+        hasMore.value = page.value < totalPages.value
+        list.value = append ? list.value.concat(mapped) : mapped
+        page.value += 1
+    } catch (e) {
+        console.error('Fetch transaction history failed:', e)
+        if (!append) list.value = []
+        hasMore.value = false
+    } finally {
+        isLoading.value = false
+    }
+}
+
+const resetAndFetch = () => {
+    page.value = 1
+    totalPages.value = 1
+    hasMore.value = true
+    list.value = []
+    fetchTransactionHistory(false)
+}
+
+const onListScroll = (e) => {
+    const el = e?.target
+    if (!el || isLoading.value || !hasMore.value) return
+    const threshold = 40
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - threshold) {
+        fetchTransactionHistory(true)
+    }
 }
 
 function openDatePicker() {
@@ -240,12 +356,22 @@ function handleClickOutside(event) {
 
 onMounted(() => {
     themeStore.applyTheme()
-    loadMockData()
     document.addEventListener('click', handleClickOutside)
+    resetAndFetch()
+    if (listRef.value) {
+        listRef.value.addEventListener('scroll', onListScroll, { passive: true })
+    }
 })
 
 onBeforeUnmount(() => {
     document.removeEventListener('click', handleClickOutside)
+    if (listRef.value) {
+        listRef.value.removeEventListener('scroll', onListScroll)
+    }
+})
+
+watch(() => filterType.value, () => {
+    // 已在 selectType 中 resetAndFetch，这里兜底防止外部改值
 })
 </script>
 
