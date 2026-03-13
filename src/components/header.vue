@@ -60,7 +60,8 @@
         </el-dropdown>
 
         <!-- 消息入口 -->
-        <button :class="['message-entry-btn', { 'is-dark': isDark }]" type="button" @click="goMessages" :title="$t('messages.title') || '消息'">
+        <button :class="['message-entry-btn', { 'is-dark': isDark }]" type="button" @click="goMessages"
+          :title="$t('messages.title') || '消息'">
           <svg class="message-icon" xmlns="http://www.w3.org/2000/svg" width="20.003" height="24"
             viewBox="0 0 20.003 24" aria-hidden="true">
             <path fill="currentColor"
@@ -515,9 +516,9 @@ onBeforeUnmount(() => {
   left: 0;
   right: 0;
   width: 100%;
-  background-color: #000000;
-  padding: 0 5%;
-  height: 80px;
+  background-color: var(--bg-page-h5, #fff);
+  padding: 0 10px;
+  height: 52px;
   display: flex;
   align-items: center;
   z-index: 1000;

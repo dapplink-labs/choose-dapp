@@ -282,7 +282,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from "vue";
+import { onMounted, onUpdated, ref, computed, watch, nextTick, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useThemeStore } from "@/stores/theme";
 import { useI18n } from "vue-i18n";
@@ -400,6 +400,15 @@ watch(claimInputAmount, (newVal) => {
   }
 })
 
+// 监听弹窗显示，禁止页面滚动
+watch(showClaimPopup, (val) => {
+  document.body.style.overflow = val ? 'hidden' : '';
+})
+
+onUnmounted(() => {
+  document.body.style.overflow = '';
+})
+
 
 
 // 处理最大值点击
@@ -407,11 +416,11 @@ const handleMaxAmount = () => claimInputAmount.value = formatChoAmount(totalAvai
 
 // 打开弹窗的函数
 const openClaimPopup = () => {
-  if (isClaimDisabledByTime.value) return;
-  if (totalAvailableAmount.value <= 0) {
-    Message.warning(t("myNode.noIncome"));
-    return;
-  }
+  // if (isClaimDisabledByTime.value) return;
+  // if (totalAvailableAmount.value <= 0) {
+  //   Message.warning(t("myNode.noIncome"));
+  //   return;
+  // }
   // 默认填入最大可领取金额，或者清空让用户手动输
   claimInputAmount.value = formatChoAmount(totalAvailableAmount.value).replace(/,/g, '');
   showClaimPopup.value = true;
@@ -659,13 +668,29 @@ const formatProgressPercent = (value) => {
 const progressIndicatorRef = ref(null);
 const progressBarRef = ref(null);
 
+
+const indicatorWidth = ref(0);
+const barWidth = ref(0);
+
+const updateWidths = () => {
+  indicatorWidth.value = progressIndicatorRef.value?.offsetWidth || 0;
+  barWidth.value = progressBarRef.value?.offsetWidth || 0;
+};
+
+onMounted(() => {
+  nextTick(updateWidths);
+});
+
+onUpdated(updateWidths);
+
 const progressIndicatorLeft = computed(() => {
   const p = Number(progressPercent.value) || 0;
-  // 获取progress-indicator标签元素的宽度
-  const width = progressIndicatorRef.value?.offsetWidth || 0;
-  // 获取progress-bar标签元素的宽度
-  const progressBarWidth = progressBarRef.value?.offsetWidth || 0;
+  // Use reactive widths
+  const width = indicatorWidth.value;
+  const progressBarWidth = barWidth.value;
+
   if (p <= 20) return `${p}%`;
+  if (!progressBarWidth) return `${p}%`;
   if (p >= 90) return `${p - ((width / progressBarWidth) * 100).toFixed(0)}%`;
   return `${p - Math.max(0, (width / progressBarWidth) * 100 / 2).toFixed(0)}%`;
 });
@@ -1452,6 +1477,7 @@ onMounted(async () => {
   border-radius: 20px 20px 0 0;
   padding: 24px 20px;
   animation: slideUp 0.3s ease-out;
+  box-sizing: border-box;
 
   .modal-header {
     display: flex;
@@ -1473,6 +1499,7 @@ onMounted(async () => {
   }
 
   .input-wrapper {
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     padding: 0 16px;
@@ -1480,15 +1507,16 @@ onMounted(async () => {
     background: var(--bg-light, #f5f5f5);
     border-radius: 12px;
     margin-bottom: 8px;
+    width: 100%;
 
     .claim-input {
-      flex: 1;
       border: none;
       outline: none;
       background: transparent;
       font-size: 20px;
       font-weight: bold;
       color: var(--text-color);
+      width: 100%;
     }
 
     .max-btn {
@@ -1500,6 +1528,8 @@ onMounted(async () => {
       border-radius: 6px;
       cursor: pointer;
       margin-right: 8px;
+      box-sizing: border-box;
+
     }
 
     .unit {

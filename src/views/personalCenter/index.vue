@@ -14,8 +14,8 @@
       <div class="action-icons">
         <!-- <img :src="isDark ? getIcon('29Dark') : getIcon('29')" :alt="$t('common.share')" class="icon-img"
           @click="handleShare" /> -->
-        <img :src="isDark ? getIcon('settingDark') : getIcon('setting')" :alt="$t('common.settings')" class="icon-img"
-          @click="handleSettings" />
+        <img v-if="!isComingSoon" :src="isDark ? getIcon('settingDark') : getIcon('setting')"
+          :alt="$t('common.settings')" class="icon-img" @click="handleSettings" />
         <img :src="isDark ? getIcon('closeDark') : getIcon('close')" :alt="$t('common.close')" class="icon-img"
           @click="handleClose" />
       </div>
@@ -110,6 +110,7 @@ import networks from "@/assets/json/networks.js";
 const BSC_CHAIN_ID = 56;
 
 const { locale, t } = useI18n();
+const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
 
 // 批量导入 icon 资源，减少单独 import
 const iconModules = import.meta.glob("@/assets/icon/*.{png,svg}", {
