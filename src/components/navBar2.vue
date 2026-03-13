@@ -182,11 +182,11 @@ onMounted(async () => {
   background-color: var(--bg-card, #ffffff);
   border-bottom: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
   height: 48px;
-  position: fixed;
-  top: 80px; // header高度
-  left: 0;
-  right: 0;
-  z-index: 999;
+  // position: fixed;
+  // top: 80px; // header高度
+  // left: 0;
+  // right: 0;
+  // z-index: 999;
   transition: background-color 0.3s ease, border-color 0.3s ease;
 
   .navbar-container {
