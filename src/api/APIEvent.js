@@ -108,10 +108,10 @@ export const getOrderHistory = (data) => {
 }
 
 // 充值
-export const recharge = (data) => {
-  return request.post('/api/v1/user/recharge', {
+export const recharge = () => {
+  return request.post('api/v1/user/fiat/deposit', {
     amount: "10000",
-    currency_code: "USD",
+    currency_code: "CNY",
     user_guid: "41f83791b601426896bcb39f45e2fd12"
   })
 }

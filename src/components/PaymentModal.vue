@@ -32,7 +32,8 @@
                         <div class="target-row">
                             <div class="outcome-badge"
                                 :class="{ 'outcome-yes': outcomeBadge === 'YES', 'outcome-no': outcomeBadge === 'NO' }">
-                                {{ outcomeTitle }} | {{ outcomeBadge === 'YES' ? $t('common.yes') : $t('common.no') }}
+                                <!-- {{ outcomeTitle }} | -->
+                                 {{ outcomeBadge === 'YES' ? $t('common.yes') : $t('common.no') }}
                                 <span class="icon" aria-hidden="true" style="display: inline-flex;"
                                     @click="toggleOutcome">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="11.997"
@@ -339,8 +340,8 @@ function triggerPreview() {
 async function fetchBalance() {
     balanceLoading.value = true
     try {
-        const address = localStorage.getItem('address') || ''
-        const res = await getUserBalances({ address })
+        const userGuid = window.sessionStorage.getItem('user_guid') || ''
+        const res = await getUserBalances({ user_guid: userGuid })
         const data = res?.data?.data
         if (data) {
             userBalance.value = data.cash || data.portfolio || '0.00'
@@ -416,6 +417,70 @@ async function fetchPreview() {
     }
 }
 
+// 计算订单过期时间字符串（YYYY-MM-DD HH:mm:ss），仅在启用过期时间时返回
+function buildExpireAt() {
+    if (!enableExpiry.value) return null
+
+    const now = new Date()
+    let target
+
+    if (expiryPreset.value === 'eod') {
+        // 当天 23:59:59（本地时间）
+        target = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            23,
+            59,
+            59,
+        )
+        // 如果当前已过 23:59:59，则顺延到下一天的 23:59:59
+        if (target.getTime() <= now.getTime()) {
+            target = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() + 1,
+                23,
+                59,
+                59,
+            )
+        }
+    } else {
+        let minutes = 0
+        switch (expiryPreset.value) {
+            case '5m':
+                minutes = 5
+                break
+            case '1h':
+                minutes = 60
+                break
+            case '12h':
+                minutes = 12 * 60
+                break
+            case '24h':
+                minutes = 24 * 60
+                break
+            case 'custom':
+                minutes = Math.max(1, Number(customExpiryMinutes.value) || 0)
+                break
+            default:
+                minutes = 0
+        }
+        if (!minutes) return null
+        target = new Date(now.getTime() + minutes * 60 * 1000)
+    }
+
+    const pad = (n) => String(n).padStart(2, '0')
+    const y = target.getFullYear()
+    const m = pad(target.getMonth() + 1)
+    const d = pad(target.getDate())
+    const hh = pad(target.getHours())
+    const mm = pad(target.getMinutes())
+    const ss = pad(target.getSeconds())
+
+    return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
+}
+
 async function handleConfirm() {
     if (submitting.value || !canSubmit.value) return
 
@@ -446,6 +511,12 @@ async function handleConfirm() {
             // 限价单：传 price + shares
             orderParams.price = String(Number(price.value) / 100) // ¢ → USDT
             orderParams.shares = String(inputValue.value)
+        }
+
+        // 过期时间（可选）
+        const expireAt = buildExpireAt()
+        if (expireAt) {
+            orderParams.expire_at = expireAt
         }
 
         const res = await makeOrder(orderParams)

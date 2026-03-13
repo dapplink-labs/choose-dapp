@@ -448,7 +448,7 @@ const mapPositionToRow = (p) => {
         pnl: Number.isFinite(pnlPct) ? Number(pnlPct.toFixed(2)) : 0,
         oddsType,
         // 中间粉/绿标签：Buy/Sell + 价格（¢）
-        oddsLabel: `${outcome === 'NO' ? 'Sell' : 'Buy'} ${formatPriceToCentText(price)}`,
+        oddsLabel: `${outcome } ${formatPriceToCentText(price)}`,
         // 底部右上角状态和历史复用字段
         resultAmount: Number.isFinite(pnlAbs) ? Number(pnlAbs.toFixed(2)) : 0,
         status: (Number(pnlAbs) < 0) ? 'lost' : 'claimed',
@@ -485,7 +485,7 @@ const mapOpenOrderToRow = (o) => {
         iconBg: outcome === 'NO' ? '#E44096' : '#2FBC87',
         pnl: 0,
         oddsType: outcome === 'NO' ? 'no' : 'yes',
-        oddsLabel: `${tradeSide === 'SELL' ? 'Sell' : 'Buy'} ${formatPriceToCentText(priceNum)}`,
+        oddsLabel: `${outcome} ${formatPriceToCentText(priceNum)}`,
         resultAmount: 0,
         status: String(o?.status || '').toLowerCase(),
         value: valueText,

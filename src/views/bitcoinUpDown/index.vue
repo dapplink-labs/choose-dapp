@@ -192,35 +192,41 @@
           $t('crypto.positions') }}</div>
         <div class="tab-item" :class="{ active: activeTab === 'Orders' }" @click="activeTab = 'Orders'">{{
           $t('crypto.orders')
-        }}</div>
+          }}</div>
         <div class="tab-item" :class="{ active: activeTab === 'History' }" @click="activeTab = 'History'">{{
           $t('crypto.history') }}</div>
       </div>
 
       <!-- Positions -->
       <div v-if="activeTab === 'Positions'" class="position-content">
-        <div v-if="activePosition" class="pos-card">
-          <h3 class="pos-title">{{ activePosition.title }}</h3>
-          <span class="pos-tag">{{ activePosition.tagLabel }}</span>
-          <div class="pos-grid">
-            <div class="grid-item">
-              <div class="g-label">{{ $t('crypto.avgPrice') }}</div>
-              <div class="g-val">{{ activePosition.avgPrice }}</div>
+        <div v-if="positions.length">
+          <div v-for="(pos, index) in positions" :key="pos.id" class="pos-card">
+            <h3 v-if="index === 0" class="pos-title">{{ pos.title }}</h3>
+            <span class="pos-tag" :class="pos.outcome">{{ pos.tagLabel }}</span>
+            <div class="pos-grid">
+              <div class="grid-item">
+                <div class="g-label">{{ $t('crypto.avgPrice') }}</div>
+                <div class="g-val">{{ pos.avgPrice }}</div>
+              </div>
+              <div class="grid-item">
+                <div class="g-label">{{ $t('crypto.cost') }}</div>
+                <div class="g-val">{{ pos.cost }}</div>
+              </div>
+              <div class="grid-item">
+                <div class="g-label">{{ $t('crypto.current') }}</div>
+                <div class="g-val">{{ pos.current }}</div>
+              </div>
+              <div class="grid-item">
+                <div class="g-label">{{ $t('crypto.profit') }}</div>
+                <div class="g-val" :class="{ 'neon': pos.profitPositive, 'hot-pink': !pos.profitPositive }">{{
+                  pos.profit }}
+                </div>
+              </div>
             </div>
-            <div class="grid-item">
-              <div class="g-label">{{ $t('crypto.cost') }}</div>
-              <div class="g-val">{{ activePosition.cost }}</div>
-            </div>
-            <div class="grid-item">
-              <div class="g-label">{{ $t('crypto.current') }}</div>
-              <div class="g-val">{{ activePosition.current }}</div>
-            </div>
-            <div class="grid-item">
-              <div class="g-label">{{ $t('crypto.profit') }}</div>
-              <div class="g-val" :class="{ neon: activePosition.profitPositive }">{{ activePosition.profit }}</div>
-            </div>
+            <button class="withdraw-hero-btn" :class="pos.outcome" type="button" @click="handlePositionWithdraw(pos)">{{
+              $t('crypto.withdraw')
+              }}</button>
           </div>
-          <button class="withdraw-hero-btn" type="button" @click="handlePositionWithdraw">{{ $t('crypto.withdraw') }}</button>
         </div>
         <div v-else class="orders-empty">{{ $t('common.noData') || '暂无数据...' }}</div>
       </div>
@@ -299,7 +305,8 @@
             $t('detail.tradeNo') }}</button>
         </div>
         <OrderBookMobile :active-side="orderBookTab" :asks="currentOrderBook.asks" :bids="currentOrderBook.bids"
-          :last-trade-price="currentOrderBook.last_trade_price" :loading="orderBookLoading" :use-mock-fallback="false" />
+          :last-trade-price="currentOrderBook.last_trade_price" :loading="orderBookLoading"
+          :use-mock-fallback="false" />
       </div>
 
       <div class="rules-footer">
@@ -401,7 +408,17 @@ const COGNITO_IDENTITY_POOL_ID =
 let iotMqtt = null
 let mqttDestroyed = false
 
-const shouldUseMqtt = computed(() => !!IOT_ENDPOINT && !!COGNITO_IDENTITY_POOL_ID && hasWebCrypto())
+// 是否启用本页面 MQTT 推送
+const shouldUseMqtt = computed(() => {
+  const enabled = !!IOT_ENDPOINT && !!COGNITO_IDENTITY_POOL_ID && hasWebCrypto()
+  console.log('[MQTT][debug] shouldUseMqtt', {
+    enabled,
+    IOT_ENDPOINT,
+    COGNITO_IDENTITY_POOL_ID,
+    hasWebCrypto: hasWebCrypto(),
+  })
+  return enabled
+})
 
 // ── 事件结束状态 ──
 // 通过 API 状态字段或倒计时归零两种途径判断事件是否已结束
@@ -427,10 +444,10 @@ const formatCompactNumber = (value) => {
 const formatMoney = (value, digits = 2) => {
   const num = Number(value)
   if (!Number.isFinite(num)) return '--'
-  return `$${num.toLocaleString('en-US', {
+  return `${num.toLocaleString('en-US', {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
-  })}`
+  })}$`
 }
 
 const formatPrice = (value) => {
@@ -528,10 +545,8 @@ const upTradePriceText = computed(() => detailData.value.yesAskPrice || '--')
 // 买入 DOWN 价格文本
 const downTradePriceText = computed(() => detailData.value.noAskPrice || '--')
 
-// 持仓列表
+// 持仓列表（同一事件下可能包含 up / down 多条）
 const positions = ref([])
-// 活跃持仓
-const activePosition = computed(() => positions.value[0] || null)
 // 挂单列表
 const openOrders = ref([])
 // 历史订单列表
@@ -592,11 +607,28 @@ const onOrderSuccess = async () => {
 // 将服务端持仓数据映射为页面展示格式
 const mapPositionCard = (item) => {
   const outcome = outcomeToTrend(item?.outcome)
-  const shares = Number(item?.position_size ?? item?.size ?? item?.quantity ?? 0)
+  const shares = Number(
+    item?.shares ??
+    item?.position_size ??
+    item?.size ??
+    item?.quantity ??
+    0,
+  )
   const costNum = firstFinite(item?.bet_amount, item?.dealed_cost, item?.cost, item?.position_value) || 0
-  const currentNum = firstFinite(item?.position_value, item?.current_value, item?.bet_amount) || 0
-  const profitNum = firstFinite(item?.profit_loss, item?.profit) || 0
-  const profitPct = costNum ? (profitNum / costNum) * 100 : 0
+  const currentNum = firstFinite(
+    item?.current_price,
+    item?.current_value,
+    item?.position_value,
+    item?.bet_amount,
+  ) || 0
+  // 可赢金额 to_win_amount：作为 profit 的兜底来源之一
+  const profitNum = firstFinite(item?.profit_loss, item?.profit, item?.to_win_amount) || 0
+  // 优先使用接口返回的收益/亏损率字段，其次用 profit / cost 计算
+  const profitPct = firstFinite(
+    item?.profit_rate,
+    item?.lost_rate,
+    costNum ? (profitNum / costNum) * 100 : 0,
+  ) || 0
   return {
     id: item?.guid || item?.position_guid || item?.sub_event_guid || `${item?.event_guid || 'pos'}-${item?.outcome || 'yes'}`,
     title: item?.sub_event_title || item?.event_name || detailData.value.title || t('crypto.upOrDown'),
@@ -604,15 +636,15 @@ const mapPositionCard = (item) => {
     avgPrice: formatCentText(item?.avg_price ?? item?.current_price),
     cost: formatMoney(costNum),
     current: formatMoney(currentNum),
-    profit: `${profitNum >= 0 ? '+' : '-'}${formatMoney(Math.abs(profitNum)).replace('$', '$')}${costNum ? `(${profitPct >= 0 ? '+' : ''}${profitPct.toFixed(2)}%)` : ''}`,
+    profit: `${profitNum >= 0 ? '+' : '-'}${formatMoney(Math.abs(profitNum))}${costNum ? `(${profitPct >= 0 ? '+' : ''}${profitPct.toFixed(2)}%)` : ''}`,
     profitPositive: profitNum >= 0,
     raw: item,
+    outcome
   }
 }
 
-// 持仓提现：读取当前持仓金额，调用法币提现接口
-const handlePositionWithdraw = async () => {
-  const pos = activePosition.value
+// 持仓提现：读取指定持仓金额，调用法币提现接口
+const handlePositionWithdraw = async (pos) => {
   const raw = pos?.raw || {}
   const amountPicked = firstFinite([
     raw?.withdraw_amount,
@@ -677,7 +709,7 @@ const fetchPositions = async () => {
       user_guid: getUserGuid(),
       status: 'holding',
       page: 1,
-      page_size: 20,
+      page_size: 2000,
       language_label: languageLabel,
     })
     if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Fetch positions failed')
@@ -894,7 +926,6 @@ const buildChartPointsFromHistory = (priceHistoryData) => {
     })
     .filter(Boolean)
     .slice(-50)
-  // if (result.length) console.log('[Chart]', 'buildChartPointsFromHistory 历史价格', { count: result.length, latest: result[result.length - 1] })
   return result
 }
 
@@ -1295,6 +1326,14 @@ const stopMqttStream = () => {
 
 // 初始化并启动 MQTT 连接，订阅当前事件相关 topic
 const startMqttStream = async () => {
+  console.log('[MQTT][debug] startMqttStream called', {
+    mqttDestroyed,
+    shouldUseMqtt: shouldUseMqtt.value,
+    isEventEnded: isEventEnded.value,
+    eventGuid: currentEventGuid.value,
+    subEventGuid: resolvedSubEventGuid.value,
+    hasClient: !!iotMqtt,
+  })
   if (mqttDestroyed) return
   if (!shouldUseMqtt.value) return
   if (isEventEnded.value) return  // 事件已结束，不启动 MQTT 实时推送
@@ -1317,6 +1356,7 @@ const startMqttStream = async () => {
   })
 
   iotMqtt.on('connect', () => {
+    console.log('[MQTT][debug] connected, subscribing topics', topics)
     iotMqtt.subscribe(topics)
   })
 
@@ -2041,6 +2081,13 @@ $primary-blue: #5073e5;
 }
 
 .pos-card {
+  margin-bottom: 20px;
+
+  &:first-child {
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
   .pos-title {
     font-size: 20px;
     font-weight: 600;
@@ -2057,6 +2104,16 @@ $primary-blue: #5073e5;
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 24px;
+
+    &.up {
+      background: var(--button-bg-y);
+      color: var(--text-color-y);
+    }
+
+    &.down {
+      background: var(--button-bg-n);
+      color: var(--text-color-n);
+    }
   }
 
   .pos-grid {
@@ -2079,6 +2136,10 @@ $primary-blue: #5073e5;
 
         &.neon {
           color: var(--text-color-y);
+        }
+
+        &.hot-pink {
+          color: var(--text-color-n);
         }
       }
     }
