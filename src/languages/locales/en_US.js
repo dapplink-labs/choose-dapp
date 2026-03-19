@@ -711,7 +711,7 @@ export default {
     communityIncomeUSDT: "Community Performance (USDT)",
     computingPowerIncomeCMT: "Direct Referral Profit (CHO)",
     networkIncomeCMT: "Team Profit (CHO)",
-    pendingIncome: "Issued Rewards",
+    pendingIncome: "Pending Profit",
     staticIncomeCHO: "Static Profit",
     directReferralIncomeCHO: "Direct Referral Profit",
     teamIncomeCHO: "Team Profit",

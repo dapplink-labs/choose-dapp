@@ -691,7 +691,7 @@ export default {
     communityIncomeUSDT: "커뮤니티 실적(USDT)",
     computingPowerIncomeCMT: "직접 추천 수익 (CHO)",
     networkIncomeCMT: "팀 수익 (CHO)",
-    pendingIncome: "지급된 보상",
+    pendingIncome: "수령 대기 수익",
     staticIncomeCHO: "스테이킹(Static) 수익 (CHO)",
     directReferralIncomeCHO: "직접 추천 수익 (CHO)",
     teamIncomeCHO: "팀(Team) 수익 (CHO)",

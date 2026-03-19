@@ -701,7 +701,7 @@ export default {
     communityIncomeUSDT: "小区业绩(USDT)",
     computingPowerIncomeCMT: "直推收益(CHO)",
     networkIncomeCMT: "团队收益(CHO)",
-    pendingIncome: "已发放奖励",
+    pendingIncome: "待领取收益",
     staticIncomeCHO: "静态收益(CHO)",
     directReferralIncomeCHO: "直推收益(CHO)",
     teamIncomeCHO: "团队收益(CHO)",

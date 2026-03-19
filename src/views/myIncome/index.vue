@@ -83,15 +83,7 @@
       <!-- 赚取收益提示模块：使用通用跑马灯组件（type=3 展示收益样式） -->
       <!-- <ActivationMarquee :type="4" /> -->
 
-      <div class="pending-income-header">
-        <h3 class="pending-title">{{ $t("myIncome.pendingIncome") }}</h3>
-        <button class="record-link" type="button" @click="goToClaimRecord">
-          <span class="record-text">{{ $t("myIncome.claimRecord") }}</span>
-          <el-icon class="record-arrow">
-            <ArrowRightBold />
-          </el-icon>
-        </button>
-      </div>
+
 
       <div class="processDiv">
         <div class="progress-bar-container">
@@ -127,7 +119,15 @@
           </span>
         </div>
       </div>
-
+      <div class="pending-income-header">
+        <h3 class="pending-title">{{ $t("myIncome.pendingIncome") }}</h3>
+        <button class="record-link" type="button" @click="goToClaimRecord">
+          <span class="record-text">{{ $t("myIncome.claimRecord") }}</span>
+          <el-icon class="record-arrow">
+            <ArrowRightBold />
+          </el-icon>
+        </button>
+      </div>
       <div class="earnings-grid">
         <div class="earnings-item">
           <div class="earnings-label">{{ $t("myIncome.staticIncomeCHO") }}</div>
