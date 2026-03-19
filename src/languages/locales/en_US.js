@@ -337,6 +337,14 @@ export default {
     listEmpty: "No events",
     loadingMore: "Loading...",
     noMore: "No more",
+    sortBy: "Sort By",
+    frequency: "Frequency",
+    latest: "Latest",
+    hot: "Hot",
+    allFrequency: "All Frequencies",
+    daily: "Daily",
+    weekly: "Weekly",
+    monthly: "Monthly",
     dateFilter: {
       all: "All",
       allDates: "All Dates",
@@ -1093,4 +1101,17 @@ export default {
     msgSubmitSuccess: "Submitted successfully",
     msgSubmitFail: "Submission failed, please try again later",
   },
+  "searchPage": {
+    "searchPlaceholder": "Search events",
+    "browse": "Browse",
+    "themes": "Themes",
+    "trending": "Trending",
+    "popular": "Popular",
+    "liquidity": "Liquidity",
+    "endingSoon": "Ending Soon",
+    "crypto": "Crypto",
+    "sports": "Sports",
+    "politics": "Politics",
+    "science": "Science"
+  }
 };

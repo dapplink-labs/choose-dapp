@@ -164,7 +164,7 @@
                             </div>
                             <span class="view-results-status">{{ item.result === 'yes' ? $t('detail.resultYes') :
                                 $t('detail.resultNo')
-                                }}</span>
+                            }}</span>
                         </div>
                     </div>
                 </transition>
@@ -255,37 +255,43 @@
                 </div>
 
                 <!-- 持仓列表 -->
-                <div v-if="activeListTab === 'holds'" class="tab-pane holds-grid">
+                <div v-if="activeListTab === 'holds'" class="tab-pane">
                     <div v-if="!yesHolders.length && !noHolders.length" class="empty-state">
                         {{ $t('common.noData') || '暂无数据' }}
                     </div>
                     <template v-else>
-                        <div class="hold-col">
-                            <div class="hold-title">Yes Holders</div>
-                            <div v-for="h in yesHolders" :key="h.rank" class="holder-row">
-                                <div class="avatar-wrap">
-                                    <img :src="h.avatar" />
-                                    <span class="rank-badge" :style="{ background: h.rankColor }">{{ h.rank }}</span>
+                        <div class=" holds-grid">
+
+                            <div class="hold-col">
+                                <div class="hold-title">Yes Holders</div>
+                                <div v-for="h in yesHolders" :key="h.rank" class="holder-row">
+                                    <div class="avatar-wrap">
+                                        <img :src="h.avatar" />
+                                        <span class="rank-badge" :style="{ background: h.rankColor }">{{ h.rank
+                                            }}</span>
+                                    </div>
+                                    <div class="holder-info">
+                                        <div class="name">{{ h.name }}</div>
+                                        <div class="amount yes">{{ h.amount }}</div>
+                                    </div>
                                 </div>
-                                <div class="holder-info">
-                                    <div class="name">{{ h.name }}</div>
-                                    <div class="amount yes">{{ h.amount }}</div>
+                            </div>
+                            <div class="hold-col">
+                                <div class="hold-title">No Holders</div>
+                                <div v-for="h in noHolders" :key="h.rank" class="holder-row">
+                                    <div class="avatar-wrap">
+                                        <img :src="h.avatar" />
+                                        <span class="rank-badge" :style="{ background: h.rankColor }">{{ h.rank
+                                            }}</span>
+                                    </div>
+                                    <div class="holder-info">
+                                        <div class="name">{{ h.name }}</div>
+                                        <div class="amount no">{{ h.amount }}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="hold-col">
-                            <div class="hold-title">No Holders</div>
-                            <div v-for="h in noHolders" :key="h.rank" class="holder-row">
-                                <div class="avatar-wrap">
-                                    <img :src="h.avatar" />
-                                    <span class="rank-badge" :style="{ background: h.rankColor }">{{ h.rank }}</span>
-                                </div>
-                                <div class="holder-info">
-                                    <div class="name">{{ h.name }}</div>
-                                    <div class="amount no">{{ h.amount }}</div>
-                                </div>
-                            </div>
-                        </div>
+
                     </template>
                 </div>
 

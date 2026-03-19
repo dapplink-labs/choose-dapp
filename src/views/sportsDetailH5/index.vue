@@ -59,13 +59,13 @@
 
                 <div class="bet-grid">
                     <button class="bet-btn-3d yellow" @click="handleBet('1')">
-                        {{ matchData.team1.name }} 32 ¢
+                        {{ matchData.team1.name }} {{ matchData.team1.bidPrice }}
                     </button>
                     <button class="bet-btn-3d grey" @click="handleBet('draw')">
                         {{ $t('sports.draw') }} 32 ¢
                     </button>
                     <button class="bet-btn-3d pink" @click="handleBet('2')">
-                        {{ matchData.team2.name }} 32 ¢
+                        {{ matchData.team2.name }} {{ matchData.team2.bidPrice }}
                     </button>
                 </div>
             </div>
@@ -79,11 +79,11 @@
                 <div class="spread-grid">
                     <button class="spread-btn" :class="{ active: selectedSpreadSide === 'home' }"
                         @click="selectedSpreadSide = 'home'">
-                        {{ matchData.team1.name }} -{{ currentSpread }} 32 ¢
+                        {{ matchData.team1.name }} -{{ currentSpread }} {{ matchData.team1.bidPrice }}
                     </button>
                     <button class="spread-btn" :class="{ active: selectedSpreadSide === 'away' }"
                         @click="selectedSpreadSide = 'away'">
-                        {{ matchData.team2.name }} +{{ currentSpread }} 69 ¢
+                        {{ matchData.team2.name }} +{{ currentSpread }} {{ matchData.team2.askPrice }}
                     </button>
                 </div>
 
@@ -117,11 +117,11 @@
                 <div class="spread-grid">
                     <button class="spread-btn" :class="{ active: selectedTotalSide === 'over' }"
                         @click="selectedTotalSide = 'over'">
-                        {{ $t('sports.over') }} {{ currentTotal }} 32 ¢
+                        {{ $t('sports.over') }} {{ currentTotal }} {{ matchData.team1.bidPrice }}
                     </button>
                     <button class="spread-btn" :class="{ active: selectedTotalSide === 'under' }"
                         @click="selectedTotalSide = 'under'">
-                        {{ $t('sports.under') }} {{ currentTotal }} 69 ¢
+                        {{ $t('sports.under') }} {{ currentTotal }} {{ matchData.team2.askPrice }}
                     </button>
                 </div>
 
@@ -153,8 +153,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import tyIcon01 from '@/assets/icon/tyIcon01.png'
 import tyIcon02 from '@/assets/icon/tyIcon02.png'
@@ -162,20 +162,131 @@ import logoIcon from '@/assets/icon/logoIcon.png'
 import SportsOrderBook from './SportsOrderBook.vue'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import PaymentModal from '@/components/PaymentModal.vue'
+import { getEventDetailItem } from '@/api/APIEvent'
 
 const { t } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const logoUrl = logoIcon
 
 const matchData = ref({
-    title: '尼克斯队对阵湖人队',
-    date: '1月5日',
-    time: '4:00 AM',
-    volume: '$37,755,917',
-    team1: { name: '尼克斯队', record: '5-6-8', logo: tyIcon01 },
-    team2: { name: '湖人队', record: '5-6-8', logo: tyIcon02 },
-    stats: { team1Percent: 30, team2Percent: 41 },
+    title: '',
+    date: '',
+    time: '',
+    volume: '',
+    status: '',
+    eventPeriod: '',
+    isLive: false,
+    team1: { name: '', record: '', logo: tyIcon01, bidPrice: '', askPrice: '' },
+    team2: { name: '', record: '', logo: tyIcon02, bidPrice: '', askPrice: '' },
+    stats: { team1Percent: 0, team2Percent: 0 },
 })
+
+const loadingDetail = ref(false)
+
+const formatVolume = (v) => {
+    const num = Number(v)
+    if (!Number.isFinite(num)) return '$0'
+    return `$${num.toLocaleString()}`
+}
+
+const formatDateTimeForTag = (value) => {
+    if (!value) return { date: '', time: '' }
+    const dt = new Date(String(value).replace(' ', 'T'))
+    if (Number.isNaN(dt.getTime())) return { date: String(value), time: '' }
+
+    const locale = localStorage.getItem('app-locale') || navigator.language || 'zh-CN'
+    const date = new Intl.DateTimeFormat(locale, { month: 'numeric', day: 'numeric' }).format(dt)
+    const time = new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(dt)
+    return { date, time }
+}
+
+const parseChanceToPercent = (chance) => {
+    const n = Number(chance)
+    if (!Number.isFinite(n)) return 0
+    const pct = n <= 1 ? n * 100 : n
+    return Math.max(0, Math.min(100, Math.round(pct)))
+}
+
+const fetchEventDetail = async () => {
+    const eventGuid =
+        route.query.event_guid ||
+        route.query.id ||
+        route.params.event_guid ||
+        route.params.id
+    if (!eventGuid) return
+
+    loadingDetail.value = true
+    try {
+        const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
+        const language = currentLocale.split('-')[0]
+
+        const res = await getEventDetailItem({
+            event_guid: eventGuid,
+            language_label: language,
+        })
+
+        const payload = res?.data?.data || {}
+        const ev = Array.isArray(payload.events) ? payload.events[0] : null
+        if (!ev) return
+
+        // 基本信息
+        const title = ev.title || ''
+        const volume = formatVolume(ev.trade_volume)
+
+        // 时间：优先 open_time；没有则用 close_time
+        const dt = formatDateTimeForTag(ev.open_time || ev.close_time || '')
+
+        // 尝试从第一个子事件的 directions 解析两队（体育事件通常会带球队 name/logo/chance）
+        const firstSub = Array.isArray(ev.sub_events) ? ev.sub_events[0] : null
+        const dirs = Array.isArray(firstSub?.directions) ? firstSub.directions : []
+        const d1 = dirs[0] || {}
+        const d2 = dirs[1] || {}
+
+        const team1Name = d1.name || ev.parent_category_name || t('sports.home') || 'Home'
+        const team2Name = d2.name || ev.category_name || t('sports.away') || 'Away'
+        const team1Logo = d1.logo || tyIcon01
+        const team2Logo = d2.logo || tyIcon02
+
+        const p1 = parseChanceToPercent(d1.chance)
+        const p2 = parseChanceToPercent(d2.chance)
+
+        // 格式化买卖价格
+        const formatPrice = (price) => {
+            const num = Number(price)
+            return Number.isFinite(num) && num > 0 ? `${Math.round(num * 100)} ¢` : '32 ¢'
+        }
+
+        matchData.value = {
+            title,
+            date: dt.date,
+            time: dt.time,
+            volume,
+            status: ev.status || '',
+            eventPeriod: ev.event_period_name || '',
+            isLive: Boolean(ev.is_live),
+            team1: {
+                name: team1Name,
+                record: ev.main_score ? String(ev.main_score) : '',
+                logo: team1Logo,
+                bidPrice: formatPrice(d1.new_bid_price),
+                askPrice: formatPrice(d1.new_ask_price),
+            },
+            team2: {
+                name: team2Name,
+                record: ev.cluster_score ? String(ev.cluster_score) : '',
+                logo: team2Logo,
+                bidPrice: formatPrice(d2.new_bid_price),
+                askPrice: formatPrice(d2.new_ask_price),
+            },
+            stats: { team1Percent: p1, team2Percent: p2 },
+        }
+    } catch (err) {
+        console.error('Fetch sports event detail failed', err)
+    } finally {
+        loadingDetail.value = false
+    }
+}
 
 // 让球盘 / 总比分 盘口状态（刻度互相独立，默认不选中）
 const spreadValues = [1.5, 2.5, 3.5, 4.5]
@@ -265,6 +376,10 @@ const handleBet = (side) => {
     selectedBetSide.value = side
     showPayment.value = true
 }
+
+onMounted(() => {
+    fetchEventDetail()
+})
 </script>
 
 <style scoped lang="scss">

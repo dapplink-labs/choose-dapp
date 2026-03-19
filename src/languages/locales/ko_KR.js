@@ -1076,4 +1076,17 @@ export default {
     msgSubmitSuccess: "제출 성공",
     msgSubmitFail: "제출 실패, 나중에 다시 시도해주세요",
   },
+  "searchPage": {
+    "searchPlaceholder": "이벤트 검색",
+    "browse": "탐색",
+    "themes": "테마",
+    "trending": "급상승",
+    "popular": "인기",
+    "liquidity": "유동성",
+    "endingSoon": "마감 임박",
+    "crypto": "암호화폐",
+    "sports": "스포츠",
+    "politics": "정치",
+    "science": "과학"
+  }
 };

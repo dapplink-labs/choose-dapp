@@ -5,8 +5,9 @@
 
         <!-- 1. 体育子分类：使用您提供的原生 SVG -->
         <div class="sports-categories">
-            <div v-for="category in sportsCategories" :key="category.key" class="category-item"
-                :class="{ active: activeCategory === category.key }" @click="handleCategoryClick(category.key)">
+            <div v-for="category in sportsCategories" :key="category.guid || category.key" class="category-item"
+                :class="{ active: selectedCategoryGuid ? selectedCategoryGuid === category.guid : activeCategory === category.key }"
+                @click="handleCategoryClick(category)">
                 <div class="category-icon-wrapper">
                     <div class="category-icon" :class="category.key">
                         <!-- 足球图标逻辑 (世界杯/足球) -->
@@ -62,17 +63,21 @@
 
             <!-- 3. 类型切换 Tab -->
             <div class="type-tabs">
-                <button class="tab-btn" :class="{ active: activeTab === 'match' }"
-                    @click="activeTab = 'match'">{{ $t('sportsEvents.match') }}</button>
-                <button class="tab-btn" :class="{ active: activeTab === 'player' }" @click="activeTab = 'player'">{{
-                    activeCategory === 'worldcup' || activeCategory === 'football' ? $t('sportsEvents.playerMarket') : $t('sportsEvents.props') }}</button>
+                <button class="tab-btn" :class="{ active: activeTab === 'match' }" @click="handleTabClick('match')">{{
+                    $t('sportsEvents.match') }}</button>
+                <button class="tab-btn" :class="{ active: activeTab === 'player' }" @click="handleTabClick('player')">{{
+                    activeCategory === 'worldcup' || activeCategory === 'football' ? $t('sportsEvents.playerMarket') :
+                        $t('sportsEvents.props') }}</button>
             </div>
 
             <!-- 4. 赛事列表 - NBA/篮球（只在“比赛” Tab 下渲染） -->
             <div v-if="(activeCategory === 'nba' || activeCategory === 'basketball') && activeTab === 'match'"
                 class="event-list">
+                <div v-if="eventsLoading" class="list-loading">{{ $t('common.loading') || 'Loading...' }}</div>
+                <div v-else-if="!eventsList.length" class="list-empty">{{ $t('common.noData') || 'No data' }}</div>
                 <div v-for="(event, idx) in eventsList" :key="idx" class="event-wrapper">
-                    <div v-if="event.month" class="date-label">{{ formatDate(event.month, event.day, event.weekday) }}</div>
+                    <div v-if="event.month" class="date-label">{{ formatDate(event.month, event.day, event.weekday) }}
+                    </div>
 
                     <div class="event-card">
                         <div class="card-meta">
@@ -113,8 +118,12 @@
             <!-- 4. 赛事列表 - 世界杯/足球 比赛 -->
             <div v-if="(activeCategory === 'worldcup' || activeCategory === 'football') && activeTab === 'match'"
                 class="event-list worldcup-list">
+                <div v-if="eventsLoading" class="list-loading">{{ $t('common.loading') || 'Loading...' }}</div>
+                <div v-else-if="!worldcupEventsList.length" class="list-empty">{{ $t('common.noData') || 'No data' }}
+                </div>
                 <div v-for="(event, idx) in worldcupEventsList" :key="idx" class="event-wrapper">
-                    <div v-if="event.month" class="date-label">{{ formatDate(event.month, event.day, event.weekday) }}</div>
+                    <div v-if="event.month" class="date-label">{{ formatDate(event.month, event.day, event.weekday) }}
+                    </div>
 
                     <div class="event-card worldcup-card">
                         <div class="card-meta">
@@ -286,8 +295,8 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ArrowDown, Avatar } from '@element-plus/icons-vue'
 import tyIcon01 from '@/assets/icon/tyIcon01.png'
@@ -295,10 +304,13 @@ import tyIcon02 from '@/assets/icon/tyIcon02.png'
 import NavBar2 from '@/components/navBar2.vue'
 import PaymentModal from '@/components/PaymentModal.vue'
 import LeagueSelector from './LeagueSelector.vue'
+import { getCategoryList, getEventList } from '@/api/APIEvent'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const router = useRouter()
+const route = useRoute()
 const activeCategory = ref('nba')
+const selectedCategoryGuid = ref('')
 const selectedMatchday = ref(9)
 const activeTab = ref('match')
 
@@ -310,8 +322,87 @@ const selectedSide = ref(null)
 const showLeagueSelector = ref(false)
 const selectedLeague = ref('')
 
+// URL 传入的分类 ID
+const urlCategoryGuid = computed(() => route.query.category_guid || '')
+
+// 动态分类数据
+const dynamicCategories = ref([])
+
+// 获取分类列表
+const fetchCategories = async () => {
+    try {
+        const lang = locale.value === 'zh-cn' ? 'zh' :
+            locale.value === 'ko-kr' ? 'ko' :
+                locale.value === 'ja-jp' ? 'ja' : 'en'
+
+        const params = { language_label: lang }
+        // 有 URL 分类ID时，按父分类ID查询其二级分类
+        if (urlCategoryGuid.value) {
+            params.parent_category_guid = urlCategoryGuid.value
+        } else {
+            // 无父分类ID时兜底查询二级分类
+            params.level = 1
+        }
+
+        const res = await getCategoryList(params)
+
+        const categoryList = Array.isArray(res?.data?.categories)
+            ? res.data.categories
+            : Array.isArray(res?.data?.data?.categories)
+                ? res.data.data.categories
+                : []
+
+        if ((res?.data?.code === 200 || res?.data?.code === 2000) && categoryList.length > 0) {
+            // 将二级分类接口数据映射到页面分类结构
+            dynamicCategories.value = categoryList.map(item => {
+                const guid = item.category_guid || item.guid || ''
+                const label = item.category_name || item.name || ''
+                const code = (item.code || '').toLowerCase()
+                let key = guid
+                const name = label.toLowerCase()
+
+                // 常见的子分类逻辑：如果名称包含 NBA 则设为 nba key 以复用图标
+                if (name.includes('nba') || code === 'nba') key = 'nba'
+                else if (name.includes('world cup') || name.includes('世界杯') || code === 'worldcup') key = 'worldcup'
+                else if (name.includes('soccer') || name.includes('football') || name.includes('足球') || code === 'football') key = 'football'
+                else if (name.includes('basketball') || name.includes('篮球') || code === 'basketball') key = 'basketball'
+
+                return {
+                    key: key,
+                    guid,
+                    label,
+                    badge: 0
+                }
+            }).filter(item => !!item.guid)
+
+            // 自动选中第一个有效分类
+            if (dynamicCategories.value.length > 0) {
+                const byGuid = dynamicCategories.value.find(c => c.guid === selectedCategoryGuid.value)
+                const byKey = dynamicCategories.value.find(c => c.key === activeCategory.value)
+                const target = byGuid || byKey || dynamicCategories.value[0]
+                activeCategory.value = target.key
+                selectedCategoryGuid.value = target.guid
+            }
+        } else {
+            dynamicCategories.value = []
+        }
+    } catch (error) {
+        console.error('Fetch categories failed:', error)
+        dynamicCategories.value = []
+    }
+    // 分类加载完毕后立即拉取赛事（无论成功与否，保证入口调用）
+    await fetchSportsEvents()
+}
+
+onMounted(async () => {
+    await fetchCategories()
+})
+
 // 计算当前分类标题
 const currentCategoryTitle = computed(() => {
+    const found = dynamicCategories.value.find(c => c.guid === selectedCategoryGuid.value)
+    if (found) return found.label
+
     const categoryMap = {
         'worldcup': t('sportsEvents.worldCup'),
         'nba': 'NBA',
@@ -321,14 +412,16 @@ const currentCategoryTitle = computed(() => {
     return categoryMap[activeCategory.value] || 'NBA'
 })
 
-const handleCategoryClick = (categoryKey) => {
-    // 足球和篮球不切换，只打开联赛选择器
-    if (categoryKey === 'football' || categoryKey === 'basketball') {
-        showLeagueSelector.value = true
-        return
-    }
-    activeCategory.value = categoryKey
-    activeTab.value = 'match' // 切换分类时重置tab
+const handleTabClick = (tab) => {
+    activeTab.value = tab
+    fetchSportsEvents()
+}
+
+const handleCategoryClick = (category) => {
+    activeCategory.value = category.key
+    selectedCategoryGuid.value = category.guid
+    activeTab.value = 'match' // 切换分类时重置 tab
+    fetchSportsEvents()
 }
 
 const handleLeagueSelect = (league) => {
@@ -354,69 +447,200 @@ const openPayment = (event, side) => {
     showPayment.value = true
 }
 
-const sportsCategories = computed(() => [
-    { key: 'worldcup', label: t('sportsEvents.worldCup'), badge: 14 },
-    { key: 'nba', label: 'NBA', badge: 32 },
-    { key: 'football', label: t('sportsEvents.football'), badge: 0 },
-    { key: 'basketball', label: t('sportsEvents.basketball'), badge: 0 }
-])
-
-const eventsList = ref([
-    {
-        month: 'jan', day: 5, weekday: 'mon', time: '4:00 AM', volume: '$37,755,917',
-        team1: { name: '尼克斯队', shortName: '尼克斯', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: '湖人队', shortName: '湖人', record: '8-6-5', logo: tyIcon02, odds: '69' }
-    },
-    {
-        month: '', day: '', weekday: '', time: '4:00 AM', volume: '$37,755,917',
-        team1: { name: '尼克斯队', shortName: 'DET', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: '湖人队', shortName: 'Cle', record: '8-6-5', logo: tyIcon02, odds: '69' }
-    },
-    {
-        month: 'jan', day: 5, weekday: 'mon', time: '4:00 AM', volume: '$37,755,917',
-        team1: { name: '尼克斯队', shortName: '尼克斯', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: '湖人队', shortName: '湖人', record: '8-6-5', logo: tyIcon02, odds: '69' }
-    },
-    {
-        month: '', day: '', weekday: '', time: '4:00 AM', volume: '$37,755,917',
-        team1: { name: '尼克斯队', shortName: 'DET', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: '湖人队', shortName: 'Cle', record: '8-6-5', logo: tyIcon02, odds: '69' }
-    },
-    {
-        month: 'jan', day: 5, weekday: 'mon', time: '4:00 AM', volume: '$37,755,917',
-        team1: { name: '尼克斯队', shortName: '尼克斯', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: '湖人队', shortName: '湖人', record: '8-6-5', logo: tyIcon02, odds: '69' }
-    },
-    {
-        month: '', day: '', weekday: '', time: '4:00 AM', volume: '$37,755,917',
-        team1: { name: '尼克斯队', shortName: 'DET', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: '湖人队', shortName: 'Cle', record: '8-6-5', logo: tyIcon02, odds: '69' }
+const sportsCategories = computed(() => {
+    // 优先使用动态获取的分类，如果还没有获取到，可以保留几个默认的兜底
+    if (dynamicCategories.value.length > 0) {
+        return dynamicCategories.value
     }
-])
 
-// 世界杯赛事列表
-const worldcupEventsList = ref([
-    {
-        month: 'jan', day: 5, weekday: 'mon', time: '4:00 AM', volume: '$37,755,917', drawOdds: '32',
-        team1: { name: 'Leeds United FC', shortName: 'lee', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: 'Man Utd', shortName: 'MUN', record: '8-6-5', logo: tyIcon02, odds: '32' }
-    },
-    {
-        month: '', day: '', weekday: '', time: '4:00 AM', volume: '$37,755,917', drawOdds: '32',
-        team1: { name: 'Leeds United FC', shortName: 'lee', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: 'Man Utd', shortName: 'MUN', record: '8-6-5', logo: tyIcon02, odds: '32' }
-    },
-    {
-        month: 'jan', day: 6, weekday: 'mon', time: '6:00 AM', volume: '$25,500,000', drawOdds: '28',
-        team1: { name: 'Chelsea FC', shortName: 'CHE', record: '6-4-9', logo: tyIcon01, odds: '35' },
-        team2: { name: 'Arsenal', shortName: 'ARS', record: '7-5-7', logo: tyIcon02, odds: '37' }
-    },
-    {
-        month: '', day: '', weekday: '', time: '8:00 AM', volume: '$18,200,000', drawOdds: '30',
-        team1: { name: 'Liverpool FC', shortName: 'LIV', record: '8-3-8', logo: tyIcon01, odds: '40' },
-        team2: { name: 'Man City', shortName: 'MCI', record: '9-2-8', logo: tyIcon02, odds: '30' }
+    return [
+        { key: 'worldcup', label: t('sportsEvents.worldCup'), badge: 14 },
+        { key: 'nba', label: 'NBA', badge: 32 },
+        { key: 'football', label: t('sportsEvents.football'), badge: 0 },
+        { key: 'basketball', label: t('sportsEvents.basketball'), badge: 0 }
+    ]
+})
+
+// 加载状态
+const eventsLoading = ref(false)
+
+// 将接口返回的 event 对象映射为页面所需格式
+const mapApiEventToCard = (e, isFirstOfDay) => {
+    const subEvents = Array.isArray(e.sub_events) ? e.sub_events : []
+    const team1 = subEvents[0] || {}
+    const team2 = subEvents[1] || {}
+
+    // 解析 open_time: "2026-01-05 04:00:00"
+    let month = '', day = '', weekday = '', timeStr = ''
+    if (e.open_time) {
+        const dt = new Date(e.open_time.replace(' ', 'T'))
+        if (!isNaN(dt.getTime())) {
+            const monthKeys = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+            const weekdayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+            if (isFirstOfDay) {
+                month = monthKeys[dt.getMonth()]
+                day = dt.getDate()
+                weekday = weekdayKeys[dt.getDay()]
+            }
+            const h = dt.getHours()
+            const m = String(dt.getMinutes()).padStart(2, '0')
+            const ampm = h >= 12 ? 'PM' : 'AM'
+            const h12 = h % 12 || 12
+            timeStr = `${h12}:${m} ${ampm}`
+        }
     }
-])
+
+    const volumeNum = Number(e.trade_volume)
+    const volumeStr = Number.isFinite(volumeNum)
+        ? '$' + volumeNum.toLocaleString('en-US', { maximumFractionDigits: 0 })
+        : '--'
+
+    // 获取赔率（0-100 整数显示，若接口有 price 字段则用，否则均分）
+    const getOdds = (sub) => {
+        if (sub.price !== undefined && sub.price !== null) {
+            return String(Math.round(Number(sub.price) * 100))
+        }
+        return '50'
+    }
+
+    return {
+        // 日期分组标识（仅当日首条时有值）
+        month,
+        day,
+        weekday,
+        time: timeStr,
+        volume: volumeStr,
+        // 三选一赛事（足球/世界杯）置 drawOdds
+        drawOdds: subEvents[2] ? getOdds(subEvents[2]) : (subEvents.length === 3 ? '33' : ''),
+        // 原始 guid，供跳转使用
+        eventGuid: e.event_guid || '',
+        team1: {
+            name: team1.title || '',
+            shortName: (team1.title || '').slice(0, 3).toUpperCase(),
+            record: '',
+            logo: team1.logo || e.logo || '',
+            odds: getOdds(team1)
+        },
+        team2: {
+            name: team2.title || '',
+            shortName: (team2.title || '').slice(0, 3).toUpperCase(),
+            record: '',
+            logo: team2.logo || e.logo || '',
+            odds: getOdds(team2)
+        }
+    }
+}
+
+// 将事件列表按日期分组并注入 month/day/weekday 标识
+const groupEventsByDate = (events) => {
+    const seen = new Set()
+    return events.map((e) => {
+        const dateKey = e.open_time ? e.open_time.slice(0, 10) : ''
+        const isFirst = dateKey && !seen.has(dateKey)
+        if (isFirst) seen.add(dateKey)
+        return mapApiEventToCard(e, isFirst)
+    })
+}
+
+// NBA/篮球 赛事列表
+const eventsList = ref([])
+
+// 世界杯/足球 赛事列表
+const worldcupEventsList = ref([])
+
+// 获取体育赛事列表（根据当前分类 + 当前 Tab）
+const fetchSportsEvents = async () => {
+    const categoryGuid = selectedCategoryGuid.value
+    console.log('Fetching sports events for categoryGuid:', categoryGuid, 'tab:', activeTab.value)
+    if (!categoryGuid) return
+
+    eventsLoading.value = true
+    try {
+        const lang = locale.value === 'zh-cn' ? 'zh'
+            : locale.value === 'ko-kr' ? 'ko'
+                : locale.value === 'ja-jp' ? 'ja' : 'en'
+
+        const isFootball = activeCategory.value === 'worldcup' || activeCategory.value === 'football'
+
+        const baseParams = {
+            language_label: lang,
+            include_sub_events: true,
+            page: 1,
+            page_size: 20,
+            category_guid: categoryGuid
+        }
+
+        if (activeTab.value === 'match') {
+            // 比赛 Tab：拉取赛事列表
+            const res = await getEventList({ ...baseParams })
+            const list = res?.data?.data?.events || res?.data?.events || []
+            const mapped = groupEventsByDate(list)
+
+            if (isFootball) {
+                worldcupEventsList.value = mapped
+            } else {
+                eventsList.value = mapped
+            }
+        } else if (activeTab.value === 'player') {
+            const res = await getEventList({ ...baseParams })
+            const list = res?.data?.data?.events || res?.data?.events || []
+            const mapped = list.map(mapApiToPlayerItem)
+
+            if (isFootball) {
+                playerPanelList.value = mapped.length ? mapped : playerPanelList.value
+            } else {
+                nbaPlayerPanelList.value = mapped.length ? mapped : nbaPlayerPanelList.value
+            }
+        }
+    } catch (err) {
+        console.error('Fetch sports events failed:', err)
+    } finally {
+        eventsLoading.value = false
+    }
+}
+
+// 将接口球员盘事件映射为页面所需格式
+const mapApiToPlayerItem = (e) => {
+    const subEvents = Array.isArray(e.sub_events) ? e.sub_events : []
+    const totalPrice = subEvents.reduce((sum, s) => sum + Number(s.price || 0), 0)
+    const options = subEvents.map(s => ({
+        name: s.title || '',
+        percent: totalPrice > 0
+            ? Math.round((Number(s.price || 0) / totalPrice) * 100) + '%'
+            : '--'
+    }))
+
+    const volumeNum = Number(e.trade_volume)
+    const amountStr = Number.isFinite(volumeNum)
+        ? volumeNum >= 1_000_000
+            ? (volumeNum / 1_000_000).toFixed(1) + 'M'
+            : volumeNum >= 1_000
+                ? (volumeNum / 1_000).toFixed(0) + 'K'
+                : String(volumeNum)
+        : '--'
+
+    // 剩余时间（从 close_time 计算）
+    let timeRemaining = '--'
+    if (e.close_time) {
+        const diff = new Date(e.close_time.replace(' ', 'T')).getTime() - Date.now()
+        if (diff > 0) {
+            const h = Math.floor(diff / 3_600_000)
+            const m = Math.floor((diff % 3_600_000) / 60_000)
+            timeRemaining = h > 0 ? `${h}h ${m}m left` : `${m}m left`
+        }
+    }
+
+    return {
+        avatar: e.logo || '',
+        title: e.title || e.event_title || '',
+        maxLeverage: e.max_leverage ? `${e.max_leverage}x` : '--',
+        maxReturn: e.max_return ? `${Math.round(Number(e.max_return) * 100)}%` : '--',
+        options,
+        timeRemaining,
+        participantCount: Number(e.participant_count) || 0,
+        amount: amountStr
+    }
+}
 
 // 球员盘列表
 const playerPanelList = ref([
@@ -1130,6 +1354,14 @@ const nbaPlayerPanelList = ref([
             }
         }
     }
+}
+
+.list-loading,
+.list-empty {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--text-dark-gray);
+    font-size: 14px;
 }
 
 .ml-1 {

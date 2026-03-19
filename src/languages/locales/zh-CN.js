@@ -332,6 +332,14 @@ export default {
     "listEmpty": "暂无事件",
     "loadingMore": "加载中...",
     "noMore": "没有更多了",
+    "sortBy": "排序",
+    "frequency": "频率",
+    "latest": "最新",
+    "hot": "最热",
+    "allFrequency": "全部频率",
+    "daily": "每日",
+    "weekly": "每周",
+    "monthly": "每月",
     "dateFilter": {
       "all": "全部",
       "allDates": "所有日期",
@@ -1081,4 +1089,17 @@ export default {
     msgSubmitSuccess: "提交成功",
     msgSubmitFail: "提交失败，请稍后重试",
   },
+  "searchPage": {
+    "searchPlaceholder": "搜索事件",
+    "browse": "浏览",
+    "themes": "主题",
+    "trending": "成交量",
+    "popular": "热门",
+    "liquidity": "流动性",
+    "endingSoon": "即将结束",
+    "crypto": "加密货币",
+    "sports": "体育",
+    "politics": "政治",
+    "science": "科学"
+  }
 };

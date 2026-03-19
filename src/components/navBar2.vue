@@ -131,8 +131,8 @@ const updateActiveNavFromRoute = () => {
 const handleNavClick = (item) => {
   const query = item.query || {};
 
-  // 特殊分类：体育赛事，跳转到体育赛事 H5 页面
-  if (query.nav === 'sports-events') {
+  // 体育赛事：跳转到赛事列表页
+  if (query.nav === 'sports') {
     router.push({
       path: '/sports-events-h5',
       query

@@ -1336,6 +1336,8 @@ const startMqttStream = async () => {
   })
   if (mqttDestroyed) return
   if (!shouldUseMqtt.value) return
+  // 非实时模式不启动 MQTT（用户切到历史/未来时会断开）
+  if (activeSegmentMode.value !== 'live') return
   if (isEventEnded.value) return  // 事件已结束，不启动 MQTT 实时推送
   if (!currentEventGuid.value || !resolvedSubEventGuid.value) return
   if (iotMqtt) return
@@ -1384,16 +1386,21 @@ const selectPastRecord = (record) => {
   if (!record?.points?.length) return
   activeSegmentMode.value = 'past'
   selectedPastRecord.value = record
+  // 切到历史：断开 MQTT，保持历史视图稳定
+  stopMqttStream()
   setChartPoints(record.points)
   updateChart()
 }
 
 // 切换回实时视图，清除历史/未来游标
-const selectLiveSegment = () => {
+const selectLiveSegment = async () => {
   activeSegmentMode.value = 'live'
   selectedPastRecord.value = null
   selectedFutureId.value = null
+  // 回到实时：先渲染“实时按钮对应的历史数据”，再开启 MQTT 用推送覆盖
+  await Promise.allSettled([fetchPriceHistory(), fetchOrderBook()])
   syncLiveChart()
+  if (shouldUseMqtt.value && !isEventEnded.value) startMqttStream()
 }
 
 // 切换到未来时段视图
@@ -1401,6 +1408,8 @@ const selectFutureSegment = (ft) => {
   activeSegmentMode.value = 'future'
   selectedFutureId.value = ft.id
   selectedPastRecord.value = null
+  // 切到未来：断开 MQTT，保持未来视图稳定
+  stopMqttStream()
   updateChart()
 }
 
@@ -1420,8 +1429,8 @@ watch(resolvedSubEventGuid, async (subEventGuid, prevSubEventGuid) => {
   // sub_event_guid 切换时：重新加载行情数据并重连 MQTT
   await Promise.allSettled([fetchPriceHistory(), fetchOrderBook(), fetchOpenOrders(), fetchOrderHistory()])
   stopMqttStream()
-  // 仅事件未结束时才重连 MQTT
-  if (shouldUseMqtt.value && !isEventEnded.value) startMqttStream()
+  // 仅实时模式 & 事件未结束时才重连 MQTT
+  if (activeSegmentMode.value === 'live' && shouldUseMqtt.value && !isEventEnded.value) startMqttStream()
 })
 
 // 事件进行中途结束（倒计时归零）时，主动断开 MQTT
@@ -1446,7 +1455,8 @@ onMounted(async () => {
   if (activeSegmentMode.value === 'live') {
     syncLiveChart()
   }
-  if (shouldUseMqtt.value) startMqttStream()
+  // 进入页面：默认先用历史数据渲染（已在 fetchPriceHistory + syncLiveChart 完成），再开启 MQTT 用推送覆盖
+  if (activeSegmentMode.value === 'live' && shouldUseMqtt.value) startMqttStream()
   window.addEventListener('resize', resizeHandler)
 })
 onUnmounted(() => {
@@ -1948,7 +1958,7 @@ $primary-blue: #5073e5;
   .order-chip {
     display: inline-block;
     padding: 4px 10px;
-    border-radius: 999px;
+    border-radius: 4px;
     background: var(--button-bg-n);
     color: var(--text-color-n);
     font-size: 12px;
@@ -1991,13 +2001,13 @@ $primary-blue: #5073e5;
   }
 
   .order-chip.up {
-    background: $neon-green;
-    color: #000;
+    background: var(--button-bg-y);
+    color: var(--text-color-y);
   }
 
   .order-chip.down {
-    background: $hot-pink;
-    color: #fff;
+    background: var(--button-bg-n);
+    color: var(--text-color-n);
   }
 
   .order-chip .chip-price,

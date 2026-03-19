@@ -50,6 +50,21 @@ export const getSubEventDetail = (data) => {
   return request.post('/api/v1/subEventDetail/list', data)
 }
 
+// 获取收藏列表
+export const getFavoriteList = (data) => {
+  return request.post('/api/v1/favorite/list', data)
+}
+
+// 切换收藏状态
+export const toggleFavoriteEvent = (data) => {
+  return request.post('/api/v1/favorite/toggle', data)
+}
+
+// 获取事件时间段列表（支持分类筛选）
+export const getPeriodList = (data) => {
+  return request.post('/api/v1/period/list', data)
+}
+
 // 获取订单簿（买单 + 卖单）
 export const getOrderBook = (data) => {
   return request.post('/api/v1/order/book', data)

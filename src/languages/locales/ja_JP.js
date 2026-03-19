@@ -1079,4 +1079,17 @@ export default {
     msgSubmitSuccess: "送信に成功しました",
     msgSubmitFail: "送信に失敗しました。後でもう一度お試しください",
   },
+  "searchPage": {
+    "searchPlaceholder": "イベントを検索",
+    "browse": "見る",
+    "themes": "テーマ",
+    "trending": "急上昇",
+    "popular": "人気",
+    "liquidity": "流動性",
+    "endingSoon": "まもなく終了",
+    "crypto": "仮想通貨",
+    "sports": "スポーツ",
+    "politics": "政治",
+    "science": "科学"
+  }
 };

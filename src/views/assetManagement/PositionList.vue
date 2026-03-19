@@ -310,21 +310,6 @@ const onCancelAllPending = async () => {
     if (activeTab.value !== 'pending') return
     if (cancelAllLoading.value) return
 
-    try {
-        await ElMessageBox.confirm(
-            t('assetManagement.cancelAllOrdersConfirm') || 'Cancel all open orders?',
-            t('common.tip') || 'Tip',
-            {
-                confirmButtonText: t('common.confirm') || 'Confirm',
-                cancelButtonText: t('common.cancel') || 'Cancel',
-                type: 'warning',
-                customClass: 'cancel-order-confirm',
-            },
-        )
-    } catch {
-        return
-    }
-
     cancelAllLoading.value = true
     try {
         const guids = await fetchAllOpenOrderGuids()

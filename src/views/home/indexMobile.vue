@@ -51,10 +51,10 @@
                                             stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
                                     <input class="esports-search-input" type="text" placeholder="Search"
-                                        @focus="handleEsportsSearch" />
+                                        v-model="searchQuery" @input="handleSearchInput" />
                                 </div>
                                 <template v-else>
-                                    <!-- 二级分类不为空时，展示二级分类数据 -->
+                                    <!-- 二级分类不为空时，只展示分类按钮 -->
                                     <button v-for="tag in ecosystemList" :key="tag.value" class="tag-btn"
                                         :class="{ active: activeTag === tag.value }" @click="handleTagClick(tag.value)">
                                         {{ tag.label }}
@@ -82,7 +82,7 @@
                                     </g>
                                 </svg>
                             </div>
-                            <div class="action-btn bookmark-btn" @click="handleBookmark">
+                            <div class="action-btn bookmark-btn" :class="{ active: activeTag === 'favorite' }" @click="handleBookmark">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                     <g transform="translate(-336 -358)">
                                         <g transform="translate(340 361)">
@@ -101,53 +101,48 @@
                     <!-- 筛选面板（移动端） -->
                     <transition name="filter-panel">
                         <div v-if="showFilterPanel" class="filter-panel">
-                            <div class="filter-dropdowns">
-                                <div class="filter-dropdown">
-                                    <!-- 排序按钮 -->
-                                    <button class="filter-select-btn">
+                            <div class="filter-dropdowns-row">
+                                <!-- 排序按钮 -->
+                                <div class="filter-select-wrapper">
+                                    <button class="filter-select-btn" @click.stop="toggleSortDropdown">
                                         <div class="filter-label">
-                                            <span>排序:</span> {{ currentSortLabel }}
+                                            <span>{{ $t('home.sortBy') || 'Sort' }}:</span> 
+                                            <span class="label-value">{{ currentSortLabel }}</span>
                                         </div>
-                                        <el-icon class="filter-arrow">
+                                        <el-icon class="filter-arrow" :class="{ rotate: showSortList }">
                                             <ArrowDownBold />
                                         </el-icon>
                                     </button>
-                                    <!-- 频率按钮 -->
-                                    <button class="filter-select-btn">
-                                        <div class="filter-label">
-                                            <span>频率:</span> {{ currentFrequencyLabel }}
+                                    <div v-if="showSortList" class="custom-dropdown-list">
+                                        <div v-for="opt in sortOptions" :key="opt.value" 
+                                            class="dropdown-item" :class="{ active: selectedSort === opt.value }"
+                                            @click="handleSortChange(opt.value)">
+                                            {{ opt.label }}
                                         </div>
-                                        <el-icon class="filter-arrow">
+                                    </div>
+                                </div>
+                                <!-- 频率按钮 -->
+                                <div class="filter-select-wrapper">
+                                    <button class="filter-select-btn" @click.stop="toggleFrequencyDropdown">
+                                        <div class="filter-label">
+                                            <span>{{ $t('home.frequency') || 'Freq' }}:</span>
+                                            <span class="label-value">{{ currentFrequencyLabel }}</span>
+                                        </div>
+                                        <el-icon class="filter-arrow" :class="{ rotate: showFrequencyList }">
                                             <ArrowDownBold />
                                         </el-icon>
                                     </button>
+                                    <div v-if="showFrequencyList" class="custom-dropdown-list">
+                                        <div v-for="opt in frequencyOptions" :key="opt.value" 
+                                            class="dropdown-item" :class="{ active: selectedFrequency === opt.value }"
+                                            @click="handleFrequencyChange(opt.value)">
+                                            {{ opt.label }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </transition>
-                </div>
-
-                <!-- 日期筛选模块：仅电子竞技选中时显示 -->
-                <div v-if="showDateFilter" class="date-filter-section">
-                    <!-- 固定在最左侧的"全部" -->
-                    <div class="date-card fixed-all" :class="{ active: activeDateKey === 'all' }"
-                        @click="handleDateClick('all')">
-                        <div class="date-title">{{ $t('home.dateFilter.all') }}</div>
-                        <div class="date-subtitle">{{ $t('home.dateFilter.allDates') }}</div>
-                        <div class="date-count">{{ totalDateCount }}</div>
-                    </div>
-
-                    <!-- 可横向滚动的日期列表 -->
-                    <div class="date-scroll-wrapper">
-                        <div class="date-scroll">
-                            <div v-for="item in dateFilterList" :key="item.key" class="date-card"
-                                :class="{ active: activeDateKey === item.key }" @click="handleDateClick(item.key)">
-                                <div class="date-title">{{ $t(`home.dateFilter.weekdays.${item.weekKey}`) }}</div>
-                                <div class="date-subtitle">{{ item.date }}</div>
-                                <div class="date-count">{{ item.count }}</div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- 列表：根据 item.cardType 展示大卡片或小卡片 -->
@@ -334,8 +329,9 @@ import banner4Img from "@/assets/images/banner4.png";
 import fallbackListImg from "@/assets/icon/LP1.png";
 import NotificationModal from '@/components/NotificationModal.vue';
 import { getNoticeData } from "@/api/API";
-import { getHomeBanner, getEcosystemList, getEventList } from "@/api/APIEvent";
+import { getHomeBanner, getEcosystemList, getEventList, getFavoriteList, toggleFavoriteEvent, getPeriodList } from "@/api/APIEvent";
 import { useAccount } from "@wagmi/vue";
+import { ElMessage } from 'element-plus';
 
 // 获取用户地址
 const { address } = useAccount();
@@ -387,8 +383,8 @@ watch(
 
 // 获取首页轮播图
 async function getHomeBannerList() {
-    // const response = await getHomeBanner({ language: currentLocale, limit: 4 });
-    // console.log(response);
+    const response = await getHomeBanner({ language: currentLocale, limit: 4 });
+    console.log(response);
 }
 
 
@@ -432,40 +428,67 @@ const activeTag = ref("all");
 
 // 移动端筛选面板
 const showFilterPanel = ref(false);
-const sortOptions = [
-    { value: "latest", label: "最新" },
-    { value: "hot", label: "最热" },
-];
-const frequencyOptions = [
-    { value: "all", label: "全部频率" },
-    { value: "daily", label: "每日" },
-];
-const selectedSort = ref("latest");
-const selectedFrequency = ref("all");
-const currentSortLabel = computed(() => sortOptions.find((opt) => opt.value === selectedSort.value)?.label || "最新");
-const currentFrequencyLabel = computed(() => frequencyOptions.find((opt) => opt.value === selectedFrequency.value)?.label || "全部频率");
-
-// 根据路由查询参数判断是否显示日期筛选模块（仅电子竞技选中时显示）
-const showDateFilter = computed(() => route.query.nav === "esports");
-
-// 日期筛选数据
-const dateFilterList = ref([
-    { key: "mon", weekKey: "mon", date: "01.01", count: 0 },
-    { key: "tue", weekKey: "tue", date: "01.02", count: 6 },
-    { key: "wed", weekKey: "wed", date: "01.03", count: 0 },
-    { key: "thu", weekKey: "thu", date: "01.04", count: 0 },
-    { key: "fri", weekKey: "fri", date: "01.05", count: 0 },
-    { key: "sat", weekKey: "sat", date: "01.06", count: 0 },
+const sortOptions = computed(() => [
+    { value: "latest", label: t('home.latest') || "最新" },
+    { value: "hot", label: t('home.hot') || "最热" },
+]);
+// 频率选项：动态从接口加载，value 为 event_period_guid 或 'all'
+const frequencyOptions = ref([
+    { value: "all", label: t('home.allFrequency') || "全部频率" },
 ]);
 
-const activeDateKey = ref("all");
-const totalDateCount = computed(() =>
-    dateFilterList.value.reduce((sum, item) => sum + (item.count || 0), 0),
+// 拉取时间段列表
+const fetchPeriodList = async (categoryGuid) => {
+    try {
+        const params = { language_label: language };
+        if (categoryGuid) params.category_guid = categoryGuid;
+        const res = await getPeriodList(params);
+        const periods = res?.data?.data?.event_periods || [];
+        frequencyOptions.value = [
+            { value: "all", label: t('home.allFrequency') || "全部频率" },
+            ...periods.map(p => ({ value: p.event_period_guid, label: p.name })),
+        ];
+    } catch (err) {
+        console.error('Fetch period list failed', err);
+    }
+};
+const selectedSort = ref("latest");
+const selectedFrequency = ref("all");
+const searchQuery = ref("");
+const showSortList = ref(false);
+const showFrequencyList = ref(false);
+
+// 监听 category_guid 变化，重置所有筛选条件并重新拉取时间段列表
+watch(
+    () => route.query.category_guid,
+    (categoryGuid, oldGuid) => {
+        // 首次加载（oldGuid 为 undefined）不重置，避免覆盖用户已有状态
+        if (oldGuid !== undefined) {
+            selectedFrequency.value = 'all';
+            selectedSort.value = 'latest';
+            searchQuery.value = '';
+            activeTag.value = 'all';
+            showFilterPanel.value = false;
+            showSortList.value = false;
+            showFrequencyList.value = false;
+        }
+        fetchPeriodList(categoryGuid);
+    },
+    { immediate: true },
 );
 
-const handleDateClick = (key) => {
-    activeDateKey.value = key;
+const toggleSortDropdown = () => {
+    showSortList.value = !showSortList.value;
+    showFrequencyList.value = false;
 };
+
+const toggleFrequencyDropdown = () => {
+    showFrequencyList.value = !showFrequencyList.value;
+    showSortList.value = false;
+};
+
+const currentSortLabel = computed(() => sortOptions.value.find((opt) => opt.value === selectedSort.value)?.label || "最新");
+const currentFrequencyLabel = computed(() => frequencyOptions.value.find((opt) => opt.value === selectedFrequency.value)?.label || "全部频率");
 
 // 事件列表：通过 item.cardType === 'large' | 'small' 控制展示大卡片或小卡片
 const cardList = ref([]);
@@ -495,6 +518,8 @@ const mapEventToCard = (e) => {
 
     return {
         id: e.event_guid,
+        // 是否体育事件（用于跳转体育详情页）
+        isSports: !!e.is_sports,
         // 直播中（is_live === 1）为大卡片
         cardType: e.is_live === 1 ? 'large' : 'small',
         avatar: e.logo || '',
@@ -507,7 +532,7 @@ const mapEventToCard = (e) => {
         isTimeUrgent: e.is_live === 1,
         participantCount: 0,
         amount,
-        isFavorite: false,
+        isFavorite: !!e.is_favorite,
         options: subEvents.map((sub) => ({
             text: sub.title || '',
         })),
@@ -550,11 +575,22 @@ const fetchEventList = async (append = false) => {
             page_size: PAGE_SIZE,
         };
         if (query.category_guid) params.category_guid = query.category_guid;
-        if (activeTag.value && activeTag.value !== 'all') params.ecosystem_guid = activeTag.value;
+        if (activeTag.value && activeTag.value !== 'all' && activeTag.value !== 'favorite') params.ecosystem_guid = activeTag.value;
+        if (searchQuery.value) params.title = searchQuery.value;
+        if (selectedFrequency.value && selectedFrequency.value !== 'all') params.event_period_guid = selectedFrequency.value;
+        if (selectedSort.value) params.sort_by = selectedSort.value === 'hot' ? 'trade_volume' : 'open_time';
+        
         const eventType = getEventTypeFromNav(query.nav);
         if (eventType !== undefined) params.event_type = eventType;
 
-        const res = await getEventList(params);
+        let res;
+        if (activeTag.value === 'favorite') {
+            params.user_guid = address.value;
+            res = await getFavoriteList(params);
+        } else {
+            res = await getEventList(params);
+        }
+        
         const data = res?.data?.data || {};
         const list = data.events || [];
         const totalPages = data.total_pages ?? 1;
@@ -581,7 +617,18 @@ let loadMoreObserver = null;
 
 // 跳转到详情页面
 const navigateToDetail = (item, choice) => {
-    // 如果当前通过导航条处于“加密货币”场景，则进入加密货币详情页
+    // 1. 体育事件：进入体育详情页
+    if (item?.isSports) {
+        router.push({
+            path: '/sports-detail-h5',
+            query: {
+                id: item.id || item.title,
+            },
+        });
+        return;
+    }
+
+    // 2. 加密货币场景：进入加密货币详情页
     if (route.query.nav === 'crypto' || route.query.nav === 'crypto-chinese') {
         router.push({
             path: '/bitcoin-up-down',
@@ -592,7 +639,7 @@ const navigateToDetail = (item, choice) => {
         return;
     }
 
-    // 默认行为：跳转通用详情页
+    // 3. 默认行为：跳转通用详情页
     router.push({
         path: "/detail-h5",
         query: {
@@ -607,19 +654,77 @@ const handleTagClick = (tagValue) => {
     activeTag.value = tagValue;
 };
 
+// 搜索防抖
+let searchTimer = null;
+const handleSearchInput = () => {
+    if (searchTimer) clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        fetchEventList();
+    }, 500);
+};
+
+// 处理频率选择 (日期筛选面板中的频率)
+const handleFrequencyChange = (value) => {
+    selectedFrequency.value = value;
+    showFrequencyList.value = false;
+    fetchEventList();
+};
+
+// 处理排序选择
+const handleSortChange = (value) => {
+    selectedSort.value = value;
+    showSortList.value = false;
+    fetchEventList();
+};
+
 // 处理筛选按钮点击
 const handleFilter = () => {
     showFilterPanel.value = !showFilterPanel.value;
+    if (!showFilterPanel.value) {
+        showSortList.value = false;
+        showFrequencyList.value = false;
+    }
 };
 
-// 处理收藏点击
+// 处理收藏按钮点击（筛选收藏列表）
 const handleBookmark = () => {
-    // 这里可以实现收藏功能
+    if (!address.value) {
+        ElMessage.warning(t('pleaseConnectWallet') || 'Please connect wallet');
+        return;
+    }
+    if (activeTag.value === 'favorite') {
+        activeTag.value = 'all';
+    } else {
+        activeTag.value = 'favorite';
+    }
 };
 
 // 切换收藏状态
-const toggleFavorite = (item) => {
-    item.isFavorite = !item.isFavorite;
+const toggleFavorite = async (item) => {
+    if (!address.value) {
+        ElMessage.warning(t('pleaseConnectWallet') || 'Please connect wallet');
+        return;
+    }
+    
+    try {
+        const res = await toggleFavoriteEvent({
+            user_guid: address.value,
+            event_guid: item.id
+        });
+        
+        if (res.code === 200 || res.code === 0) {
+            item.isFavorite = !item.isFavorite;
+            ElMessage.success(item.isFavorite ? t('favoriteSuccess') || 'Favorite success' : t('unfavoriteSuccess') || 'Unfavorite success');
+            
+            // 如果是在收藏列表中取消收藏，则移除该项
+            if (activeTag.value === 'favorite' && !item.isFavorite) {
+                cardList.value = cardList.value.filter(card => card.id !== item.id);
+            }
+        }
+    } catch (err) {
+        console.error('Toggle favorite failed', err);
+        ElMessage.error(t('operateFailed') || 'Operation failed');
+    }
 };
 
 // 监听筛选条件变化，获取事件列表
@@ -897,6 +1002,10 @@ $gradient-mask-right: linear-gradient(to right,
                         background: transparent;
                         color: var(--text-color, #ffffff);
 
+                        &.active {
+                            color: var(--text-color-y);
+                        }
+
                         .icon {
                             fill: currentColor;
 
@@ -922,20 +1031,22 @@ $gradient-mask-right: linear-gradient(to right,
                 box-shadow: none;
                 z-index: 100;
 
-                .filter-dropdowns {
+                .filter-dropdowns-row {
+                    display: flex;
+                    gap: 10px;
                     width: 100%;
                 }
 
-                .filter-dropdown {
-                    display: block;
-                    width: 100%;
+                .filter-select-wrapper {
+                    position: relative;
+                    min-width: 0;
                 }
 
                 .filter-select-btn {
-                    padding: 10px 16px;
+                    padding: 8px 12px;
                     border: 1px solid var(--border-color);
                     border-radius: 999px;
-                    font-size: 14px;
+                    font-size: 13px;
                     font-weight: 400;
                     color: var(--bg-opposite);
                     background: transparent;
@@ -944,76 +1055,72 @@ $gradient-mask-right: linear-gradient(to right,
                     display: inline-flex;
                     align-items: center;
                     justify-content: space-between;
-                    min-height: 40px;
+                    min-height: 36px;
+                    width: 100%;
                     box-sizing: border-box;
-                    margin-right: 10px;
 
+                    .filter-label {
+                        display: flex;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        flex: 1;
+                        gap: 4px;
+                        
+                        span {
+                            flex-shrink: 0;
+                        }
+
+                        .label-value {
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                        }
+                    }
 
                     .filter-arrow {
-                        margin-left: 12px;
-                        font-size: 14px;
-                        color: var(--bg-opposite);
+                        font-size: 12px;
+                        color: var(--text-dark-gray);
                         transition: transform 0.2s;
                         flex-shrink: 0;
+                        margin-left: 4px;
+                        
+                        &.rotate {
+                            transform: rotate(180deg);
+                        }
                     }
                 }
-            }
-        }
 
-        // 日期筛选模块
-        .date-filter-section {
-            margin: 8px 0 14px;
-            display: flex;
-            align-items: stretch;
-            gap: 4px;
+                .custom-dropdown-list {
+                    position: absolute;
+                    top: 100%;
+                    left: 0;
+                    right: 0;
+                    background: var(--bg-card);
+                    border: 1px solid var(--border-color);
+                    border-radius: 12px;
+                    margin-top: 4px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    z-index: 101;
+                    overflow: hidden;
 
-            .date-card {
-                padding: 6px 4px 8px;
-                box-sizing: border-box;
-                background: var(--bg-page);
-                border-radius: 0;
-                border-top: 3px solid var(--border-color);
-                text-align: center;
-                color: var(--text-dark-gray);
-                font-family:
-                    PingFang SC,
-                    PingFang SC;
-                flex-shrink: 0;
+                    .dropdown-item {
+                        padding: 12px 16px;
+                        font-size: 14px;
+                        color: var(--bg-opposite);
+                        cursor: pointer;
+                        transition: background 0.2s;
 
-                .date-title {
-                    font-size: 13px;
-                    margin-bottom: 4px;
+                        &:active {
+                            background: var(--bg-page);
+                        }
+
+                        &.active {
+                            color: var(--text-color-y);
+                            background: var(--bg-page);
+                        }
+                    }
                 }
-
-                .date-subtitle {
-                    font-size: 11px;
-                    margin-bottom: 2px;
-                }
-
-                .date-count {
-                    font-size: 11px;
-                }
-
-                &.active {
-                    border-top-color: var(--text-color-y);
-                    color: var(--bg-opposite);
-                }
-            }
-
-            .fixed-all {
-                flex-shrink: 0;
-            }
-
-            .date-scroll-wrapper {
-                flex: 1;
-                overflow-x: auto;
-                overflow-y: hidden;
-            }
-
-            .date-scroll {
-                display: flex;
-                gap: 4px;
-                min-width: max-content;
             }
         }
 
