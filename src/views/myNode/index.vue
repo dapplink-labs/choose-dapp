@@ -5,7 +5,7 @@
     <div class="banner1">
       <h1 class="page-title">
         {{
-          nodeType && nodeType === 0
+          nodeType === 0
             ? $t("myNode.distributedNode")
             : $t("myNode.clusterNode")
         }}
