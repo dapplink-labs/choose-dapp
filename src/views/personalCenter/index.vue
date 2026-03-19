@@ -504,12 +504,12 @@ const handleClose = () => {
 const allowedPaths = [
   "/my-earnings", // 我的收益
   "/LPVault", // LPVault
-  "/computing-power-services", // 在线客服
-  '/dashboard', // 链上数据
-  '/asset-management', // 链上资产
-  '/leaderboardH5', // 排行榜
-  '/event-pool', // 事件池
-  '/help-center', // 帮助中心
+  // "/computing-power-services", // 在线客服
+  // '/dashboard', // 链上数据
+  // '/asset-management', // 链上资产
+  // '/leaderboardH5', // 排行榜
+  // '/event-pool', // 事件池
+  // '/help-center', // 帮助中心
   '/feedback', // 反馈
 ];
 
