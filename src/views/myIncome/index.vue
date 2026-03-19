@@ -46,7 +46,7 @@
           <b>{{ $t("myIncome.myIncomeCMT") }}</b>
           <p>+{{ formatAmount(currentNodeStakingInfo?.total_reward) }}</p>
           <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.total_reward *
-            currentNodeStakingInfo?.cho2usdt_rate ) }} USDT</span>
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myNode.projectedReturns") }}</b>
@@ -54,19 +54,19 @@
             +{{ formatAmount(currentNodeStakingInfo?.total_prediction_reward) }}
           </p>
           <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.total_prediction_reward *
-            currentNodeStakingInfo?.cho2usdt_rate ) }} USDT</span>
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myIncome.networkIncomeCMT") }}</b>
           <p>+{{ formatAmount(currentNodeStakingInfo?.network_reward) }}</p>
           <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.network_reward *
-            currentNodeStakingInfo?.cho2usdt_rate ) }} USDT</span>
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myIncome.computingPowerIncomeCMT") }}</b>
           <p>+{{ formatAmount(currentNodeStakingInfo?.hashrate_reward) }}</p>
           <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.hashrate_reward *
-            currentNodeStakingInfo?.cho2usdt_rate ) }} USDT</span>
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myIncome.forecastFlowBonusUSDT") }}</b>
@@ -98,8 +98,8 @@
           <div class="progress-bar" ref="progressBarRef">
             <div class="progress-fill" :style="{
               width: (currentNodeStakingInfo?.progressPercent || 0) < 4
-                ? currentNodeStakingInfo?.progressPercent + '%'
-                : '4%',
+                ? '4%'
+                : currentNodeStakingInfo?.progressPercent + '%',
             }"></div>
             <div class="progress-indicator" ref="progressIndicatorRef" :style="{ left: progressIndicatorLeft }"
               :class="{ 'progress-indicator-left': (currentNodeStakingInfo?.progressPercent || 0) < 20, 'progress-indicator-right': (currentNodeStakingInfo?.progressPercent || 0) >= 90 }">
