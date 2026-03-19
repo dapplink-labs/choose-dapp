@@ -45,20 +45,28 @@
         <div class="item">
           <b>{{ $t("myIncome.myIncomeCMT") }}</b>
           <p>+{{ formatAmount(currentNodeStakingInfo?.total_reward) }}</p>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.total_reward *
+            currentNodeStakingInfo?.cho2usdt_rate ) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myNode.projectedReturns") }}</b>
           <p>
             +{{ formatAmount(currentNodeStakingInfo?.total_prediction_reward) }}
           </p>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.total_prediction_reward *
+            currentNodeStakingInfo?.cho2usdt_rate ) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myIncome.networkIncomeCMT") }}</b>
           <p>+{{ formatAmount(currentNodeStakingInfo?.network_reward) }}</p>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.network_reward *
+            currentNodeStakingInfo?.cho2usdt_rate ) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myIncome.computingPowerIncomeCMT") }}</b>
           <p>+{{ formatAmount(currentNodeStakingInfo?.hashrate_reward) }}</p>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.hashrate_reward *
+            currentNodeStakingInfo?.cho2usdt_rate ) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myIncome.forecastFlowBonusUSDT") }}</b>
@@ -508,10 +516,10 @@ const progressIndicatorLeft = computed(() => {
   // Use reactive widths
   const width = indicatorWidth.value;
   const progressBarWidth = barWidth.value;
-  
+
   if (p <= 20) return `${p}%`;
   if (!progressBarWidth) return `${p}%`;
-  
+
   if (p >= 90) return `${p - ((width / progressBarWidth) * 100).toFixed(0)}%`;
   return `${p - Math.max(0, (width / progressBarWidth) * 100 / 2).toFixed(0)}%`;
 });
@@ -1057,6 +1065,12 @@ watch(activeTab, () => {
         word-break: break-all;
         overflow-wrap: anywhere;
       }
+
+      .currey {
+        font-size: 12px;
+        color: var(--text-color-secondary, #999);
+      }
+
     }
   }
 
