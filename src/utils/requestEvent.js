@@ -61,4 +61,81 @@ serive.interceptors.request.use(
   (error) => Promise.reject(error),
 )
 
+// Add response interceptor for token refresh
+let isRefreshing = false
+let requests = []
+
+serive.interceptors.response.use(
+  (response) => {
+    return response
+  },
+  async (error) => {
+    const config = error.config
+    if (!config) return Promise.reject(error)
+
+    // Handle 401 Unauthorized
+    if (error.response && error.response.status === 401 && !config._retry) {
+      config._retry = true
+
+      // Avoid infinite loop if login itself fails
+      if (config.url.includes('/api/v1/login')) {
+        return Promise.reject(error)
+      }
+
+      if (!isRefreshing) {
+        isRefreshing = true
+        try {
+          // Attempt to login again (using hardcoded credentials as per current project pattern)
+          const res = await serive.post('/api/v1/login', {
+            login_type: 'password',
+            email: 'seek10@example.com',
+            password: '123456'
+          })
+
+          const newToken = res.data?.data?.token
+          const newUserGuid = res.data?.data?.user_guid
+
+          if (newToken) {
+            window.sessionStorage.setItem('token', newToken)
+            if (newUserGuid) {
+              window.sessionStorage.setItem('user_guid', newUserGuid)
+            }
+
+            // Execute all queued requests with the new token
+            requests.forEach((cb) => cb(newToken))
+            requests = []
+
+            // Retry the original failed request
+            config.headers.Authorization = `Bearer ${newToken}`
+            return serive(config)
+          }
+        } catch (refreshError) {
+          console.error('Auto-refresh token failed:', refreshError)
+          requests.forEach((cb) => cb(null))
+          requests = []
+          // Optionally clear token or redirect to login
+          window.sessionStorage.removeItem('token')
+          return Promise.reject(refreshError)
+        } finally {
+          isRefreshing = false
+        }
+      } else {
+        // If already refreshing, queue this request
+        return new Promise((resolve) => {
+          requests.push((token) => {
+            if (token) {
+              config.headers.Authorization = `Bearer ${token}`
+              resolve(serive(config))
+            } else {
+              resolve(Promise.reject(error))
+            }
+          })
+        })
+      }
+    }
+
+    return Promise.reject(error)
+  }
+)
+
 export default serive
