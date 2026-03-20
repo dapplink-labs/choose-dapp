@@ -698,6 +698,11 @@ watch(activeTab, () => {
   }
 }
 
+.currey {
+  font-size: 12px;
+  color: var(--text-color-secondary, #999);
+}
+
 .myIncome {
   min-height: 100vh;
   padding: 80px 10px 0 10px;
@@ -1083,10 +1088,7 @@ watch(activeTab, () => {
     }
   }
 
-  .currey {
-    font-size: 12px;
-    color: var(--text-color-secondary, #999);
-  }
+
 
   .my-team {
     margin-top: 40px;

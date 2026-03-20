@@ -863,6 +863,11 @@ onMounted(async () => {
     }
   }
 
+  .currey {
+    font-size: 12px;
+    color: var(--text-color-secondary, #999);
+  }
+
   .page-title {
     font-family:
       Noto Sans SC,
@@ -916,10 +921,7 @@ onMounted(async () => {
       }
     }
 
-    .currey {
-      font-size: 12px;
-      color: var(--text-color-secondary, #999);
-    }
+
 
     .earn-prompt {
       display: flex;
