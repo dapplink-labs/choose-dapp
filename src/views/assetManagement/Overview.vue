@@ -340,9 +340,9 @@ onMounted(() => {
     }
 
     &.deposit-btn {
-      background: linear-gradient(90deg, #c8ff2d 0%, #b3ff1a 100%);
+      background: var(--text-color-y, #BBFF2E);
       color: #0a0a0a;
-      box-shadow: 0 4px 12px rgba(200, 255, 45, 0.3);
+      box-shadow: 0 4px 12px var(--button-bg-y, rgba(47, 188, 135, 0.2));
 
       &:active {
         transform: scale(0.98);
@@ -350,9 +350,9 @@ onMounted(() => {
     }
 
     &.withdraw-btn {
-      background: linear-gradient(90deg, #c8ff2d 0%, #b3ff1a 100%);
+      background: var(--text-color-y, #BBFF2E);
       color: #0a0a0a;
-      box-shadow: 0 4px 12px rgba(200, 255, 45, 0.3);
+      box-shadow: 0 4px 12px var(--button-bg-y, rgba(47, 188, 135, 0.2));
 
       &:active {
         transform: scale(0.98);
@@ -360,9 +360,9 @@ onMounted(() => {
     }
 
     &.bill-btn {
-      background: linear-gradient(90deg, #c8ff2d 0%, #b3ff1a 100%);
+      background: var(--text-color-y, #BBFF2E);
       color: #0a0a0a;
-      box-shadow: 0 4px 12px rgba(200, 255, 45, 0.3);
+      box-shadow: 0 4px 12px var(--button-bg-y, rgba(47, 188, 135, 0.2));
 
       &:active {
         transform: scale(0.98);

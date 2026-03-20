@@ -475,7 +475,7 @@ watch(() => themeStore.isDark, () => {
 
   .claim-btn {
     padding: 8px 22px;
-    background: linear-gradient(90deg, #c8ff2d 0%, #b3ff1a 100%);
+    background: var(--text-color-y, #BBFF2E);
     color: #0a0a0a;
     border: none;
     border-radius: 999px;

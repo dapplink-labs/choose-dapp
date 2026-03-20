@@ -56,7 +56,9 @@ export default {
     "yourAddress": "入金アドレス",
     "copy": "コピー",
     "selectCurrency": "通貨を選択",
-    "selectNetwork": "ネットワークを選択"
+    "selectNetwork": "ネットワークを選択",
+    "amountLabel": "入金数量",
+    "confirmBtn": "入金を確認"
   },
   "transactionSuccess": {
     "title": "取引成功",

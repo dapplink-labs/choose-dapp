@@ -3,26 +3,6 @@
     <BackHeaderNav :title="$t('deposit.title')" />
 
     <div class="main-content">
-      <!-- QR 码区域 -->
-      <div class="qr-section">
-        <div class="qr-wrap">
-          <img :src="qrCodeUrl" alt="Deposit QR" class="qr-image" />
-        </div>
-        <div class="min-deposit-tip">
-          <span class="tip-label">{{ $t('deposit.minAmountLabel') }}</span>
-          <span class="tip-value">{{ minAmount }} {{ selectedCurrency }}</span>
-        </div>
-      </div>
-
-      <!-- 存款地址 -->
-      <div class="form-group">
-        <label class="form-label">{{ $t('deposit.yourAddress') }}</label>
-        <div class="address-wrap">
-          <span class="address-text">{{ displayAddress }}</span>
-          <button class="copy-btn" @click="copyAddress">{{ $t('deposit.copy') }}</button>
-        </div>
-      </div>
-
       <!-- 选择币种 -->
       <div class="form-group">
         <label class="form-label">{{ $t('deposit.selectCurrency') }}</label>
@@ -43,6 +23,26 @@
         </div>
       </div>
 
+      <!-- 充币数量 -->
+      <div class="form-group">
+        <label class="form-label">{{ $t('deposit.amountLabel') }}</label>
+        <div class="input-wrap amount-wrap">
+          <input type="number" v-model="amount" placeholder="0.00" class="amount-input" />
+          <span class="currency-suffix">{{ selectedCurrency }}</span>
+        </div>
+        <div class="min-deposit-tip">
+          <span class="tip-label">{{ $t('deposit.minAmountLabel') }}</span>
+          <span class="tip-value">{{ minAmount }} {{ selectedCurrency }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 底部按钮 -->
+    <div class="bottom-action">
+      <button class="submit-btn" @click="handleDeposit">
+        {{ $t('deposit.confirmBtn') }}
+      </button>
     </div>
 
     <!-- 币种选择弹窗 -->
@@ -64,78 +64,35 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAccount } from '@wagmi/vue'
 import { useI18n } from 'vue-i18n'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
-import Message from '@/utils/message'
-import QRCode from 'qrcode'
 
 const router = useRouter()
 const { t } = useI18n()
-const { address } = useAccount()
 
-const depositAddress = computed(() => address.value || '0x0d766a37A0E60f75A9bDFEfA3EDFd12D372a5b85')
 const selectedCurrency = ref('USDT')
 const selectedNetwork = ref('BNB Smart Chain(BEP20)')
+const amount = ref('')
 const minAmount = ref('0.01')
 const showCurrencyPicker = ref(false)
-const qrCodeUrl = ref('')
 
 const currencyList = ['USDT', 'CHO']
-
-const displayAddress = computed(() => {
-  return depositAddress.value
-})
-
-const copyAddress = async () => {
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(depositAddress.value)
-      Message.success(t('common.copied'))
-      return
-    }
-  } catch (e) {
-    // ignore
-  }
-  try {
-    const textarea = document.createElement('textarea')
-    textarea.value = depositAddress.value
-    textarea.style.position = 'fixed'
-    textarea.style.opacity = '0'
-    document.body.appendChild(textarea)
-    textarea.select()
-    const ok = document.execCommand('copy')
-    document.body.removeChild(textarea)
-    if (ok) Message.success(t('common.copied'))
-  } catch (e) {
-    // ignore
-  }
-}
 
 const selectCurrency = (currency) => {
   selectedCurrency.value = currency
   showCurrencyPicker.value = false
 }
 
-const generateQR = async () => {
-  if (!depositAddress.value) return
-  try {
-    qrCodeUrl.value = await QRCode.toDataURL(depositAddress.value, {
-      width: 200,
-      margin: 2,
-      color: { dark: '#000000', light: '#ffffff' }
-    })
-  } catch (e) {
-    console.error('QR generate failed:', e)
-    qrCodeUrl.value = ''
-  }
+const handleDeposit = () => {
+  // Deposit logic here
+  console.log('Deposit confirmed', {
+    currency: selectedCurrency.value,
+    network: selectedNetwork.value,
+    amount: amount.value
+  })
 }
-
-watch(depositAddress, generateQR, { immediate: true })
-
-// 已完成充值按钮逻辑已下线，保留页面展示与地址复制功能
 </script>
 
 <style scoped lang="scss">
@@ -145,6 +102,7 @@ watch(depositAddress, generateQR, { immediate: true })
   background-color: var(--bg-page-h5);
   color: var(--text-color);
   padding-top: 60px;
+  padding-bottom: 100px;
   box-sizing: border-box;
 }
 
@@ -152,95 +110,64 @@ watch(depositAddress, generateQR, { immediate: true })
   padding: 24px 16px;
 }
 
-.qr-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 32px;
-}
-
-.qr-wrap {
-  border-radius: 12px;
-  overflow: hidden;
-  display: inline-block;
-  padding: 8px;
-  border: 1px solid var(--border-color);
-}
-
-.qr-image {
-  display: block;
-  width: 128px;
-  height: 128px;
-  border-radius: 12px;
-}
-
-.min-deposit-tip {
-  margin-top: 16px;
-  font-size: 14px;
-
-  .tip-label {
-    color: var(--text-color);
-  }
-
-  .tip-value {
-    color: var(--text-dark-gray, #909090);
-  }
-}
-
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 
   .form-label {
     display: block;
     font-family: PingFang SC, PingFang SC;
     font-weight: 600;
     font-size: 14px;
-    color: var(--text-dark-gray);
-    margin-bottom: 15px;
-  }
-
-  .address-wrap {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border: 1px solid var(--border-color, #23262f);
-    border-radius: 12px;
-    padding: 14px 16px;
-
-    .address-text {
-      flex: 1;
-      font-size: 16px;
-      color: var(--text-color);
-      word-break: break-all;
-      white-space: pre-line;
-    }
-
-    .copy-btn {
-      flex-shrink: 0;
-      padding: 8px 16px;
-      background: var(--border-color, #23262f);
-      border-radius: 8px;
-      font-size: 14px;
-      color: var(--text-color);
-      border: none;
-      cursor: pointer;
-
-      &:active {
-        opacity: 0.8;
-      }
-    }
+    color: var(--text-dark-gray, #909090);
+    margin-bottom: 12px;
   }
 
   .input-wrap {
     border: 1px solid var(--border-color, #23262f);
     border-radius: 12px;
     padding: 14px 16px;
+    background: transparent;
 
     &.select-wrap {
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
+    }
+
+    &.amount-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      
+      .amount-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text-color);
+        font-size: 16px;
+        width: 100%;
+        
+        &::placeholder {
+          color: var(--text-dark-gray, #909090);
+        }
+
+        /* Hide spin buttons for input type number */
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+        -moz-appearance: textfield;
+      }
+      
+      .currency-suffix {
+        font-size: 16px;
+        color: var(--text-color);
+        margin-left: 8px;
+        font-weight: 500;
+      }
     }
 
     .input-value {
@@ -252,6 +179,45 @@ watch(depositAddress, generateQR, { immediate: true })
       width: 20px;
       height: 20px;
       color: var(--text-dark-gray, #909090);
+    }
+  }
+
+  .min-deposit-tip {
+    margin-top: 10px;
+    font-size: 12px;
+    text-align: right;
+
+    .tip-label {
+      color: var(--text-dark-gray, #909090);
+    }
+
+    .tip-value {
+      color: var(--text-dark-gray, #909090);
+    }
+  }
+}
+
+.bottom-action {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 16px 34px;
+  background: var(--bg-page-h5);
+
+  .submit-btn {
+    width: 100%;
+    height: 50px;
+    background: var(--text-color-y, #BBFF2E);
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #000000;
+    cursor: pointer;
+
+    &:active {
+      opacity: 0.8;
     }
   }
 }

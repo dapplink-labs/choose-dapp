@@ -57,6 +57,8 @@ export default {
     copy: "Copy",
     selectCurrency: "Select Currency",
     selectNetwork: "Select Network",
+    amountLabel: "Deposit Amount",
+    confirmBtn: "Confirm Deposit"
   },
   transactionSuccess: {
     title: "Transaction Success",

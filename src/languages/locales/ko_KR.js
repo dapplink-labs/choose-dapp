@@ -53,10 +53,12 @@ export default {
   deposit: {
     title: "입금",
     minAmountLabel: "최소 입금액: ",
-    yourAddress: "입금 주소",
+    yourAddress: "당신의 입금 주소",
     copy: "복사",
     selectCurrency: "통화 선택",
     selectNetwork: "네트워크 선택",
+    amountLabel: "입금 수량",
+    confirmBtn: "입금 확인"
   },
   transactionSuccess: {
     title: "거래 성공",

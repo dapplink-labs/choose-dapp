@@ -56,7 +56,9 @@ export default {
     "yourAddress": "你的存款地址",
     "copy": "复制",
     "selectCurrency": "选择币种",
-    "selectNetwork": "选择网络"
+    "selectNetwork": "选择网络",
+    "amountLabel": "充币数量",
+    "confirmBtn": "确定充币"
   },
   "transactionSuccess": {
     "title": "交易成功",
