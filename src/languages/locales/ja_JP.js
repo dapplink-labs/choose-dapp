@@ -702,7 +702,7 @@ export default {
     superNode: "スーパーノード",
     superNodeIncomeCHO: "スーパーノード収益",
     equalLevelIncomeCHO: "等級収益",
-    flowBonusIncomeCHO: "My Flow Bonus (USDT)",
+    flowBonusIncomeUSDT: "My Flow Bonus (USDT)",
     forecastFlowBonusUSDT: "予測フローボーナス(USDT)",
     claimRecord: "受取記録",
     claimAll: "全収益の受取",

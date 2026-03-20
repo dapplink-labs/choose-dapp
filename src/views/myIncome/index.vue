@@ -134,6 +134,8 @@
           <div class="earnings-value">
             {{ formatAmount(currentNodeStakingInfo?.static_reward) }}
           </div>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.static_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="earnings-item">
           <div class="earnings-label">
@@ -142,12 +144,16 @@
           <div class="earnings-value">
             {{ formatAmount(currentNodeStakingInfo?.direct_reward) }}
           </div>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.direct_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="earnings-item">
           <div class="earnings-label">{{ $t("myIncome.teamIncomeCHO") }}</div>
           <div class="earnings-value">
             {{ formatAmount(currentNodeStakingInfo?.team_reward) }}
           </div>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.team_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <!-- 创世节点 5% 收益：仅当当前节点为创世节点（例如 T6）时显示 -->
         <div class="earnings-item" v-if="currentNodeStakingInfo?.node_level === 'T6'">
@@ -157,6 +163,8 @@
           <div class="earnings-value">
             {{ formatAmount(currentNodeStakingInfo?.creation_reward) }}
           </div>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.creation_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <!-- 超级节点收益：仅当当前节点为超级节点（例如 T5）时显示 -->
         <div class="earnings-item" v-if="currentNodeStakingInfo?.node_level === 'T5'">
@@ -166,6 +174,8 @@
           <div class="earnings-value">
             {{ formatAmount(currentNodeStakingInfo?.super_node_reward) }}
           </div>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.super_node_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="earnings-item">
           <div class="earnings-label">
@@ -174,10 +184,12 @@
           <div class="earnings-value">
             {{ formatAmount(currentNodeStakingInfo?.lateral_reward) }}
           </div>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.lateral_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="earnings-item">
           <div class="earnings-label">
-            {{ $t("myIncome.flowBonusIncomeCHO") }}
+            {{ $t("myIncome.flowBonusIncomeUSDT") }}
           </div>
           <div class="earnings-value">
             {{
@@ -1066,12 +1078,14 @@ watch(activeTab, () => {
         overflow-wrap: anywhere;
       }
 
-      .currey {
-        font-size: 12px;
-        color: var(--text-color-secondary, #999);
-      }
+
 
     }
+  }
+
+  .currey {
+    font-size: 12px;
+    color: var(--text-color-secondary, #999);
   }
 
   .my-team {

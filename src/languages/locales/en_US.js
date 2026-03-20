@@ -719,7 +719,7 @@ export default {
     superNode: "Super Node",
     superNodeIncomeCHO: "Super Node Profit",
     equalLevelIncomeCHO: "Equal Level Profit",
-    flowBonusIncomeCHO: "My Flow Bonus (USDT)",
+    flowBonusIncomeUSDT: "My Flow Bonus (USDT)",
     forecastFlowBonusUSDT: "Forecast Flow Bonus (USDT)",
     claimRecord: "Claim Records",
     claimAll: "Claim All Profit",
