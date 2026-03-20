@@ -94,14 +94,17 @@
         <div class="income-item">
           <div class="income-label">{{ $t("myNode.nodeIncome") }}</div>
           <div class="income-value">{{ formatAmount(nodeIncome) }}</div>
+          <span class="currey">≈{{ formatAmount(nodeIncome * cho2usdt_rate) }} USDT</span>
         </div>
         <div class="income-item">
           <div class="income-label">{{ $t("myNode.networkFeeIncome") }}</div>
           <div class="income-value">{{ formatAmount(networkFeeIncome) }}</div>
+          <span class="currey">≈{{ formatAmount(networkFeeIncome * cho2usdt_rate) }} USDT</span>
         </div>
         <div class="income-item">
           <div class="income-label">{{ $t("myNode.subCoinFeeIncome") }}</div>
           <div class="income-value">{{ formatAmount(subCoinFeeIncome) }}</div>
+          <span class="currey">≈{{ formatAmount(subCoinFeeIncome * cho2usdt_rate) }} USDT</span>
         </div>
         <div class="income-item">
           <div class="income-label">
@@ -110,6 +113,7 @@
           <div class="income-value">
             {{ formatAmount(secondaryMarketIncome) }}
           </div>
+          <span class="currey">≈{{ formatAmount(secondaryMarketIncome * cho2usdt_rate) }} USDT</span>
         </div>
         <div class="income-item">
           <div class="income-label">
@@ -118,10 +122,12 @@
           <div class="income-value">
             {{ formatAmount(directReferralIncome) }}
           </div>
+          <span class="currey">≈{{ formatAmount(directReferralIncome * cho2usdt_rate) }} USDT</span>
         </div>
         <div class="income-item">
           <div class="income-label">{{ $t("myNode.networkIncome") }}</div>
           <div class="income-value">{{ formatAmount(teamIncome) }}</div>
+          <span class="currey">≈{{ formatAmount(teamIncome * cho2usdt_rate) }} USDT</span>
         </div>
       </div>
 
@@ -906,11 +912,13 @@ onMounted(async () => {
           transition: color 0.3s ease;
         }
 
-        .currey {
-          font-size: 12px;
-          color: var(--text-color-secondary, #999);
-        }
+
       }
+    }
+
+    .currey {
+      font-size: 12px;
+      color: var(--text-color-secondary, #999);
     }
 
     .earn-prompt {

@@ -709,7 +709,7 @@ export default {
     superNode: "超级节点",
     superNodeIncomeCHO: "超级节点收益(CHO)",
     equalLevelIncomeCHO: "平级收益(CHO)",
-    flowBonusIncomeCHO: "我的流水分红(USDT)",
+    flowBonusIncomeUSDT: "我的流水分红(USDT)",
     forecastFlowBonusUSDT: "预测流水分红(USDT)",
     claimRecord: "领取记录",
     claimAll: "领取收益",
