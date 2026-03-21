@@ -14,7 +14,8 @@
                 <el-icon class="search-icon">
                     <Search />
                 </el-icon>
-                <input v-model="searchKeyword" type="text" class="search-input" :placeholder="t('assetManagement.search')" />
+                <input v-model="searchKeyword" type="text" class="search-input"
+                    :placeholder="t('assetManagement.search')" />
             </div>
 
             <div class="filter-pill" @click="toggleTypeDropdown">
@@ -93,10 +94,8 @@
 
                         <!-- 历史仓位事件：仅展示状态，不再在中间行重复金额 -->
                         <template v-else>
-                            <span
-                                class="status-pill status-right"
-                                :class="item.status === 'lost' ? 'status-lost' : 'status-claimed'"
-                            >
+                            <span class="status-pill status-right"
+                                :class="item.status === 'lost' ? 'status-lost' : 'status-claimed'">
                                 <el-icon class="status-icon">
                                     <CloseBold v-if="item.status === 'lost'" />
                                     <Select v-else />
@@ -430,6 +429,7 @@ if (typeof window !== 'undefined') {
     padding: 6px 0;
     border: 1px solid var(--border-color);
     z-index: 10;
+    background-color: var(--bg-page-h5);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
     .dropdown-item {

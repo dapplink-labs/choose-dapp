@@ -45,13 +45,14 @@ import { ElLoading } from 'element-plus'
 import Message from '@/utils/message'
 import { register } from '@/api/API'
 import { eventBus } from '@/utils/eventBus'
-import { readContract } from '@wagmi/core'
+import { readContract, switchChain } from '@wagmi/core'
 import { config } from '@/wagmi.ts'
 import networks from '@/assets/json/networks.js'
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
 import logoLight from '@/assets/icon/logo.png'
 import logoDark from '@/assets/icon/logoDark.png'
 import { UserRejectedRequestError } from 'viem'
+
 // 基础配置
 const { t } = useI18n()
 const BSC_CHAIN_ID = 56
@@ -101,6 +102,17 @@ const checkUserStatus = async () => {
     const currentNetwork = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
     if (!currentNetwork || !currentNetwork.proxyNodeManager) {
       throw new Error('未找到 BSC 网络合约配置')
+    }
+    // 1. Check network
+    if (Number(chainId.value) !== BSC_CHAIN_ID) {
+      try {
+        await switchChain(config, { chainId: BSC_CHAIN_ID })
+        await new Promise((r) => setTimeout(r, 1000))
+      } catch (switchError) {
+        console.error('Failed to switch chain:', switchError)
+        loading.close()
+        return
+      }
     }
     console.log("------------------------")
     // 3. 读取合约检查邀请人
