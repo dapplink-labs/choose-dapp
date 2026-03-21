@@ -173,6 +173,7 @@ const handleDeposit = () => {
     .input-value {
       font-size: 16px;
       color: var(--text-color);
+      font-weight: bold;
     }
 
     .arrow-icon {
