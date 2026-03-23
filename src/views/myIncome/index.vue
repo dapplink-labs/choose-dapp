@@ -600,6 +600,7 @@ const fetchNodeStakingInfo = async () => {
   data.id = currentNodeStakingInfo.value.id;
   data.name = t(nodeTypeMap[data.node_level]?.nodeNameKey || "");
   currentNodeStakingInfo.value = data;
+  currentNodeStakingInfo.value.produced_income = currentNodeStakingInfo?.produced_income > currentNodeStakingInfo.value.forecast_income ? currentNodeStakingInfo.value.forecast_income : currentNodeStakingInfo?.produced_income
   // 返回两个字段 已发放奖励  总奖励  计算百分比
   currentNodeStakingInfo.value.progressPercent =
     (1 - (currentNodeStakingInfo.value.produced_income /
