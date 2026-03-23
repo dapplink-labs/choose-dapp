@@ -15,9 +15,9 @@
         <span v-if="showAssets" class="value-number">{{ formatNumber(predictionTotal) }}</span>
         <span v-else class="value-number">****</span>
         <span class="value-unit">USDT</span>
-        <el-icon class="dropdown-icon">
+        <!-- <el-icon class="dropdown-icon">
           <CaretBottom />
-        </el-icon>
+        </el-icon> -->
       </div>
       <div class="today-profit">
         <span class="label">今日盈亏：</span>

@@ -18,9 +18,9 @@
         <span v-if="showAssets" class="value-number">{{ formatNumber(totalAssets) }}</span>
         <span v-else class="value-number">****</span>
         <span class="value-unit">USDT</span>
-        <el-icon class="dropdown-icon">
+        <!-- <el-icon class="dropdown-icon">
           <CaretBottom />
-        </el-icon>
+        </el-icon> -->
       </div>
     </div>
 
