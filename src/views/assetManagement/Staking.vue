@@ -15,7 +15,9 @@
         <span v-if="showAssets" class="value-number">{{ formatNumber(stakingTotal) }}</span>
         <span v-else class="value-number">****</span>
         <span class="value-unit">USDT</span>
-        <el-icon class="dropdown-icon"><CaretBottom /></el-icon>
+        <el-icon class="dropdown-icon">
+          <CaretBottom />
+        </el-icon>
       </div>
       <div class="today-profit">
         <span class="label">今日：</span>
@@ -31,8 +33,10 @@
           <div class="card-desc">{{ card.desc }}</div>
         </div>
         <div class="card-right">
-          <span class="card-value">{{ formatEarningsNumber(card.value) }}</span>
-          <el-icon v-if="card.hasArrow" class="arrow-icon"><ArrowRight /></el-icon>
+          <span class="card-value">{{ card.value }}</span>
+          <el-icon v-if="card.hasArrow" class="arrow-icon">
+            <ArrowRight />
+          </el-icon>
         </div>
       </div>
     </div>
@@ -40,49 +44,110 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { View, Hide, CaretBottom, ArrowRight } from '@element-plus/icons-vue'
+import { useAccount } from '@wagmi/vue'
+import { getMyIncome } from "@/api/API"
+import { formatChoAmount, formatTokenAmount } from '@/utils/format_amount'
 
 const { t } = useI18n()
+const router = useRouter()
+const { address } = useAccount()
 
 const showAssets = ref(true)
 const stakingTotal = ref(2263.23)
 const todayProfit = ref(800.00)
 const todayProfitRate = ref(200)
 
-const earningsCards = ref([
-  {
-    title: '节点收益',
-    desc: '母币交易手续费收益',
-    value: 12345678,
-    hasArrow: true
-  },
-  {
-    title: '质押收益',
-    desc: '预测平台母币质押收益',
-    value: 12345678,
-    hasArrow: true
-  },
-  {
-    title: '流水收益',
-    desc: '预测平台交易流水收益',
-    value: 12345678,
-    hasArrow: false
-  },
-  {
-    title: '子币收益',
-    desc: '事件预言机收益',
-    value: 12345678,
-    hasArrow: false
-  },
-  {
-    title: '预测平台FOMO池金额',
-    desc: '预测平台盈利金额的*10%，分给当天质押6000U/14000U用户',
-    value: 12345678,
-    hasArrow: false
+const myIncomeData = ref({
+  node_income: '0',
+  staking_income: '0',
+  forecast_income: '0',
+  sub_coin_income: '0',
+  fomo_pool_income: '0'
+})
+
+const fetchMyIncomeData = async () => {
+  if (!address.value) return
+  try {
+    const res = await getMyIncome({ address: address.value })
+    if (res?.data?.success) {
+      myIncomeData.value = res.data.data
+      updateEarningsCards()
+    }
+  } catch (error) {
+    console.error('Failed to fetch my income:', error)
   }
-])
+}
+
+watch(address, (newVal) => {
+  if (newVal) {
+    fetchMyIncomeData()
+  }
+})
+
+onMounted(() => {
+  if (address.value) {
+    fetchMyIncomeData()
+  }
+})
+
+const formatAmount = (value) => formatChoAmount(value, { maxFractionDigits: 4, useGrouping: true })
+const formatUsdtAmount = (value) => formatTokenAmount(value, { decimals: 18, maxFractionDigits: 2, useGrouping: true })
+
+const earningsCards = ref([])
+
+const updateEarningsCards = () => {
+  const cards = []
+
+  if (myIncomeData.value.active_node_id) {
+    cards.push({
+      id: 'node',
+      title: t('myEarnings.nodeEarnings') || '节点收益',
+      desc: t('myEarnings.nodeEarningsDesc') || '母币交易手续费收益',
+      value: formatAmount(myIncomeData.value.node_income),
+      hasArrow: true
+    })
+  }
+
+  cards.push(
+    {
+      id: 'staking',
+      title: t('myEarnings.stakingEarnings') || '质押收益',
+      desc: t('myEarnings.stakingEarningsDesc') || '预测平台母币质押收益',
+      value: formatAmount(myIncomeData.value.staking_income),
+      hasArrow: true
+    },
+    {
+      id: 'flow',
+      title: t('myEarnings.flowEarnings') || '流水收益',
+      desc: t('myEarnings.flowEarningsDesc') || '预测平台交易流水收益',
+      value: formatUsdtAmount(myIncomeData.value.forecast_income),
+      hasArrow: false
+    },
+    {
+      id: 'subCoin',
+      title: t('myEarnings.subCoinEarnings') || '子币收益',
+      desc: t('myEarnings.subCoinEarningsDesc') || '事件预言机收益',
+      value: formatAmount(myIncomeData.value.sub_coin_income),
+      hasArrow: false
+    },
+    {
+      id: 'fomoPool',
+      title: t('myEarnings.fomoPoolEarnings') || '预测平台FOMO池金额',
+      desc: t('myEarnings.fomoPoolEarningsDesc') || '预测平台盈利金额的*10%，分给当天质押6000U/14000U用户',
+      value: formatAmount(myIncomeData.value.fomo_pool_income),
+      hasArrow: false
+    }
+  )
+
+  earningsCards.value = cards
+}
+
+// 初始化默认值
+updateEarningsCards()
 
 const toggleAssetsVisibility = () => {
   showAssets.value = !showAssets.value
@@ -98,14 +163,19 @@ const formatCurrency = (num) => {
   return `$${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-const formatEarningsNumber = (num) => {
-  if (typeof num !== 'number') return '0'
-  return num.toLocaleString('en-US')
-}
-
 const handleCardClick = (card) => {
-  if (card.hasArrow) {
-    console.log('Navigate to details for', card.title)
+  if (!card.hasArrow) return
+
+  if (card.id === 'node') {
+    const activeNode = myIncomeData.value.active_node_id
+    router.push({
+      path: "/myNode",
+      query: {
+        id: activeNode ?? "093ba260586549c087ef43b6a1326265",
+      },
+    })
+  } else if (card.id === 'staking') {
+    router.push('/myIncome')
   }
 }
 </script>
@@ -176,16 +246,16 @@ const handleCardClick = (card) => {
 
   .today-profit {
     font-size: 14px;
-    
+
     .label {
       color: var(--text-gray, rgba(255, 255, 255, 0.7));
     }
 
     .profit-value {
       font-weight: 500;
-      
+
       &.positive {
-        color: #2FBC87;
+        color: var(--text-color-y, #BBFF2E);
       }
     }
   }
@@ -233,7 +303,7 @@ const handleCardClick = (card) => {
       .card-value {
         font-size: 18px;
         font-weight: 600;
-        color: #2FBC87;
+        color: var(--text-color-y, #BBFF2E);
       }
 
       .arrow-icon {

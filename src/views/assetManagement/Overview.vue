@@ -52,7 +52,7 @@
     </div>
 
     <!-- 最近记录 -->
-    <div class="recent-records">
+    <div class="recent-records" v-if="recentRecords.length > 0">
       <div class="record-item" v-for="(record, index) in recentRecords" :key="index"
         @click="handleRecordDetail(record)">
         <div class="record-left">
@@ -122,9 +122,9 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAccount } from '@wagmi/vue'
 import { useThemeStore } from '@/stores/theme'
-import { View, Hide, ArrowRight, Document } from '@element-plus/icons-vue'
+import { View, Hide, ArrowRight, Document, CaretBottom } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
-import { getUserBalances } from '@/api/APIEvent'
+import { getUserBalances, getFundsHistory } from '@/api/APIEvent'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -154,25 +154,50 @@ const toggleAssetsVisibility = () => {
 // Tabs
 const distTab = ref('coin')
 
-// 最近记录模拟数据
-const recentRecords = ref([
-  {
-    type: 'deposit',
-    amount: 100.00,
-    unit: 'USDT',
-    status: 'pending',
-    statusText: '充币中',
-    statusColor: 'color-green'
-  },
-  {
-    type: 'withdraw',
-    amount: 5000.00,
-    unit: 'USDT',
-    status: 'success',
-    statusText: '已完成',
-    statusColor: 'color-green'
+// 最近记录
+const recentRecords = ref([])
+
+// 获取最近充提记录
+const fetchFundsHistory = async () => {
+  if (!address.value) return
+
+  try {
+    const res = await getFundsHistory({ address: address.value, page: 1, limit: 2 })
+    const list = res?.data?.data?.list || res?.data?.data || []
+    
+    // 只取最新的两条记录
+    const records = (Array.isArray(list) ? list : []).slice(0, 2)
+    
+    recentRecords.value = records.map(item => {
+      const isDeposit = item.type === 'deposit' || String(item.type) === '1'
+      const typeStr = isDeposit ? 'deposit' : 'withdraw'
+      
+      let statusText = '处理中'
+      let statusColor = 'color-yellow'
+      
+      const statusStr = String(item.status).toLowerCase()
+      if (statusStr === '1' || statusStr === 'success' || statusStr === 'completed') {
+        statusText = '已完成'
+        statusColor = 'color-green'
+      } else if (statusStr === '2' || statusStr === 'fail' || statusStr === 'failed') {
+        statusText = '已失败'
+        statusColor = 'color-red'
+      }
+
+      return {
+        type: typeStr,
+        amount: Number(item.amount || item.value || 0),
+        unit: item.unit || item.symbol || item.coin || 'USDT',
+        statusText: statusText,
+        statusColor: statusColor,
+        raw: item
+      }
+    })
+  } catch (error) {
+    console.error('获取充提记录失败:', error)
+    recentRecords.value = []
   }
-])
+}
 
 const handleRecordDetail = (record) => {
   console.log('Record detail', record)
@@ -267,10 +292,12 @@ const fetchAssets = async () => {
 
 onMounted(() => {
   fetchAssets()
+  fetchFundsHistory()
 })
 
 watch(() => address.value, () => {
   fetchAssets()
+  fetchFundsHistory()
 })
 </script>
 
@@ -470,6 +497,12 @@ watch(() => address.value, () => {
 
         &.color-green {
           color: var(--text-color-y, #BBFF2E);
+        }
+        &.color-yellow {
+          color: #FFB020; /* 待处理颜色 */
+        }
+        &.color-red {
+          color: #FF3B30; /* 失败颜色 */
         }
       }
 

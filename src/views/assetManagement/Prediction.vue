@@ -635,7 +635,7 @@ watch(() => address?.value, () => {
     .reward-amount {
       font-size: 20px;
       font-weight: 600;
-      color: #2FBC87;
+      color: var(--text-color-y, #BBFF2E);
       flex: 2;
       text-align: center;
     }
