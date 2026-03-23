@@ -12,7 +12,7 @@ export default defineConfig({
     cors: true, // 允许跨域请求
     proxy: {
       "/event-api": {
-        target: "https://eventapi.roothashpay.com",
+        target: "https://eventchmeapi.roothashpay.com",
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/event-api/, ""),
