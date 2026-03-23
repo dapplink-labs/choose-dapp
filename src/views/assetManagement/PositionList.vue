@@ -32,14 +32,10 @@
                 </div>
             </div>
 
-            <button
-                v-if="activeTab === 'pending'"
-                type="button"
-                class="filter-pill filter-action-btn"
-                :disabled="cancelAllLoading"
-                @click.stop="onCancelAllPending"
-            >
-                {{ cancelAllLoading ? (t('common.loading') || 'Loading...') : (t('assetManagement.cancelAllOrders') || 'Cancel all') }}
+            <button v-if="activeTab === 'pending'" type="button" class="filter-pill filter-action-btn"
+                :disabled="cancelAllLoading" @click.stop="onCancelAllPending">
+                {{ cancelAllLoading ? (t('common.loading') || 'Loading...') : (t('assetManagement.cancelAllOrders') ||
+                'Cancel all') }}
             </button>
 
             <div v-else class="filter-pill" @click="toggleMonthDropdown">
@@ -97,13 +93,10 @@
 
                             <!-- 委托仓位：显示进度 -->
                             <template v-else-if="activeTab === 'pending'">
-                                <button
-                                    type="button"
-                                    class="cancel-btn"
-                                    :disabled="cancelingId === item.id"
-                                    @click.stop="onCancelPending(item)"
-                                >
-                                    {{ cancelingId === item.id ? (t('common.loading') || 'Loading...') : (t('assetManagement.cancelOrder') || 'Cancel') }}
+                                <button type="button" class="cancel-btn" :disabled="cancelingId === item.id"
+                                    @click.stop="onCancelPending(item)">
+                                    {{ cancelingId === item.id ? (t('common.loading') || 'Loading...') :
+                                        (t('assetManagement.cancelOrder') || 'Cancel') }}
                                 </button>
                             </template>
 
@@ -227,7 +220,7 @@ const totalPages = ref(1)
 const hasMore = computed(() => page.value <= totalPages.value)
 const PAGE_SIZE = 20
 
-const getUserGuid = () => window.sessionStorage.getItem('user_guid') || '41f83791b601426896bcb39f45e2fd12'
+
 const isRespSuccess = (res) => {
     const code = res?.data?.code
     return code === 0 || code === 200 || code === 2000
@@ -283,7 +276,8 @@ const fetchAllOpenOrderGuids = async () => {
     let total = 1
     while (p <= total) {
         const res = await getOpenOrders({
-            user_guid: getUserGuid(),
+            user_guid: '',
+            address: address.value,
             page: p,
             page_size: 100,
             event_guid: undefined,
@@ -433,7 +427,7 @@ const mapPositionToRow = (p) => {
         pnl: Number.isFinite(pnlPct) ? Number(pnlPct.toFixed(2)) : 0,
         oddsType,
         // 中间粉/绿标签：Buy/Sell + 价格（¢）
-        oddsLabel: `${outcome } ${formatPriceToCentText(price)}`,
+        oddsLabel: `${outcome} ${formatPriceToCentText(price)}`,
         // 底部右上角状态和历史复用字段
         resultAmount: Number.isFinite(pnlAbs) ? Number(pnlAbs.toFixed(2)) : 0,
         status: (Number(pnlAbs) < 0) ? 'lost' : 'claimed',
@@ -570,7 +564,8 @@ const fetchPositions = async (append = false) => {
         if (activeTab.value === 'pending') {
             // 委托仓位（挂单）
             res = await getOpenOrders({
-                user_guid: getUserGuid(),
+                user_guid: '',
+                address: address.value || '',
                 page: page.value,
                 page_size: PAGE_SIZE,
                 event_guid: undefined,
@@ -582,7 +577,8 @@ const fetchPositions = async (append = false) => {
             // 历史仓位订单
             const range = monthToRange(filterMonth.value)
             res = await getOrderHistory({
-                user_guid: getUserGuid(),
+                user_guid: '',
+                address: address.value || '',
                 page: page.value,
                 page_size: PAGE_SIZE,
                 start_date: range?.start_date,
@@ -596,8 +592,8 @@ const fetchPositions = async (append = false) => {
             const status = tabToStatus(activeTab.value)
             const range = monthToRange(filterMonth.value)
             res = await getUserPositions({
-                address: address.value || undefined,
-                user_guid: !address.value ? getUserGuid() : undefined,
+                address: address.value || '',
+                user_guid: '',
                 status,
                 page: page.value,
                 page_size: PAGE_SIZE,
@@ -704,7 +700,7 @@ onBeforeUnmount(() => {
     margin-top: 20px;
 }
 
-.load-more-footer{
+.load-more-footer {
     text-align: center;
     margin-top: 20px;
 }

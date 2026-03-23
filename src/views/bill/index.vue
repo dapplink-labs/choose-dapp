@@ -92,9 +92,11 @@ import { ArrowDownBold } from '@element-plus/icons-vue'
 import { useThemeStore } from '@/stores/theme'
 import DateRangePicker from '@/components/DateRangePicker.vue'
 import { getTransactionHistory } from '@/api/APIEvent'
+import { useAccount } from '@wagmi/vue'
 
 const { t } = useI18n()
 const themeStore = useThemeStore()
+const { address } = useAccount()
 
 // 后端类型：all / FIAT_DEPOSIT / FIAT_WITHDRAW / ...
 const filterType = ref('all')
@@ -171,8 +173,6 @@ const page = ref(1)
 const totalPages = ref(1)
 const PAGE_SIZE = 20
 
-// 目前项目未存 user_guid，先与充值接口的默认用户保持一致（token 也来自该账户）
-const getUserGuid = () => window.sessionStorage.getItem('user_guid') || '41f83791b601426896bcb39f45e2fd12'
 
 const isRespSuccess = (res) => {
     const code = res?.data?.code
@@ -278,7 +278,8 @@ const fetchTransactionHistory = async (append = false) => {
         const type = filterType.value === 'all' ? 'all' : filterType.value
         const { start_date, end_date } = getDateRangeParams()
         const res = await getTransactionHistory({
-            user_guid: getUserGuid(),
+            user_guid: "",
+            address: address?.value || '',
             type, // all / FIAT_DEPOSIT / FIAT_WITHDRAW / ...
             start_date: start_date || undefined,
             end_date: end_date || undefined,

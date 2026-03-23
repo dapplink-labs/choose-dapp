@@ -200,11 +200,7 @@ onMounted(async () => {
   setTimeout(async () => {
     disconnect()
     window.sessionStorage.clear()
-    //保存token
-    await userLogin().then(res => {
-      window.sessionStorage.setItem('token', res?.data?.data?.token)
-      window.sessionStorage.setItem('user_guid', res?.data?.data?.user_guid)
-    })
+
   }, 500)
 
 })

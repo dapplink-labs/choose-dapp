@@ -192,7 +192,7 @@
           $t('crypto.positions') }}</div>
         <div class="tab-item" :class="{ active: activeTab === 'Orders' }" @click="activeTab = 'Orders'">{{
           $t('crypto.orders')
-          }}</div>
+        }}</div>
         <div class="tab-item" :class="{ active: activeTab === 'History' }" @click="activeTab = 'History'">{{
           $t('crypto.history') }}</div>
       </div>
@@ -225,7 +225,7 @@
             </div>
             <button class="withdraw-hero-btn" :class="pos.outcome" type="button" @click="handlePositionWithdraw(pos)">{{
               $t('crypto.withdraw')
-              }}</button>
+            }}</button>
           </div>
         </div>
         <div v-else class="orders-empty">{{ $t('common.noData') || '暂无数据...' }}</div>
@@ -349,6 +349,7 @@ import { createIotMqttClient, hasWebCrypto } from '@/utils/mqttClient'
 import OrderBookMobile from '@/components/OrderBookMobile.vue'
 import PaymentModal from '@/components/PaymentModal.vue'
 import { useThemeStore } from '@/stores/theme'
+import { useAccount } from '@wagmi/vue'
 import {
   cancelOrder,
   fiatWithdraw,
@@ -365,8 +366,7 @@ const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
 const themeStore = useThemeStore()
-
-const FALLBACK_USER_GUID = '41f83791b601426896bcb39f45e2fd12'
+const { address } = useAccount()
 
 const handleBack = () => router.back()
 const goWithdraw = () => router.push({ name: 'withdraw' })
@@ -376,7 +376,6 @@ const activeTab = ref('Positions')
 const isBookOpen = ref(false)
 const orderBookTab = ref('yes')
 
-const getUserGuid = () => window.sessionStorage.getItem('user_guid') || FALLBACK_USER_GUID
 const isRespSuccess = (res) => {
   const code = res?.data?.code
   return code === 0 || code === 200 || code === 2000
@@ -656,16 +655,16 @@ const handlePositionWithdraw = async (pos) => {
   ])
   const amount = Number.isFinite(amountPicked) && amountPicked > 0 ? String(amountPicked) : null
   const currency_code = raw?.currency_code || raw?.currency || 'USD'
-  const user_guid = getUserGuid()
-
-  const missing = ['amount', 'currency_code', 'user_guid'].filter((k) => !({ amount, currency_code, user_guid }[k]))
+  const user_guid = ''
+  const address = address.value || ''
+  const missing = ['amount', 'currency_code', 'address'].filter((k) => !({ amount, currency_code, address }[k]))
   if (missing.length) {
     ElMessage.error(`Withdraw 参数缺失：${missing.join(', ')}`)
     return
   }
 
   try {
-    const res = await fiatWithdraw({ amount, currency_code, user_guid })
+    const res = await fiatWithdraw({ amount, currency_code, user_guid, address })
     if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Withdraw failed')
     ElMessage.success(res?.data?.message || 'Withdraw success')
     await Promise.allSettled([fetchPositions(), fetchOpenOrders(), fetchOrderHistory()])
@@ -706,7 +705,8 @@ const fetchPositions = async () => {
     const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
     const languageLabel = currentLocale.split('-')[0]
     const res = await getUserPositions({
-      user_guid: getUserGuid(),
+      user_guid: "",
+      address: address.value || '',
       status: 'holding',
       page: 1,
       page_size: 2000,
@@ -731,7 +731,8 @@ const fetchOpenOrders = async () => {
   }
   try {
     const res = await getOpenOrders({
-      user_guid: getUserGuid(),
+      user_guid: "",
+      address: address.value || '',
       page: 1,
       page_size: 20,
       event_guid: currentEventGuid.value,
@@ -756,7 +757,8 @@ const fetchOrderHistory = async () => {
   }
   try {
     const res = await getOrderHistory({
-      user_guid: getUserGuid(),
+      user_guid: "",
+      address: address.value || '',
       page: 1,
       page_size: 20,
       status: '',
@@ -1342,7 +1344,7 @@ const startMqttStream = async () => {
   if (!currentEventGuid.value || !resolvedSubEventGuid.value) return
   if (iotMqtt) return
 
-  const userGuid = getUserGuid()
+  const userGuid = address.value || ''
   const topics = [
     `price/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
     `orderbook/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,

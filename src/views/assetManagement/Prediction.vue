@@ -188,15 +188,14 @@ const formatXAxisLabel = (isoLike) => {
 }
 
 const fetchPnlAndRender = async () => {
-  const user_guid = window.sessionStorage.getItem('user_guid') || ''
   const addr = address?.value || ''
-  if (!addr && !user_guid) return
+  if (!addr) return
 
   pnlLoading.value = true
   try {
     const res = await getUserPnl({
-      address: addr || undefined,
-      user_guid: user_guid || undefined,
+      address: addr || '',
+      user_guid: "",
       range: selectedPeriod.value,
     })
     const code = res?.data?.code
@@ -227,15 +226,14 @@ const fetchPnlAndRender = async () => {
 }
 
 const fetchUserStat = async () => {
-  const user_guid = window.sessionStorage.getItem('user_guid') || ''
   const addr = address?.value || ''
-  if (!addr && !user_guid) return
+  if (!addr) return
 
   statLoading.value = true
   try {
     const res = await getUserStat({
-      address: addr || undefined,
-      user_guid: user_guid || undefined,
+      address: addr,
+      user_guid: "",
     })
     const code = res?.data?.code
     if (!(code === 0 || code === 200 || code === 2000)) {
@@ -258,7 +256,7 @@ const refreshPredictionData = async () => {
 // 更新图表
 const updateChart = () => {
   if (!myChart) return
- const points = pnlPoints.value
+  const points = pnlPoints.value
   const values = points.map(p => toNumber(p?.profit_lost))
   const labels = points.map(p => formatXAxisLabel(p?.timestamp))
   // 模拟数据 - 面积图数据
@@ -363,17 +361,18 @@ const updateChart = () => {
 const handleClaim = async () => {
   if (rewardData.value.winnings === 0) return
 
-  const user_guid = window.sessionStorage.getItem('user_guid') || ''
+
   const payload = {
     amount: String(rewardData.value.winnings ?? ''),
     asset_guid: rewardData.value.asset_guid,
     event_guid: rewardData.value.event_guid,
     outcome: String(rewardData.value.outcome || '').toUpperCase(),
     sub_event_guid: rewardData.value.sub_event_guid,
-    user_guid,
+    user_guid: "",
+    address: address?.value || '',
   }
 
-  const missing = ['amount', 'asset_guid', 'event_guid', 'sub_event_guid', 'user_guid'].filter(
+  const missing = ['amount', 'asset_guid', 'event_guid', 'sub_event_guid', 'address'].filter(
     (k) => !payload[k],
   )
   if (missing.length) {

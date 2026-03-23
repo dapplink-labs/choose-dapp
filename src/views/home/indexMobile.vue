@@ -216,7 +216,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -282,7 +282,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -300,10 +300,10 @@
                         <div ref="loadMoreSentinel" class="load-more-sentinel" aria-hidden="true"></div>
                         <div class="load-more-footer">
                             <span v-if="loadingMore" class="load-more-text">{{ $t('home.loadingMore') || '加载中...'
-                            }}</span>
+                                }}</span>
                             <span v-else-if="cardList.length && !hasMore" class="load-more-text">{{ $t('home.noMore') ||
                                 '没有更多了'
-                            }}</span>
+                                }}</span>
                         </div>
                     </div>
                 </div>
@@ -597,7 +597,8 @@ const fetchEventList = async (append = false) => {
 
         let res;
         if (activeTag.value === 'favorite') {
-            params.user_guid = address.value;
+            params.user_guid = '';
+            params.address = address.value || '';
             res = await getFavoriteList(params);
         } else {
             res = await getEventList(params);
@@ -723,7 +724,8 @@ const toggleFavorite = async (item) => {
 
     try {
         const res = await toggleFavoriteEvent({
-            user_guid: address.value,
+            user_guid: '',
+            address: address.value || '',
             event_guid: item.id
         });
 
