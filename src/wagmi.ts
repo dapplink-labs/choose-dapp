@@ -21,11 +21,29 @@ const bsc = defineChain({
   },
   testnet: false,
 })
-
+const BNBTEST = defineChain({
+  id: 97,
+  name: 'BNBTEST',
+  nativeCurrency: { name: 'BNBTEST', symbol: 'BNBTEST', decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: [
+        'https://go.getblock.io/00384bdf2ed44f53956c987b6866009e'
+      ]
+    }
+  },
+  blockExplorers: {
+    default: {
+      name: 'BNBTEST',
+      url: 'https://bnb-testnet.api.onfinality.io/public',
+    },
+  },
+  testnet: false,
+})
 // ✅ 2. 构建 wagmi config
 // createConfig 用于创建 wagmi 的配置对象
 export const config = createConfig({
-  chains: [bsc],// 配置支持的区块链网络
+  chains: [bsc, BNBTEST],// 配置支持的区块链网络
   // connectors: [
   //   // injected(), // ✅ 添加 injected 连接器支持 MetaMask 等浏览器钱包
   //   walletConnect({// WalletConnect 连接器与injected 连接器类似，允许用户通过 WalletConnect 协议连接他们的移动钱包或其他支持 WalletConnect 的钱包。
@@ -37,7 +55,10 @@ export const config = createConfig({
   transports: {
     [bsc.id]: fallback([
       http('https://go.getblock.asia/8e87ac495a5941ae9dfb9ea6ed9ae7d2')
-    ])
+    ]),
+    [BNBTEST.id]: fallback([
+      http('https://go.getblock.io/00384bdf2ed44f53956c987b6866009e')
+    ]),
   },
 })
 

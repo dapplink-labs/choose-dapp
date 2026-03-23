@@ -823,6 +823,7 @@ onBeforeUnmount(() => {
     border: 1px solid var(--border-color);
     background-color: var(--bg-page-h5);
     z-index: 10;
+    background-color: var(--bg-page-h5);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
     .dropdown-item {

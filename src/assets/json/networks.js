@@ -93,4 +93,23 @@ export default [
       ? devContracts
       : prodContracts),
   },
+  {
+    name: "BNBTEST",
+    chainId: 97,
+    img: "bnb.png",
+    rpcUrl: "https://go.getblock.io/00384bdf2ed44f53956c987b6866009e",
+    explorerUrl: "https://bnb-testnet.api.onfinality.io/public",
+    currency: "BNB",
+    nativeTokenContract: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    cpContract: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    ethContract: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+    bridgeContract: "0x0000000000000000000000000000000000000000",
+    deployer: "0x2323f5aab64c382ae942fd7c040c7aeaa6a9f333",
+    proxyAdminFeeVault: "0x15c0af26f622897946724eab0ab8087a4027001f",
+    proxyFeeVaultManager: "0x64e583a70ec522df0f5fc9f68b761daef661b528",
+    proxyFundingManager: "0x23b011a77a29e79c539114f1c506cfa4ea902648",
+    proxyFeeVaultPod: "0x4178fd8b30d48faa65de8a75681ca6a39db74193",
+    proxyFundingPod: "0x036434106b09a0d091a2a5d71d1282ab0208c517",
+    mockERC20: "0x5da415dfaef8086225ffef7a6110a755606ad064",
+  },
 ];

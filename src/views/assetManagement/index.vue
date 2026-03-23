@@ -8,6 +8,12 @@
                     {{ $t('assetManagement.overview') || '资产总览' }}
                 </div>
                 <div :class="['tab-item', { active: activeTab === 1 }]" @click="handleTabClick(1)">
+                    {{ $t('assetManagement.funds') || '资金' }}
+                </div>
+                <div :class="['tab-item', { active: activeTab === 2 }]" @click="handleTabClick(2)">
+                    {{ $t('assetManagement.staking') || '质押' }}
+                </div>
+                <div :class="['tab-item', { active: activeTab === 3 }]" @click="handleTabClick(3)">
                     {{ $t('assetManagement.prediction') || '预测' }}
                 </div>
             </div>
@@ -15,7 +21,9 @@
             <!-- 内容区域 -->
             <div class="tab-content">
                 <Overview v-if="activeTab === 0" />
-                <Prediction v-else />
+                <Funds v-else-if="activeTab === 1" />
+                <Staking v-else-if="activeTab === 2" />
+                <Prediction v-else-if="activeTab === 3" />
             </div>
         </div>
     </div>
@@ -23,6 +31,8 @@
 <script setup>
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import Overview from './Overview.vue'
+import Funds from './Funds.vue'
+import Staking from './Staking.vue'
 import Prediction from './Prediction.vue'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'

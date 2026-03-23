@@ -4,6 +4,15 @@ import request from '@/utils/requestEvent'
 export const getHomeBanner = (data) => {
   return request.post('/api/v1/banner/list', data)
 }
+// 获取资产列表
+export const getAssetList = (data) => {
+    return request.post('/api/v1/asset/list', data)
+}
+
+// 用户提现
+export const userWithdraw = (data) => {
+    return request.post('/api/v1/user/withdraw', data)
+}
 
 // 获取分类列表数据
 export const getCategoryList = (data) => {
