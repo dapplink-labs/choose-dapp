@@ -43,6 +43,7 @@
             d="M880.64 747.57632v61.44c0 39.58784-32.09216 71.68-71.68 71.68H215.04c-39.58784 0-71.68-32.09216-71.68-71.68v-61.44a35.84 35.84 0 1 0-71.68 0v61.44c0 79.17568 64.18432 143.36 143.36 143.36h593.92c79.17568 0 143.36-64.18432 143.36-143.36v-61.44a35.84 35.84 0 1 0-71.68 0z"
             fill="currentColor"></path>
         </svg>
+
         <span>{{ $t('assetManagement.withdraw') || '提币' }}</span>
       </button>
     </div>
@@ -52,20 +53,12 @@
       <div class="record-item" v-for="(record, index) in recentRecords" :key="index"
         @click="handleRecordDetail(record)">
         <div class="record-left">
-          <div class="record-icon" :class="record.type">
-            <svg v-if="record.type === 'deposit'" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="12"
-              height="12">
-              <path
-                d="M839.8574 434.3808a41.216 41.216 0 0 0-10.9056-28.9792l-0.5632-0.5632a40.0896 40.0896 0 0 0-27.9552-11.1616 42.496 42.496 0 0 0-30.6176 13.1072l-216.1664 216.2176V41.6768a41.6768 41.6768 0 0 0-83.3024 0v581.12L254.3854 406.784a43.1104 43.1104 0 0 0-29.5424-12.9024h-1.024c-10.5984 0-20.48 3.9936-27.9552 10.9056l-0.6144 0.5632a41.472 41.472 0 0 0 1.9968 58.5728l282.0096 281.9584c3.7376 4.8128 8.448 8.704 13.824 11.4688l2.1504 1.024 0.768 0.3072c4.9152 2.0992 10.24 3.1744 15.5136 3.1744H512.6382a39.2704 39.2704 0 0 0 23.552-7.7312 42.0352 42.0352 0 0 0 7.8336-7.2704l282.9312-282.9312a43.0592 43.0592 0 0 0 12.9024-29.5936z"
-                fill="currentColor"></path>
-            </svg>
-            <svg v-else viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" width="12" height="12">
-              <path
-                d="M782.72512 327.9104l-242.54464-242.54464a35.84512 35.84512 0 0 0-13.76256-10.7008c-0.22016-0.09728-0.44032-0.2048-0.67072-0.30208a33.97632 33.97632 0 0 0-13.34272-2.73408l-0.08704 0.00512-0.32256-0.01536c-0.09216 0-0.1792 0.01536-0.27136 0.01536-0.09728 0-0.18944-0.01536-0.2816-0.01536a33.7664 33.7664 0 0 0-20.21376 6.66624 35.96288 35.96288 0 0 0-6.79936 6.27712l-243.3536 243.36384c-6.97856 6.97856-10.85952 15.97952-11.0848 25.4208a35.4304 35.4304 0 0 0 9.3696 24.9344l0.512 0.512a34.49344 34.49344 0 0 0 24.01792 9.57952 36.5568 36.5568 0 0 0 26.33728-11.29472L476.16 191.14496v499.99872a35.84 35.84 0 1 0 71.68 0v-499.8144l185.73312 185.73312c6.97856 6.97856 15.97952 10.85952 25.41568 11.0848l0.86016 0.01024c9.1136 0 17.60768-3.43552 24.07936-9.37984l0.512-0.512c13.30176-13.83424 12.76928-36.38272-1.7152-50.3552z"
-                fill="currentColor"></path>
-            </svg>
-          </div>
-          <span class="record-title">{{ record.type === 'deposit' ? '充值' : '提币' }}</span>
+
+          <img class="record-icon" v-if="record.type === 'deposit'" src="@/assets/icon/deposit.png" alt="">
+          <img class="record-icon" v-else src="@/assets/icon/withdraw.png" alt="">
+
+          <span class="record-title">{{ record.type === 'deposit' ? $t('assetManagement.deposit') :
+            $t('assetManagement.withdraw') }}</span>
           <span class="record-amount">{{ formatNumber(record.amount) }}</span>
           <span class="record-unit">{{ record.unit }}</span>
         </div>
@@ -354,7 +347,7 @@ onMounted(() => {
 
     &.deposit-btn {
       background: var(--text-color-y, #BBFF2E);
-      color: #0a0a0a;
+      color: var(--bg-color-010101, #010101);
       box-shadow: 0 4px 12px var(--button-bg-y, rgba(47, 188, 135, 0.2));
 
       &:active {
@@ -363,9 +356,8 @@ onMounted(() => {
     }
 
     &.withdraw-btn {
-      background: var(--text-color-y, #BBFF2E);
-      color: #0a0a0a;
-      box-shadow: 0 4px 12px var(--button-bg-y, rgba(47, 188, 135, 0.2));
+      background: var(--bg-opposite, #FFFFFF);
+      color: var(--bg-color-010101, #444444);
 
       &:active {
         transform: scale(0.98);
@@ -418,9 +410,7 @@ onMounted(() => {
         background: rgba(255, 255, 255, 0.1);
         color: var(--text-color);
 
-        &.deposit {
-          transform: rotate(180deg);
-        }
+
       }
 
       .record-title {
@@ -449,7 +439,7 @@ onMounted(() => {
         font-size: 14px;
 
         &.color-green {
-          color: #2FBC87;
+          color: var(--text-color-y, #BBFF2E);
         }
       }
 

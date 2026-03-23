@@ -213,12 +213,12 @@ const handleBill = () => {
 
     &.deposit-btn {
       background: var(--text-color-y, #BBFF2E);
-      color: #0a0a0a;
+      color: var(--bg-color-010101, #010101);
     }
 
     &.withdraw-btn {
-      background: #FFFFFF;
-      color: #0a0a0a;
+         background: var(--bg-opposite, #FFFFFF);
+      color: var(--bg-color-010101, #010101);
     }
   }
 }
