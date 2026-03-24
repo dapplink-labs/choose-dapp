@@ -136,7 +136,8 @@ export const recharge = () => {
   return request.post('api/v1/user/fiat/deposit', {
     amount: "10000",
     currency_code: "CNY",
-    user_guid: "41f83791b601426896bcb39f45e2fd12"
+    user_guid: "",
+    
   })
 }
 

@@ -656,15 +656,15 @@ const handlePositionWithdraw = async (pos) => {
   const amount = Number.isFinite(amountPicked) && amountPicked > 0 ? String(amountPicked) : null
   const currency_code = raw?.currency_code || raw?.currency || 'USD'
   const user_guid = ''
-  const address = address.value || ''
-  const missing = ['amount', 'currency_code', 'address'].filter((k) => !({ amount, currency_code, address }[k]))
+  const user_address = address.value || ''
+  const missing = ['amount', 'currency_code', 'user_address'].filter((k) => !({ amount, currency_code, user_address }[k]))
   if (missing.length) {
     ElMessage.error(`Withdraw 参数缺失：${missing.join(', ')}`)
     return
   }
 
   try {
-    const res = await fiatWithdraw({ amount, currency_code, user_guid, address })
+    const res = await fiatWithdraw({ amount, currency_code, user_guid, user_address })
     if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Withdraw failed')
     ElMessage.success(res?.data?.message || 'Withdraw success')
     await Promise.allSettled([fetchPositions(), fetchOpenOrders(), fetchOrderHistory()])
@@ -706,7 +706,7 @@ const fetchPositions = async () => {
     const languageLabel = currentLocale.split('-')[0]
     const res = await getUserPositions({
       user_guid: "",
-      address: address.value || '',
+      user_address: address.value || '',
       status: 'holding',
       page: 1,
       page_size: 2000,
@@ -732,7 +732,7 @@ const fetchOpenOrders = async () => {
   try {
     const res = await getOpenOrders({
       user_guid: "",
-      address: address.value || '',
+      user_address: address.value || '',
       page: 1,
       page_size: 20,
       event_guid: currentEventGuid.value,
@@ -758,7 +758,7 @@ const fetchOrderHistory = async () => {
   try {
     const res = await getOrderHistory({
       user_guid: "",
-      address: address.value || '',
+      user_address: address.value || '',
       page: 1,
       page_size: 20,
       status: '',

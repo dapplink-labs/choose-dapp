@@ -600,7 +600,7 @@ const fetchEventList = async (append = false) => {
         let res;
         if (activeTag.value === 'favorite') {
             params.user_guid = '';
-            params.address = address.value || '';
+            params.user_address = address.value || '';
             res = await getFavoriteList(params);
         } else {
             res = await getEventList(params);
@@ -727,7 +727,7 @@ const toggleFavorite = async (item) => {
     try {
         const res = await toggleFavoriteEvent({
             user_guid: '',
-            address: address.value || '',
+            user_address: address.value || '',
             event_guid: item.id
         });
 

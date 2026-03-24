@@ -162,19 +162,19 @@ const fetchFundsHistory = async () => {
   if (!address.value) return
 
   try {
-    const res = await getFundsHistory({ address: address.value, page: 1, limit: 2 })
+    const res = await getFundsHistory({ user_address: address.value, page: 1, page_size: 2, type: 'all' })
     const list = res?.data?.data?.list || res?.data?.data || []
-    
+
     // 只取最新的两条记录
     const records = (Array.isArray(list) ? list : []).slice(0, 2)
-    
+
     recentRecords.value = records.map(item => {
       const isDeposit = item.type === 'deposit' || String(item.type) === '1'
       const typeStr = isDeposit ? 'deposit' : 'withdraw'
-      
+
       let statusText = '处理中'
       let statusColor = 'color-yellow'
-      
+
       const statusStr = String(item.status).toLowerCase()
       if (statusStr === '1' || statusStr === 'success' || statusStr === 'completed') {
         statusText = '已完成'
@@ -498,11 +498,15 @@ watch(() => address.value, () => {
         &.color-green {
           color: var(--text-color-y, #BBFF2E);
         }
+
         &.color-yellow {
-          color: #FFB020; /* 待处理颜色 */
+          color: #FFB020;
+          /* 待处理颜色 */
         }
+
         &.color-red {
-          color: #FF3B30; /* 失败颜色 */
+          color: #FF3B30;
+          /* 失败颜色 */
         }
       }
 
