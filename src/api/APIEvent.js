@@ -131,15 +131,6 @@ export const getOrderHistory = (data) => {
   return request.post('/api/v1/order/history', data)
 }
 
-// 充值
-export const recharge = (address) => {
-  return request.post('api/v1/user/fiat/deposit', {
-    amount: "100000",
-    currency_code: "CNY",
-    user_address: address,
-  })
-}
-
 // 获取账单/资金流水（充值+提现）
 export const getFundsHistory = (data) => {
   return request.post('/api/v1/user/funds-history', data)
