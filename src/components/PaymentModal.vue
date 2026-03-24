@@ -180,8 +180,12 @@
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Wallet } from '@element-plus/icons-vue'
+import { useAccount } from '@wagmi/vue'
 import { getUserBalances, previewBuyOrder, previewSellOrder, makeOrder } from '@/api/APIEvent'
 import { ElMessage } from 'element-plus'
+
+
+const { address } = useAccount()
 
 const { t } = useI18n()
 
@@ -340,8 +344,8 @@ function triggerPreview() {
 async function fetchBalance() {
     balanceLoading.value = true
     try {
-        const userGuid = window.sessionStorage.getItem('user_guid') || ''
-        const res = await getUserBalances({ user_guid: userGuid })
+    
+        const res = await getUserBalances({ address: address.value })
         const data = res?.data?.data
         if (data) {
             userBalance.value = data.cash || data.portfolio || '0.00'

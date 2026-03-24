@@ -3,31 +3,11 @@
     <BackHeaderNav :title="$t('deposit.title')" />
 
     <div class="main-content">
-      <!-- QR 码区域 -->
-      <div class="qr-section">
-        <div class="qr-wrap">
-          <img :src="qrCodeUrl" alt="Deposit QR" class="qr-image" />
-        </div>
-        <div class="min-deposit-tip">
-          <span class="tip-label">{{ $t('deposit.minAmountLabel') }}</span>
-          <span class="tip-value">{{ minAmount }} {{ selectedCurrency }}</span>
-        </div>
-      </div>
-
-      <!-- 存款地址 -->
-      <div class="form-group">
-        <label class="form-label">{{ $t('deposit.yourAddress') }}</label>
-        <div class="address-wrap">
-          <span class="address-text">{{ displayAddress }}</span>
-          <button class="copy-btn" @click="copyAddress">{{ $t('deposit.copy') }}</button>
-        </div>
-      </div>
-
       <!-- 选择币种 -->
       <div class="form-group">
         <label class="form-label">{{ $t('deposit.selectCurrency') }}</label>
         <div class="input-wrap select-wrap" @click="showCurrencyPicker = true">
-          <span class="input-value">{{ selectedCurrency }}</span>
+          <span class="input-value">{{ selectedCurrency?.asset_symbol || 'Select Currency' }}</span>
           <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round" />
@@ -43,6 +23,26 @@
         </div>
       </div>
 
+      <!-- 充币数量 -->
+      <div class="form-group">
+        <label class="form-label">{{ $t('deposit.amountLabel') }}</label>
+        <div class="input-wrap amount-wrap">
+          <input type="number" v-model="amount" placeholder="0.00" class="amount-input" @input="handleAmountInput" />
+          <span class="currency-suffix">{{ selectedCurrency?.asset_symbol }}</span>
+        </div>
+        <div class="min-deposit-tip">
+          <span class="tip-label">{{ $t('deposit.minAmountLabel') }}</span>
+          <span class="tip-value">{{ minAmount }} {{ selectedCurrency?.asset_symbol }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 底部按钮 -->
+    <div class="bottom-action">
+      <button class="submit-btn" @click="handleDeposit">
+        {{ $t('deposit.confirmBtn') }}
+      </button>
     </div>
 
     <!-- 币种选择弹窗 -->
@@ -53,9 +53,10 @@
           <span class="picker-close" @click="showCurrencyPicker = false">×</span>
         </div>
         <div class="picker-list">
-          <div v-for="currency in currencyList" :key="currency" class="picker-item"
-            :class="{ active: selectedCurrency === currency }" @click="selectCurrency(currency)">
-            {{ currency }}
+          <div v-for="currency in currencyList" :key="currency.asset_address" class="picker-item"
+            :class="{ active: selectedCurrency?.asset_address === currency.asset_address }"
+            @click="selectCurrency(currency)">
+            {{ currency.asset_symbol }}
           </div>
         </div>
       </div>
@@ -64,53 +65,71 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAccount } from '@wagmi/vue'
 import { useI18n } from 'vue-i18n'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
+import { getAssetList } from '@/api/APIEvent'
+import { ElLoading } from 'element-plus'
 import Message from '@/utils/message'
-import QRCode from 'qrcode'
+import { useChainId, useAccount } from '@wagmi/vue'
+import { switchChain } from '@wagmi/core'
+import { parseUnits } from 'viem'
+import { config } from '../../wagmi.ts'
+import networks from '@/assets/json/networks.js'
+import fundingPodABI from '@/assets/abi/fundingPodABI.json'
+import {
+  getUserTokenBalance,
+  approveToken,
+  checkAllowance,
+  writeContractOptimized
+} from '@/utils/requestWEB3.js'
 
 const router = useRouter()
 const { t } = useI18n()
+
+const chainId = useChainId()
 const { address } = useAccount()
 
-const depositAddress = computed(() => address.value || '0x0d766a37A0E60f75A9bDFEfA3EDFd12D372a5b85')
-const selectedCurrency = ref('USDT')
-const selectedNetwork = ref('BNB Smart Chain(BEP20)')
+const selectedCurrency = ref(null)
+const selectedNetwork = computed(() => {
+  if (!selectedCurrency.value) return 'BNB Smart Chain(BEP20)'
+  const targetChainId = Number(selectedCurrency.value.chain_id)
+  const net = networks.find(n => Number(n.chainId) === targetChainId)
+  return net ? net.name : 'Unknown Network'
+})
+const amount = ref('')
 const minAmount = ref('0.01')
 const showCurrencyPicker = ref(false)
-const qrCodeUrl = ref('')
 
-const currencyList = ['USDT', 'CHO']
+const currencyList = ref([])
 
-const displayAddress = computed(() => {
-  return depositAddress.value
-})
-
-const copyAddress = async () => {
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(depositAddress.value)
-      Message.success(t('common.copied'))
-      return
+const handleAmountInput = (e) => {
+  let val = e.target.value
+  // 如果包含小数点
+  if (val.includes('.')) {
+    let parts = val.split('.')
+    // 限制只能有一个小数点，且小数部分最多2位
+    if (parts[1].length > 2) {
+      parts[1] = parts[1].slice(0, 2)
+      val = parts.join('.')
+      amount.value = val
     }
-  } catch (e) {
-    // ignore
   }
+}
+
+const fetchAssets = async () => {
   try {
-    const textarea = document.createElement('textarea')
-    textarea.value = depositAddress.value
-    textarea.style.position = 'fixed'
-    textarea.style.opacity = '0'
-    document.body.appendChild(textarea)
-    textarea.select()
-    const ok = document.execCommand('copy')
-    document.body.removeChild(textarea)
-    if (ok) Message.success(t('common.copied'))
-  } catch (e) {
-    // ignore
+    const res = await getAssetList({})
+    const { data } = res
+    if (data.code === 2000) {
+      currencyList.value = data?.data?.filter(item => item.is_active) || []
+      if (currencyList.value.length > 0) {
+        selectedCurrency.value = currencyList.value[0]
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch asset list:', error)
   }
 }
 
@@ -119,23 +138,133 @@ const selectCurrency = (currency) => {
   showCurrencyPicker.value = false
 }
 
-const generateQR = async () => {
-  if (!depositAddress.value) return
+const handleDeposit = async () => {
+
+  const loading = ElLoading.service({
+    lock: true,
+    text: 'Processing...',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
   try {
-    qrCodeUrl.value = await QRCode.toDataURL(depositAddress.value, {
-      width: 200,
-      margin: 2,
-      color: { dark: '#000000', light: '#ffffff' }
+    if (!address.value) {
+      Message.error(t('lpVault.connectWalletFirst') || 'Please connect wallet first')
+      return
+    }
+
+    if (!selectedCurrency.value) {
+      Message.error('Please select a currency')
+      return
+    }
+
+    const depositAmount = parseFloat(amount.value) || 0
+    if (depositAmount <= 0) {
+      Message.error('Please enter a valid amount')
+      return
+    }
+
+    const targetChainId = Number(selectedCurrency.value.chain_id)
+    const tokenAddress = selectedCurrency.value.asset_address
+    const tokenDecimals = selectedCurrency.value.asset_decimal
+
+    console.log('Number(chainId.value) !== targetChainId', chainId.value, targetChainId)
+    // 1. Check network
+    if (Number(chainId.value) !== targetChainId) {
+      try {
+        await switchChain(config, { chainId: targetChainId })
+        await new Promise((r) => setTimeout(r, 1000))
+      } catch (switchError) {
+        console.error('Failed to switch chain:', switchError)
+        loading.close()
+        return
+      }
+    }
+
+    const netConfig = networks.find((n) => Number(n.chainId) === targetChainId)
+    // Using proxyEventFundingManager as the funding manager
+    const proxyFundingManager = netConfig?.proxyFundingPod
+
+    if (!proxyFundingManager) {
+      Message.error('Contract address not found for this network')
+      return
+    }
+
+    const amountBigInt = parseUnits(String(depositAmount), tokenDecimals)
+
+    // Check Balance
+    const userBalance = await getUserTokenBalance(
+      tokenAddress,
+      address.value,
+      "balanceOf"
+    )
+
+    if (userBalance < amountBigInt) {
+      Message.error('Insufficient balance')
+      return
+    }
+
+    // Native token check (usually 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE or similar)
+    const isNative = tokenAddress.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
+
+    // Check Allowance if not native token
+    if (!isNative) {
+      const allowance = await checkAllowance(
+        tokenAddress,
+        address.value,
+        proxyFundingManager
+      )
+
+      if (allowance === BigInt(0) || allowance < amountBigInt) {
+        loading.text = 'Requesting Approval...'
+        try {
+          await approveToken({
+            tokenAddress: tokenAddress,
+            spenderAddress: proxyFundingManager,
+            amount: amountBigInt,
+            userAddress: address.value,
+            BRIDGE_MESSAGES: {
+              approvalSuccess: 'Approval Success',
+              userCancelledAuth: 'User Cancelled',
+              approveTokenFailed: 'Approval Failed',
+            },
+          })
+        } catch (approveError) {
+          loading.close()
+          return
+        }
+      }
+    }
+
+    loading.text = 'Depositing...'
+    // Call contract deposit
+    const result = await writeContractOptimized({
+      abi: fundingPodABI,
+      address: proxyFundingManager,
+      functionName: "deposit",
+      args: [tokenAddress, amountBigInt],
+      userAddress: address.value,
+      value: isNative ? amountBigInt : parseUnits("0", 18),
+      messages: {
+        success: 'Deposit Success',
+        failed: 'Deposit Failed',
+        rejected: 'Deposit Cancelled',
+      },
     })
-  } catch (e) {
-    console.error('QR generate failed:', e)
-    qrCodeUrl.value = ''
+
+    if (result && result.hash) {
+      amount.value = ''
+      Message.success('Deposit successful!')
+    }
+
+  } catch (error) {
+    console.error('Deposit error:', error)
+  } finally {
+    loading.close()
   }
 }
 
-watch(depositAddress, generateQR, { immediate: true })
-
-// 已完成充值按钮逻辑已下线，保留页面展示与地址复制功能
+onMounted(() => {
+  fetchAssets()
+})
 </script>
 
 <style scoped lang="scss">
@@ -145,6 +274,7 @@ watch(depositAddress, generateQR, { immediate: true })
   background-color: var(--bg-page-h5);
   color: var(--text-color);
   padding-top: 60px;
+  padding-bottom: 100px;
   box-sizing: border-box;
 }
 
@@ -152,89 +282,23 @@ watch(depositAddress, generateQR, { immediate: true })
   padding: 24px 16px;
 }
 
-.qr-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 32px;
-}
-
-.qr-wrap {
-  border-radius: 12px;
-  overflow: hidden;
-  display: inline-block;
-  padding: 8px;
-  border: 1px solid var(--border-color);
-}
-
-.qr-image {
-  display: block;
-  width: 128px;
-  height: 128px;
-  border-radius: 12px;
-}
-
-.min-deposit-tip {
-  margin-top: 16px;
-  font-size: 14px;
-
-  .tip-label {
-    color: var(--text-color);
-  }
-
-  .tip-value {
-    color: var(--text-dark-gray, #909090);
-  }
-}
-
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 
   .form-label {
     display: block;
     font-family: PingFang SC, PingFang SC;
     font-weight: 600;
     font-size: 14px;
-    color: var(--text-dark-gray);
-    margin-bottom: 15px;
-  }
-
-  .address-wrap {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border: 1px solid var(--border-color, #23262f);
-    border-radius: 12px;
-    padding: 14px 16px;
-
-    .address-text {
-      flex: 1;
-      font-size: 16px;
-      color: var(--text-color);
-      word-break: break-all;
-      white-space: pre-line;
-    }
-
-    .copy-btn {
-      flex-shrink: 0;
-      padding: 8px 16px;
-      background: var(--border-color, #23262f);
-      border-radius: 8px;
-      font-size: 14px;
-      color: var(--text-color);
-      border: none;
-      cursor: pointer;
-
-      &:active {
-        opacity: 0.8;
-      }
-    }
+    color: var(--text-dark-gray, #909090);
+    margin-bottom: 12px;
   }
 
   .input-wrap {
     border: 1px solid var(--border-color, #23262f);
     border-radius: 12px;
     padding: 14px 16px;
+    background: transparent;
 
     &.select-wrap {
       display: flex;
@@ -243,15 +307,91 @@ watch(depositAddress, generateQR, { immediate: true })
       cursor: pointer;
     }
 
+    &.amount-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .amount-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--text-color);
+        font-size: 16px;
+        width: 100%;
+
+        &::placeholder {
+          color: var(--text-dark-gray, #909090);
+        }
+
+        /* Hide spin buttons for input type number */
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+
+        -moz-appearance: textfield;
+      }
+
+      .currency-suffix {
+        font-size: 16px;
+        color: var(--text-color);
+        margin-left: 8px;
+        font-weight: 500;
+      }
+    }
+
     .input-value {
       font-size: 16px;
       color: var(--text-color);
+      font-weight: bold;
     }
 
     .arrow-icon {
       width: 20px;
       height: 20px;
       color: var(--text-dark-gray, #909090);
+    }
+  }
+
+  .min-deposit-tip {
+    margin-top: 10px;
+    font-size: 12px;
+    text-align: right;
+
+    .tip-label {
+      color: var(--text-dark-gray, #909090);
+    }
+
+    .tip-value {
+      color: var(--text-dark-gray, #909090);
+    }
+  }
+}
+
+.bottom-action {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 16px 34px;
+  background: var(--bg-page-h5);
+
+  .submit-btn {
+    width: 100%;
+    height: 50px;
+    background: var(--text-color-y, #BBFF2E);
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: #000000;
+    cursor: pointer;
+
+    &:active {
+      opacity: 0.8;
     }
   }
 }

@@ -82,7 +82,8 @@
                                     </g>
                                 </svg>
                             </div>
-                            <div class="action-btn bookmark-btn" :class="{ active: activeTag === 'favorite' }" @click="handleBookmark">
+                            <div class="action-btn bookmark-btn" :class="{ active: activeTag === 'favorite' }"
+                                @click="handleBookmark">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                                     <g transform="translate(-336 -358)">
                                         <g transform="translate(340 361)">
@@ -106,7 +107,7 @@
                                 <div class="filter-select-wrapper">
                                     <button class="filter-select-btn" @click.stop="toggleSortDropdown">
                                         <div class="filter-label">
-                                            <span>{{ $t('home.sortBy') || 'Sort' }}:</span> 
+                                            <span>{{ $t('home.sortBy') || 'Sort' }}:</span>
                                             <span class="label-value">{{ currentSortLabel }}</span>
                                         </div>
                                         <el-icon class="filter-arrow" :class="{ rotate: showSortList }">
@@ -114,8 +115,8 @@
                                         </el-icon>
                                     </button>
                                     <div v-if="showSortList" class="custom-dropdown-list">
-                                        <div v-for="opt in sortOptions" :key="opt.value" 
-                                            class="dropdown-item" :class="{ active: selectedSort === opt.value }"
+                                        <div v-for="opt in sortOptions" :key="opt.value" class="dropdown-item"
+                                            :class="{ active: selectedSort === opt.value }"
                                             @click="handleSortChange(opt.value)">
                                             {{ opt.label }}
                                         </div>
@@ -133,8 +134,8 @@
                                         </el-icon>
                                     </button>
                                     <div v-if="showFrequencyList" class="custom-dropdown-list">
-                                        <div v-for="opt in frequencyOptions" :key="opt.value" 
-                                            class="dropdown-item" :class="{ active: selectedFrequency === opt.value }"
+                                        <div v-for="opt in frequencyOptions" :key="opt.value" class="dropdown-item"
+                                            :class="{ active: selectedFrequency === opt.value }"
                                             @click="handleFrequencyChange(opt.value)">
                                             {{ opt.label }}
                                         </div>
@@ -215,7 +216,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -281,7 +282,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -298,8 +299,11 @@
                         <!-- 上拉加载：触底哨兵 + 底部状态 -->
                         <div ref="loadMoreSentinel" class="load-more-sentinel" aria-hidden="true"></div>
                         <div class="load-more-footer">
-                            <span v-if="loadingMore" class="load-more-text">{{ $t('home.loadingMore') || '加载中...' }}</span>
-                            <span v-else-if="cardList.length && !hasMore" class="load-more-text">{{ $t('home.noMore') || '没有更多了' }}</span>
+                            <span v-if="loadingMore" class="load-more-text">{{ $t('home.loadingMore') || '加载中...'
+                                }}</span>
+                            <span v-else-if="cardList.length && !hasMore" class="load-more-text">{{ $t('home.noMore') ||
+                                '没有更多了'
+                                }}</span>
                         </div>
                     </div>
                 </div>
@@ -329,7 +333,7 @@ import banner4Img from "@/assets/images/banner4.png";
 import fallbackListImg from "@/assets/icon/LP1.png";
 import NotificationModal from '@/components/NotificationModal.vue';
 import { getNoticeData } from "@/api/API";
-import { getHomeBanner, getEcosystemList, getEventList, getFavoriteList, toggleFavoriteEvent, getPeriodList } from "@/api/APIEvent";
+import { getHomeBanner, getEcosystemList, getCategoryList, getEventList, getFavoriteList, toggleFavoriteEvent, getPeriodList } from "@/api/APIEvent";
 import { useAccount } from "@wagmi/vue";
 import { ElMessage } from 'element-plus';
 
@@ -355,6 +359,14 @@ async function getNotice() {
         showNotice.value = true;
     }
 }
+// 获取分类列表数据
+const categoryList = ref([]);
+async function getCategoryListData() {
+    const response = await getCategoryList({ language_label: language });
+    const data = response?.data?.data?.categories || [];
+    console.log("分类列表数据：", data);
+    categoryList.value = [...data]
+}
 // 获取生态列表（用于后续标签筛选）通过分类ID查询生态列表
 const ecosystemList = ref([]);
 async function getEcosystemListData(categoryId) {
@@ -364,7 +376,7 @@ async function getEcosystemListData(categoryId) {
     }
     const response = await getEcosystemList({ language_label: language, category_guid: categoryId });
     const data = response?.data?.data?.ecosystems || [];
-    console.log("分类列表数据：", data);
+    console.log("生态列表数据：", data);
     ecosystemList.value = data.map(item => ({
         label: item.name,
         value: item.ecosystem_guid
@@ -581,18 +593,19 @@ const fetchEventList = async (append = false) => {
         if (searchQuery.value) params.title = searchQuery.value;
         if (selectedFrequency.value && selectedFrequency.value !== 'all') params.event_period_guid = selectedFrequency.value;
         if (selectedSort.value) params.sort_by = selectedSort.value === 'hot' ? 'trade_volume' : 'open_time';
-        
+
         const eventType = getEventTypeFromNav(query.nav);
         if (eventType !== undefined) params.event_type = eventType;
 
         let res;
         if (activeTag.value === 'favorite') {
-            params.user_guid = address.value;
+            params.user_guid = '';
+            params.address = address.value || '';
             res = await getFavoriteList(params);
         } else {
             res = await getEventList(params);
         }
-        
+
         const data = res?.data?.data || {};
         const list = data.events || [];
         const totalPages = data.total_pages ?? 1;
@@ -619,8 +632,11 @@ let loadMoreObserver = null;
 
 // 跳转到详情页面
 const navigateToDetail = (item, choice) => {
+    // electronic:电子竞技,crypto:加密货币,sports:体育事件
+    const categoryCode = categoryList.value.find(c => c.guid === item.category_guid)?.code || '';
+    console.log('categoryCode:', categoryCode);
     // 1. 体育事件：进入体育详情页
-    if (item?.isSports) {
+    if (categoryCode === 'sports') {
         router.push({
             path: '/sports-detail-h5',
             query: {
@@ -631,7 +647,7 @@ const navigateToDetail = (item, choice) => {
     }
 
     // 2. 加密货币场景：进入加密货币详情页
-    if (route.query.nav === 'crypto' || route.query.nav === 'crypto-chinese') {
+    if (categoryCode === 'crypto') {
         router.push({
             path: '/bitcoin-up-down',
             query: {
@@ -707,17 +723,18 @@ const toggleFavorite = async (item) => {
         ElMessage.warning(t('pleaseConnectWallet') || 'Please connect wallet');
         return;
     }
-    
+
     try {
         const res = await toggleFavoriteEvent({
-            user_guid: address.value,
+            user_guid: '',
+            address: address.value || '',
             event_guid: item.id
         });
-        
+
         if (res.code === 200 || res.code === 0) {
             item.isFavorite = !item.isFavorite;
             ElMessage.success(item.isFavorite ? t('favoriteSuccess') || 'Favorite success' : t('unfavoriteSuccess') || 'Unfavorite success');
-            
+
             // 如果是在收藏列表中取消收藏，则移除该项
             if (activeTag.value === 'favorite' && !item.isFavorite) {
                 cardList.value = cardList.value.filter(card => card.id !== item.id);
@@ -764,6 +781,7 @@ watch(
 // 页面数据初始化
 onMounted(async () => {
     getNotice();
+    getCategoryListData();
     getHomeBannerList();
     countdownTimer = setInterval(() => {
         now.value = Date.now();
@@ -1068,7 +1086,7 @@ $gradient-mask-right: linear-gradient(to right,
                         white-space: nowrap;
                         flex: 1;
                         gap: 4px;
-                        
+
                         span {
                             flex-shrink: 0;
                         }
@@ -1086,7 +1104,7 @@ $gradient-mask-right: linear-gradient(to right,
                         transition: transform 0.2s;
                         flex-shrink: 0;
                         margin-left: 4px;
-                        
+
                         &.rotate {
                             transform: rotate(180deg);
                         }
@@ -1168,6 +1186,7 @@ $gradient-mask-right: linear-gradient(to right,
             .load-more-footer {
                 padding: 16px 0 24px;
                 text-align: center;
+
                 .load-more-text {
                     font-size: 12px;
                     color: var(--text-gray, #999);

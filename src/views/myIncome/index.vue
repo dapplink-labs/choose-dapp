@@ -45,20 +45,28 @@
         <div class="item">
           <b>{{ $t("myIncome.myIncomeCMT") }}</b>
           <p>+{{ formatAmount(currentNodeStakingInfo?.total_reward) }}</p>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.total_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myNode.projectedReturns") }}</b>
           <p>
             +{{ formatAmount(currentNodeStakingInfo?.total_prediction_reward) }}
           </p>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.total_prediction_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myIncome.networkIncomeCMT") }}</b>
           <p>+{{ formatAmount(currentNodeStakingInfo?.network_reward) }}</p>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.network_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myIncome.computingPowerIncomeCMT") }}</b>
           <p>+{{ formatAmount(currentNodeStakingInfo?.hashrate_reward) }}</p>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.hashrate_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="item">
           <b>{{ $t("myIncome.forecastFlowBonusUSDT") }}</b>
@@ -75,23 +83,15 @@
       <!-- 赚取收益提示模块：使用通用跑马灯组件（type=3 展示收益样式） -->
       <!-- <ActivationMarquee :type="4" /> -->
 
-      <div class="pending-income-header">
-        <h3 class="pending-title">{{ $t("myIncome.pendingIncome") }}</h3>
-        <button class="record-link" type="button" @click="goToClaimRecord">
-          <span class="record-text">{{ $t("myIncome.claimRecord") }}</span>
-          <el-icon class="record-arrow">
-            <ArrowRightBold />
-          </el-icon>
-        </button>
-      </div>
+
 
       <div class="processDiv">
         <div class="progress-bar-container">
           <div class="progress-bar" ref="progressBarRef">
             <div class="progress-fill" :style="{
               width: (currentNodeStakingInfo?.progressPercent || 0) < 4
-                ? currentNodeStakingInfo?.progressPercent + '%'
-                : '4%',
+                ? '4%'
+                : currentNodeStakingInfo?.progressPercent + '%',
             }"></div>
             <div class="progress-indicator" ref="progressIndicatorRef" :style="{ left: progressIndicatorLeft }"
               :class="{ 'progress-indicator-left': (currentNodeStakingInfo?.progressPercent || 0) < 20, 'progress-indicator-right': (currentNodeStakingInfo?.progressPercent || 0) >= 90 }">
@@ -119,13 +119,23 @@
           </span>
         </div>
       </div>
-
+      <div class="pending-income-header">
+        <h3 class="pending-title">{{ $t("myIncome.pendingIncome") }}</h3>
+        <button class="record-link" type="button" @click="goToClaimRecord">
+          <span class="record-text">{{ $t("myIncome.claimRecord") }}</span>
+          <el-icon class="record-arrow">
+            <ArrowRightBold />
+          </el-icon>
+        </button>
+      </div>
       <div class="earnings-grid">
         <div class="earnings-item">
           <div class="earnings-label">{{ $t("myIncome.staticIncomeCHO") }}</div>
           <div class="earnings-value">
             {{ formatAmount(currentNodeStakingInfo?.static_reward) }}
           </div>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.static_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="earnings-item">
           <div class="earnings-label">
@@ -134,12 +144,16 @@
           <div class="earnings-value">
             {{ formatAmount(currentNodeStakingInfo?.direct_reward) }}
           </div>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.direct_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="earnings-item">
           <div class="earnings-label">{{ $t("myIncome.teamIncomeCHO") }}</div>
           <div class="earnings-value">
             {{ formatAmount(currentNodeStakingInfo?.team_reward) }}
           </div>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.team_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <!-- 创世节点 5% 收益：仅当当前节点为创世节点（例如 T6）时显示 -->
         <div class="earnings-item" v-if="currentNodeStakingInfo?.node_level === 'T6'">
@@ -149,6 +163,8 @@
           <div class="earnings-value">
             {{ formatAmount(currentNodeStakingInfo?.creation_reward) }}
           </div>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.creation_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <!-- 超级节点收益：仅当当前节点为超级节点（例如 T5）时显示 -->
         <div class="earnings-item" v-if="currentNodeStakingInfo?.node_level === 'T5'">
@@ -158,6 +174,8 @@
           <div class="earnings-value">
             {{ formatAmount(currentNodeStakingInfo?.super_node_reward) }}
           </div>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.super_node_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="earnings-item">
           <div class="earnings-label">
@@ -166,10 +184,12 @@
           <div class="earnings-value">
             {{ formatAmount(currentNodeStakingInfo?.lateral_reward) }}
           </div>
+          <span class="currey">≈{{ formatAmount(currentNodeStakingInfo?.lateral_reward *
+            currentNodeStakingInfo?.cho2usdt_rate) }} USDT</span>
         </div>
         <div class="earnings-item">
           <div class="earnings-label">
-            {{ $t("myIncome.flowBonusIncomeCHO") }}
+            {{ $t("myIncome.flowBonusIncomeUSDT") }}
           </div>
           <div class="earnings-value">
             {{
@@ -508,10 +528,10 @@ const progressIndicatorLeft = computed(() => {
   // Use reactive widths
   const width = indicatorWidth.value;
   const progressBarWidth = barWidth.value;
-  
+
   if (p <= 20) return `${p}%`;
   if (!progressBarWidth) return `${p}%`;
-  
+
   if (p >= 90) return `${p - ((width / progressBarWidth) * 100).toFixed(0)}%`;
   return `${p - Math.max(0, (width / progressBarWidth) * 100 / 2).toFixed(0)}%`;
 });
@@ -580,6 +600,7 @@ const fetchNodeStakingInfo = async () => {
   data.id = currentNodeStakingInfo.value.id;
   data.name = t(nodeTypeMap[data.node_level]?.nodeNameKey || "");
   currentNodeStakingInfo.value = data;
+  currentNodeStakingInfo.value.produced_income = currentNodeStakingInfo?.produced_income > currentNodeStakingInfo.value.forecast_income ? currentNodeStakingInfo.value.forecast_income : currentNodeStakingInfo?.produced_income
   // 返回两个字段 已发放奖励  总奖励  计算百分比
   currentNodeStakingInfo.value.progressPercent =
     (1 - (currentNodeStakingInfo.value.produced_income /
@@ -676,6 +697,11 @@ watch(activeTab, () => {
   .progress-bar {
     background: #2f2f2f !important;
   }
+}
+
+.currey {
+  font-size: 12px;
+  color: var(--text-color-secondary, #999);
 }
 
 .myIncome {
@@ -1057,8 +1083,13 @@ watch(activeTab, () => {
         word-break: break-all;
         overflow-wrap: anywhere;
       }
+
+
+
     }
   }
+
+
 
   .my-team {
     margin-top: 40px;
