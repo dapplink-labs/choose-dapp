@@ -342,6 +342,17 @@ export default {
     "listEmpty": "イベントがありません",
     "loadingMore": "読み込み中...",
     "noMore": "これ以上ありません",
+    "sortBy": "並び替え",
+    "frequency": "頻度",
+    "latest": "最新",
+    "hot": "人気",
+    "sortAll": "すべて",
+    "sortOpenTime": "開始時間",
+    "sortTradeVolume": "取引量",
+    "allFrequency": "すべての頻度",
+    "daily": "毎日",
+    "weekly": "毎週",
+    "monthly": "毎月",
     "dateFilter": {
       "all": "すべて",
       "allDates": "すべての日付",
@@ -1096,5 +1107,8 @@ export default {
     "sports": "スポーツ",
     "politics": "政治",
     "science": "科学"
-  }
+  },
+  "favoriteSuccess": "お気に入りに追加しました",
+  "unfavoriteSuccess": "お気に入りから削除しました",
+  "operateFailed": "操作に失敗しました"
 };

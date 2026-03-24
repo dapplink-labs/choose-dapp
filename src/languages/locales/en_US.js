@@ -346,6 +346,9 @@ export default {
     frequency: "Frequency",
     latest: "Latest",
     hot: "Hot",
+    sortAll: "All",
+    sortOpenTime: "Open time",
+    sortTradeVolume: "Trade volume",
     allFrequency: "All Frequencies",
     daily: "Daily",
     weekly: "Weekly",
@@ -1118,5 +1121,8 @@ export default {
     "sports": "Sports",
     "politics": "Politics",
     "science": "Science"
-  }
+  },
+  "favoriteSuccess": "Added to favorites",
+  "unfavoriteSuccess": "Removed from favorites",
+  "operateFailed": "Operation failed"
 };

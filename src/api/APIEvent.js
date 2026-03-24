@@ -132,12 +132,11 @@ export const getOrderHistory = (data) => {
 }
 
 // 充值
-export const recharge = () => {
+export const recharge = (address) => {
   return request.post('api/v1/user/fiat/deposit', {
-    amount: "10000",
+    amount: "100000",
     currency_code: "CNY",
-    user_guid: "",
-    
+    user_address: address,
   })
 }
 

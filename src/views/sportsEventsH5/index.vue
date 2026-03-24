@@ -305,8 +305,10 @@ import NavBar2 from '@/components/navBar2.vue'
 import PaymentModal from '@/components/PaymentModal.vue'
 import LeagueSelector from './LeagueSelector.vue'
 import { getCategoryList, getEventList } from '@/api/APIEvent'
+import { useAccount } from '@wagmi/vue'
 
 const { t, locale } = useI18n()
+const { address } = useAccount()
 const router = useRouter()
 const route = useRoute()
 const activeCategory = ref('nba')
@@ -570,6 +572,7 @@ const fetchSportsEvents = async () => {
         const baseParams = {
             language_label: lang,
             include_sub_events: true,
+            user_address: address.value || '',
             page: 1,
             page_size: 20,
             category_guid: categoryGuid

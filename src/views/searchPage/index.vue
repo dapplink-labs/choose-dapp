@@ -116,9 +116,11 @@ import si3 from '@/assets/images/searchIcon03.png'
 import si4 from '@/assets/images/searchIcon04.png'
 import { getEventList } from '@/api/APIEvent'
 import fallbackListImg from '@/assets/images/searchIcon01.png'
+import { useAccount } from '@wagmi/vue'
 
 const router = useRouter()
 const { t, locale } = useI18n()
+const { address } = useAccount()
 
 // 搜索关键词
 const searchQuery = ref('')
@@ -165,6 +167,7 @@ const handleSearch = async () => {
                      
         const params = {
             language_label: lang,
+            user_address: address.value || '',
             search_key: query,
             page: 1,
             page_size: 50
@@ -210,6 +213,7 @@ const handleBrowseClick = async (item) => {
                      
         const params = {
             language_label: lang,
+            user_address: address.value || '',
             page: 1,
             page_size: 50
         }
@@ -257,6 +261,7 @@ const handleThemeClick = async (theme) => {
                      
         const params = {
             language_label: lang,
+            user_address: address.value || '',
             page: 1,
             page_size: 50
         }

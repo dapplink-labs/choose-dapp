@@ -349,6 +349,17 @@ export default {
     listEmpty: "이벤트가 없습니다",
     loadingMore: "로딩 중...",
     noMore: "더 이상 없습니다",
+    sortBy: "정렬",
+    frequency: "빈도",
+    latest: "최신",
+    hot: "인기",
+    sortAll: "전체",
+    sortOpenTime: "오픈 시간",
+    sortTradeVolume: "거래량",
+    allFrequency: "전체 빈도",
+    daily: "매일",
+    weekly: "매주",
+    monthly: "매월",
     dateFilter: {
       all: "전체",
       allDates: "모든 날짜",
@@ -1093,5 +1104,8 @@ export default {
     "sports": "스포츠",
     "politics": "정치",
     "science": "과학"
-  }
+  },
+  "favoriteSuccess": "즐겨찾기에 추가되었습니다",
+  "unfavoriteSuccess": "즐겨찾기에서 삭제되었습니다",
+  "operateFailed": "작업에 실패했습니다"
 };

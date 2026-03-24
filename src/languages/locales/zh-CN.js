@@ -341,6 +341,9 @@ export default {
     "frequency": "频率",
     "latest": "最新",
     "hot": "最热",
+    "sortAll": "全部",
+    "sortOpenTime": "开盘时间",
+    "sortTradeVolume": "交易量",
     "allFrequency": "全部频率",
     "daily": "每日",
     "weekly": "每周",
@@ -1106,5 +1109,8 @@ export default {
     "sports": "体育",
     "politics": "政治",
     "science": "科学"
-  }
+  },
+  "favoriteSuccess": "收藏成功",
+  "unfavoriteSuccess": "已取消收藏",
+  "operateFailed": "操作失败"
 };
