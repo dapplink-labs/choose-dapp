@@ -723,7 +723,7 @@ async function init() {
       directed_number.value = data.directed_number ?? 0;
       target_direct_number.value = data.target_direct_number ?? 0;
       forecast_income.value = data.forecast_income ?? "0"; // 预测收益
-      total_reward_usdt.value = data.produced_income > data.forecast_income ? data.forecast_income : data.produced_income ?? "0"; // 节点总收益（USDT）
+      total_reward_usdt.value = Number(data.produced_income) > Number(data.forecast_income) ? data.forecast_income : data.produced_income ?? "0"; // 节点总收益（USDT）
       progressPercent.value = formatProgressPercent(
         (1 -
           (Number(data.produced_income) / Number(data.forecast_income))) *
