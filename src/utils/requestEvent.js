@@ -33,10 +33,10 @@ serive.interceptors.request.use(
     if (signatureInfo?.signature) config.headers["X-Signature"] = signatureInfo.signature
 
     // 只有存在 address 才传
-    const address = localStorage.getItem('address')
-    if (address) {
-      config.headers.address = address
-    }
+    // const address = localStorage.getItem('address')
+    // if (address) {
+    //   config.headers.address = address
+    // }
 
     // 禁用缓存 & GET 请求增加时间戳
     config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
