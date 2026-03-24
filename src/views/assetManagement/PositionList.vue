@@ -277,7 +277,7 @@ const fetchAllOpenOrderGuids = async () => {
     while (p <= total) {
         const res = await getOpenOrders({
             user_guid: '',
-            address: address.value,
+            user_address: address.value,
             page: p,
             page_size: 100,
             event_guid: undefined,
@@ -565,7 +565,7 @@ const fetchPositions = async (append = false) => {
             // 委托仓位（挂单）
             res = await getOpenOrders({
                 user_guid: '',
-                address: address.value || '',
+                user_address: address.value || '',
                 page: page.value,
                 page_size: PAGE_SIZE,
                 event_guid: undefined,
@@ -578,7 +578,7 @@ const fetchPositions = async (append = false) => {
             const range = monthToRange(filterMonth.value)
             res = await getOrderHistory({
                 user_guid: '',
-                address: address.value || '',
+                user_address: address.value || '',
                 page: page.value,
                 page_size: PAGE_SIZE,
                 start_date: range?.start_date,
@@ -592,7 +592,7 @@ const fetchPositions = async (append = false) => {
             const status = tabToStatus(activeTab.value)
             const range = monthToRange(filterMonth.value)
             res = await getUserPositions({
-                address: address.value || '',
+                user_address: address.value || '',
                 user_guid: '',
                 status,
                 page: page.value,

@@ -194,7 +194,7 @@ const fetchPnlAndRender = async () => {
   pnlLoading.value = true
   try {
     const res = await getUserPnl({
-      address: addr || '',
+      user_address: addr || '',
       user_guid: "",
       range: selectedPeriod.value,
     })
@@ -232,7 +232,7 @@ const fetchUserStat = async () => {
   statLoading.value = true
   try {
     const res = await getUserStat({
-      address: addr,
+      user_address: addr,
       user_guid: "",
     })
     const code = res?.data?.code
@@ -369,10 +369,10 @@ const handleClaim = async () => {
     outcome: String(rewardData.value.outcome || '').toUpperCase(),
     sub_event_guid: rewardData.value.sub_event_guid,
     user_guid: "",
-    address: address?.value || '',
+    user_address: address?.value || '',
   }
 
-  const missing = ['amount', 'asset_guid', 'event_guid', 'sub_event_guid', 'address'].filter(
+  const missing = ['amount', 'asset_guid', 'event_guid', 'sub_event_guid', 'user_address'].filter(
     (k) => !payload[k],
   )
   if (missing.length) {
