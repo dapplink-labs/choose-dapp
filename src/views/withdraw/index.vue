@@ -167,7 +167,7 @@ const fetchBalance = async () => {
   }
   try {
     const res = await getUserBalances({
-      address: address.value,
+      user_address: address.value,
       asset_guid: selectedCurrency.value.asset_guid,
       currency: selectedCurrency.value.asset_symbol
     })

@@ -814,13 +814,26 @@ onBeforeUnmount(() => {
     top: calc(100% + 6px);
     left: 0;
     min-width: 100%;
+    max-height: 150px;
+    overflow-y: auto;
     border-radius: 10px;
     padding: 6px 0;
     border: 1px solid var(--border-color);
     background-color: var(--bg-page-h5);
-    z-index: 10;
-    background-color: var(--bg-page-h5);
+    z-index: 100;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    /* 滚动条样式 */
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--border-color);
+        border-radius: 4px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
 
     .dropdown-item {
         padding: 8px 14px;

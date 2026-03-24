@@ -248,7 +248,7 @@ const fetchAssets = async () => {
 
   try {
     loadingAssets.value = true
-    const res = await getUserBalances({ address: address.value })
+    const res = await getUserBalances({ user_address: address.value })
     const data = res?.data?.data || {}
 
     const toNum = (v) => {

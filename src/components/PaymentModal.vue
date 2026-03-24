@@ -345,7 +345,7 @@ async function fetchBalance() {
     balanceLoading.value = true
     try {
     
-        const res = await getUserBalances({ address: address.value })
+        const res = await getUserBalances({ user_address: address.value })
         const data = res?.data?.data
         if (data) {
             userBalance.value = data.cash || data.portfolio || '0.00'
