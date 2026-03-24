@@ -352,7 +352,7 @@ import { useThemeStore } from '@/stores/theme'
 import { useAccount } from '@wagmi/vue'
 import {
   cancelOrder,
-  fiatWithdraw,
+  userWithdraw,
   getEventDetailItem,
   getEventPriceHistory,
   getOpenOrders,
@@ -654,17 +654,18 @@ const handlePositionWithdraw = async (pos) => {
     raw?.profit,
   ])
   const amount = Number.isFinite(amountPicked) && amountPicked > 0 ? String(amountPicked) : null
-  const currency_code = raw?.currency_code || raw?.currency || 'USD'
-  const user_guid = ''
+  const asset_guid = raw?.asset_guid || ''
+  const token_address = raw?.token_address || ''
   const user_address = address.value || ''
-  const missing = ['amount', 'currency_code', 'user_address'].filter((k) => !({ amount, currency_code, user_address }[k]))
+  const to_address = user_address
+  const missing = ['amount', 'user_address'].filter((k) => !({ amount, user_address }[k]))
   if (missing.length) {
     ElMessage.error(`Withdraw 参数缺失：${missing.join(', ')}`)
     return
   }
 
   try {
-    const res = await fiatWithdraw({ amount, currency_code, user_guid, user_address })
+    const res = await userWithdraw({ amount, asset_guid, to_address, token_address, user_address })
     if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Withdraw failed')
     ElMessage.success(res?.data?.message || 'Withdraw success')
     await Promise.allSettled([fetchPositions(), fetchOpenOrders(), fetchOrderHistory()])
