@@ -501,6 +501,7 @@ async function handleConfirm() {
             outcome: outcomeBadge.value,
             side: activeSide.value,
             order_type: orderType.value,
+            user_address: address.value
         }
 
         if (orderType.value === 'market') {
