@@ -512,6 +512,8 @@ const hasMore = computed(() => eventPage.value <= eventTotalPages.value);
 
 // 根据路由 nav 映射事件类型
 const getEventTypeFromNav = (nav) => {
+    // 默认使用趋势分类：当路由未携带 nav 时按 trends 处理
+    if (!nav) return 0;
     if (nav === 'trends') return 0;
     if (nav === 'breaking') return 1;
     if (nav === 'news') return 2;
@@ -638,7 +640,7 @@ const navigateToDetail = (item, choice) => {
         router.push({
             path: '/sports-detail-h5',
             query: {
-                id: item.id || item.title,
+                id: item.id,
             },
         });
         return;
@@ -649,7 +651,7 @@ const navigateToDetail = (item, choice) => {
         router.push({
             path: '/bitcoin-up-down',
             query: {
-                id: item.id || item.title,
+                id: item.id,
             },
         });
         return;
@@ -660,7 +662,7 @@ const navigateToDetail = (item, choice) => {
         path: "/detail-h5",
         query: {
             choice,
-            id: item.id || item.title,
+            id: item.id,
         },
     });
 };

@@ -438,7 +438,12 @@ const formatDate = (month, day, weekdayKey) => {
 }
 
 const handleGameView = (event) => {
-    router.push('/sports-detail-h5')
+    router.push({
+        path: '/sports-detail-h5',
+        query: {
+            event_guid: event?.eventGuid || event?.event_guid || ''
+        },
+    })
 }
 
 const openPayment = (event, side) => {

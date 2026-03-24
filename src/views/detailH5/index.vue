@@ -217,7 +217,7 @@
             <!-- 7. 选项卡模块 (评论/持仓/活动) -->
             <div class="tabs-section">
                 <div class="tabs-nav">
-                    <button class="tab-nav-item" :class="{ active: activeListTab === 'comments' }"
+                    <button v-if="SHOW_COMMENTS" class="tab-nav-item" :class="{ active: activeListTab === 'comments' }"
                         @click="activeListTab = 'comments'">
                         {{ $t('detail.comments') || '评论' }}
                     </button>
@@ -232,7 +232,7 @@
                 </div>
 
                 <!-- 评论列表 -->
-                <div v-if="activeListTab === 'comments'" class="tab-pane">
+                <div v-if="SHOW_COMMENTS && activeListTab === 'comments'" class="tab-pane">
                     <div v-for="(comment, index) in commentsData" :key="index" class="comment-item">
                         <img :src="comment.avatar" class="user-avatar" />
                         <div class="comment-main">
@@ -378,7 +378,9 @@ const loadingActivity = ref(false)
 const ACTIVITY_PAGE_SIZE = 20
 
 // --- 状态控制 ---
-const activeListTab = ref('comments')
+// 备注：评论模块第二期再启用；当前先隐藏并避免请求接口
+const SHOW_COMMENTS = false
+const activeListTab = ref(SHOW_COMMENTS ? 'comments' : 'holds')
 const showViewResultsExpanded = ref(false)
 const showPayment = ref(false)
 
@@ -1014,7 +1016,7 @@ const openPredictionDetail = (outcome) => {
 }
 onMounted(() => {
     fetchDetail()
-    fetchComments()
+    if (SHOW_COMMENTS) fetchComments()
     fetchActivity()
     fetchTopHolders()
     updateCountdown()

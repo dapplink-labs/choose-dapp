@@ -27,7 +27,7 @@
                 d="M896 981.333333H96a53.393333 53.393333 0 0 1-53.333333-53.333333V96a53.393333 53.393333 0 0 1 53.333333-53.333333h704a53.393333 53.393333 0 0 1 53.333333 53.333333v117.333333h74.666667a53.393333 53.393333 0 0 1 53.333333 53.333334v629.333333a85.426667 85.426667 0 0 1-85.333333 85.333333z m-42.666667-725.333333v640a42.666667 42.666667 0 0 0 85.333334 0V266.666667a10.666667 10.666667 0 0 0-10.666667-10.666667zM96 85.333333a10.666667 10.666667 0 0 0-10.666667 10.666667v832a10.666667 10.666667 0 0 0 10.666667 10.666667h726.12a84.82 84.82 0 0 1-11.453333-42.666667V96a10.666667 10.666667 0 0 0-10.666667-10.666667z m565.333333 725.333334H234.666667a21.333333 21.333333 0 0 1 0-42.666667h426.666666a21.333333 21.333333 0 0 1 0 42.666667z m0-170.666667H234.666667a21.333333 21.333333 0 0 1 0-42.666667h426.666666a21.333333 21.333333 0 0 1 0 42.666667z m0-213.333333H533.333333a21.333333 21.333333 0 0 1 0-42.666667h128a21.333333 21.333333 0 0 1 0 42.666667z m0-170.666667H533.333333a21.333333 21.333333 0 0 1 0-42.666667h128a21.333333 21.333333 0 0 1 0 42.666667zM412.393333 468.133333A21.333333 21.333333 0 0 0 426.666667 448V234.666667a21.333333 21.333333 0 0 0-42.666667 0v152.52L251.333333 221.333333a21.333333 21.333333 0 0 0-38 13.333334v213.333333a21.333333 21.333333 0 0 0 42.666667 0V295.48L388.666667 461.333333a21.333333 21.333333 0 0 0 23.72 6.806667z"
                 fill="currentColor"></path>
             </svg>
-            <span class="nav-text">{{ item.label }}</span>
+            <span class="nav-text">{{ item.i18nKey ? t(item.i18nKey) : item.label }}</span>
           </div>
           <div class="nav-divider" v-if="item.key === 'news'"></div>
         </template>
@@ -39,6 +39,7 @@
 <script setup>
 import { ref, watch, onMounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { getCategoryList } from '@/api/APIEvent'
 // 获取当前语言环境
 const language = (localStorage.getItem('app-locale') || navigator.language).split('-')[0];
@@ -46,6 +47,7 @@ const language = (localStorage.getItem('app-locale') || navigator.language).spli
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 
 // 状态管理
 const activeNav = ref('')
@@ -54,9 +56,9 @@ const navSectionRef = ref(null)
 
 // 基础导航配置
 const navItems = ref([
-  { key: 'trends', label: '趋势', query: { nav: 'trends' } },
-  { key: 'breaking', label: '热点', query: { nav: 'breaking' } },
-  { key: 'news', label: '最新', query: { nav: 'news' } },
+  { key: 'trends', i18nKey: 'navbar2.nav.trends', label: '趋势', query: { nav: 'trends' } },
+  { key: 'breaking', i18nKey: 'navbar2.nav.breaking', label: '热点', query: { nav: 'breaking' } },
+  { key: 'news', i18nKey: 'navbar2.nav.news', label: '最新', query: { nav: 'news' } },
 ])
 
 /**
