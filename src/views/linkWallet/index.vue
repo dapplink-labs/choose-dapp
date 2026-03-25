@@ -49,6 +49,7 @@ import { readContract, switchChain } from '@wagmi/core'
 import { config } from '@/wagmi.ts'
 import networks from '@/assets/json/networks.js'
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
+import { userLogin } from '@/api/APIEvent'
 import logoLight from '@/assets/icon/logo.png'
 import logoDark from '@/assets/icon/logoDark.png'
 import { UserRejectedRequestError } from 'viem'
@@ -177,7 +178,16 @@ async function wallconnects(id, chainId) {
 
       if (!signature) return
 
-      // 3️⃣ 签名成功 → 进首页 ✅
+      // 3️⃣ 签名成功 → 钱包登录接口 ✅
+      try {
+        await userLogin({ user_address: addr })
+      } catch (err) {
+        console.error('Wallet login failed:', err)
+        Message.error(t('linkWallet.userVerificationFailed') || 'Wallet login failed')
+        return
+      }
+
+      // 4️⃣ 登录成功 → 进首页 ✅
       router.push('/home')
       await checkUserStatus()
 

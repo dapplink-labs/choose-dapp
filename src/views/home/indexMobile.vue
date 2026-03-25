@@ -382,11 +382,6 @@ import { Swiper, SwiperSlide } from "swiper/vue";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
-import bannerImg from "@/assets/images/banner.png";
-import banner0Img from "@/assets/images/banner0.png";
-import banner2Img from "@/assets/images/banner2.png";
-import linghua1Img from "@/assets/images/linghua1.png";
-import banner4Img from "@/assets/images/banner4.png";
 import fallbackListImg from "@/assets/icon/LP1.png";
 import NotificationModal from '@/components/NotificationModal.vue';
 import { getNoticeData } from "@/api/API";
@@ -452,8 +447,24 @@ watch(
 
 // 获取首页轮播图
 async function getHomeBannerList() {
-    const response = await getHomeBanner({ language: currentLocale, limit: 4 });
-    console.log(response);
+    try {
+        const response = await getHomeBanner({ language: language, limit: 10 });
+        const list = response?.data?.data?.banners
+            || response?.data?.banners
+            || response?.data?.data?.banner_list
+            || response?.data?.banner_list
+            || [];
+
+        bannerList.value = list
+            .map((item) => ({
+                img: item?.log || item?.img || item?.image || item?.banner || item?.banner_url || '',
+                href: item?.href || item?.url || item?.link || '',
+            }))
+            .filter((item) => item.img);
+    } catch (error) {
+        console.error('Fetch banner list failed', error);
+        bannerList.value = [];
+    }
 }
 
 
@@ -461,30 +472,10 @@ async function getHomeBannerList() {
 const swiperModules = [Autoplay, Pagination];
 
 // 轮播图数据
-const bannerList = ref([
-    {
-        img: bannerImg,
-        href: "/home",
-    },
-    {
-        img: banner0Img,
-        href: "/LPVault",
-    },
-    {
-        img: banner2Img,
-        href: "/bitcoin-up-down",// 跳转到加密货币详情页面
-    },
-    {
-        img: linghua1Img,
-        href: "https://web.chooseme.vip/",
-    },
-    {
-        img: banner4Img,
-        href: "/home",
-    },
-]);
+const bannerList = ref([]);
 
 function goHref(item) {
+    if (!item?.href) return;
     if (item.href.includes("https")) {
         window.open(item.href, "_blank");
     } else {

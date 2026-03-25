@@ -151,11 +151,7 @@ export const fiatWithdraw = (data) => {
   return request.post('/api/v1/user/fiat/withdraw', data)
 }
 
-// 用户登录接口 - 使用死数据登录
-export const userLogin = () => {
-  return request.post('/api/v1/login', {
-    login_type: 'password',
-    email: 'seek10@example.com',
-    password: '123456'
-  })
+// 用户登录接口 - 钱包地址登录
+export const userLogin = (data) => {
+  return request.post('/api/v1/user/login', data)
 }
