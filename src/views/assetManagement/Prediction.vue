@@ -368,7 +368,6 @@ const handleClaim = async () => {
     event_guid: rewardData.value.event_guid,
     outcome: String(rewardData.value.outcome || '').toUpperCase(),
     sub_event_guid: rewardData.value.sub_event_guid,
-    user_guid: "",
     user_address: address?.value || '',
   }
 

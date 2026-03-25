@@ -706,7 +706,6 @@ const fetchPositions = async () => {
     const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
     const languageLabel = currentLocale.split('-')[0]
     const res = await getUserPositions({
-      user_guid: "",
       user_address: address.value || '',
       status: 'holding',
       page: 1,
@@ -732,7 +731,6 @@ const fetchOpenOrders = async () => {
   }
   try {
     const res = await getOpenOrders({
-      user_guid: "",
       user_address: address.value || '',
       page: 1,
       page_size: 20,
@@ -758,7 +756,6 @@ const fetchOrderHistory = async () => {
   }
   try {
     const res = await getOrderHistory({
-      user_guid: "",
       user_address: address.value || '',
       page: 1,
       page_size: 20,
@@ -781,7 +778,7 @@ const handleCancelOrder = async (id) => {
   const order = openOrders.value.find(item => item.id === id)
   if (!order?.orderGuid) return
   try {
-    const res = await cancelOrder({ order_guid: order.orderGuid })
+    const res = await cancelOrder({ order_guid: order.orderGuid, user_address: address.value || '' })
     if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Cancel failed')
     ElMessage.success(t('assetManagement.cancelSuccess') || 'Canceled')
     await fetchOpenOrders()
@@ -795,7 +792,7 @@ const handleCancelAllOrders = async () => {
   const orderGuids = openOrders.value.map(item => item.orderGuid).filter(Boolean)
   if (!orderGuids.length) return
   try {
-    await Promise.all(orderGuids.map(orderGuid => cancelOrder({ order_guid: orderGuid })))
+    await Promise.all(orderGuids.map(orderGuid => cancelOrder({ order_guid: orderGuid, user_address: address.value || '' })))
     ElMessage.success(t('assetManagement.cancelSuccess') || 'Canceled')
     await fetchOpenOrders()
   } catch (error) {
