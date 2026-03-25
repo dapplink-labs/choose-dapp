@@ -59,11 +59,19 @@
                     <div class="input-section" v-if="orderType === 'limit'">
                         <label class="input-label">{{ $t('payment.limitPrice') }}</label>
                         <div class="stepper-box">
-                            <button class="step-btn" @click="price > 1 && price--">-</button>
+                            <button class="step-btn" @click="stepPrice(-1)">-</button>
                             <div class="step-center">
-                                <div class="step-value">{{ price }}¢</div>
+                                <input
+                                    v-model.number="price"
+                                    type="number"
+                                    class="price-input"
+                                    min="1"
+                                    max="99"
+                                    @blur="clampPrice"
+                                />
+                                <span class="price-unit">¢</span>
                             </div>
-                            <button class="step-btn" @click="price < 99 && price++">+</button>
+                            <button class="step-btn" @click="stepPrice(1)">+</button>
                         </div>
                     </div>
 
@@ -72,11 +80,9 @@
                         <label class="input-label">
                             {{ isMarketBuy ? $t('payment.amount') || 'Amount' : $t('payment.shares') }}
                         </label>
-                        <div class="stepper-box">
-                            <div class="input-box">
-                                <input v-model="inputValue" type="number" class="main-input"
-                                    :placeholder="isMarketBuy ? '0.00' : '0'" @input="onInputChange" />
-                            </div>
+                        <div class="input-box">
+                            <input v-model="inputValue" type="number" class="main-input"
+                                :placeholder="isMarketBuy ? '0.00' : '0'" @input="onInputChange" />
                         </div>
                     </div>
                     <!-- 快捷加减按钮 -->
@@ -309,6 +315,17 @@ function switchOrderType(type) {
     orderType.value = type
     resetPreview()
     inputValue.value = ''
+}
+
+function stepPrice(delta) {
+    price.value = Math.min(99, Math.max(1, (Number(price.value) || 1) + delta))
+}
+
+function clampPrice() {
+    const v = Number(price.value)
+    if (isNaN(v) || v < 1) price.value = 1
+    else if (v > 99) price.value = 99
+    else price.value = Math.floor(v)
 }
 
 function adjustInput(val) {
@@ -783,20 +800,33 @@ watch(() => props.modelValue, (val) => {
         flex: 1;
         text-align: center;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
         justify-content: center;
-        line-height: 1.2;
+        gap: 2px;
     }
 
-    .step-value {
+    .price-input {
+        width: 56px;
+        background: none;
+        border: none;
+        color: var(--bg-opposite);
+        text-align: center;
         font-size: 18px;
         font-weight: 800;
+        outline: none;
+        -moz-appearance: textfield;
+
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     }
 
-    .step-sub {
-        margin-top: 2px;
-        font-size: 12px;
+    .price-unit {
+        font-size: 15px;
+        font-weight: 600;
         color: var(--text-dark-gray);
     }
 }
