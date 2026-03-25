@@ -195,7 +195,6 @@ const fetchPnlAndRender = async () => {
   try {
     const res = await getUserPnl({
       user_address: addr || '',
-      user_guid: "",
       range: selectedPeriod.value,
     })
     const code = res?.data?.code
@@ -233,7 +232,6 @@ const fetchUserStat = async () => {
   try {
     const res = await getUserStat({
       user_address: addr,
-      user_guid: "",
     })
     const code = res?.data?.code
     if (!(code === 0 || code === 200 || code === 2000)) {
