@@ -113,7 +113,7 @@
                                                 d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
                                                 transform="translate(-69.818 -69.818)" fill="currentColor" />
                                         </svg>
-                                        <span class="time-text">{{ item.timeRemaining }}</span>
+                                        <span class="time-text">{{ getCountdown(item.closeTime) }}</span>
                                     </div>
                                     <div class="participant-info">
                                         <el-icon class="participant-icon">
@@ -161,7 +161,7 @@
                             <div class="item-options">
                                 <div class="option-item">
                                     <div class="option-text">
-                                        <span>{{ item.options[0].text }}</span>
+                                        <span>{{ item.options?.[0]?.text || '' }}</span>
                                         <span>{{ item.percentage }}</span>
                                     </div>
                                     <div class="option-buttons">
@@ -175,7 +175,7 @@
                                 </div>
                                 <div class="option-item">
                                     <div class="option-text">
-                                        <span>{{ item.options[1].text }}</span>
+                                        <span>{{ item.options?.[1]?.text || '' }}</span>
                                         <span>{{ item.percentage }}</span>
                                     </div>
                                     <div class="option-buttons">
@@ -201,7 +201,7 @@
                                                 d="M75.818,69.818a6,6,0,1,1-6,6A6,6,0,0,1,75.818,69.818ZM75.66,72.66a.474.474,0,0,0-.474.474v2.842a.474.474,0,0,0,.474.474H78.5a.474.474,0,1,0,0-.947H76.134V73.134A.474.474,0,0,0,75.66,72.66Z"
                                                 transform="translate(-69.818 -69.818)" fill="currentColor" />
                                         </svg>
-                                        <span class="time-text">{{ item.timeRemaining }}</span>
+                                        <span class="time-text">{{ getCountdown(item.closeTime) }}</span>
                                     </div>
                                     <div class="participant-info">
                                         <el-icon class="participant-icon">
@@ -230,38 +230,63 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import NavBar2 from "@/components/navBar2.vue";
 import { Search, Avatar } from "@element-plus/icons-vue";
 import router from "@/router";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { tagButtons as rawTagButtons, leftList as rawLeftList, rightList as rawRightList } from "./homeData";
+import { ElMessage } from "element-plus";
+import { useAccount } from "@wagmi/vue";
+import { getCategoryList, getEventList, getFavoriteList, toggleFavoriteEvent } from "@/api/APIEvent";
 
 const { t } = useI18n();
 const route = useRoute();
 const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
 
+const { address } = useAccount();
+
+// 语言环境（给接口的 language_label 用）
+const currentLocale = localStorage.getItem("app-locale") || navigator.language || "en";
+const language = String(currentLocale).split("-")[0];
+
 // 搜索相关（PC 顶部栏）
 const searchQuery = ref("");
+const categoryList = ref([]);
 
-// 标签按钮数据
-const tagButtons = ref(rawTagButtons);
-
-// PC tab（含“全部”）
-const pcTagButtons = computed(() => [
-    { value: "all", label: t("home.all") },
-    ...tagButtons.value,
-]);
-
-// 当前激活的标签
+// 当前激活的标签（用于高亮；值为 category_guid 或 all）
 const activeTag = ref("all");
+const favoriteOnly = ref(false);
 
-// 模拟数据：左边垂直列表
-const leftList = ref(rawLeftList);
+const PAGE_SIZE = 20;
 
-// 模拟数据：右边横向列表（通过 CSS 控制每行展示数量）
-const rightList = ref(rawRightList);
+const cardList = ref([]);
+const leftList = computed(() => cardList.value.filter((i) => i.cardType === "large"));
+const rightList = computed(() => cardList.value.filter((i) => i.cardType === "small"));
+
+const pcTagButtons = computed(() => {
+    const base = [{ value: "all", label: t("home.all") || "All" }];
+    const cats = categoryList.value.map((c) => ({
+        value: c.guid,
+        label: c.name || c.title || c.code || c.guid,
+    }));
+    return base.concat(cats);
+});
+
+const now = ref(Date.now());
+let countdownTimer = null;
+
+const getCountdown = (closeTime) => {
+    if (!closeTime) return "--";
+    const end = new Date(String(closeTime).replace(" ", "T"));
+    const diff = end.getTime() - now.value;
+    if (diff <= 0) return "--";
+    const totalSec = Math.floor(diff / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    return [h, m, s].map((x) => String(x).padStart(2, "0")).join(":");
+};
 
 // 跳转到收益页面
 const navigateToEarnings = () => {
@@ -290,21 +315,181 @@ const navigateToDetail = (item, choice) => {
     });
 };
 
-// 处理标签点击
-const handleTagClick = (tagValue) => {
-    activeTag.value = tagValue;
-    // 这里可以根据标签筛选内容
+const getEventTypeFromNav = (nav) => {
+    if (!nav) return 0;
+    if (nav === "trends") return 0;
+    if (nav === "breaking") return 1;
+    if (nav === "news") return 2;
+    return undefined;
 };
 
-// 处理收藏点击
-const handleBookmark = () => {
-    // 这里可以实现收藏功能
+const mapEventToCard = (e) => {
+    const subEvents = Array.isArray(e.sub_events) ? e.sub_events : [];
+    const volumeNum = Number(e.trade_volume);
+    const amount =
+        Number.isFinite(volumeNum) && !Number.isNaN(volumeNum) ? volumeNum.toFixed(2) : "0.00";
+
+    const clusterNum = Number(e.cluster_score);
+    const percentage =
+        Number.isFinite(clusterNum) && !Number.isNaN(clusterNum) ? `${clusterNum}%` : "0%";
+
+    const maxLeverageNum = Number(e.max_leverage);
+    const maxLeverage =
+        Number.isFinite(maxLeverageNum) && !Number.isNaN(maxLeverageNum) ? `${maxLeverageNum}X` : "--";
+
+    const maxReturnNum = Number(e.max_return);
+    let maxReturn = "--";
+    if (Number.isFinite(maxReturnNum) && !Number.isNaN(maxReturnNum)) {
+        // max_return 通常是小数倍数（如 1.82 -> 182%），但若后端返回 230 这种整数则直接当作百分比
+        maxReturn = maxReturnNum <= 10 ? `${Math.round(maxReturnNum * 100)}%` : `${Math.round(maxReturnNum)}%`;
+    }
+
+    return {
+        id: e.event_guid,
+        cardType: e.is_live === 1 ? "large" : "small",
+        avatar: e.logo || "",
+        title: e.title || "",
+        percentage,
+        amount,
+        participantCount: Number(e.participant_count) || 0,
+        maxLeverage,
+        maxReturn,
+        closeTime: e.close_time || "",
+        isTimeUrgent: e.is_live === 1,
+        options: subEvents.map((sub) => ({
+            text: sub.title || sub.option_title || "",
+        })),
+        isFavorite: !!e.is_favorited,
+    };
+};
+
+const fetchCategoryListData = async () => {
+    try {
+        const response = await getCategoryList({ language_label: language });
+        const cats = response?.data?.data?.categories || [];
+        categoryList.value = [...cats];
+    } catch (err) {
+        console.error("Fetch category list failed:", err);
+        categoryList.value = [];
+    }
+};
+
+const fetchEventList = async () => {
+    try {
+        const query = route.query || {};
+        const params = {
+            language_label: language,
+            include_sub_events: true,
+            page: 1,
+            page_size: PAGE_SIZE,
+            user_address: address.value || "",
+        };
+
+        // 优先用路由查询条件（NavBar2 已经在做）
+        if (query.category_guid) params.category_guid = query.category_guid;
+        if (query.ecosystem_guid) params.ecosystem_guid = query.ecosystem_guid;
+
+        if (searchQuery.value) params.title = searchQuery.value;
+
+        const eventType = getEventTypeFromNav(query.nav);
+        if (eventType !== undefined) params.event_type = eventType;
+
+        const res = favoriteOnly.value ? await getFavoriteList(params) : await getEventList(params);
+        const data = res?.data?.data || {};
+        const list = data.events || [];
+        cardList.value = list.map(mapEventToCard);
+    } catch (err) {
+        console.error("Fetch PC event list failed:", err);
+        cardList.value = [];
+    }
+};
+
+// 处理标签点击（更新路由，让 watch 触发刷新）
+const handleTagClick = (tagValue) => {
+    const newQuery = { ...(route.query || {}) };
+    delete newQuery.ecosystem_guid;
+    if (tagValue === "all") {
+        delete newQuery.category_guid;
+    } else {
+        newQuery.category_guid = tagValue;
+    }
+    activeTag.value = tagValue;
+    router.push({ path: "/home", query: newQuery });
+};
+
+// 处理收藏点击（收藏模式）
+const handleBookmark = async () => {
+    if (!address.value) {
+        ElMessage.warning(t("pleaseConnectWallet") || "Please connect wallet");
+        return;
+    }
+    favoriteOnly.value = !favoriteOnly.value;
 };
 
 // 切换收藏状态
-const toggleFavorite = (item) => {
-    item.isFavorite = !item.isFavorite;
+const toggleFavorite = async (item) => {
+    if (!address.value) {
+        ElMessage.warning(t("pleaseConnectWallet") || "Please connect wallet");
+        return;
+    }
+
+    try {
+        const res = await toggleFavoriteEvent({
+            user_address: address.value || "",
+            event_guid: item.id,
+        });
+
+        const payload = res?.data ?? res;
+        const code = payload?.code;
+        if (code === 200 || code === 2000 || code === 0) {
+            item.isFavorite = !item.isFavorite;
+            item.is_favorited = item.isFavorite;
+            // 收藏筛选模式下，如果取消收藏则把卡片从列表移除
+            if (favoriteOnly.value && !item.isFavorite) {
+                cardList.value = cardList.value.filter((i) => i.id !== item.id);
+            }
+        }
+    } catch (err) {
+        console.error("Toggle favorite failed:", err);
+        ElMessage.error(t("operateFailed") || "Operation failed");
+    }
 };
+
+watch(
+    () => route.query,
+    () => {
+        activeTag.value = route.query?.category_guid ? String(route.query.category_guid) : "all";
+        fetchEventList();
+    },
+    { deep: true, immediate: true }
+);
+
+let searchTimer = null;
+watch(searchQuery, () => {
+    if (searchTimer) clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        fetchEventList();
+    }, 500);
+});
+
+watch(address, () => {
+    fetchEventList();
+});
+
+watch(favoriteOnly, () => {
+    fetchEventList();
+});
+
+onMounted(async () => {
+    fetchCategoryListData();
+    countdownTimer = window.setInterval(() => {
+        now.value = Date.now();
+    }, 1000);
+});
+
+onUnmounted(() => {
+    if (countdownTimer) window.clearInterval(countdownTimer);
+});
 </script>
 
 <style scoped lang="scss">
