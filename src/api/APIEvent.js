@@ -84,15 +84,7 @@ export const getUserBalances = (data) => {
   return request.post('/api/v1/user/balances', data)
 }
 
-// 市价买入预查询
-export const previewBuyOrder = (data) => {
-  return request.post('/api/v1/order/preview/buy', data)
-}
 
-// 市价卖出预查询
-export const previewSellOrder = (data) => {
-  return request.post('/api/v1/order/preview/sell', data)
-}
 
 // 创建订单（市价单/限价单）
 export const makeOrder = (data) => {

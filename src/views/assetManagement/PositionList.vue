@@ -277,7 +277,6 @@ const fetchAllOpenOrderGuids = async () => {
     let total = 1
     while (p <= total) {
         const res = await getOpenOrders({
-            user_guid: '',
             user_address: address.value,
             page: p,
             page_size: 100,
@@ -565,7 +564,6 @@ const fetchPositions = async (append = false) => {
         if (activeTab.value === 'pending') {
             // 委托仓位（挂单）
             res = await getOpenOrders({
-                user_guid: '',
                 user_address: address.value || '',
                 page: page.value,
                 page_size: PAGE_SIZE,
@@ -593,7 +591,6 @@ const fetchPositions = async (append = false) => {
             const range = monthToRange(filterMonth.value)
             res = await getUserPositions({
                 user_address: address.value || '',
-                user_guid: '',
                 status,
                 page: page.value,
                 page_size: PAGE_SIZE,

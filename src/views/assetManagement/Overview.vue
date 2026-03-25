@@ -259,7 +259,8 @@ const fetchAssets = async () => {
     // 目前项目其他地方（PaymentModal）优先用 cash / portfolio
     const cash = toNum(data.cash)
     const portfolio = toNum(data.portfolio)
-    const total = toNum(data.total_assets ?? data.totalAssets) || (cash + portfolio)
+    // const total = toNum(data.total_assets ?? data.totalAssets) || (cash + portfolio)
+    const total = cash
 
     totalAssets.value = total
     funds.value = cash
@@ -270,13 +271,16 @@ const fetchAssets = async () => {
     fo.value = toNum(data.fo)
 
     // 资产分布（若后端返回列表则渲染，否则为空）
-    const list = Array.isArray(data.assets) ? data.assets : Array.isArray(data.asset_list) ? data.asset_list : []
-    assetList.value = list.map((a) => ({
-      name: a.symbol || a.name || '',
-      icon: a.icon || (a.symbol ? `https://effigy.im/a/${a.symbol}.svg` : ''),
-      quantity: toNum(a.quantity ?? a.amount),
-      value: toNum(a.value ?? a.usdt_value ?? a.usd_value),
-    })).filter(v => v.name)
+    const list = Array.isArray(data.balances) ? data.balances : []
+    assetList.value = list.map((a) => {
+      const symbol = a.asset_name || ''
+      return {
+        name: symbol,
+        icon: a.icon || (symbol ? `https://effigy.im/a/${symbol.toLowerCase()}.svg` : ''),
+        quantity: toNum(a.total_balance ?? a.quantity ?? a.amount),
+        value: toNum(a.usdt_equivalent ?? a.value ?? a.usdt_value ?? a.usd_value),
+      }
+    }).filter(v => v.name)
   } catch (error) {
     console.error('获取资产数据失败:', error)
     totalAssets.value = 0

@@ -278,7 +278,6 @@ const fetchTransactionHistory = async (append = false) => {
         const type = filterType.value === 'all' ? 'all' : filterType.value
         const { start_date, end_date } = getDateRangeParams()
         const res = await getTransactionHistory({
-            user_guid: "",
             user_address: address?.value || '',
             type, // all / FIAT_DEPOSIT / FIAT_WITHDRAW / ...
             start_date: start_date || undefined,
