@@ -89,33 +89,6 @@
                         </div>
                     </div>
 
-                    <!-- 市价单预览信息 -->
-                    <div v-if="orderType === 'market'" class="preview-info-row">
-                        <div v-if="previewLoading" class="preview-loading">
-                            {{ $t('payment.calculating') || 'Calculating...' }}
-                        </div>
-                        <template v-else-if="previewData">
-                            <div v-if="isMarketBuy" class="preview-details">
-                                <span class="preview-text">
-                                    {{ $t('payment.avgPrice') }}：{{ previewData.avg_price || '--' }} USDT
-                                </span>
-                                <span class="preview-text">
-                                    {{ $t('payment.estimatedShares') || 'Est. Shares' }}：{{ previewData.shares || '--'
-                                    }}
-                                </span>
-                            </div>
-                            <div v-else class="preview-details">
-                                <span class="preview-text">
-                                    {{ $t('payment.avgPrice') }}：{{ previewData.avg_price || '--' }} USDT
-                                </span>
-                                <span class="preview-text">
-                                    {{ $t('payment.estimatedProfit') || 'Est. Profit' }}：{{ previewData.profit || '--'
-                                    }} USDT
-                                </span>
-                            </div>
-                        </template>
-                    </div>
-
                     <!-- 5. 杠杆（暂不对接） -->
                     <div class="input-section" style="opacity: 0.4; pointer-events: none;">
                         <label class="input-label">{{ $t('payment.leverage') }}</label>
@@ -181,7 +154,7 @@ import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Wallet } from '@element-plus/icons-vue'
 import { useAccount } from '@wagmi/vue'
-import { getUserBalances, previewBuyOrder, previewSellOrder, makeOrder } from '@/api/APIEvent'
+import { getUserBalances, makeOrder } from '@/api/APIEvent'
 import { ElMessage } from 'element-plus'
 
 
@@ -229,12 +202,7 @@ const expiryOptions = computed(() => ([
 // ===================== 异步状态 =====================
 const userBalance = ref('0.00')
 const balanceLoading = ref(false)
-const previewData = ref(null)
-const previewLoading = ref(false)
 const submitting = ref(false)
-
-// 防抖定时器
-let previewTimer = null
 
 // ===================== 计算属性 =====================
 const isMarketBuy = computed(() => activeSide.value === 'buy' && orderType.value === 'market')
@@ -251,8 +219,8 @@ const displayTotal = computed(() => {
             // 市价买入：用户输入的就是金额
             return inputValue.value ? `$${Number(inputValue.value).toFixed(2)}` : '$0.00'
         }
-        // 市价卖出：预览返回 total_amount
-        return previewData.value?.total_amount ? `$${Number(previewData.value.total_amount).toFixed(2)}` : '$0.00'
+        // 市价卖出：无法预估总额，显示占位符
+        return '--'
     }
     // 限价单：price * shares / 100
     const p = Number(price.value) || 0
@@ -261,12 +229,13 @@ const displayTotal = computed(() => {
 })
 
 const displayGain = computed(() => {
-    if (orderType.value === 'market' && !isMarketBuy.value && previewData.value?.profit) {
-        return `$${Number(previewData.value.profit).toFixed(2)}`
+    if (orderType.value === 'market' && !isMarketBuy.value) {
+        // 由于移除了卖出预览接口，无法预估利润，显示占位符
+        return '0'
     }
-    if (orderType.value === 'market' && isMarketBuy.value && previewData.value?.shares) {
-        // 买入潜在收益 = 份数（结算时每份=1 USDT）
-        return `$${Number(previewData.value.shares).toFixed(2)}`
+    if (orderType.value === 'market' && isMarketBuy.value) {
+        // 由于移除了买入预览接口，无法预估份额，显示占位符
+        return `0`
     }
     // 限价单潜在收益 = shares
     const s = Number(inputValue.value) || 0
@@ -293,51 +262,27 @@ const executeLabel = computed(() => {
 // ===================== 方法 =====================
 function toggleOutcome() {
     outcomeBadge.value = outcomeBadge.value === 'YES' ? 'NO' : 'YES'
-    resetPreview()
-    triggerPreview()
 }
 
 function switchSide(side) {
     if (activeSide.value === side) return
     activeSide.value = side
-    resetPreview()
     inputValue.value = ''
 }
 
 function switchOrderType(type) {
     if (orderType.value === type) return
     orderType.value = type
-    resetPreview()
     inputValue.value = ''
 }
 
 function adjustInput(val) {
     const current = Number(inputValue.value) || 0
     inputValue.value = String(Math.max(0, current + val))
-    triggerPreview()
 }
 
 function onInputChange() {
-    triggerPreview()
-}
-
-function resetPreview() {
-    previewData.value = null
-    if (previewTimer) {
-        clearTimeout(previewTimer)
-        previewTimer = null
-    }
-}
-
-// 防抖触发预览查询
-function triggerPreview() {
-    if (previewTimer) clearTimeout(previewTimer)
-    const val = Number(inputValue.value)
-    if (!val || val <= 0 || orderType.value !== 'market') {
-        previewData.value = null
-        return
-    }
-    previewTimer = setTimeout(() => fetchPreview(), 500)
+    // 之前用来触发预览逻辑，现在移除
 }
 
 // ===================== API 调用 =====================
@@ -369,58 +314,6 @@ const isOrderSuccess = (res) => {
     if (code === 0 || code === 200 || code === 2000) return true
     if (msg.includes('order created successfully') || msg === 'success') return true
     return false
-}
-
-async function fetchPreview() {
-    const val = Number(inputValue.value)
-    if (!val || val <= 0) return
-    if (!props.eventGuid || !props.subEventGuid) return
-
-    previewLoading.value = true
-    try {
-        if (isMarketBuy.value) {
-            // 市价买入预览
-            const res = await previewBuyOrder({
-                amount: String(val),
-                event_guid: props.eventGuid,
-                sub_event_guid: props.subEventGuid,
-                outcome: outcomeBadge.value,
-                user_address: address.value,
-            })
-            if (isRespSuccess(res)) {
-                previewData.value = res.data.data
-            } else {
-                const msg = res?.data?.message
-                if (msg && String(msg).toLowerCase() !== 'success') {
-                    console.warn('Preview buy failed:', msg)
-                }
-                previewData.value = null
-            }
-        } else if (activeSide.value === 'sell' && orderType.value === 'market') {
-            // 市价卖出预览
-            const res = await previewSellOrder({
-                shares: String(val),
-                event_guid: props.eventGuid,
-                sub_event_guid: props.subEventGuid,
-                outcome: outcomeBadge.value,
-                user_address: address.value,
-            })
-            if (isRespSuccess(res)) {
-                previewData.value = res.data.data
-            } else {
-                const msg = res?.data?.message
-                if (msg && String(msg).toLowerCase() !== 'success') {
-                    console.warn('Preview sell failed:', msg)
-                }
-                previewData.value = null
-            }
-        }
-    } catch (err) {
-        console.error('Fetch preview failed', err)
-        previewData.value = null
-    } finally {
-        previewLoading.value = false
-    }
 }
 
 // 计算订单过期时间字符串（YYYY-MM-DD HH:mm:ss），仅在启用过期时间时返回
@@ -548,7 +441,6 @@ async function handleConfirm() {
 }
 
 function handleClose() {
-    resetPreview()
     emit('update:modelValue', false)
 }
 
@@ -560,7 +452,6 @@ watch(() => props.modelValue, (val) => {
         outcomeBadge.value = (props.initialOutcome || 'YES').toUpperCase()
         orderType.value = 'market'
         inputValue.value = ''
-        previewData.value = null
         fetchBalance()
     }
 })
