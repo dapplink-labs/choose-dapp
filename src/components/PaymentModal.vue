@@ -385,6 +385,7 @@ async function fetchPreview() {
                 event_guid: props.eventGuid,
                 sub_event_guid: props.subEventGuid,
                 outcome: outcomeBadge.value,
+                user_address: address.value,
             })
             if (isRespSuccess(res)) {
                 previewData.value = res.data.data
@@ -402,6 +403,7 @@ async function fetchPreview() {
                 event_guid: props.eventGuid,
                 sub_event_guid: props.subEventGuid,
                 outcome: outcomeBadge.value,
+                user_address: address.value,
             })
             if (isRespSuccess(res)) {
                 previewData.value = res.data.data

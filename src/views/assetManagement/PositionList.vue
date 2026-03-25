@@ -257,6 +257,7 @@ const onCancelPending = async (item) => {
     try {
         const res = await cancelOrder({
             order_guid,
+            user_address: address.value,
         })
         if (!isRespSuccess(res)) {
             throw new Error(res?.data?.message || 'Cancel failed')
@@ -316,7 +317,7 @@ const onCancelAllPending = async () => {
         let failCount = 0
         for (const order_guid of guids) {
             try {
-                const res = await cancelOrder({ order_guid })
+                const res = await cancelOrder({ order_guid, user_address: address.value })
                 if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Cancel failed')
                 successCount += 1
             } catch {
@@ -577,7 +578,6 @@ const fetchPositions = async (append = false) => {
             // 历史仓位订单
             const range = monthToRange(filterMonth.value)
             res = await getOrderHistory({
-                user_guid: '',
                 user_address: address.value || '',
                 page: page.value,
                 page_size: PAGE_SIZE,
