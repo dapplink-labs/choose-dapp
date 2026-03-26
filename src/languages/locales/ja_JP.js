@@ -1017,7 +1017,8 @@ export default {
     "orderFailed": "注文に失敗しました",
     "buyNo": "Buy No",
     "buyYes": "Buy Yes",
-    "missingIds": "イベントIDまたはサブイベントIDが不足しています"
+    "missingIds": "イベントIDまたはサブイベントIDが不足しています",
+    "insufficientBalance": "残高不足"
   },
   "datePicker": {
     "title": "日付範囲で絞り込み",

@@ -1018,7 +1018,9 @@ export default {
     "orderFailed": "下单失败",
     "buyNo": "Buy No",
     "buyYes": "Buy Yes",
-    "missingIds": "缺少事件或子事件ID"
+    "missingIds": "缺少事件或子事件ID",
+    "insufficientBalance": "余额不足"
+    
   },
   "datePicker": {
     "title": "按日期范围筛选",

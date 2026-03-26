@@ -1031,6 +1031,7 @@ export default {
     buyNo: "Buy No",
     buyYes: "Buy Yes",
     missingIds: "Missing event or sub-event id",
+    insufficientBalance: "Insufficient balance",
   },
   datePicker: {
     title: "Filter by Date Range",

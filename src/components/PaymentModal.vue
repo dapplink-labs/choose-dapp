@@ -405,6 +405,24 @@ async function handleConfirm() {
         return
     }
 
+    // 校验余额 (Check balance for buy orders)
+    if (activeSide.value === 'buy') {
+        let requiredAmount = 0
+        if (orderType.value === 'market') {
+            requiredAmount = Number(inputValue.value) || 0
+        } else {
+            const p = Number(price.value) || 0
+            const s = Number(inputValue.value) || 0
+            requiredAmount = (p * s) / 100
+        }
+
+        const currentBalance = Number(userBalance.value) || 0
+        if (requiredAmount > currentBalance) {
+            ElMessage.error(t('payment.insufficientBalance') || 'Insufficient balance')
+            return
+        }
+    }
+
     submitting.value = true
     try {
         const orderParams = {
