@@ -62,12 +62,15 @@
         <!-- 消息入口 -->
         <button :class="['message-entry-btn', { 'is-dark': isDark }]" type="button" @click="goMessages"
           :title="$t('messages.title') || '消息'">
-          <svg class="message-icon" xmlns="http://www.w3.org/2000/svg" width="20.003" height="24"
-            viewBox="0 0 20.003 24" aria-hidden="true">
-            <path fill="currentColor"
-              d="M184.288,117h-18a1,1,0,0,1-.8-1.6l2.238-3.026V106.5a7.567,7.567,0,0,1,15.133,0v5.879l2.238,3.026a1,1,0,0,1-.8,1.6Zm-16.018-2H182.3l-1.255-1.7a1,1,0,0,1-.2-.594V106.5a5.566,5.566,0,0,0-11.132,0v6.208a1,1,0,0,1-.2.594Zm9.519,5h-5a1,1,0,0,1,0-2h5a1,1,0,0,1,0,2Zm-2-22h-1a1,1,0,1,1,0-2h1a1,1,0,1,1,0,2Z"
-              transform="translate(-165.286 -96)" />
-          </svg>
+          <div style="position: relative; display: flex;">
+            <svg class="message-icon" xmlns="http://www.w3.org/2000/svg" width="20.003" height="24"
+              viewBox="0 0 20.003 24" aria-hidden="true">
+              <path fill="currentColor"
+                d="M184.288,117h-18a1,1,0,0,1-.8-1.6l2.238-3.026V106.5a7.567,7.567,0,0,1,15.133,0v5.879l2.238,3.026a1,1,0,0,1-.8,1.6Zm-16.018-2H182.3l-1.255-1.7a1,1,0,0,1-.2-.594V106.5a5.566,5.566,0,0,0-11.132,0v6.208a1,1,0,0,1-.2.594Zm9.519,5h-5a1,1,0,0,1,0-2h5a1,1,0,0,1,0,2Zm-2-22h-1a1,1,0,1,1,0-2h1a1,1,0,1,1,0,2Z"
+                transform="translate(-165.286 -96)" />
+            </svg>
+            <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+          </div>
         </button>
 
         <!-- 关灯按钮 -->
@@ -115,12 +118,15 @@
       <div class="h5-user-section">
         <!-- 消息入口 -->
         <button class="h5-message-entry-btn" type="button" @click="goMessages" :title="$t('messages.title') || '消息'">
-          <svg class="message-icon" xmlns="http://www.w3.org/2000/svg" width="20.003" height="24"
-            viewBox="0 0 20.003 24" aria-hidden="true">
-            <path fill="currentColor"
-              d="M184.288,117h-18a1,1,0,0,1-.8-1.6l2.238-3.026V106.5a7.567,7.567,0,0,1,15.133,0v5.879l2.238,3.026a1,1,0,0,1-.8,1.6Zm-16.018-2H182.3l-1.255-1.7a1,1,0,0,1-.2-.594V106.5a5.566,5.566,0,0,0-11.132,0v6.208a1,1,0,0,1-.2.594Zm9.519,5h-5a1,1,0,0,1,0-2h5a1,1,0,0,1,0,2Zm-2-22h-1a1,1,0,1,1,0-2h1a1,1,0,1,1,0,2Z"
-              transform="translate(-165.286 -96)" />
-          </svg>
+          <div style="position: relative; display: flex;">
+            <svg class="message-icon" xmlns="http://www.w3.org/2000/svg" width="20.003" height="24"
+              viewBox="0 0 20.003 24" aria-hidden="true">
+              <path fill="currentColor"
+                d="M184.288,117h-18a1,1,0,0,1-.8-1.6l2.238-3.026V106.5a7.567,7.567,0,0,1,15.133,0v5.879l2.238,3.026a1,1,0,0,1-.8,1.6Zm-16.018-2H182.3l-1.255-1.7a1,1,0,0,1-.2-.594V106.5a5.566,5.566,0,0,0-11.132,0v6.208a1,1,0,0,1-.2.594Zm9.519,5h-5a1,1,0,0,1,0-2h5a1,1,0,0,1,0,2Zm-2-22h-1a1,1,0,1,1,0-2h1a1,1,0,1,1,0,2Z"
+                transform="translate(-165.286 -96)" />
+            </svg>
+            <span v-if="unreadCount > 0" class="unread-badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
+          </div>
         </button>
 
 
@@ -227,6 +233,7 @@ import { useCounterStore } from '@/stores/counter'
 import { useI18n } from 'vue-i18n'
 import img from "../assets/wallconnect.svg";
 import router from "@/router";
+import { getUnreadAnnouncementCount } from '@/api/APIEvent'
 import logoLight from "@/assets/logo.png";
 import logoDark from "@/assets/logo-Dark.png";
 import cnIcon from "@/assets/languagesIcon/cn.svg";
@@ -239,6 +246,8 @@ const { disconnect } = useDisconnect();
 const counterStore = useCounterStore()
 const chainId = useChainId();
 const { locale, t } = useI18n();
+const { address, status } = useAccount()
+
 
 // 批量导入 icon 资源，减少单独 import
 const iconModules = import.meta.glob('@/assets/icon/*.{png,svg}', { eager: true })
@@ -276,8 +285,33 @@ const searchValue = ref('')
 const showUserMenu = ref(false)
 const userMenuRef = ref(null)
 
+const unreadCount = ref(0)
+
+const fetchUnreadCount = async () => {
+  if (!address.value) {
+    unreadCount.value = 0
+    return
+  }
+  try {
+    const res = await getUnreadAnnouncementCount({ user_address: address.value })
+    if (res && res.code === 2000) {
+      unreadCount.value = res.data?.unread_count || 0
+    }
+  } catch (error) {
+    console.error('Failed to fetch unread count:', error)
+  }
+}
+
+watch(address, (newVal) => {
+  if (newVal) {
+    fetchUnreadCount()
+  } else {
+    unreadCount.value = 0
+  }
+}, { immediate: true })
+
 // wagmi 连接状态
-const { address, status } = useAccount()
+
 const { connect, connectors } = useConnect()
 
 const isConnected = computed(() => status.value === 'connected')
@@ -781,6 +815,20 @@ onBeforeUnmount(() => {
   .h5-message-entry-btn .message-icon {
     color: var(--text-color, #FFFFFF);
     transition: color 0.2s ease;
+  }
+
+  .unread-badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background-color: #ff4d4f;
+    color: #fff;
+    font-size: 10px;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 10px;
+    font-weight: bold;
+    transform: scale(0.8);
   }
 
   // 语言切换按钮

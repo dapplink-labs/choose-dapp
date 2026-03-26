@@ -100,3 +100,6 @@ export const getHomeBanner = (data) => {
     return request.get('/api/v1/banner/list', { params: data })
 }
 
+
+
+

@@ -147,3 +147,22 @@ export const fiatWithdraw = (data) => {
 export const userLogin = (data) => {
   return request.post('/api/v1/user/login', data)
 }
+// 获取公告列表
+export const getAnnouncementList = (data) => {
+    return request.post('/api/v1/announcement/list', data)
+}
+
+// 获取公告详情
+export const getAnnouncementDetail = (data) => {
+    return request.post('/api/v1/announcement/detail', data)
+}
+
+// 标记公告已读
+export const markAnnouncementRead = (data) => {
+    return request.post('/api/v1/announcement/read', data)
+}
+
+// 获取未读公告数量
+export const getUnreadAnnouncementCount = (data) => {
+    return request.post('/api/v1/announcement/unread-count', data)
+}

@@ -226,7 +226,7 @@ const displayTotal = computed(() => {
             return inputValue.value ? `$${Number(inputValue.value).toFixed(2)}` : '$0.00'
         }
         // 市价卖出：无法预估总额，显示占位符
-        return '--'
+        return '0'
     }
     // 限价单：price * shares / 100
     const p = Number(price.value) || 0
@@ -403,6 +403,24 @@ async function handleConfirm() {
     if (!props.eventGuid || !props.subEventGuid) {
         ElMessage.error(t('payment.missingIds') || 'Missing event or sub-event id')
         return
+    }
+
+    // 校验余额 (Check balance for buy orders)
+    if (activeSide.value === 'buy') {
+        let requiredAmount = 0
+        if (orderType.value === 'market') {
+            requiredAmount = Number(inputValue.value) || 0
+        } else {
+            const p = Number(price.value) || 0
+            const s = Number(inputValue.value) || 0
+            requiredAmount = (p * s) / 100
+        }
+
+        const currentBalance = Number(userBalance.value) || 0
+        if (requiredAmount > currentBalance) {
+            ElMessage.error(t('payment.insufficientBalance') || 'Insufficient balance')
+            return
+        }
     }
 
     submitting.value = true
