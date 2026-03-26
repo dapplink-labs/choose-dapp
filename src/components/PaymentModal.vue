@@ -226,7 +226,7 @@ const displayTotal = computed(() => {
             return inputValue.value ? `$${Number(inputValue.value).toFixed(2)}` : '$0.00'
         }
         // 市价卖出：无法预估总额，显示占位符
-        return '--'
+        return '0'
     }
     // 限价单：price * shares / 100
     const p = Number(price.value) || 0
