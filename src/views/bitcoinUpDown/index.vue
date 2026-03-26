@@ -37,10 +37,14 @@
             </svg>
           </div>
           <div class="asset-text">
-            <h2>{{ detailData.title || $t('bitcoinUpDown.questionTitle') }}</h2>
+            <h2>
+              <span>{{ detailData.title || $t('bitcoinUpDown.questionTitle') }}</span>
+              <span v-if="showBaopeiTag" class="baopei-tag">{{ $t('bitcoinUpDown.baopei') }}</span>
+            </h2>
+            <p v-if="titleTimeRangeText" class="asset-time-range">{{ titleTimeRangeText }}</p>
           </div>
-          <!-- 选中历史记录时隐藏倒计时 -->
-          <div class="timer" v-show="activeSegmentMode !== 'past'">
+          <!-- 倒计时规则：进入历史视图隐藏；剩余时间超过 24h 隐藏 -->
+          <div class="timer" v-show="activeSegmentMode !== 'past' && shouldShowCountDown">
             <div class="time-block">
               <div class="time-value">
                 <span class="digit-wrapper" v-for="(char, i) in countDown.hours.split('')" :key="'h' + i">
@@ -372,6 +376,59 @@ const handleBack = () => router.back()
 const goWithdraw = () => router.push({ name: 'withdraw' })
 const currentEventGuid = computed(() => route.query.id || route.query.event_guid || '')
 const requestedSubEventGuid = computed(() => route.query.sub_event_guid || '')
+const showBaopeiTag = computed(() => {
+  const fromFlag = String(route.query.from_new_user_compensation || '').toLowerCase()
+  const nav = String(route.query.nav || '').toUpperCase()
+  return fromFlag === '1' || fromFlag === 'true' || nav === 'NEW_USER_EVENTS'
+})
+
+const parseDateSafe = (value) => {
+  if (!value) return null
+  const date = value instanceof Date ? value : new Date(String(value).replace(' ', 'T'))
+  return Number.isNaN(date.getTime()) ? null : date
+}
+
+const formatMonthDay = (date) => {
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const monthSuffix = t('datePicker.month')
+  const daySuffix = t('datePicker.day')
+
+  const monthText = monthSuffix ? `${month}${monthSuffix}` : `${month}`
+  const dayText = daySuffix ? `${day}${daySuffix}` : `${day}`
+
+  // 英文等场景 month/day 后缀为空时，补一个空格避免粘连
+  if (!monthSuffix && !daySuffix) return `${month} ${day}`
+  return `${monthText}${dayText}`
+}
+const formatHourMinute = (date) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+const getUtcOffsetText = (date = new Date()) => {
+  const offsetMinutes = -date.getTimezoneOffset()
+  const sign = offsetMinutes >= 0 ? '+' : '-'
+  const abs = Math.abs(offsetMinutes)
+  const hours = Math.floor(abs / 60)
+  const minutes = abs % 60
+  if (minutes === 0) return `UTC${sign}${hours}`
+  return `UTC${sign}${hours}:${String(minutes).padStart(2, '0')}`
+}
+
+const titleTimeRangeText = computed(() => {
+  const start = parseDateSafe(detailData.value.startTime)
+  const end = parseDateSafe(detailData.value.closeTime)
+  if (!start && !end) return ''
+  const tz = getUtcOffsetText(end || start || new Date())
+  if (start && end) {
+    const sameDay = start.getFullYear() === end.getFullYear()
+      && start.getMonth() === end.getMonth()
+      && start.getDate() === end.getDate()
+    if (sameDay) {
+      return `${formatMonthDay(start)} ${formatHourMinute(start)}-${formatHourMinute(end)} ${tz}`
+    }
+    return `${formatMonthDay(start)} ${formatHourMinute(start)}-${formatMonthDay(end)} ${formatHourMinute(end)} ${tz}`
+  }
+  const single = end || start
+  return `${formatMonthDay(single)} ${formatHourMinute(single)} ${tz}`
+})
 const activeTab = ref('Positions')
 const isBookOpen = ref(false)
 const orderBookTab = ref('yes')
@@ -525,6 +582,7 @@ const detailData = ref({
   tradeVolume: 0,
   rulesDescription: '',
   closeTime: '',
+  startTime: '',
   targetPrice: null,
   currentPrice: null,
   yesAskPrice: '--',
@@ -811,6 +869,11 @@ const handleScroll = (e) => {
 // --- 倒计时 ---
 const targetTime = ref(0)
 const countDown = ref({ hours: '00', minutes: '00', seconds: '00' })
+const remainingSeconds = ref(0)
+const shouldShowCountDown = computed(() => {
+  if (!Number.isFinite(targetTime.value) || targetTime.value <= 0) return false
+  return remainingSeconds.value <= 24 * 3600
+})
 let timerInterval = null
 // 启动倒计时（每秒刷新）
 const startCountDown = () => {
@@ -822,6 +885,7 @@ const startCountDown = () => {
 // 当倒计时归零且目标时间有效时，标记事件为已结束
 const updateCountDown = () => {
   const diff = Math.max(0, Math.floor((targetTime.value - Date.now()) / 1000))
+  remainingSeconds.value = diff
   const hours = Math.floor(diff / 3600).toString().padStart(2, '0')
   const minutes = Math.floor((diff % 3600) / 60).toString().padStart(2, '0')
   const seconds = (diff % 60).toString().padStart(2, '0')
@@ -889,59 +953,167 @@ const diffData = computed(() => {
 const chartRef = ref(null)
 // 图表实例
 let chartInstance = null
+// 图表 X 轴唯一键
+let chartDataKeys = []
 // 图表 X 轴数据
 let chartDataX = []
-// 图表 Y 轴数据
-let chartDataY = []
-// 实时价格点队列
-let liveSeriesPoints = []
+// 图表多条折线数据
+let chartSeriesData = []
+// 实时价格点队列，按 outcome 分组
+let liveSeriesPoints = {}
+
+const CHART_SERIES_COLORS = {
+  yes: '#BBFF2E',
+  no: '#E44096',
+}
+
+const normalizeOutcomeKey = (value, fallback = 'series') => {
+  const text = String(value || '').trim().toLowerCase()
+  if (!text) return fallback
+  if (['yes', 'up'].includes(text)) return 'yes'
+  if (['no', 'down'].includes(text)) return 'no'
+  return text
+}
+
+const getChartSeriesMeta = (outcomeKey, index = 0) => {
+  const normalized = normalizeOutcomeKey(outcomeKey, `series_${index + 1}`)
+  if (normalized === 'yes') return { key: normalized, name: 'YES', color: CHART_SERIES_COLORS.yes }
+  if (normalized === 'no') return { key: normalized, name: 'NO', color: CHART_SERIES_COLORS.no }
+  return {
+    key: normalized,
+    name: String(outcomeKey || `Series ${index + 1}`).toUpperCase(),
+    color: ['#5073e5', '#31c1b9', '#ffb020', '#9b7cff'][index % 4],
+  }
+}
+
+const normalizePointTimestamp = (value) => {
+  if (!value) return ''
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? '' : value.toISOString()
+  }
+  const date = new Date(String(value).replace(' ', 'T'))
+  if (!Number.isNaN(date.getTime())) return date.toISOString()
+  return String(value)
+}
+
+const buildChartPoint = (price, ts, fallbackKey = '') => {
+  const num = Number(price)
+  if (!Number.isFinite(num)) return null
+  const timestamp = normalizePointTimestamp(ts || new Date())
+  const label = formatTimeLocal(ts || new Date(), { seconds: true }) || String(ts || '')
+  const key = timestamp || `${fallbackKey || 'point'}-${label}`
+  return { key, label, value: num, timestamp }
+}
+
+const sortChartPoints = (points = []) => {
+  return [...points].sort((left, right) => {
+    const leftDate = parseDateSafe(left?.timestamp)
+    const rightDate = parseDateSafe(right?.timestamp)
+    if (leftDate && rightDate) return leftDate.getTime() - rightDate.getTime()
+    if (leftDate) return -1
+    if (rightDate) return 1
+    return String(left?.key || '').localeCompare(String(right?.key || ''))
+  })
+}
 
 // 设置图表点数据
-const setChartPoints = (points) => {
-  chartDataX = points.map(point => point.label)
-  chartDataY = points.map(point => point.value)
+const setChartPoints = (seriesList) => {
+  chartSeriesData = Array.isArray(seriesList) ? seriesList.filter(series => Array.isArray(series?.points) && series.points.length) : []
+  const categoryMap = new Map()
+
+  chartSeriesData.forEach((series, seriesIndex) => {
+    series.points.forEach((point, pointIndex) => {
+      const key = point?.key || point?.timestamp || `${series.key || seriesIndex}-${pointIndex}-${point?.label || ''}`
+      if (categoryMap.has(key)) return
+      const sortDate = parseDateSafe(point?.timestamp)
+      categoryMap.set(key, {
+        key,
+        label: point?.label || '',
+        sortValue: sortDate ? sortDate.getTime() : Number.MAX_SAFE_INTEGER,
+        order: categoryMap.size,
+      })
+    })
+  })
+
+  const categories = Array.from(categoryMap.values()).sort((left, right) => {
+    if (left.sortValue !== right.sortValue) return left.sortValue - right.sortValue
+    return left.order - right.order
+  })
+
+  chartDataKeys = categories.map(item => item.key)
+  chartDataX = categories.map(item => item.label)
+}
+
+const buildChartSeriesList = (seriesState = {}) => {
+  return Object.entries(seriesState)
+    .map(([outcomeKey, points], index) => {
+      const meta = getChartSeriesMeta(outcomeKey, index)
+      return {
+        ...meta,
+        points: sortChartPoints(points).slice(-50),
+      }
+    })
+    .filter(series => series.points.length)
+}
+
+const getLatestSeriesPoint = (series) => {
+  if (!Array.isArray(series?.points) || !series.points.length) return null
+  return series.points[series.points.length - 1]
+}
+
+const buildSeriesLineData = (series) => {
+  const pointMap = new Map((series?.points || []).map(point => [point.key, point.value]))
+  return chartDataKeys.map(key => (pointMap.has(key) ? pointMap.get(key) : null))
 }
 
 // 同步实时图表
 const syncLiveChart = () => {
-  setChartPoints(liveSeriesPoints)
+  setChartPoints(buildChartSeriesList(liveSeriesPoints))
   updateChart()
 }
 
-// 将 API 返回的历史价格数据解析为图表所需的 [{label, value, timestamp}] 格式
+// 将 API 返回的历史价格数据解析为按 outcome 分组的折线数据
 const buildChartPointsFromHistory = (priceHistoryData) => {
   console.log('[Chart]', 'buildChartPointsFromHistory 历史价格', priceHistoryData)
   const points = Array.isArray(priceHistoryData?.data_points) ? priceHistoryData.data_points : []
-  if (!points.length) return []
-  const pickedPoint = points.find(item => Array.isArray(item?.history) && item.history.length) || points[0]
-  const histories = Array.isArray(pickedPoint?.history) ? pickedPoint.history : []
-  const pickedHistory = histories.find(item => (item?.outcome || '').toLowerCase() === 'yes') || histories[0]
-  const rows = Array.isArray(pickedHistory?.data) ? pickedHistory.data : []
-  const result = rows
-    .map(row => {
-      const price = Number(row?.p)
-      if (!Number.isFinite(price)) return null
-      const label = formatTimeLocal(row?.t) || String(row?.t || '')
-      return { label, value: price, timestamp: row?.t || '' }
+  if (!points.length) return {}
+
+  const seriesState = {}
+  points.forEach((group, groupIndex) => {
+    const histories = Array.isArray(group?.history) ? group.history : []
+    histories.forEach((history, historyIndex) => {
+      const outcomeKey = normalizeOutcomeKey(history?.outcome, `series_${groupIndex}_${historyIndex}`)
+      const rows = Array.isArray(history?.data) ? history.data : []
+      const parsedRows = rows
+        .map((row, rowIndex) => buildChartPoint(row?.p, row?.t, `${outcomeKey}-${groupIndex}-${historyIndex}-${rowIndex}`))
+        .filter(Boolean)
+      if (!parsedRows.length) return
+      seriesState[outcomeKey] = [...(seriesState[outcomeKey] || []), ...parsedRows]
+      seriesState[outcomeKey] = sortChartPoints(seriesState[outcomeKey]).slice(-50)
     })
-    .filter(Boolean)
-    .slice(-50)
-  return result
+  })
+
+  return seriesState
 }
 
 // 将新的实时价格点追加到走势图数据队列（最多保留 50 个点）
-const pushPricePoint = (price, ts) => {
-  const num = Number(price)
-  if (!Number.isFinite(num)) return
-  const label = formatTimeLocal(ts || new Date(), { seconds: true }) || new Date().toLocaleTimeString('en-US', { hour12: false })
-  const point = { label, value: num, timestamp: (ts ? new Date(ts) : new Date()).toISOString() }
-  liveSeriesPoints.push(point)
-  console.log('[Chart]', 'pushPricePoint 实时价格', { price: num, timestamp: point.timestamp, label, totalPoints: liveSeriesPoints.length })
-  if (liveSeriesPoints.length > 50) {
-    liveSeriesPoints = liveSeriesPoints.slice(-50)
+const pushPricePoint = (price, ts, outcome = 'yes') => {
+  const outcomeKey = normalizeOutcomeKey(outcome)
+  const point = buildChartPoint(price, ts, `${outcomeKey}-${(liveSeriesPoints[outcomeKey] || []).length}`)
+  if (!point) return
+  liveSeriesPoints[outcomeKey] = [...(liveSeriesPoints[outcomeKey] || []), point]
+  liveSeriesPoints[outcomeKey] = sortChartPoints(liveSeriesPoints[outcomeKey]).slice(-50)
+  console.log('[Chart]', 'pushPricePoint 实时价格', {
+    outcome: outcomeKey,
+    price: point.value,
+    timestamp: point.timestamp,
+    label: point.label,
+    totalPoints: liveSeriesPoints[outcomeKey].length,
+  })
+  if (outcomeKey === 'yes' || !Number.isFinite(livePrice.value)) {
+    livePrice.value = point.value
+    detailData.value.currentPrice = point.value
   }
-  livePrice.value = num
-  detailData.value.currentPrice = num
   if (activeSegmentMode.value === 'live') {
     syncLiveChart()
   }
@@ -962,6 +1134,23 @@ const updateChart = () => {
     markLineData = [{ yAxis: displayTargetPrice.value }]
   }
 
+  const lineSeries = chartSeriesData.map((series, index) => ({
+    name: series.name,
+    type: 'line',
+    data: buildSeriesLineData(series),
+    smooth: 0.3,
+    symbol: 'none',
+    connectNulls: false,
+    lineStyle: { width: 3, color: series.color },
+    itemStyle: { color: series.color },
+    markLine: index === 0 ? {
+      symbol: ['none', 'none'],
+      label: { show: false },
+      data: markLineData,
+      lineStyle: { type: 'dashed', color: '#888', width: 1, opacity: 0.6 }
+    } : undefined,
+  }))
+
   const option = {
     backgroundColor: 'transparent',
     animation: true,
@@ -972,7 +1161,7 @@ const updateChart = () => {
     xAxis: {
       type: 'category', data: chartDataX,
       axisLine: { show: false }, axisTick: { show: false },
-      axisLabel: { show: true, interval: Math.floor(chartDataX.length / 2), color: colors.axisLabel, fontSize: 10 }
+      axisLabel: { show: true, interval: chartDataX.length > 1 ? Math.floor(chartDataX.length / 2) : 0, color: colors.axisLabel, fontSize: 10 }
     },
     yAxis: {
       type: 'value', position: 'right', scale: true,
@@ -980,28 +1169,22 @@ const updateChart = () => {
       axisLabel: { formatter: (v) => '$' + v.toFixed(2), color: colors.axisLabel, fontSize: 10 },
       splitLine: { lineStyle: { color: colors.splitLine } }
     },
-    series: [
-      {
-        name: 'PriceLine', type: 'line', data: chartDataY,
-        smooth: 0.3, symbol: 'none',
-        lineStyle: { width: 3, color: colors.primary },
-        markLine: {
-          symbol: ['none', 'none'], label: { show: false },
-          data: markLineData,
-          lineStyle: { type: 'dashed', color: '#888', width: 1, opacity: 0.6 }
-        }
-      }
-    ]
+    series: lineSeries
   }
 
   if (activeSegmentMode.value !== 'past') {
-    option.series.push({
-      name: 'PulseDot', type: 'effectScatter', coordinateSystem: 'cartesian2d',
-      data: [[chartDataX[chartDataX.length - 1], chartDataY[chartDataY.length - 1]]],
-      symbolSize: 8, showEffectOn: 'render',
-      rippleEffect: { period: 2, scale: 3, brushType: 'fill' },
-      itemStyle: { color: colors.primary, shadowBlur: 10, shadowColor: colors.primary },
-      zlevel: 1
+    chartSeriesData.forEach((series) => {
+      const latestPoint = getLatestSeriesPoint(series)
+      const xIndex = latestPoint ? chartDataKeys.indexOf(latestPoint.key) : -1
+      if (!latestPoint || xIndex < 0) return
+      option.series.push({
+        name: `${series.name}PulseDot`, type: 'effectScatter', coordinateSystem: 'cartesian2d',
+        data: [{ value: [xIndex, latestPoint.value] }],
+        symbolSize: 8, showEffectOn: 'render',
+        rippleEffect: { period: 2, scale: 3, brushType: 'fill' },
+        itemStyle: { color: series.color, shadowBlur: 10, shadowColor: series.color },
+        zlevel: 1
+      })
     })
   }
   chartInstance.setOption(option, false)
@@ -1100,17 +1283,23 @@ const fetchPriceHistory = async () => {
     })
     if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Fetch price history failed')
     liveSeriesPoints = buildChartPointsFromHistory(res?.data?.data?.data || res?.data?.data || {})
-    if (liveSeriesPoints.length) {
-      const latest = liveSeriesPoints[liveSeriesPoints.length - 1]
-      livePrice.value = latest.value
-      detailData.value.currentPrice = latest.value
+    const liveChartSeries = buildChartSeriesList(liveSeriesPoints)
+    const latestYes = liveChartSeries.find(series => series.key === 'yes')
+    const latestFallback = liveChartSeries[0]
+    const latestPoint = getLatestSeriesPoint(latestYes || latestFallback)
+    if (latestPoint) {
+      livePrice.value = latestPoint.value
+      detailData.value.currentPrice = latestPoint.value
       if (activeSegmentMode.value === 'live') {
         syncLiveChart()
       }
+    } else {
+      setChartPoints([])
+      updateChart()
     }
   } catch (error) {
     console.error('Fetch price history failed', error)
-    liveSeriesPoints = []
+    liveSeriesPoints = {}
     setChartPoints([])
     updateChart()
   }
@@ -1155,6 +1344,7 @@ const fetchDetail = async () => {
       yesDirection?.new_bid_price,
       yesDirection?.new_ask_price,
     )
+    const startTime = subEvent?.open_time || eventItem?.open_time || ''
     const closeTime = subEvent?.close_time || eventItem?.close_time || ''
     if (closeTime) {
       const closeTs = new Date(String(closeTime).replace(' ', 'T')).getTime()
@@ -1183,6 +1373,7 @@ const fetchDetail = async () => {
       ) || 0,
       rulesDescription: eventItem?.description || eventItem?.rule_description || '',
       closeTime,
+      startTime,
       targetPrice,
       currentPrice,
       yesAskPrice: formatCentText(yesDirection?.new_ask_price || yesDirection?.new_bid_price),
@@ -1233,10 +1424,10 @@ const handleMqttBusinessMessage = (data, topic) => {
   if (type === 'price_update' && data.prices) {
     const yesPoints = Array.isArray(data.prices?.YES) ? data.prices.YES : []
     const noPoints = Array.isArray(data.prices?.NO) ? data.prices.NO : []
-    const picked = yesPoints[yesPoints.length - 1] || noPoints[noPoints.length - 1]
-    if (picked?.p) pushPricePoint(picked.p, picked.t)
     const latestYes = yesPoints[yesPoints.length - 1]
     const latestNo = noPoints[noPoints.length - 1]
+    if (latestYes?.p) pushPricePoint(latestYes.p, latestYes.t, 'yes')
+    if (latestNo?.p) pushPricePoint(latestNo.p, latestNo.t, 'no')
     if (latestYes?.p) detailData.value.yesAskPrice = formatCentText(latestYes.p)
     if (latestNo?.p) detailData.value.noAskPrice = formatCentText(latestNo.p)
     console.log('[Chart][Amount]', 'price_update', { yesPick: latestYes, noPick: latestNo, yesAskPrice: detailData.value.yesAskPrice, noAskPrice: detailData.value.noAskPrice })
@@ -1286,10 +1477,8 @@ const handleMqttBusinessMessage = (data, topic) => {
       if (!Number.isFinite(price)) return
       orderBookYes.value.last_trade_price = String(price)
       orderBookNo.value.last_trade_price = String(price)
-      if (!tr?.outcome || tr.outcome.toUpperCase() === 'YES') {
-        const tradeTs = tr?.trade_time ? new Date(tr.trade_time * 1000).toISOString() : undefined
-        pushPricePoint(price, tradeTs)
-      }
+      const tradeTs = tr?.trade_time ? new Date(tr.trade_time * 1000).toISOString() : undefined
+      pushPricePoint(price, tradeTs, tr?.outcome || 'yes')
     })
     return
   }
@@ -1383,12 +1572,17 @@ const startMqttStream = async () => {
 
 // 切换到历史记录视图，展示过去的价格走势
 const selectPastRecord = (record) => {
-  if (!record?.points?.length) return
+  const recordSeries = Array.isArray(record?.seriesList)
+    ? record.seriesList
+    : (Array.isArray(record?.points) && record.points.length
+      ? [{ ...getChartSeriesMeta('yes'), points: record.points }]
+      : [])
+  if (!recordSeries.length) return
   activeSegmentMode.value = 'past'
   selectedPastRecord.value = record
   // 切到历史：断开 MQTT，保持历史视图稳定
   stopMqttStream()
-  setChartPoints(record.points)
+  setChartPoints(recordSeries)
   updateChart()
 }
 
@@ -1604,7 +1798,31 @@ $primary-blue: #5073e5;
     margin: 0;
     line-height: 1.3;
     color: var(--bg-opposite);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     transition: font-size 0.3s ease;
+  }
+
+  .asset-time-range {
+    margin: 6px 0 0;
+    color: var(--text-dark-gray);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .baopei-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 600;
+    color: #000;
+    background: linear-gradient(90deg, rgb(62, 195, 197) 0%, rgb(153, 89, 189) 100%);
+    white-space: nowrap;
   }
 
   .timer {
@@ -1622,7 +1840,7 @@ $primary-blue: #5073e5;
     .unit {
       font-size: 20px;
       font-weight: 700;
-      color: #888;
+      color: #F6465D;
       line-height: 1;
       transition: font-size 0.3s ease;
     }
@@ -1725,7 +1943,7 @@ $primary-blue: #5073e5;
 
     &.current .label,
     &.current .value {
-      color: $primary-blue;
+      color: var(--text-color-y);
     }
   }
 }

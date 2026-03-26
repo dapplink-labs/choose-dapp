@@ -126,7 +126,9 @@ export default {
     secs: "SECS",
     volume: "Vol.",
     questionTitle: "Will Ethereum go up or down on Feb 27?",
-    rulesDescription: "The FED interest rates are defined in this market by the upper bound of the target federal funds range."
+    rulesDescription:
+      "The FED interest rates are defined in this market by the upper bound of the target federal funds range.",
+    baopei: "Compensation"
   },
   link: {
     titel: "Connect Wallet",

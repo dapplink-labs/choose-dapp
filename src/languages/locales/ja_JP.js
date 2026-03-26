@@ -126,7 +126,8 @@ export default {
     "secs": "秒",
     "volume": "出来高",
     "questionTitle": "イーサリアムは2月27日に上昇しますか下降しますか？",
-    "rulesDescription": "本市場におけるFED金利は、フェデラルファンド目標レンジの上限によって定義されています。"
+    "rulesDescription": "本市場におけるFED金利は、フェデラルファンド目標レンジの上限によって定義されています。",
+    "baopei": "補償"
   },
   "link": {
     "titel": "ウォレット接続",

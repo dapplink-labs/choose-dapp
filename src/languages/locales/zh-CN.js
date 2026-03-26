@@ -126,7 +126,8 @@ export default {
     "secs": "秒",
     "volume": "成交量",
     "questionTitle": "以太坊在2月27日上涨还是下跌?",
-    "rulesDescription": "本市场中 FED 利率由联邦基金目标区间的上限定义。"
+    "rulesDescription": "本市场中 FED 利率由联邦基金目标区间的上限定义。",
+    "baopei": "包赔"
   },
   "link": {
     "titel": "链接钱包",

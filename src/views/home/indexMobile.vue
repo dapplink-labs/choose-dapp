@@ -197,7 +197,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -273,7 +273,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                                }}</span>
+                                            }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -339,7 +339,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                                }}</span>
+                                            }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -357,10 +357,10 @@
                         <div ref="loadMoreSentinel" class="load-more-sentinel" aria-hidden="true"></div>
                         <div class="load-more-footer">
                             <span v-if="loadingMore" class="load-more-text">{{ $t('home.loadingMore') || '加载中...'
-                                }}</span>
+                            }}</span>
                             <span v-else-if="cardList.length && !hasMore" class="load-more-text">{{ $t('home.noMore') ||
                                 '没有更多了'
-                                }}</span>
+                            }}</span>
                         </div>
                     </div>
                 </div>
@@ -449,16 +449,11 @@ watch(
 async function getHomeBannerList() {
     try {
         const response = await getHomeBanner({ language: language, limit: 10 });
-        const list = response?.data?.data?.banners
-            || response?.data?.banners
-            || response?.data?.data?.banner_list
-            || response?.data?.banner_list
-            || [];
-
+        const list = response?.data?.data?.banners || [];
         bannerList.value = list
             .map((item) => ({
-                img: item?.log || item?.img || item?.image || item?.banner || item?.banner_url || '',
-                href: item?.href || item?.url || item?.link || '',
+                img: item?.logo || '',
+                href: item?.link || '',
             }))
             .filter((item) => item.img);
     } catch (error) {
@@ -620,6 +615,16 @@ const getCountdown = (closeTime) => {
     const diff = end.getTime() - now.value;
     if (diff <= 0) return '--';
     const totalSec = Math.floor(diff / 1000);
+    // 倒计时超过 72h 时，把前面计算为“天”
+    const showDays = totalSec > 72 * 3600;
+    if (showDays) {
+        const d = Math.floor(totalSec / (24 * 3600));
+        const remainSec = totalSec % (24 * 3600);
+        const h = Math.floor(remainSec / 3600);
+        const m = Math.floor((remainSec % 3600) / 60);
+        const s = remainSec % 60;
+        return `${t('datePicker.days', { n: d })} ${[h, m, s].map((x) => String(x).padStart(2, '0')).join(':')}`;
+    }
     const h = Math.floor(totalSec / 3600);
     const m = Math.floor((totalSec % 3600) / 60);
     const s = totalSec % 60;
@@ -712,6 +717,7 @@ const navigateToDetail = (item, choice) => {
             path: '/bitcoin-up-down',
             query: {
                 id: item.id,
+                ...(isNewUserEventsCategory.value ? { from_new_user_compensation: '1' } : {}),
             },
         });
         return;
@@ -1469,6 +1475,7 @@ $gradient-mask-right: linear-gradient(to right,
                         &.active {
                             transform: scale(1.15);
                         }
+
                         &.active path {
                             fill: var(--text-color-y);
                         }

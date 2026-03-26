@@ -133,7 +133,9 @@ export default {
     secs: "초",
     volume: "거래량",
     questionTitle: "이더리움이 2월 27일에 오를까요 내릴까요?",
-    rulesDescription: "본 시장의 FED 금리는 연방기금 목표 범위 상한선으로 정의됩니다."
+    rulesDescription:
+      "본 시장의 FED 금리는 연방기금 목표 범위 상한선으로 정의됩니다.",
+    baopei: "보상"
   },
   link: {
     titel: "지갑 연결",
