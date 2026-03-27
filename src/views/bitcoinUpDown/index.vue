@@ -1695,7 +1695,7 @@ const startMqttStream = async () => {
   if (!currentEventGuid.value || !resolvedSubEventGuid.value) return
   if (iotMqtt) return
 
-  const userGuid = address.value || ''
+  const userGuid = localStorage.getItem('user_guid') || ''
   const topics = [
     `price/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
     `orderbook/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,

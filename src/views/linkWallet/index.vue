@@ -180,7 +180,9 @@ async function wallconnects(id, chainId) {
 
       // 3️⃣ 签名成功 → 钱包登录接口 ✅
       try {
-        await userLogin({ user_address: addr })
+       const res = await userLogin({ user_address: addr })
+        console.log(res)
+        localStorage.setItem('user_guid', res.data.data.user_guid)
       } catch (err) {
         console.error('Wallet login failed:', err)
         Message.error(t('linkWallet.userVerificationFailed') || 'Wallet login failed')

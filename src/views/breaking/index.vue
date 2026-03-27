@@ -7,11 +7,11 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import BreakingPC from './indexPC.vue'
 import BreakingMobile from './breakingMobile.vue'
 
-const isMobile = ref(false)
+const isMobile = ref(true)
 
 const updateIsMobile = () => {
   if (typeof window !== 'undefined') {
-    isMobile.value = window.innerWidth <= 768
+    // isMobile.value = window.innerWidth <= 768
   }
 }
 
