@@ -119,7 +119,7 @@ const handleConfirm = async () => {
 
         const code = res.data.code
         const msg = String(res.data.message || '').toLowerCase()
-        const isSuccess = code === 0 || code === 200 || code === 2000 || msg.includes('order created successfully') || msg === 'success'
+        const isSuccess = code === 2000 || msg.includes('order created successfully') || msg === 'success'
 
         if (isSuccess) {
             emit('order-success', res.data.data)
