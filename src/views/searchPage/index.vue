@@ -20,7 +20,8 @@
             <div v-if="!searchQuery.trim()" class="browse-section">
                 <h3 class="section-title">{{ $t('searchPage.browse') }}</h3>
                 <div class="browse-buttons">
-                    <button v-for="item in browseItems" :key="item.key" class="browse-btn" @click="handleBrowseClick(item)">
+                    <button v-for="item in browseItems" :key="item.key" class="browse-btn"
+                        @click="handleBrowseClick(item)">
                         <el-icon class="browse-icon">
 
                             <!-- 渲染内联 SVG 图标 -->
@@ -76,7 +77,8 @@
             <div v-if="!searchQuery.trim()" class="themes-section">
                 <h3 class="section-title">{{ $t('searchPage.themes') }}</h3>
                 <div class="themes-grid">
-                    <button v-for="theme in themeItems" :key="theme.key" class="theme-btn" @click="handleThemeClick(theme)">
+                    <button v-for="theme in themeItems" :key="theme.key" class="theme-btn"
+                        @click="handleThemeClick(theme)">
                         <div class="theme-thumbnail">
                             <img :src="theme.thumbnail" :alt="theme.label" />
                         </div>
@@ -90,9 +92,11 @@
                 <div v-if="loading" class="list-loading">{{ $t('common.loading') }}</div>
                 <div v-else-if="!results.length" class="list-empty">{{ $t('common.noData') }}</div>
                 <div v-else class="results-list">
-                    <div v-for="(item, index) in results" :key="index" class="result-item" @click="navigateToDetail(item)">
+                    <div v-for="(item, index) in results" :key="index" class="result-item"
+                        @click="navigateToDetail(item)">
                         <div class="result-left">
-                            <img :src="item.avatar" class="result-avatar" @error="(e) => (e.target.src = fallbackListImg)" />
+                            <img :src="item.avatar" class="result-avatar"
+                                @error="(e) => (e.target.src = fallbackListImg)" />
                             <div class="result-title">{{ item.title }}</div>
                         </div>
                         <div class="result-right">
@@ -158,29 +162,30 @@ const handleSearch = async () => {
         results.value = []
         return
     }
-    
+
     loading.value = true
     try {
-        const lang = locale.value === 'zh-cn' ? 'zh' : 
-                     locale.value === 'ko-kr' ? 'ko' : 
-                     locale.value === 'ja-jp' ? 'ja' : 'en'
-                     
+        const lang = locale.value === 'zh-cn' ? 'zh' :
+            locale.value === 'ko-kr' ? 'ko' :
+                locale.value === 'ja-jp' ? 'ja' : 'en'
+
         const params = {
             language_label: lang,
             user_address: address.value || '',
             search_key: query,
             page: 1,
-            page_size: 50
+            page_size: 50,
+            include_sub_events: true
         }
-        
+
         const res = await getEventList(params)
         const list = res?.data?.data?.events || res?.data?.events || []
-        
+
         results.value = list.map(e => {
             const subEvents = Array.isArray(e.sub_events) ? e.sub_events : []
             const firstSub = subEvents[0] || {}
             const percentage = firstSub.price ? Math.round(Number(firstSub.price) * 100) + '%' : '0%'
-            
+
             return {
                 guid: e.event_guid,
                 title: e.event_title || e.title,
@@ -207,15 +212,16 @@ const handleSearchInput = () => {
 const handleBrowseClick = async (item) => {
     loading.value = true
     try {
-        const lang = locale.value === 'zh-cn' ? 'zh' : 
-                     locale.value === 'ko-kr' ? 'ko' : 
-                     locale.value === 'ja-jp' ? 'ja' : 'en'
-                     
+        const lang = locale.value === 'zh-cn' ? 'zh' :
+            locale.value === 'ko-kr' ? 'ko' :
+                locale.value === 'ja-jp' ? 'ja' : 'en'
+
         const params = {
             language_label: lang,
             user_address: address.value || '',
             page: 1,
-            page_size: 50
+            page_size: 50,
+            include_sub_events: true
         }
 
         // 根据不同的 key 设置排序
@@ -228,16 +234,16 @@ const handleBrowseClick = async (item) => {
         } else if (item.key === 'endingSoon') {
             params.sort_type = 4 // 假设 4 是即将结束
         }
-        
+
         const res = await getEventList(params)
         const list = res?.data?.data?.events || res?.data?.events || []
-        
+
         searchQuery.value = item.label // 显示当前浏览的项目名
         results.value = list.map(e => {
             const subEvents = Array.isArray(e.sub_events) ? e.sub_events : []
             const firstSub = subEvents[0] || {}
             const percentage = firstSub.price ? Math.round(Number(firstSub.price) * 100) + '%' : '0%'
-            
+
             return {
                 guid: e.event_guid,
                 title: e.event_title || e.title,
@@ -255,29 +261,30 @@ const handleBrowseClick = async (item) => {
 const handleThemeClick = async (theme) => {
     loading.value = true
     try {
-        const lang = locale.value === 'zh-cn' ? 'zh' : 
-                     locale.value === 'ko-kr' ? 'ko' : 
-                     locale.value === 'ja-jp' ? 'ja' : 'en'
-                     
+        const lang = locale.value === 'zh-cn' ? 'zh' :
+            locale.value === 'ko-kr' ? 'ko' :
+                locale.value === 'ja-jp' ? 'ja' : 'en'
+
         const params = {
             language_label: lang,
             user_address: address.value || '',
             page: 1,
-            page_size: 50
+            page_size: 50,
+            include_sub_events: true
         }
 
         // 根据主题 key 映射 category_guid (这里需要根据实际情况配置)
         // params.category_guid = theme.guid 
-        
+
         const res = await getEventList(params)
         const list = res?.data?.data?.events || res?.data?.events || []
-        
+
         searchQuery.value = theme.label
         results.value = list.map(e => {
             const subEvents = Array.isArray(e.sub_events) ? e.sub_events : []
             const firstSub = subEvents[0] || {}
             const percentage = firstSub.price ? Math.round(Number(firstSub.price) * 100) + '%' : '0%'
-            
+
             return {
                 guid: e.event_guid,
                 title: e.event_title || e.title,
@@ -306,7 +313,7 @@ const navigateToDetail = (item) => {
     padding: 20px 0;
     box-sizing: border-box;
     width: 100%;
-/* ... existing code ... */
+    /* ... existing code ... */
 }
 
 // 搜索结果
