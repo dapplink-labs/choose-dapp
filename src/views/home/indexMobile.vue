@@ -197,7 +197,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -273,7 +273,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                                }}</span>
+                                            }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -343,7 +343,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                                }}</span>
+                                            }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -361,10 +361,10 @@
                         <div ref="loadMoreSentinel" class="load-more-sentinel" aria-hidden="true"></div>
                         <div class="load-more-footer">
                             <span v-if="loadingMore" class="load-more-text">{{ $t('home.loadingMore') || '加载中...'
-                                }}</span>
+                            }}</span>
                             <span v-else-if="cardList.length && !hasMore" class="load-more-text">{{ $t('home.noMore') ||
                                 '没有更多了'
-                                }}</span>
+                            }}</span>
                         </div>
                     </div>
                 </div>
@@ -771,7 +771,7 @@ const navigateToDetail = (item, choice, subEventGuid) => {
         return;
     }
 
-    // 2. 加密货币场景：进入加密货币详情页
+    // 2. 进入单事件详情页
     if (item?.options?.length === 1) {
         const cryptoQuery = {
             event_guid: item.id,
@@ -785,7 +785,7 @@ const navigateToDetail = (item, choice, subEventGuid) => {
         return;
     }
 
-    // 3. 默认行为：跳转通用详情页
+    // 3. 默认行为：跳转通用多事件详情页
     router.push({
         path: "/detail-h5",
         query: {
