@@ -122,6 +122,21 @@
       <div class="chart-section">
         <div class="chart-container">
           <div ref="chartRef" class="main-chart" style="touch-action: none;"></div>
+          <!-- 拖拽价格浮窗 -->
+          <transition name="cdt">
+            <div
+              v-if="chartDragState.tooltipVisible"
+              class="chart-drag-tooltip"
+              :style="{ left: chartDragState.tooltipLeft + 'px', top: chartDragState.tooltipTop + 'px' }"
+            >
+              <div class="cdt-time">{{ chartDragState.tooltipTime }}</div>
+              <div v-for="item in chartDragState.tooltipItems" :key="item.name" class="cdt-row">
+                <span class="cdt-dot" :style="{ background: item.color }"></span>
+                <span class="cdt-name">{{ item.name }}</span>
+                <span class="cdt-price">${{ item.price }}</span>
+              </div>
+            </div>
+          </transition>
         </div>
 
         <div class="chart-toolbar">
@@ -1103,6 +1118,96 @@ const chartColors = computed(() => ({
   primary: '#5073e5',
 }))
 
+// ═══════════════════════════════════════════════════════
+// ■ 图表横向拖拽探索（swipe 查看历史数据点）
+// ═══════════════════════════════════════════════════════
+const chartDragState = ref({
+  tooltipVisible: false,
+  tooltipLeft: 0,
+  tooltipTop: 0,
+  tooltipTime: '',
+  tooltipItems: /** @type {{ name: string, price: string, color: string }[]} */ ([]),
+})
+let _chartDragActive = false
+let _chartDragStartX = 0
+
+const _getPointerPos = (e) => {
+  const src = e.touches?.[0] ?? e.changedTouches?.[0] ?? e
+  return { x: Number(src.clientX ?? 0), y: Number(src.clientY ?? 0) }
+}
+
+const onChartPointerDown = (e) => {
+  _chartDragActive = true
+  _chartDragStartX = _getPointerPos(e).x
+}
+
+const onChartPointerMove = (e) => {
+  if (!_chartDragActive) return
+  const pos = _getPointerPos(e)
+  const dx = Math.abs(pos.x - _chartDragStartX)
+  if (dx < 8 && !chartDragState.value.tooltipVisible) return
+  if (!chartInstance || !chartDataKeys.length) return
+  const el = chartRef.value
+  if (!el) return
+  const rect = el.getBoundingClientRect()
+  const relX = pos.x - rect.left
+  const relY = pos.y - rect.top
+  const coord = chartInstance.convertFromPixel({ gridIndex: 0 }, [relX, relY])
+  if (!coord) return
+  const idx = Math.max(0, Math.min(chartDataKeys.length - 1, Math.round(coord[0])))
+  const items = chartSeriesData
+    .map(series => {
+      const lineData = buildSeriesLineData(series)
+      const val = lineData[idx]
+      return val != null ? { name: series.name, price: val.toFixed(2), color: series.color } : null
+    })
+    .filter(Boolean)
+  if (!items.length) return
+  const tLeft = Math.min(Math.max(0, relX - 60), rect.width - 140)
+  const tTop = Math.max(8, relY - 88)
+  chartDragState.value = {
+    tooltipVisible: true,
+    tooltipLeft: tLeft,
+    tooltipTop: tTop,
+    tooltipTime: chartDataX[idx] || '',
+    tooltipItems: items,
+  }
+  updateChartWithCursor(idx)
+}
+
+const onChartPointerUp = () => {
+  if (!_chartDragActive) return
+  _chartDragActive = false
+  if (chartDragState.value.tooltipVisible) {
+    chartDragState.value = { ...chartDragState.value, tooltipVisible: false }
+    updateChart()
+  }
+}
+
+const setupChartDragListeners = () => {
+  const el = chartRef.value
+  if (!el) return
+  el.addEventListener('touchstart', onChartPointerDown, { passive: true })
+  el.addEventListener('touchmove', onChartPointerMove, { passive: true })
+  el.addEventListener('touchend', onChartPointerUp, { passive: true })
+  el.addEventListener('mousedown', onChartPointerDown)
+  el.addEventListener('mousemove', onChartPointerMove)
+  el.addEventListener('mouseup', onChartPointerUp)
+  el.addEventListener('mouseleave', onChartPointerUp)
+}
+
+const cleanupChartDragListeners = () => {
+  const el = chartRef.value
+  if (!el) return
+  el.removeEventListener('touchstart', onChartPointerDown)
+  el.removeEventListener('touchmove', onChartPointerMove)
+  el.removeEventListener('touchend', onChartPointerUp)
+  el.removeEventListener('mousedown', onChartPointerDown)
+  el.removeEventListener('mousemove', onChartPointerMove)
+  el.removeEventListener('mouseup', onChartPointerUp)
+  el.removeEventListener('mouseleave', onChartPointerUp)
+}
+
 // 将当前数据渲染到 ECharts 实例（含目标价参考线和实时脉冲点）
 const updateChart = () => {
   if (!chartInstance) return
@@ -1165,7 +1270,88 @@ const updateChart = () => {
       })
     })
   }
-  chartInstance.setOption(option, false)
+  chartInstance.setOption(option, { replaceMerge: ['series'] })
+}
+
+// 拖拽时：实线跟随游标截断，全量数据以低透明度占位，无虚线
+const updateChartWithCursor = (cursorIndex) => {
+  if (!chartInstance) return
+  const colors = chartColors.value
+
+  let markLineData = []
+  if (activeSegmentMode.value !== 'future' && Number.isFinite(displayTargetPrice.value)) {
+    markLineData = [{ yAxis: displayTargetPrice.value }]
+  }
+
+  const seriesList = []
+
+  chartSeriesData.forEach((series, index) => {
+    const fullLineData = buildSeriesLineData(series)
+    // 截断：实线只画到游标位置
+    const activeLineData = fullLineData.map((v, i) => (i <= cursorIndex ? v : null))
+    const markLineCfg = index === 0 && markLineData.length
+      ? { symbol: ['none', 'none'], label: { show: false }, data: markLineData, lineStyle: { type: 'dashed', color: '#888', width: 1, opacity: 0.3 } }
+      : undefined
+
+    // 1. 透明占位走势线（全量数据，低透明度）
+    seriesList.push({
+      name: `${series.name}_ghost`,
+      type: 'line',
+      data: fullLineData,
+      smooth: 0.3,
+      symbol: 'none',
+      connectNulls: false,
+      lineStyle: { width: 3, color: series.color, opacity: 0.18 },
+      itemStyle: { color: series.color, opacity: 0.18 },
+      markLine: markLineCfg,
+      zlevel: 0,
+    })
+
+    // 2. 实线跟随游标（截断数据，完全不透明）
+    seriesList.push({
+      name: series.name,
+      type: 'line',
+      data: activeLineData,
+      smooth: 0.3,
+      symbol: 'none',
+      connectNulls: false,
+      lineStyle: { width: 3, color: series.color },
+      itemStyle: { color: series.color },
+      zlevel: 1,
+    })
+
+    // 3. 游标末端高亮圆点
+    const val = fullLineData[cursorIndex]
+    if (val != null) {
+      seriesList.push({
+        name: `_cursor_dot_${series.key}`,
+        type: 'scatter',
+        data: [[cursorIndex, val]],
+        symbolSize: 9,
+        itemStyle: { color: series.color, borderColor: '#fff', borderWidth: 2 },
+        zlevel: 2,
+      })
+    }
+  })
+
+  const option = {
+    backgroundColor: 'transparent',
+    animation: false,
+    grid: { left: '2%', right: '15%', top: '15%', bottom: '12%', containLabel: false },
+    xAxis: {
+      type: 'category', data: chartDataX,
+      axisLine: { show: false }, axisTick: { show: false },
+      axisLabel: { show: true, interval: chartDataX.length > 1 ? Math.floor(chartDataX.length / 2) : 0, color: colors.axisLabel, fontSize: 10 },
+    },
+    yAxis: {
+      type: 'value', position: 'right', scale: true,
+      axisLine: { show: false }, axisTick: { show: false },
+      axisLabel: { formatter: (v) => '$' + v.toFixed(2), color: colors.axisLabel, fontSize: 10 },
+      splitLine: { lineStyle: { color: colors.splitLine } },
+    },
+    series: seriesList,
+  }
+  chartInstance.setOption(option, { replaceMerge: ['series'] })
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1616,6 +1802,7 @@ onMounted(async () => {
   nextTick(() => {
     chartInstance = echarts.init(chartRef.value)
     updateChart()
+    setupChartDragListeners()
   })
   await Promise.allSettled([
     fetchPriceHistory(),
@@ -1635,6 +1822,7 @@ onUnmounted(() => {
   mqttDestroyed = true
   clearInterval(timerInterval)
   stopMqttStream()
+  cleanupChartDragListeners()
   window.removeEventListener('resize', resizeHandler)
   chartInstance?.dispose()
 })
@@ -1941,6 +2129,65 @@ $primary-blue: #5073e5;
     height: 100%;
     -webkit-tap-highlight-color: transparent;
   }
+}
+
+/* ── 图表拖拽探索浮窗 ── */
+.chart-drag-tooltip {
+  position: absolute;
+  z-index: 10;
+  background: var(--bg-page, rgba(20, 24, 30, 0.92));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 10px;
+  padding: 10px 14px;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  min-width: 120px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+  .cdt-time {
+    font-size: 11px;
+    color: var(--text-dark-gray, #888);
+    margin-bottom: 6px;
+    white-space: nowrap;
+  }
+
+  .cdt-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .cdt-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .cdt-name {
+    font-size: 12px;
+    color: var(--text-dark-gray, #888);
+    min-width: 30px;
+  }
+
+  .cdt-price {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bg-opposite, #fff);
+    margin-left: auto;
+  }
+}
+
+.cdt-enter-active,
+.cdt-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.cdt-enter-from,
+.cdt-leave-to {
+  opacity: 0;
+  transform: translateY(-4px) scale(0.97);
 }
 
 .svg-icon-wrapper {
