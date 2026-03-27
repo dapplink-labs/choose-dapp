@@ -8,7 +8,7 @@
 
                     <div class="trade-body">
                         <div class="target-info">
-                            <h3 class="target-title">Sell {{ outcomeLabel }}</h3>
+                            <h3 class="target-title">{{ t('payment.sell') }} {{ outcomeLabel }}</h3>
                             <div class="target-row">
                                 <span class="date-text">{{ dateText }}</span>
                             </div>
@@ -16,19 +16,19 @@
 
                         <div class="cashout-summary">
                             <div class="receive-row">
-                                <span class="label">Receive</span>
+                                <span class="label">{{ t('payment.receive') }}</span>
                                 <span class="value receive-value">{{ positionValue }}</span>
                             </div>
                             <div class="shares-row">
-                                <span class="label">Selling {{ shares }} shares @ {{ avgPrice }}</span>
+                                <span class="label">{{ t('payment.sellingShares', { shares, avgPrice }) }}</span>
                             </div>
                         </div>
 
                         <div class="action-buttons">
-                            <button class="edit-btn" @click="handleClose">Edit order</button>
+                            <button class="edit-btn" @click="handleClose">{{ t('payment.cancel') }}</button>
                             <button class="cashing-btn" :disabled="submitting" @click="handleConfirm">
                                 <span v-if="submitting" class="loading-icon"></span>
-                                {{ submitting ? 'Cashing...' : 'Cashing' }}
+                                {{ submitting ? t('payment.cashing') : t('payment.cashout') }}
                             </button>
                         </div>
                     </div>
@@ -64,13 +64,13 @@ const submitting = ref(false)
 
 const outcomeLabel = computed(() => {
     const outcome = props.position?.outcome
-    return outcome === 'up' || outcome === 'yes' ? 'Yes' : 'No'
+    return outcome || ''
 })
 
 const dateText = computed(() => {
     const d = new Date()
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    return `${months[d.getMonth()]} ${d.getDate()}`
+    const monthKeys = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+    return `${t('detail.months.' + monthKeys[d.getMonth()])} ${d.getDate()}`
 })
 
 const positionValue = computed(() => {
@@ -93,7 +93,7 @@ const handleClose = () => {
 
 const handleConfirm = async () => {
     if (submitting.value) return
-    
+
     if (!props.eventGuid) {
         ElMessage.error(t('payment.missingIds') || 'Missing event id')
         return
@@ -196,7 +196,8 @@ const handleConfirm = async () => {
 }
 
 .receive-value {
-    color: #2e8b57; /* or match the image green */
+    color: #2e8b57;
+    /* or match the image green */
 }
 
 .shares-row {
@@ -226,7 +227,8 @@ const handleConfirm = async () => {
     flex: 1;
     padding: 14px;
     border-radius: 12px;
-    background: #1a73e8; /* matches button blue */
+    background: #1a73e8;
+    /* matches button blue */
     border: none;
     color: #fff;
     font-size: 16px;
@@ -273,6 +275,7 @@ const handleConfirm = async () => {
 .fade-leave-active {
     transition: opacity 0.3s;
 }
+
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;

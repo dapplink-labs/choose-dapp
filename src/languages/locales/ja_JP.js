@@ -523,6 +523,20 @@ export default {
     yesHolders: "Yes holders",
     noHolders: "No holders",
     bought: "Bought",
+    months: {
+      jan: "1月",
+      feb: "2月",
+      mar: "3月",
+      apr: "4月",
+      may: "5月",
+      jun: "6月",
+      jul: "7月",
+      aug: "8月",
+      sep: "9月",
+      oct: "10月",
+      nov: "11月",
+      dec: "12月",
+    },
     timeRanges: {
       "1D": "1D",
       "1W": "1W",
@@ -1019,7 +1033,13 @@ export default {
     "buyNo": "Buy No",
     "buyYes": "Buy Yes",
     "missingIds": "イベントIDまたはサブイベントIDが不足しています",
-    "insufficientBalance": "残高不足"
+    "insufficientBalance": "残高不足",
+    "receive": "受け取る",
+    "sellingShares": "{shares} 株を販売 {'@'} {avgPrice}",
+    "editOrder": "注文を編集",
+    "cancel": "キャンセル",
+    "cashing": "現金化中...",
+    "cashout": "現金化"
   },
   "datePicker": {
     "title": "日付範囲で絞り込み",

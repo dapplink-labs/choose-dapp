@@ -1034,6 +1034,12 @@ export default {
     buyYes: "Buy Yes",
     missingIds: "Missing event or sub-event id",
     insufficientBalance: "Insufficient balance",
+    receive: "Receive",
+    sellingShares: "Selling {shares} shares {'@'} {avgPrice}",
+    editOrder: "Edit order",
+    cancel: "Cancel",
+    cashing: "Cashing...",
+    cashout: "Cashing"
   },
   datePicker: {
     title: "Filter by Date Range",
