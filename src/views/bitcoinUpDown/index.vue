@@ -339,6 +339,9 @@
     <PaymentModal v-model="showPayment" :event-title="detailData.title" :outcome-title="paymentOutcomeTitle"
       :event-guid="currentEventGuid" :sub-event-guid="resolvedSubEventGuid" :initial-outcome="paymentInitialOutcome"
       :initial-side="paymentInitialSide" @order-success="onOrderSuccess" />
+
+    <CashoutModal v-model="showCashoutModal" :position="cashoutPosition" :event-guid="currentEventGuid"
+      :sub-event-guid="resolvedSubEventGuid" @order-success="onOrderSuccess" />
   </div>
 </template>
 
@@ -352,11 +355,11 @@ import { ElMessage } from 'element-plus'
 import { createIotMqttClient, hasWebCrypto } from '@/utils/mqttClient'
 import OrderBookMobile from '@/components/OrderBookMobile.vue'
 import PaymentModal from '@/components/PaymentModal.vue'
+import CashoutModal from '@/components/CashoutModal.vue'
 import { useThemeStore } from '@/stores/theme'
 import { useAccount } from '@wagmi/vue'
 import {
   cancelOrder,
-  userWithdraw,
   getEventDetailItem,
   getEventPriceHistory,
   getOpenOrders,
@@ -634,6 +637,10 @@ const paymentInitialSide = ref('buy')
 // 支付弹窗显示状态
 const showPayment = ref(false)
 
+// 提现（二次确认）弹窗显示状态
+const showCashoutModal = ref(false)
+const cashoutPosition = ref(null)
+
 // ═══════════════════════════════════════════════════════
 // ■ 支付弹窗
 // ═══════════════════════════════════════════════════════
@@ -697,36 +704,10 @@ const mapPositionCard = (item) => {
   }
 }
 
-// 持仓提现：读取指定持仓金额，调用法币提现接口
+// 持仓提现：读取指定持仓金额，打开市价单售卖二次确认弹窗
 const handlePositionWithdraw = async (pos) => {
-  const raw = pos?.raw || {}
-  const amountPicked = firstFinite([
-    raw?.withdraw_amount,
-    raw?.amount,
-    raw?.position_value,
-    raw?.current_value,
-    raw?.profit_loss,
-    raw?.profit,
-  ])
-  const amount = Number.isFinite(amountPicked) && amountPicked > 0 ? String(amountPicked) : null
-  const asset_guid = raw?.asset_guid || ''
-  const token_address = raw?.token_address || ''
-  const user_address = address.value || ''
-  const to_address = user_address
-  const missing = ['amount', 'user_address'].filter((k) => !({ amount, user_address }[k]))
-  if (missing.length) {
-    ElMessage.error(`Withdraw 参数缺失：${missing.join(', ')}`)
-    return
-  }
-
-  try {
-    const res = await userWithdraw({ amount, asset_guid, to_address, token_address, user_address })
-    if (!isRespSuccess(res)) throw new Error(res?.data?.message || 'Withdraw failed')
-    ElMessage.success(res?.data?.message || 'Withdraw success')
-    await Promise.allSettled([fetchPositions(), fetchOpenOrders(), fetchOrderHistory()])
-  } catch (e) {
-    ElMessage.error(e?.message || 'Withdraw failed')
-  }
+  cashoutPosition.value = pos
+  showCashoutModal.value = true
 }
 
 // 将服务端挂单数据映射为页面展示格式

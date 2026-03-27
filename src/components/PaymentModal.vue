@@ -160,7 +160,7 @@ import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Wallet } from '@element-plus/icons-vue'
 import { useAccount } from '@wagmi/vue'
-import { getUserBalances, makeOrder } from '@/api/APIEvent'
+import { getUserBalances, makeOrder, getOrderBook } from '@/api/APIEvent'
 import { ElMessage } from 'element-plus'
 
 
@@ -196,6 +196,8 @@ const enableExpiry = ref(false)
 const expiryPreset = ref('5m') // '5m' | '1h' | '12h' | '24h' | 'eod' | 'custom'
 const customExpiryMinutes = ref(5)
 
+const orderBookData = ref(null)
+
 const expiryOptions = computed(() => ([
     { key: '5m', label: t('payment.expiry5m') || '5m' },
     { key: '1h', label: t('payment.expiry1h') || '1h' },
@@ -225,7 +227,15 @@ const displayTotal = computed(() => {
             // 市价买入：用户输入的就是金额
             return inputValue.value ? `$${Number(inputValue.value).toFixed(2)}` : '$0.00'
         }
-        // 市价卖出：无法预估总额，显示占位符
+        // 市价卖出：使用 orderBook 的 bids 预测
+        const sideStr = outcomeBadge.value.toLowerCase() // 'yes' or 'no'
+        const bids = orderBookData.value?.[sideStr]?.bids || []
+        console.log(sideStr)
+        if (bids.length > 0) {
+            const estPrice = Number(bids[0].price) || 0
+            const s = Number(inputValue.value) || 0
+            return `$${(estPrice * s).toFixed(2)}`
+        }
         return '0'
     }
     // 限价单：price * shares / 100
@@ -316,6 +326,25 @@ async function fetchBalance() {
         console.error('Fetch balance failed', err)
     } finally {
         balanceLoading.value = false
+    }
+}
+
+async function fetchOrderBookData() {
+    if (!props.eventGuid || !props.subEventGuid) return
+    try {
+        const res = await getOrderBook({
+            event_guid: props.eventGuid,
+            sub_event_guid: props.subEventGuid,
+            outcome: 'all',
+        })
+        const code = res?.data?.code
+        console.log(res)
+
+        if (code === 2000) {
+            orderBookData.value = res?.data?.data || null
+        }
+    } catch (err) {
+        console.error('Fetch order book failed in modal', err)
     }
 }
 
@@ -488,6 +517,9 @@ watch(() => props.modelValue, (val) => {
         orderType.value = 'market'
         inputValue.value = ''
         fetchBalance()
+        fetchOrderBookData()
+    } else {
+        orderBookData.value = null
     }
 })
 </script>
