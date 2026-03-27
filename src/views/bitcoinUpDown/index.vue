@@ -218,7 +218,7 @@
               </div>
               <div class="grid-item">
                 <div class="g-label">{{ $t('crypto.current') }}</div>
-                <div class="g-val">{{ pos.current }}</div>
+                <div class="g-val">{{ pos.positionValue }}</div>
               </div>
               <div class="grid-item">
                 <div class="g-label">{{ $t('crypto.profit') }}</div>
@@ -336,9 +336,9 @@
       </div>
     </div>
 
-    <PaymentModal v-model="showPayment" :event-title="detailData.eventTitle || detailData.title"
-      :outcome-title="paymentOutcomeTitle" :event-guid="currentEventGuid" :sub-event-guid="resolvedSubEventGuid"
-      :initial-outcome="paymentInitialOutcome" :initial-side="paymentInitialSide" @order-success="onOrderSuccess" />
+    <PaymentModal v-model="showPayment" :event-title="detailData.title" :outcome-title="paymentOutcomeTitle"
+      :event-guid="currentEventGuid" :sub-event-guid="resolvedSubEventGuid" :initial-outcome="paymentInitialOutcome"
+      :initial-side="paymentInitialSide" @order-success="onOrderSuccess" />
   </div>
 </template>
 
@@ -640,7 +640,7 @@ const showPayment = ref(false)
 
 // 打开支付弹窗，根据方向设置初始 outcome
 const openPayment = (side) => {
-  paymentOutcomeTitle.value = detailData.value.title || detailData.value.eventTitle || ''
+  paymentOutcomeTitle.value = detailData.value.title || ''
   paymentInitialOutcome.value = side === 'up' ? 'YES' : 'NO'
   paymentInitialSide.value = 'buy'
   showPayment.value = true
@@ -673,26 +673,23 @@ const mapPositionCard = (item) => {
   )
   const costNum = firstFinite(item?.bet_amount, item?.dealed_cost, item?.cost, item?.position_value) || 0
   const currentNum = firstFinite(
-    item?.current_price,
-    item?.current_value,
     item?.position_value,
-    item?.bet_amount,
   ) || 0
   // 可赢金额 to_win_amount：作为 profit 的兜底来源之一
   const profitNum = firstFinite(item?.profit_loss, item?.profit, item?.to_win_amount) || 0
   // 优先使用接口返回的收益/亏损率字段，其次用 profit / cost 计算
   const profitPct = firstFinite(
-    item?.profit_rate,
-    item?.lost_rate,
+    // item?.profit_rate,
+    // item?.lost_rate,
     costNum ? (profitNum / costNum) * 100 : 0,
   ) || 0
   return {
-    id: item?.guid || item?.position_guid || item?.sub_event_guid || `${item?.event_guid || 'pos'}-${item?.outcome || 'yes'}`,
-    title: item?.sub_event_title || item?.event_name || detailData.value.title || t('crypto.upOrDown'),
+    id: item?.guid || `pos-${item?.outcome || 'yes'}`,
+    title: item?.sub_event_name || t('crypto.upOrDown'),
     tagLabel: `${outcome === 'up' ? t('crypto.up') : t('crypto.down')} | ${shares || 0} ${t('sports.shares')}`,
-    avgPrice: formatCentText(item?.avg_price ?? item?.current_price),
+    avgPrice: formatCentText(item?.avg_price || 0),
     cost: formatMoney(costNum),
-    current: formatMoney(currentNum),
+    positionValue: formatMoney(currentNum),
     profit: `${profitNum >= 0 ? '+' : '-'}${formatMoney(Math.abs(profitNum))}${costNum ? `(${profitPct >= 0 ? '+' : ''}${profitPct.toFixed(2)}%)` : ''}`,
     profitPositive: profitNum >= 0,
     raw: item,
@@ -1355,7 +1352,7 @@ const fetchDetail = async () => {
     }
 
     // 解析事件状态（多种字段名兼容）
-    const rawStatus = subEvent?.status || subEvent?.event_status || eventItem?.status || eventItem?.event_status || ''
+    const rawStatus = subEvent?.status || eventItem?.status || ''
     const isSettled = subEvent?.is_settled === true || subEvent?.is_settled === 1
       || eventItem?.is_settled === true || eventItem?.is_settled === 1
     const ENDED_STATUSES = ['settled', 'ended', 'closed', 'resolved', 'expired', 'finished', 'completed']
@@ -1365,8 +1362,8 @@ const fetchDetail = async () => {
     }
 
     detailData.value = {
-      eventTitle: eventItem?.title || subEvent?.title || '',
-      title: subEvent?.title || eventItem?.title || '',
+      eventTitle: eventItem?.title | '',
+      title: subEvent?.title || '',
       tradeVolume: firstFinite(
         subEvent?.trade_volume, subEvent?.total_volume, subEvent?.bet_volume, subEvent?.total_bet_amount,
         eventItem?.trade_volume, eventItem?.total_volume,

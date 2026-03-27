@@ -52,6 +52,9 @@
           <div class="header-value">{{ $t('assetManagement.value') || '价值' }}</div>
         </div>
         <!-- 数据行 -->
+        <div v-if="!assetList.length" class="distribution-empty">
+          {{ $t('common.noData') || '暂无数据' }}
+        </div>
         <div v-for="asset in assetList" :key="asset.name" class="distribution-item">
           <div class="asset-info">
             <img :src="asset.icon" :alt="asset.name" class="asset-icon" />
@@ -66,31 +69,22 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { View, Hide, CaretBottom, Document } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { useAccount } from '@wagmi/vue'
+import { getUserBalances } from '@/api/APIEvent'
 
 const { t } = useI18n()
 const router = useRouter()
+const { address } = useAccount()
 
 const showAssets = ref(true)
-const fundsTotal = ref(100000.00)
+const fundsTotal = ref(0)
+const loadingAssets = ref(false)
 
-const assetList = ref([
-  {
-    name: 'USDT',
-    icon: 'https://effigy.im/a/USDT.svg',
-    quantity: 100.00,
-    value: 100.00
-  },
-  {
-    name: 'CHO',
-    icon: 'https://effigy.im/a/CHO.svg',
-    quantity: 3234100.00,
-    value: 32341.00
-  }
-])
+const assetList = ref([])
 
 const toggleAssetsVisibility = () => {
   showAssets.value = !showAssets.value
@@ -105,6 +99,50 @@ const formatCurrency = (num) => {
   if (typeof num !== 'number') return '$0.00'
   return `$${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
+
+const fetchAssets = async () => {
+  if (!address.value) return
+
+  try {
+    loadingAssets.value = true
+    const res = await getUserBalances({ user_address: address.value })
+    const data = res?.data?.data || {}
+
+    const toNum = (v) => {
+      const n = Number(v)
+      return Number.isFinite(n) ? n : 0
+    }
+
+    // 资金估值使用 portfolio
+    fundsTotal.value = toNum(data.portfolio)
+
+    // 资产分布
+    const list = Array.isArray(data.balances) ? data.balances : []
+    assetList.value = list.map((a) => {
+      const symbol = a.asset_name || ''
+      return {
+        name: symbol,
+        icon: a.icon || (symbol ? `https://effigy.im/a/${symbol.toLowerCase()}.svg` : ''),
+        quantity: toNum(a.total_balance ?? a.quantity ?? a.amount),
+        value: toNum(a.usdt_equivalent ?? a.value ?? a.usdt_value ?? a.usd_value),
+      }
+    }).filter(v => v.name)
+  } catch (error) {
+    console.error('获取资金数据失败:', error)
+    fundsTotal.value = 0
+    assetList.value = []
+  } finally {
+    loadingAssets.value = false
+  }
+}
+
+onMounted(() => {
+  fetchAssets()
+})
+
+watch(() => address.value, () => {
+  fetchAssets()
+})
 
 const handleDeposit = () => {
   router.push('/deposit')
@@ -235,6 +273,13 @@ const handleBill = () => {
   }
 
   .distribution-list {
+    .distribution-empty {
+      padding: 18px 0;
+      text-align: center;
+      color: var(--text-gray, rgba(255, 255, 255, 0.5));
+      font-size: 14px;
+    }
+
     .distribution-header {
       display: flex;
       align-items: center;
