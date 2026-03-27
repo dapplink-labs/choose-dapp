@@ -259,7 +259,7 @@ const fetchAssets = async () => {
     // 目前项目其他地方（PaymentModal）优先用 cash / portfolio
     const cash = toNum(data.cash)
     const portfolio = toNum(data.portfolio)
-    const total = toNum(data.total_assets ?? data.totalAssets) || (cash + portfolio)
+    const total = portfolio
 
     totalAssets.value = total
     funds.value = cash
