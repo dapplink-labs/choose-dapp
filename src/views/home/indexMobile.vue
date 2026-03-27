@@ -293,7 +293,7 @@
                                     <img :src="item.avatar" :alt="$t('common.userAvatar')" class="user-avatar"
                                         @error="(e) => (e.target.src = fallbackListImg)" />
                                     <div class="item-meta">
-                                        <div class="item-title" @click="navigateToDetail(item)">{{ item.title }}</div>
+                                        <div class="item-title" @click="handleTitleClick(item)">{{ item.title }}</div>
                                     </div>
                                 </div>
                                 <div class="item-leverage-info">
@@ -306,17 +306,21 @@
                                         <span class="leverage-value">{{ item.maxReturn || "182%" }}</span>
                                     </div>
                                 </div>
-                                <div class="item-options">
-                                    <div class="option-item" v-for="(opt, optIndex) in item.options" :key="optIndex">
+                                <div class="item-options" :class="{ 'scrollable-options': item.options.length > 3 }"
+                                    :ref="(el) => setOptionsContainerRef(item.id, el)"
+                                    @scroll.passive="handleOptionsScroll(item, $event)">
+                                    <div class="option-item" v-for="(opt, optIndex) in item.options" :key="optIndex"
+                                        :class="{ 'is-focused': isFocusedOption(item, optIndex) }"
+                                        @click="handleOptionRowClick(item, opt)">
                                         <div class="option-text">
                                             <span>{{ opt.text }}</span>
                                             <span>{{ item.percentage }}</span>
                                         </div>
                                         <div class="option-buttons">
                                             <button class="option-btn yes-btn"
-                                                @click="navigateToDetail(item, 'yes')">Yes</button>
+                                                @click.stop="navigateToDetail(item, 'yes', opt.subEventGuid)">Yes</button>
                                             <button class="option-btn no-btn"
-                                                @click="navigateToDetail(item, 'no')">No</button>
+                                                @click.stop="navigateToDetail(item, 'no', opt.subEventGuid)">No</button>
                                         </div>
                                     </div>
                                 </div>
@@ -552,11 +556,59 @@ const cardList = ref([]);
 const eventPage = ref(1);
 const eventTotalPages = ref(1);
 const loadingMore = ref(false);
+const optionsContainerMap = ref({});
+const optionsFocusStartMap = ref({});
 const PAGE_SIZE = 20;
 const hasMore = computed(() => eventPage.value <= eventTotalPages.value);
 const isNewUserEventsCategory = computed(
     () => String(route.query.nav || '').toUpperCase() === 'NEW_USER_EVENTS'
 );
+
+const getOptionsStep = (container) => {
+    if (!container) return 28;
+    const items = container.querySelectorAll('.option-item');
+    if (items.length >= 2) {
+        const diff = items[1].offsetTop - items[0].offsetTop;
+        return diff > 0 ? diff : 28;
+    }
+    if (items.length === 1) return items[0].offsetHeight + 8;
+    return 28;
+};
+
+const updateFocusedOptions = (item, container) => {
+    if (!item?.id || !container) return;
+    if (!Array.isArray(item.options) || item.options.length <= 3) {
+        optionsFocusStartMap.value[item.id] = 0;
+        return;
+    }
+    const step = getOptionsStep(container);
+    const maxStart = Math.max((item.options?.length || 0) - 2, 0);
+    const start = Math.min(Math.max(Math.round(container.scrollTop / step), 0), maxStart);
+    optionsFocusStartMap.value[item.id] = start;
+};
+
+const setOptionsContainerRef = (itemId, el) => {
+    if (!itemId) return;
+    if (el) {
+        optionsContainerMap.value[itemId] = el;
+        const item = cardList.value.find((card) => card.id === itemId);
+        if (item) nextTick(() => updateFocusedOptions(item, el));
+        return;
+    }
+    delete optionsContainerMap.value[itemId];
+};
+
+const handleOptionsScroll = (item, event) => {
+    const container = event?.target;
+    if (!container || !item) return;
+    updateFocusedOptions(item, container);
+};
+
+const isFocusedOption = (item, optionIndex) => {
+    if (!item?.isCrypto || item?.cardType !== 'small' || (item?.options?.length || 0) <= 3) return false;
+    const start = optionsFocusStartMap.value[item.id] ?? 0;
+    return optionIndex === start || optionIndex === start + 1;
+};
 
 // 根据路由 nav 映射事件类型
 const getEventTypeFromNav = (nav) => {
@@ -571,6 +623,9 @@ const getEventTypeFromNav = (nav) => {
 // 将接口返回的事件结构映射到页面卡片结构
 const mapEventToCard = (e) => {
     const subEvents = Array.isArray(e.sub_events) ? e.sub_events : [];
+    const eventCode = String(e.code || '').toUpperCase();
+    const categoryCode = String(e.category_code || '').toUpperCase();
+    const isCrypto = eventCode === 'CRYPTO' || categoryCode === 'CRYPTO';
 
     const volumeNum = Number(e.trade_volume);
     const amount =
@@ -584,8 +639,10 @@ const mapEventToCard = (e) => {
         category_guid: e.category_guid || '',
         // 是否体育事件（用于跳转体育详情页）
         isSports: !!e.is_sports,
-        // 直播中（is_live === 1）为大卡片
-        cardType: e.is_live === 1 ? 'large' : 'small',
+        // 加密货币列表：子事件=1 大卡，子事件>1 小卡
+        // 其他列表：沿用直播中为大卡
+        isCrypto,
+        cardType: isCrypto ? (subEvents.length > 1 ? 'small' : 'large') : (e.is_live === 1 ? 'large' : 'small'),
         avatar: e.logo || '',
         title: e.title || '',
         // 暂无胜率字段，用占位字符串保持布局
@@ -600,6 +657,7 @@ const mapEventToCard = (e) => {
         isFavorite: !!e.is_favorited,
         options: subEvents.map((sub) => ({
             text: sub.title || '',
+            subEventGuid: sub.sub_event_guid || '',
         })),
     };
 };
@@ -692,7 +750,9 @@ const loadMoreSentinel = ref(null);
 let loadMoreObserver = null;
 
 // 跳转到详情页面
-const navigateToDetail = (item, choice) => {
+const navigateToDetail = (item, choice, subEventGuid) => {
+    const fallbackSubEventGuid = item?.options?.[0]?.subEventGuid || '';
+    const finalSubEventGuid = subEventGuid || fallbackSubEventGuid;
     // 优先按事件 code 分流，兜底再用 category code
     const eventCode = String(item.code || '').toUpperCase();
     const categoryCode = String(
@@ -713,12 +773,14 @@ const navigateToDetail = (item, choice) => {
 
     // 2. 加密货币场景：进入加密货币详情页
     if (targetCode === 'CRYPTO') {
+        const cryptoQuery = {
+            event_guid: item.id,
+            ...(finalSubEventGuid ? { sub_event_guid: finalSubEventGuid } : {}),
+            ...(isNewUserEventsCategory.value ? { from_new_user_compensation: '1' } : {}),
+        };
         router.push({
             path: '/bitcoin-up-down',
-            query: {
-                id: item.id,
-                ...(isNewUserEventsCategory.value ? { from_new_user_compensation: '1' } : {}),
-            },
+            query: cryptoQuery,
         });
         return;
     }
@@ -729,8 +791,21 @@ const navigateToDetail = (item, choice) => {
         query: {
             choice,
             id: item.id,
+            ...(finalSubEventGuid ? { sub_event_guid: finalSubEventGuid } : {}),
         },
     });
+};
+
+const handleTitleClick = (item) => {
+    // 加密货币小卡仅允许点击子事件按钮跳转
+    if (item?.isCrypto && item?.cardType === 'small') return;
+    navigateToDetail(item);
+};
+
+const handleOptionRowClick = (item, opt) => {
+    // 加密货币小卡仅允许点击子事件按钮跳转
+    if (item?.isCrypto && item?.cardType === 'small') return;
+    navigateToDetail(item, undefined, opt?.subEventGuid);
 };
 
 // 处理标签点击
@@ -1487,6 +1562,21 @@ $gradient-mask-right: linear-gradient(to right,
                     margin-bottom: 8px;
                     padding: 0 16px;
                     box-sizing: border-box;
+
+                    &.scrollable-options {
+                        max-height: 82px;
+                        overflow: hidden auto;
+                        overflow-y: auto;
+                        -webkit-overflow-scrolling: touch;
+                        scroll-snap-type: y proximity;
+                        padding-top: 28px;
+                        padding-bottom: 28px;
+                        mask-image: linear-gradient(to bottom,
+                                rgba(0, 0, 0, 0.35) 0%,
+                                rgba(0, 0, 0, 1) 18%,
+                                rgba(0, 0, 0, 1) 82%,
+                                rgba(0, 0, 0, 0.35) 100%);
+                    }
                 }
 
                 // 选项项样式
@@ -1494,11 +1584,23 @@ $gradient-mask-right: linear-gradient(to right,
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
-                    margin-bottom: 8px;
+                    margin-bottom: 10px;
+                    transition: opacity 0.2s ease, transform 0.2s ease;
 
                     &:last-child {
                         margin-bottom: 0;
                     }
+                }
+
+                .scrollable-options .option-item {
+                    scroll-snap-align: start;
+                    opacity: 0.45;
+                    transform: translateZ(0) scale(0.98);
+                }
+
+                .scrollable-options .option-item.is-focused {
+                    opacity: 1;
+                    transform: translateZ(0) scale(1);
                 }
 
                 // 选项文本样式
