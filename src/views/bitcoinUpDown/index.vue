@@ -691,7 +691,7 @@ const mapPositionCard = (item) => {
     costNum ? (profitNum / costNum) * 100 : 0,
   ) || 0
   return {
-    id: item?.guid || `pos-${item?.outcome || 'yes'}`,
+    id: item?.guid ,
     title: item?.sub_event_name || t('crypto.upOrDown'),
     tagLabel: `${outcome === 'up' ? t('crypto.up') : t('crypto.down')} | ${shares || 0} ${t('sports.shares')}`,
     avgPrice: formatCentText(item?.avg_price || 0),

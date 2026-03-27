@@ -79,7 +79,7 @@ const positionValue = computed(() => {
 
 const shares = computed(() => {
     const item = props.position?.raw || {}
-    return Number(item?.shares ?? item?.position_size ?? item?.size ?? item?.quantity ?? 0)
+    return Number(item?.shares ?? 0)
 })
 
 const avgPrice = computed(() => {
@@ -98,13 +98,13 @@ const handleConfirm = async () => {
         ElMessage.error(t('payment.missingIds') || 'Missing event id')
         return
     }
-
+    const item = props.position?.raw || {}
     submitting.value = true
     try {
         const orderParams = {
             event_guid: props.eventGuid,
             sub_event_guid: props.subEventGuid || props.position?.raw?.sub_event_guid,
-            outcome: outcomeLabel.value.toUpperCase(),
+            outcome: item?.outcome || '',
             side: 'sell',
             order_type: 'market',
             user_address: address.value,
