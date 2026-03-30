@@ -1435,6 +1435,17 @@ watch(isEventEnded, (ended) => {
   if (ended) stopMqttStream()
 })
 
+// 监听 tab 切换，动态拉取对应数据
+watch(activeTab, (newTab) => {
+  if (newTab === 'Positions') {
+    fetchPositions()
+  } else if (newTab === 'Orders') {
+    fetchOpenOrders()
+  } else if (newTab === 'History') {
+    fetchOrderHistory()
+  }
+})
+
 onMounted(async () => {
   startCountDown()
   await fetchDetail()
