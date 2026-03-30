@@ -486,6 +486,7 @@ export default {
       followBtn: "follow on X",
       breakingNews: "Breaking News",
     },
+    title:"突発事件"
   },
   detail: {
     viewResults: "View Results",

@@ -2,7 +2,13 @@
   <div class="breaking-mobile-page">
     <!-- 突发事件横幅 -->
     <div class="hero-banner">
-      <img class="hero-image" :src="breakingBanner" alt="breaking banner" />
+      <div class="hero-bg" :style="{ backgroundImage: `url(${breakingBanner})` }">
+        <div class="hero-content">
+          <div class="hero-date">{{ currentDate }}</div>
+          <div class="hero-title">{{ $t('breaking.title') || '突发事件' }}</div>
+          <!-- <div class="hero-subtitle">{{ $t('breaking.subtitle') || '检视过去24小时内变动最大的市场' }}</div> -->
+        </div>
+      </div>
     </div>
 
     <!-- 类别筛选器 -->
@@ -50,7 +56,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { TopRight, BottomRight } from '@element-plus/icons-vue'
 import lp1Png from '@/assets/icon/LP1.png'
-import breakingBanner from '@/assets/images/breakingBanner.png'
+import breakingBanner from '@/assets/images/sudden.png'
 import { getCategoryList, getEventList } from "@/api/APIEvent"
 import { useAccount } from "@wagmi/vue"
 import { useI18n } from "vue-i18n"
@@ -61,6 +67,21 @@ const { t } = useI18n()
 
 const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
 const language = currentLocale.split('-')[0]
+
+const currentDate = ref('')
+
+const updateDate = () => {
+  const d = new Date()
+  if (language === 'zh') {
+    currentDate.value = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
+  } else {
+    currentDate.value = d.toLocaleDateString(currentLocale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+}
 
 // 图片加载失败兜底（避免外链失效导致裂图）
 const handleImgError = (e) => {
@@ -196,6 +217,7 @@ const handleEventClick = (item) => {
 }
 
 onMounted(() => {
+  updateDate();
   getCategoryListData();
   fetchEventList();
 })
@@ -216,12 +238,42 @@ onMounted(() => {
     position: relative;
     box-sizing: border-box;
 
-    .hero-image {
+    .hero-bg {
       width: 100%;
-      height: auto;
-      display: block;
+      aspect-ratio: 708 / 224;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       border-radius: 12px;
-      object-fit: cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 20px;
+      box-sizing: border-box;
+
+      .hero-content {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-width: 60%;
+      }
+
+      .hero-date {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .hero-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 4px 0;
+      }
+
+      .hero-subtitle {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.6);
+      }
     }
   }
 

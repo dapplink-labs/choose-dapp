@@ -492,6 +492,7 @@ export default {
       followBtn: "follow on X",
       breakingNews: "Breaking News",
     },
+    title:"돌발 사건"
   },
   detail: {
     viewResults: "View Results",

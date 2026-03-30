@@ -479,6 +479,7 @@ export default {
       followBtn: "follow on X",
       breakingNews: "突发新闻",
     },
+    title:"突发事件"
   },
   detail: {
     viewResults: "查看结果",
