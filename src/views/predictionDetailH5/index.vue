@@ -14,7 +14,7 @@
                     </el-icon>
                     <span class="top-volume">{{ detailData.volume }}</span>
                 </div>
-                <button class="top-btn bookmark-btn" type="button">
+                <button class="top-btn bookmark-btn" :class="{ active: detailData.isFavorite }" type="button" @click="handleBookmark">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z"
@@ -139,13 +139,16 @@ import logoIcon from '@/assets/icon/logoIcon.png'
 import OrderBookMobile from '@/components/OrderBookMobile.vue'
 import PaymentModal from '@/components/PaymentModal.vue'
 import { useThemeStore } from '@/stores/theme'
-import { getSubEventDetail, getOrderBook, getEventPriceHistory } from '@/api/APIEvent'
+import { getSubEventDetail, getOrderBook, getEventPriceHistory, toggleFavoriteEvent, getEventDetailItem } from '@/api/APIEvent'
 import fallbackAvatar from '@/assets/icon/LP1.png'
+import { ElMessage } from 'element-plus'
+import { useAccount } from '@wagmi/vue'
 
 const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
 const themeStore = useThemeStore()
+const { address } = useAccount()
 
 const logoUrl = logoIcon
 
@@ -168,6 +171,7 @@ const detailData = ref({
     noBidPrice: '--',
     yesAskPrice: '--',
     noAskPrice: '--',
+    isFavorite: false,
 })
 
 const loadingDetail = ref(false)
@@ -245,6 +249,57 @@ const fetchSubEventDetail = async () => {
         detailData.value.title = route.query.title || ''
     } finally {
         loadingDetail.value = false
+    }
+}
+
+const fetchEventFavoriteStatus = async () => {
+    if (!eventGuid.value) return
+    try {
+        const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
+        const language = currentLocale.split('-')[0]
+        const res = await getEventDetailItem({
+            event_guid: eventGuid.value,
+            language_label: language,
+        })
+        const data = res?.data?.data || {}
+        const ev = Array.isArray(data.events) ? data.events[0] : null
+        if (ev) {
+            detailData.value.isFavorite = !!ev.is_favorited
+        }
+    } catch (err) {
+        console.error('Fetch event favorite status failed', err)
+    }
+}
+
+const handleBookmark = async () => {
+    if (!address.value) {
+        ElMessage.warning(t('pleaseConnectWallet') || 'Please connect wallet')
+        return
+    }
+
+    if (!eventGuid.value) return
+
+    try {
+        const res = await toggleFavoriteEvent({
+            user_address: address.value,
+            event_guid: eventGuid.value
+        })
+        
+        const payload = res?.data ?? res
+        const code = payload?.code
+        if (code === 200 || code === 2000 || code === 0) {
+            detailData.value.isFavorite = !detailData.value.isFavorite
+            ElMessage.success(
+                detailData.value.isFavorite 
+                    ? t('favoriteSuccess') || 'Favorite success' 
+                    : t('unfavoriteSuccess') || 'Unfavorite success'
+            )
+        } else {
+            ElMessage.error(payload?.msg || 'Operation failed')
+        }
+    } catch (err) {
+        console.error('Toggle favorite failed', err)
+        ElMessage.error(t('operateFailed') || 'Operation failed')
     }
 }
 
@@ -497,6 +552,7 @@ onMounted(async () => {
 
     // 步骤1：获取子事件详情（含 subEventGuidResolved），渲染基本数据
     await fetchSubEventDetail()
+    fetchEventFavoriteStatus()
 
     // 步骤2：基于 subEventGuidResolved 并行获取订单簿 + 价格历史
     const [source] = await Promise.all([
@@ -599,6 +655,15 @@ const onOrderSuccess = (orderData) => {
     color: var(--text-dark-gray);
 }
 
+.bookmark-btn {
+    transition: color 0.3s;
+    &.active {
+        color: #e44096;
+        svg {
+            fill: currentColor;
+        }
+    }
+}
 .bookmark-btn svg {
     width: 18px;
     height: 18px;
