@@ -212,7 +212,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -277,7 +277,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -313,6 +313,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import bannerImg from "@/assets/images/banner.png";
 import banner0Img from "@/assets/images/banner0.png";
+import banner6Img from "@/assets/images/banner6.png";
 import banner2Img from "@/assets/images/banner2.png";
 import linghua1Img from "@/assets/images/linghua1.png";
 import banner4Img from "@/assets/images/banner4.png";
@@ -364,8 +365,8 @@ const bannerList = ref([
         href: "https://web.chooseme.vip/",
     },
     {
-        img: banner0Img,
-        href: "/LPVault",
+        img: banner6Img,
+        href: "",
     },
     {
         img: banner2Img,
@@ -379,6 +380,7 @@ const bannerList = ref([
         img: banner4Img,
         href: "https://web.chooseme.vip/",
     },
+
 ]);
 
 function goHref(item) {
@@ -553,6 +555,7 @@ $gradient-mask-right: linear-gradient(to right,
                         max-height: 200px;
                         object-fit: cover;
                         display: block;
+                        border-radius: 12px;
                     }
                 }
 
