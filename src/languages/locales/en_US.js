@@ -75,11 +75,12 @@ export default {
     confirmBtn: "Confirm Deposit"
   },
   transactionSuccess: {
-    title: "Transaction Success",
+    title: "Transaction Successful",
     withdraw: {
       amountLabel: "Withdrawal Amount",
       completed: "Withdrawn",
-      success: "Withdrawal successful",
+      success: "Withdrawal Successful",
+      pending: "Withdrawal Under Review",
     },
     deposit: {
       amountLabel: "Deposit Amount",

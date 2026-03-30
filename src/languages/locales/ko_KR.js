@@ -82,6 +82,7 @@ export default {
       amountLabel: "출금 수량",
       completed: "출금 완료",
       success: "출금 성공",
+      pending: "출금 심사 중",
     },
     deposit: {
       amountLabel: "입금 수량",

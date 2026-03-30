@@ -79,7 +79,8 @@ export default {
     "withdraw": {
       "amountLabel": "出金数量",
       "completed": "出金済み",
-      "success": "出金成功"
+      "success": "出金成功",
+      "pending": "出金審査中"
     },
     "deposit": {
       "amountLabel": "入金数量",

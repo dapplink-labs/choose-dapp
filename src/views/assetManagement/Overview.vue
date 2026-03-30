@@ -163,7 +163,7 @@ const fetchFundsHistory = async () => {
   if (!address.value) return
 
   try {
-    const res = await getFundsHistory({ user_address: address.value, page: 1, page_size: 20, type: 'all' })
+    const res = await getFundsHistory({ user_address: address.value, page: 1, page_size: 2, type: 'all' })
     const list = res?.data?.data?.transactions || []
     console.log(res)
     // 只取最新的两条记录

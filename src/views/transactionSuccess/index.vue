@@ -117,21 +117,28 @@ const amountLabel = computed(() =>
 const completedText = computed(() =>
   t(`transactionSuccess.${txType.value}.completed`)
 )
-const successText = computed(() =>
-  t(`transactionSuccess.${txType.value}.success`)
-)
+
+const status = ref(route.query.status || '')
+
+const successText = computed(() => {
+  if (isWithdraw.value && status.value === 'PENDING') {
+    return t('transactionSuccess.withdraw.pending')
+  }
+  return t(`transactionSuccess.${txType.value}.success`)
+})
+
 const depositAccount = ref(route.query.depositAccount || 'ChooseMe 账户')
 
 // 从路由参数获取，默认展示数据
-const amount = ref(route.query.amount || '100')
-const currency = ref(route.query.currency || 'USDT')
-const address = ref(route.query.address || '0x0d766a37A0E60f75A9bDFEfA3EDFd12D372a5b85')
-const network = ref(route.query.network || 'BNB Smart Chain(BEP20)')
-const networkFee = ref(route.query.networkFee || '0.05')
-const txId = ref(route.query.txId || '8jkj90...798h56')
+const amount = ref(route.query.amount || '')
+const currency = ref(route.query.currency || '')
+const address = ref(route.query.address || '')
+const network = ref(route.query.network || '')
+const networkFee = ref(route.query.networkFee || '')
+const txId = ref(route.query.txId || '')
 const txIdFull = ref(route.query.txIdFull || '')
-const submitTime = ref(route.query.submitTime || '2025年12月12日 14:33')
-const referenceNo = ref(route.query.referenceNo || '36357071')
+const submitTime = ref(route.query.submitTime || '')
+const referenceNo = ref(route.query.referenceNo || '')
 
 const displayAddress = computed(() => {
   return address.value.length > 20

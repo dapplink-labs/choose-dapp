@@ -80,6 +80,7 @@ export default {
       amountLabel: "提币数量",
       completed: "已提取",
       success: "提币成功",
+      pending: "提币审核中",
     },
     deposit: {
       amountLabel: "充币数量",
