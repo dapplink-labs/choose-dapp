@@ -124,7 +124,8 @@ import { useAccount } from '@wagmi/vue'
 import { useThemeStore } from '@/stores/theme'
 import { View, Hide, ArrowRight, Document, CaretBottom } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
-import { getUserBalances, getFundsHistory } from '@/api/APIEvent'
+import { getUserBalances, getFundsHistory, getUserAssets, getExchangeRateCho } from '@/api/APIEvent'
+import { getMyIncome } from "@/api/API"
 
 const router = useRouter()
 const { t } = useI18n()
@@ -205,10 +206,10 @@ const handleRecordDetail = (record) => {
 
 // 账户列表
 const accountList = ref([
-  { name: '资金', value: 1000.00 },
-  { name: '质押', value: 2263.23 },
-  { name: '预测', value: 1263.23 },
-  { name: '预测金额', value: 188.23 }
+  { name: '资金', value: 0 },
+  { name: '质押', value: 0 },
+  { name: '预测', value: 0 },
+  { name: '预测金额', value: 0 }
 ])
 
 // 格式化数字（添加千分位）
@@ -248,36 +249,78 @@ const fetchAssets = async () => {
 
   try {
     loadingAssets.value = true
-    const res = await getUserBalances({ user_address: address.value })
+    const [res, assetsRes, incomeRes, priceRes] = await Promise.all([
+      getUserBalances({ user_address: address.value }),
+      getUserAssets({ user_address: address.value }),
+      getMyIncome({ address: address.value }),
+      getExchangeRateCho()
+    ])
+
     const data = res?.data?.data || {}
+    const assetsData = assetsRes?.data?.data || {}
 
     const toNum = (v) => {
       const n = Number(v)
       return Number.isFinite(n) ? n : 0
     }
 
-    // 目前项目其他地方（PaymentModal）优先用 cash / portfolio
-    const cash = toNum(data.cash)
+    // 预测为 getUserBalances 接口返回的 portfolio 字段
     const portfolio = toNum(data.portfolio)
-    const total = portfolio
+    // 资金为所有币种价值之和 (getUserAssets 接口的 total_value_usdt)
+    const fundsValue = toNum(assetsData.total_value_usdt)
 
-    totalAssets.value = total
-    funds.value = cash
+    // 计算质押总估值：质押收益 * CHO价格
+    let choPrice = 0
+    if (priceRes?.data?.code === 2000 || priceRes?.data?.data) {
+      choPrice = Number(priceRes.data.data.price_usdt || 0)
+    }
+
+    let stakingIncomeNum = 0
+    if (incomeRes?.data?.success) {
+      const incomeData = incomeRes.data.data
+      try {
+        if (incomeData.staking_income) {
+          if (typeof incomeData.staking_income === 'string' && incomeData.staking_income.includes('.')) {
+            stakingIncomeNum = Number(incomeData.staking_income)
+          } else {
+            const { formatUnits } = await import('viem')
+            stakingIncomeNum = Number(formatUnits(BigInt(incomeData.staking_income.toString()), 6))
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse staking income', e)
+      }
+    }
+    const stakingValue = stakingIncomeNum * choPrice
+
+    funds.value = toNum(0)
+
+    // 更新账户列表
+    accountList.value = [
+      { name: t('assetManagement.funds') || '资金', value: fundsValue },
+      { name: t('assetManagement.staking') || '质押', value: stakingValue },
+      { name: t('assetManagement.prediction') || '预测', value: portfolio },
+      { name: t('assetManagement.predictionAmount') || '预测金额', value: funds.value }
+    ]
+
+    // 顶部总资产为资金、质押、预测之和
+    totalAssets.value = fundsValue + stakingValue + portfolio + funds.value
+    
 
     // 可选字段（后端不一定返回）
     earnings.value = toNum(data.earnings ?? data.cho)
     earningsValue.value = toNum(data.earnings_value ?? data.cho_value)
     fo.value = toNum(data.fo)
 
-    // 资产分布（若后端返回列表则渲染，否则为空）
-    const list = Array.isArray(data.balances) ? data.balances : []
+    // 资产列表
+    const list = Array.isArray(assetsData.assets) ? assetsData.assets : []
     assetList.value = list.map((a) => {
-      const symbol = a.asset_name || ''
+      const symbol = a.asset_symbol || a.asset_name || ''
       return {
         name: symbol,
         icon: a.icon || (symbol ? `https://effigy.im/a/${symbol.toLowerCase()}.svg` : ''),
-        quantity: toNum(a.total_balance ?? a.quantity ?? a.amount),
-        value: toNum(a.usdt_equivalent ?? a.value ?? a.usdt_value ?? a.usd_value),
+        quantity: toNum(a.balance),
+        value: toNum(a.value_usdt),
       }
     }).filter(v => v.name)
   } catch (error) {
@@ -288,6 +331,12 @@ const fetchAssets = async () => {
     earningsValue.value = 0
     fo.value = 0
     assetList.value = []
+    accountList.value = [
+      { name: t('assetManagement.funds') || '资金', value: 0 },
+      { name: t('assetManagement.staking') || '质押', value: 0 },
+      { name: t('assetManagement.prediction') || '预测', value: 0 },
+      { name: t('assetManagement.predictionAmount') || '预测金额', value: 0 }
+    ]
   } finally {
     loadingAssets.value = false
   }

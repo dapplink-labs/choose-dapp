@@ -282,6 +282,15 @@ const getCountdown = (closeTime) => {
     const diff = end.getTime() - now.value;
     if (diff <= 0) return "--";
     const totalSec = Math.floor(diff / 1000);
+    const showDays = totalSec > 72 * 3600;
+    if (showDays) {
+        const d = Math.floor(totalSec / (24 * 3600));
+        const remainSec = totalSec % (24 * 3600);
+        const h = Math.floor(remainSec / 3600);
+        const m = Math.floor((remainSec % 3600) / 60);
+        const s = remainSec % 60;
+        return `${t('datePicker.days', { n: d })} ${[h, m, s].map((x) => String(x).padStart(2, '0')).join(':')}`;
+    }
     const h = Math.floor(totalSec / 3600);
     const m = Math.floor((totalSec % 3600) / 60);
     const s = totalSec % 60;

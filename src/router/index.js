@@ -142,15 +142,6 @@ const router = createRouter({
       }
     },
     {
-      path: '/bitcoin-up-down',
-      name: 'bitcoinUpDown',
-      component: bitcoinUpDown,
-      meta: {
-        hideHeader: true,
-        hideFooterNav: true
-      }
-    },
-    {
       path: "/breaking",
       name: "breaking",
       component: breaking,

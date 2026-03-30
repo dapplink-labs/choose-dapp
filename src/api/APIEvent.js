@@ -84,6 +84,16 @@ export const getUserBalances = (data) => {
   return request.post('/api/v1/user/balances', data)
 }
 
+// 获取用户资产列表
+export const getUserAssets = (data) => {
+  return request.post('/api/v1/user/assets', data)
+}
+
+// 获取CHO价格
+export const getExchangeRateCho = () => {
+  return request.get('/api/v1/exchange-rate/cho')
+}
+
 
 
 // 创建订单（市价单/限价单）

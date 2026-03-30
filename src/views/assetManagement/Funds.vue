@@ -74,7 +74,7 @@ import { useI18n } from 'vue-i18n'
 import { View, Hide, CaretBottom, Document } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import { useAccount } from '@wagmi/vue'
-import { getUserBalances } from '@/api/APIEvent'
+import { getUserAssets } from '@/api/APIEvent'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -105,7 +105,7 @@ const fetchAssets = async () => {
 
   try {
     loadingAssets.value = true
-    const res = await getUserBalances({ user_address: address.value })
+    const res = await getUserAssets({ user_address: address.value })
     const data = res?.data?.data || {}
 
     const toNum = (v) => {
@@ -113,18 +113,18 @@ const fetchAssets = async () => {
       return Number.isFinite(n) ? n : 0
     }
 
-    // 资金估值使用 portfolio
-    fundsTotal.value = toNum(data.portfolio)
+    // 资金估值使用总资产估值
+    fundsTotal.value = toNum(data.total_value_usdt)
 
     // 资产分布
-    const list = Array.isArray(data.balances) ? data.balances : []
+    const list = Array.isArray(data.assets) ? data.assets : []
     assetList.value = list.map((a) => {
-      const symbol = a.asset_name || ''
+      const symbol = a.asset_symbol || a.asset_name || ''
       return {
         name: symbol,
         icon: a.icon || (symbol ? `https://effigy.im/a/${symbol.toLowerCase()}.svg` : ''),
-        quantity: toNum(a.total_balance ?? a.quantity ?? a.amount),
-        value: toNum(a.usdt_equivalent ?? a.value ?? a.usdt_value ?? a.usd_value),
+        quantity: toNum(a.balance),
+        value: toNum(a.value_usdt),
       }
     }).filter(v => v.name)
   } catch (error) {

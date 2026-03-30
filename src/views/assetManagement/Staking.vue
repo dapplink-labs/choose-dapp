@@ -19,10 +19,10 @@
           <CaretBottom />
         </el-icon> -->
       </div>
-      <div class="today-profit">
+      <!-- <div class="today-profit">
         <span class="label">今日：</span>
         <span class="profit-value positive">+{{ formatCurrency(todayProfit) }} (+{{ todayProfitRate }}%)</span>
-      </div>
+      </div> -->
     </div>
 
     <!-- 收益卡片列表 -->
@@ -50,6 +50,7 @@ import { useI18n } from 'vue-i18n'
 import { View, Hide, CaretBottom, ArrowRight } from '@element-plus/icons-vue'
 import { useAccount } from '@wagmi/vue'
 import { getMyIncome } from "@/api/API"
+import { getExchangeRateCho } from "@/api/APIEvent"
 import { formatChoAmount, formatTokenAmount } from '@/utils/format_amount'
 
 const { t } = useI18n()
@@ -57,7 +58,8 @@ const router = useRouter()
 const { address } = useAccount()
 
 const showAssets = ref(true)
-const stakingTotal = ref(2263.23)
+const stakingTotal = ref(0)
+const choPrice = ref(0)
 const todayProfit = ref(800.00)
 const todayProfitRate = ref(200)
 
@@ -72,13 +74,38 @@ const myIncomeData = ref({
 const fetchMyIncomeData = async () => {
   if (!address.value) return
   try {
-    const res = await getMyIncome({ address: address.value })
-    if (res?.data?.success) {
-      myIncomeData.value = res.data.data
+    const [incomeRes, priceRes] = await Promise.all([
+      getMyIncome({ address: address.value }),
+      getExchangeRateCho()
+    ])
+    
+    if (priceRes?.data?.code === 2000 || priceRes?.data?.data) {
+      choPrice.value = Number(priceRes.data.data.price_usdt || 0)
+    }
+
+    if (incomeRes?.data?.success) {
+      myIncomeData.value = incomeRes.data.data
       updateEarningsCards()
+      
+      // 计算质押总估值：质押收益 * CHO价格
+      // 注意：staking_income 返回的是 6 位精度的数值
+      let stakingIncomeNum = 0
+      try {
+        if (myIncomeData.value.staking_income) {
+          if (typeof myIncomeData.value.staking_income === 'string' && myIncomeData.value.staking_income.includes('.')) {
+            stakingIncomeNum = Number(myIncomeData.value.staking_income)
+          } else {
+            const { formatUnits } = await import('viem')
+            stakingIncomeNum = Number(formatUnits(BigInt(myIncomeData.value.staking_income.toString()), 6))
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse staking income', e)
+      }
+      stakingTotal.value = stakingIncomeNum * choPrice.value
     }
   } catch (error) {
-    console.error('Failed to fetch my income:', error)
+    console.error('Failed to fetch my income or cho price:', error)
   }
 }
 

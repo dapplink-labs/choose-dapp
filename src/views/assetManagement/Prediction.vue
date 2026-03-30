@@ -19,10 +19,10 @@
           <CaretBottom />
         </el-icon> -->
       </div>
-      <div class="today-profit">
+      <!-- <div class="today-profit">
         <span class="label">今日盈亏：</span>
         <span class="profit-value positive">+{{ formatCurrency(todayProfit) }} (+{{ todayProfitRate }}%)</span>
-      </div>
+      </div> -->
     </div>
 
     <!-- 收益盈亏部分 -->

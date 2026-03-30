@@ -48,6 +48,7 @@ export default {
     noOpenOrdersToCancel: "暂无可取消的挂单",
     cancelAllSuccess: "已取消 {n} 个挂单",
     cancelAllFailed: "{n} 个挂单取消失败",
+    predictionAmount: "预测金额",
   },
   withdraw: {
     title: "提币",
@@ -483,6 +484,7 @@ export default {
     viewResults: "查看结果",
     resultYes: "是",
     resultNo: "否",
+    day: "天",
     hour: "时",
     minute: "分",
     second: "秒",

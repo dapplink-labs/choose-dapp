@@ -48,6 +48,7 @@ export default {
     noOpenOrdersToCancel: "No open orders to cancel",
     cancelAllSuccess: "Canceled {n} orders",
     cancelAllFailed: "{n} orders failed to cancel",
+    predictionAmount: "Prediction Amount",
   },
   withdraw: {
     title: "Withdraw",
@@ -491,6 +492,7 @@ export default {
     viewResults: "View Results",
     resultYes: "Yes",
     resultNo: "No",
+    day: "D",
     hour: "H",
     minute: "M",
     second: "S",

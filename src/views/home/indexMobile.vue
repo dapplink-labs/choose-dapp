@@ -642,7 +642,7 @@ const mapEventToCard = (e) => {
         // 加密货币列表：子事件=1 大卡，子事件>1 小卡
         // 其他列表：沿用直播中为大卡
         isCrypto,
-        cardType: isCrypto ? (subEvents.length > 1 ? 'small' : 'large') : (e.is_live === 1 ? 'large' : 'small'),
+        cardType: subEvents.length > 1 ? 'small' : 'large',
         avatar: e.logo || '',
         title: e.title || '',
         // 暂无胜率字段，用占位字符串保持布局
@@ -771,8 +771,8 @@ const navigateToDetail = (item, choice, subEventGuid) => {
         return;
     }
 
-    // 2. 加密货币场景：进入加密货币详情页
-    if (targetCode === 'CRYPTO') {
+    // 2. 进入单事件详情页
+    if (item?.options?.length === 1) {
         const cryptoQuery = {
             event_guid: item.id,
             ...(finalSubEventGuid ? { sub_event_guid: finalSubEventGuid } : {}),
@@ -785,7 +785,7 @@ const navigateToDetail = (item, choice, subEventGuid) => {
         return;
     }
 
-    // 3. 默认行为：跳转通用详情页
+    // 3. 默认行为：跳转通用多事件详情页
     router.push({
         path: "/detail-h5",
         query: {
@@ -798,13 +798,13 @@ const navigateToDetail = (item, choice, subEventGuid) => {
 
 const handleTitleClick = (item) => {
     // 加密货币小卡仅允许点击子事件按钮跳转
-    if (item?.isCrypto && item?.cardType === 'small') return;
+    // if (item?.isCrypto && item?.cardType === 'small') return;
     navigateToDetail(item);
 };
 
 const handleOptionRowClick = (item, opt) => {
     // 加密货币小卡仅允许点击子事件按钮跳转
-    if (item?.isCrypto && item?.cardType === 'small') return;
+    // if (item?.isCrypto && item?.cardType === 'small') return;
     navigateToDetail(item, undefined, opt?.subEventGuid);
 };
 
