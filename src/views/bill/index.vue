@@ -65,8 +65,7 @@
                     <div class="bill-amount" :class="item.amount >= 0 ? 'inflow' : 'outflow'">
                         {{ item.amount >= 0 ? '+' : '-' }}{{ item.amountFormatted }} {{ item.currency_code || 'USD' }}
                     </div>
-                    <div v-if="['FIAT_WITHDRAW', 'FIAT_BIG_WITHDRAW'].includes(item.type)" class="bill-status"
-                        :class="item.status?.toLowerCase()">
+                    <div v-if="['FIAT_WITHDRAW', 'FIAT_BIG_WITHDRAW'].includes(item.type)" class="bill-status">
                         {{ item.status ? $t(`bill.status.${item.status}`) : '' }}
                     </div>
                     <div v-if="['FIAT_WITHDRAW', 'FIAT_BIG_WITHDRAW'].includes(item.type) && ['REJECTED'].includes(item.status) && item.remark"
@@ -544,24 +543,24 @@ watch(() => filterType.value, () => {
 .bill-status {
     font-size: 12px;
 
-    &.processing,
-    &.pending {
-        color: #E6A23C;
-    }
+    // &.processing,
+    // &.pending {
+    //     color: #E6A23C;
+    // }
 
-    &.completed {
-        color: #32B764;
-    }
+    // &.completed {
+    //     color: #32B764;
+    // }
 
-    &.rejected,
-    &.failed {
-        color: #F56C6C;
-    }
+    // &.rejected,
+    // &.failed {
+    //     color: #F56C6C;
+    // }
 }
 
 .bill-remark {
     font-size: 12px;
-    color: #F56C6C;
+    // color: #F56C6C;
     max-width: 150px;
     text-align: right;
     word-break: break-all;
