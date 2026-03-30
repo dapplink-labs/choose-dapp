@@ -13,6 +13,10 @@
                     <!-- 倒计时 -->
                     <div class="event-countdown">
                         <div class="countdown-block">
+                            <span class="countdown-num">{{ countdownDisplay.days }}</span>
+                            <span class="countdown-label">{{ $t('detail.day') }}</span>
+                        </div>
+                        <div class="countdown-block">
                             <span class="countdown-num">{{ countdownDisplay.hours }}</span>
                             <span class="countdown-label">{{ $t('detail.hour') }}</span>
                         </div>
@@ -42,7 +46,7 @@
                             </el-icon>
                             <span class="info-text">{{ detailData.closeDate }}</span>
                         </div>
-                        <div class="bookmark-icon">
+                        <div class="bookmark-icon" :class="{ active: detailData.isFavorite }" @click="handleBookmark">
                             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z"
@@ -333,12 +337,15 @@ import PaymentModal from '@/components/PaymentModal.vue'
 import NavBar2 from '@/components/navBar2.vue'
 import { useDark } from '@vueuse/core'
 import router from '@/router'
-import { getEventDetailItem, getEventActivity, getEventTopHolders, getEventCommentList, getEventPriceHistory, getSubEventDetail } from '@/api/APIEvent'
+import { getEventDetailItem, getEventActivity, getEventTopHolders, getEventCommentList, getEventPriceHistory, getSubEventDetail, toggleFavoriteEvent } from '@/api/APIEvent'
 import fallbackAvatar from '@/assets/icon/LP1.png'
+import { ElMessage } from 'element-plus'
+import { useAccount } from "@wagmi/vue";
 
 const route = useRoute()
 const { t } = useI18n()
 const isDarkMode = useDark()
+const { address } = useAccount()
 
 // --- 基础数据 ---
 const detailData = ref({
@@ -398,20 +405,22 @@ const timeRanges = [
 const selectedTimeRange = ref('1W')
 
 // --- 倒计时 ---
-const countdown = ref({ hours: 0, minutes: 0, seconds: 0 })
+const countdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 let countdownTimer = null
 const targetTime = ref(Date.now() + 3600000 * 5)
 
 const updateCountdown = () => {
     const diff = Math.max(0, Math.floor((targetTime.value - Date.now()) / 1000))
     countdown.value = {
-        hours: Math.floor(diff / 3600),
+        days: Math.floor(diff / 86400),
+        hours: Math.floor((diff % 86400) / 3600),
         minutes: Math.floor((diff % 3600) / 60),
         seconds: diff % 60
     }
 }
 
 const countdownDisplay = computed(() => ({
+    days: String(countdown.value.days).padStart(2, '0'),
     hours: String(countdown.value.hours).padStart(2, '0'),
     minutes: String(countdown.value.minutes).padStart(2, '0'),
     seconds: String(countdown.value.seconds).padStart(2, '0')
@@ -478,8 +487,9 @@ const fetchDetail = async () => {
             avatar: ev.logo || detailData.value.avatar,
             volume: formatVolume(ev.trade_volume),
             closeDate: ev.close_time || '',
-            maxLeverage: '10X',
-            maxReturn: '182%'
+            maxLeverage: '--',
+            maxReturn: '--',
+            isFavorite: !!ev.is_favorited
         }
 
         // 使用 close_time 作为倒计时目标
@@ -1005,6 +1015,38 @@ const onOrderSuccess = (orderData) => {
     fetchActivity()
 }
 
+// --- 收藏/取消收藏 ---
+const handleBookmark = async () => {
+    if (!address.value) {
+        ElMessage.warning(t('pleaseConnectWallet') || 'Please connect wallet')
+        return
+    }
+
+    const eventGuid = route.query.id || route.query.event_guid
+    if (!eventGuid) return
+
+    try {
+        const res = await toggleFavoriteEvent({
+            user_address: address.value,
+            event_guid: eventGuid
+        })
+        
+        const payload = res?.data ?? res
+        const code = payload?.code
+        if (code === 200 || code === 2000 || code === 0) {
+            detailData.value.isFavorite = !detailData.value.isFavorite
+            ElMessage.success(
+                detailData.value.isFavorite 
+                    ? t('favoriteSuccess') || 'Favorite success' 
+                    : t('unfavoriteSuccess') || 'Unfavorite success'
+            )
+        }
+    } catch (err) {
+        console.error('Toggle favorite failed', err)
+        ElMessage.error(t('operateFailed') || 'Operation failed')
+    }
+}
+
 const openPredictionDetail = (outcome) => {
     router.push({
         name: 'predictionDetailH5',
@@ -1114,6 +1156,13 @@ onUnmounted(() => {
         .bookmark-icon {
             margin-left: auto;
             width: 18px;
+            cursor: pointer;
+            transition: color 0.3s;
+            color: var(--text-dark-gray);
+
+            &.active {
+                color: #e44096;
+            }
         }
 
         .leverage-value,

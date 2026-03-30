@@ -48,6 +48,7 @@ export default {
     noOpenOrdersToCancel: "취소할 미체결 주문이 없습니다",
     cancelAllSuccess: "{n}건의 주문을 취소했습니다",
     cancelAllFailed: "{n}건의 주문 취소에 실패했습니다",
+    predictionAmount: "예측 금액",
   },
   withdraw: {
     title: "출금",
@@ -498,6 +499,7 @@ export default {
     viewResults: "View Results",
     resultYes: "Yes",
     resultNo: "No",
+    day: "일",
     hour: "시",
     minute: "분",
     second: "초",

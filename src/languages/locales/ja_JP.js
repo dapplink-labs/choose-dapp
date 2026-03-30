@@ -48,6 +48,7 @@ export default {
     noOpenOrdersToCancel: "キャンセルできる未約定注文がありません",
     cancelAllSuccess: "{n}件の注文をキャンセルしました",
     cancelAllFailed: "{n}件の注文のキャンセルに失敗しました",
+    predictionAmount: "予測金額",
   },
   "withdraw": {
     "title": "出金",
@@ -491,6 +492,7 @@ export default {
     viewResults: "View Results",
     resultYes: "Yes",
     resultNo: "No",
+    day: "日",
     hour: "時",
     minute: "分",
     second: "秒",
