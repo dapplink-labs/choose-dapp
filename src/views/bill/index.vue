@@ -61,8 +61,18 @@
                     </div>
                     <div class="bill-time">{{ item.time }}</div>
                 </div>
-                <div class="bill-amount" :class="item.amount >= 0 ? 'inflow' : 'outflow'">
-                    {{ item.amount >= 0 ? '+' : '' }}{{ item.amountFormatted }} {{ item.currency_code || 'USD' }}
+                <div class="bill-right">
+                    <div class="bill-amount" :class="item.amount >= 0 ? 'inflow' : 'outflow'">
+                        {{ item.amount >= 0 ? '+' : '-' }}{{ item.amountFormatted }} {{ item.currency_code || 'USD' }}
+                    </div>
+                    <div v-if="['FIAT_WITHDRAW', 'FIAT_BIG_WITHDRAW'].includes(item.type)" class="bill-status"
+                        :class="item.status?.toLowerCase()">
+                        {{ item.status ? $t(`bill.status.${item.status}`) : '' }}
+                    </div>
+                    <div v-if="['FIAT_WITHDRAW', 'FIAT_BIG_WITHDRAW'].includes(item.type) && ['REJECTED'].includes(item.status) && item.remark"
+                        class="bill-remark">
+                        {{ item.remark }}
+                    </div>
                 </div>
             </div>
             <div v-if="isLoading" class="loading-more">
@@ -77,10 +87,7 @@
         </div>
 
         <!-- 日期范围选择弹层 -->
-        <DateRangePicker
-            v-model="showDateRangePicker"
-            @confirm="handleDateConfirm"
-        />
+        <DateRangePicker v-model="showDateRangePicker" @confirm="handleDateConfirm" />
     </div>
 </template>
 
@@ -222,12 +229,13 @@ const getSignedAmount = (tx) => {
     const amt = Number.isFinite(n) ? n : 0
     const type = String(tx?.type || '').toUpperCase()
     // 充值为流入，提现为流出；其它类型默认按正数展示（可后续补映射）
-    if (type === 'FIAT_WITHDRAW') return -Math.abs(amt)
-    if (type === 'FIAT_DEPOSIT') return Math.abs(amt)
+    if (['FIAT_WITHDRAW', 'FIAT_BIG_WITHDRAW'].includes(type)) return -Math.abs(amt)
+    if (['FIAT_DEPOSIT'].includes(type)) return Math.abs(amt)
     return amt
 }
 
 const mapTxToRow = (tx) => {
+
     const signed = getSignedAmount(tx)
     const type = String(tx?.type || '').toUpperCase()
     const code = tx?.currency_code || ''
@@ -292,7 +300,7 @@ const fetchTransactionHistory = async (append = false) => {
         const data = res?.data?.data || {}
         const txs = Array.isArray(data.list) ? data.list : []
         const mapped = txs.map(mapTxToRow)
-
+        console.log(mapped)
         totalPages.value = Number(data.total_pages) || 1
         hasMore.value = page.value < totalPages.value
         list.value = append ? list.value.concat(mapped) : mapped
@@ -513,9 +521,16 @@ watch(() => filterType.value, () => {
     font-size: 14px;
 }
 
+.bill-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
 .bill-amount {
     font-size: 14px;
-    flex-shrink: 0;
 
     &.inflow {
         color: #32B764;
@@ -524,6 +539,32 @@ watch(() => filterType.value, () => {
     &.outflow {
         color: #E44096;
     }
+}
+
+.bill-status {
+    font-size: 12px;
+
+    &.processing,
+    &.pending {
+        color: #E6A23C;
+    }
+
+    &.completed {
+        color: #32B764;
+    }
+
+    &.rejected,
+    &.failed {
+        color: #F56C6C;
+    }
+}
+
+.bill-remark {
+    font-size: 12px;
+    color: #F56C6C;
+    max-width: 150px;
+    text-align: right;
+    word-break: break-all;
 }
 
 .loading-more,

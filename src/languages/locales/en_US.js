@@ -801,14 +801,21 @@ export default {
     filterAsset: "Asset",
     filterDate: "Date",
     typeAll: "All",
-    typeRecharge: "Recharge",
+    typeRecharge: "Deposit",
     typeWithdraw: "Withdraw",
     typePurchase: "Purchase Event",
     typeSell: "Sell Event",
     assetAll: "All",
-    date7: "Last 7 days",
-    date30: "Last 30 days",
-    date90: "Last 90 days",
+    date7: "Last 7 Days",
+    date30: "Last 30 Days",
+    date90: "Last 90 Days",
+    status: {
+      PROCESSING: "Processing",
+      PENDING: "Pending",
+      COMPLETED: "Completed",
+      FAILED: "Failed",
+      REJECTED: "Rejected"
+    }
   },
   dashboard: {
     title: "Dashboard",

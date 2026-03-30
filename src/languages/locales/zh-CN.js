@@ -798,6 +798,13 @@ export default {
     date7: "近7天",
     date30: "近30天",
     date90: "近90天",
+    status: {
+      PROCESSING: "处理中",
+      PENDING: "待处理",
+      COMPLETED: "已完成",
+      FAILED: "失败",
+      REJECTED: "已拒绝"
+    }
   },
   dashboard: {
     title: "仪表盘",

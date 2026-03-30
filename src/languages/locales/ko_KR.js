@@ -810,6 +810,13 @@ export default {
     date7: "최근 7일",
     date30: "최근 30일",
     date90: "최근 90일",
+    status: {
+      PROCESSING: "처리 중",
+      PENDING: "대기 중",
+      COMPLETED: "완료됨",
+      FAILED: "실패",
+      REJECTED: "거부됨"
+    }
   },
   dashboard: {
     title: "대시보드",

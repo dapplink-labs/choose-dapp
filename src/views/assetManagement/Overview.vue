@@ -163,9 +163,9 @@ const fetchFundsHistory = async () => {
   if (!address.value) return
 
   try {
-    const res = await getFundsHistory({ user_address: address.value, page: 1, page_size: 2, type: 'all' })
-    const list = res?.data?.data?.list || res?.data?.data || []
-
+    const res = await getFundsHistory({ user_address: address.value, page: 1, page_size: 20, type: 'all' })
+    const list = res?.data?.data?.transactions || []
+    console.log(res)
     // 只取最新的两条记录
     const records = (Array.isArray(list) ? list : []).slice(0, 2)
 
@@ -174,13 +174,14 @@ const fetchFundsHistory = async () => {
       const typeStr = isDeposit ? 'deposit' : 'withdraw'
 
       let statusText = '处理中'
-      let statusColor = 'color-yellow'
+      let statusColor = 'color-green'
 
       const statusStr = String(item.status).toLowerCase()
-      if (statusStr === '1' || statusStr === 'success' || statusStr === 'completed') {
+      console.log(statusStr)
+      if (statusStr === 'completed') {
         statusText = '已完成'
         statusColor = 'color-green'
-      } else if (statusStr === '2' || statusStr === 'fail' || statusStr === 'failed') {
+      } else if (statusStr === 'rejected') {
         statusText = '已失败'
         statusColor = 'color-red'
       }
@@ -201,7 +202,7 @@ const fetchFundsHistory = async () => {
 }
 
 const handleRecordDetail = (record) => {
-  console.log('Record detail', record)
+   router.push('/bill')
 }
 
 // 账户列表
@@ -305,7 +306,7 @@ const fetchAssets = async () => {
 
     // 顶部总资产为资金、质押、预测之和
     totalAssets.value = fundsValue + stakingValue + portfolio + funds.value
-    
+
 
     // 可选字段（后端不一定返回）
     earnings.value = toNum(data.earnings ?? data.cho)
