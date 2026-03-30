@@ -642,7 +642,7 @@ const mapEventToCard = (e) => {
         // 加密货币列表：子事件=1 大卡，子事件>1 小卡
         // 其他列表：沿用直播中为大卡
         isCrypto,
-        cardType: isCrypto ? (subEvents.length > 1 ? 'small' : 'large') : (e.is_live === 1 ? 'large' : 'small'),
+        cardType: subEvents.length > 1 ? 'small' : 'large',
         avatar: e.logo || '',
         title: e.title || '',
         // 暂无胜率字段，用占位字符串保持布局
