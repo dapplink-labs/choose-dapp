@@ -357,7 +357,7 @@
   </div>
 </template>
 
-<script src="./bitcoinUpDown.script.js"></script>
+<script src="./index.js"></script>
 
 <style scoped lang="scss">
 $hot-pink: var(--text-color-n);
