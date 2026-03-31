@@ -133,7 +133,16 @@
                             </div>
                             <div class="outcome-chance">{{ outcome.chance }}%</div>
                         </div>
-                        <div class="outcome-divider"></div>
+                        <div class="outcome-divider">
+                            <template v-if="outcome.positions && outcome.positions.length">
+                                <span v-for="(pos, pIdx) in outcome.positions" :key="pIdx"
+                                    :class="(pos.outcome || '').toLowerCase()" style="margin-right: 8px;">
+                                    {{ pos.outcome === 'YES' ? 'Yes' : 'No' }} {{ Number(pos.shares) }} · {{
+                                        Number(pos.avg_price * 100).toFixed(1) }} ¢
+                                </span>
+                            </template>
+                            <span v-else style="visibility: hidden; display: inline-block; padding: 2px 6px;">-</span>
+                        </div>
                         <div v-if="!isEventEnded" class="outcome-actions">
                             <button class="outcome-btn yes-btn" :class="{ active: outcome.selected === 'yes' }"
                                 @click="selectOutcome(index, 'yes')">
@@ -333,7 +342,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick, shallowRef } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, shallowRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Trophy, Clock, Calendar, ArrowUpBold, ArrowDownBold, Pointer } from '@element-plus/icons-vue'
@@ -342,7 +351,7 @@ import PaymentModal from '@/components/PaymentModal.vue'
 import NavBar2 from '@/components/navBar2.vue'
 import { useDark } from '@vueuse/core'
 import router from '@/router'
-import { getEventDetailItem, getEventActivity, getEventTopHolders, getEventCommentList, getEventPriceHistory, getSubEventDetail, toggleFavoriteEvent } from '@/api/APIEvent'
+import { getEventDetailItem, getEventActivity, getEventTopHolders, getEventCommentList, getEventPriceHistory, getSubEventDetail, toggleFavoriteEvent, getUserSubEventPositions } from '@/api/APIEvent'
 import fallbackAvatar from '@/assets/icon/LP1.png'
 import { ElMessage } from 'element-plus'
 import { useAccount } from "@wagmi/vue";
@@ -452,8 +461,8 @@ const mapSubEventsToOutcomes = (subEvents = []) => {
     const list = Array.isArray(subEvents) ? subEvents : []
     return list.map((sub, idx) => {
         const directions = Array.isArray(sub.directions) ? sub.directions : []
-        const yesDir = directions.find(d => (d.outcome || '').toUpperCase() === 'YES') || directions[0] || {}
-        const noDir = directions.find(d => (d.outcome || '').toUpperCase() === 'NO') || directions[1] || directions[0] || {}
+        const yesDir = directions.find(d => (d.outcome || '').toUpperCase() === 'YES') || {}
+        const noDir = directions.find(d => (d.outcome || '').toUpperCase() === 'NO') || {}
 
         // 子事件列表概率字段：后端为 sub_events.directions.chance
         // 兼容旧结构：若 sub.directions 仍是数组，则回退到 yesDir.chance
@@ -463,8 +472,8 @@ const mapSubEventsToOutcomes = (subEvents = []) => {
         const chancePercent = Number.isFinite(chanceRaw) ? (chanceRaw <= 1 ? chanceRaw * 100 : chanceRaw) : 0
 
         // 买 Yes/No 时均使用对应方向的 new_ask_price（卖价 = 市场报价）
-        const yesPrice = yesDir.new_ask_price || yesDir.new_bid_price || '0'
-        const noPrice = noDir.new_ask_price || noDir.new_bid_price || '0'
+        const yesPrice = Number(yesDir.new_ask_price) || yesDir.chance || '0'
+        const noPrice = Number(noDir.new_ask_price) || noDir.chance || '0'
 
         return {
             title: sub.title || '',
@@ -476,6 +485,7 @@ const mapSubEventsToOutcomes = (subEvents = []) => {
             selected: null,
             sub_event_guid: sub.sub_event_guid || '',
             subEventGuid: sub.sub_event_guid || '',
+            positions: []
         }
     })
 }
@@ -503,7 +513,7 @@ const fetchDetail = async () => {
             avatar: ev.logo || detailData.value.avatar,
             volume: formatVolume(ev.trade_volume),
             closeDate: ev.close_time || '',
-            createDate: ev.create_time || '--',
+            createDate: ev.created_at || '',
             maxLeverage: '--',
             maxReturn: '--',
             isFavorite: !!ev.is_favorited
@@ -521,11 +531,35 @@ const fetchDetail = async () => {
         // 子事件映射为预测列表
         if (Array.isArray(ev.sub_events) && ev.sub_events.length) {
             outcomes.value = mapSubEventsToOutcomes(ev.sub_events)
+            fetchOutcomesPositions()
         }
     } catch (err) {
         console.error('Fetch event detail failed', err)
     } finally {
         loadingDetail.value = false
+    }
+}
+
+const fetchOutcomesPositions = async () => {
+    if (!address.value || !outcomes.value.length) return
+    const eventGuid = route.query.id || route.query.event_guid
+
+    for (let i = 0; i < outcomes.value.length; i++) {
+        const outcome = outcomes.value[i]
+        if (!outcome.sub_event_guid) continue
+
+        try {
+            const res = await getUserSubEventPositions({
+                event_guid: eventGuid,
+                sub_event_guid: outcome.sub_event_guid,
+                user_address: address.value
+            })
+            if (res?.data?.code === 2000 && res?.data?.data?.positions) {
+                outcome.positions = res.data.data.positions
+            }
+        } catch (err) {
+            console.error('Fetch outcome positions failed', err)
+        }
     }
 }
 
@@ -1016,14 +1050,14 @@ const handleBookmark = async () => {
             user_address: address.value,
             event_guid: eventGuid
         })
-        
+
         const payload = res?.data ?? res
         const code = payload?.code
         if (code === 200 || code === 2000 || code === 0) {
             detailData.value.isFavorite = !detailData.value.isFavorite
             ElMessage.success(
-                detailData.value.isFavorite 
-                    ? t('favoriteSuccess') || 'Favorite success' 
+                detailData.value.isFavorite
+                    ? t('favoriteSuccess') || 'Favorite success'
                     : t('unfavoriteSuccess') || 'Unfavorite success'
             )
         }
@@ -1055,6 +1089,13 @@ onMounted(async () => {
     const source = await fetchPriceHistory()
     initChart(source)
 })
+
+watch(() => address.value, (newAddr) => {
+    if (newAddr && outcomes.value.length) {
+        fetchOutcomesPositions()
+    }
+})
+
 onUnmounted(() => {
     clearInterval(countdownTimer)
     chartInstance.value?.dispose()
