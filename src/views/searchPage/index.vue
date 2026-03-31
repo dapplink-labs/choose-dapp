@@ -220,7 +220,7 @@ const handleSearchInput = () => {
 
 const handleBrowseClick = async (item) => {
     const params = {}
-    
+
     // 根据不同的 key 设置排序
     if (item.key === 'trends') {
         params.sort_type = 'trade_volume' // 假设 trade_volume 是 trends/成交量
@@ -251,10 +251,16 @@ const navigateToDetail = (item) => {
 <style scoped lang="scss">
 /* ... existing code ... */
 .search-page {
-    padding: 20px 0;
-    box-sizing: border-box;
     width: 100%;
+    background: var(--bg-page-h5);
+    min-height: 100vh;
+    box-sizing: border-box;
     /* ... existing code ... */
+}
+
+.search-content {
+    padding: 20px 0;
+
 }
 
 // 搜索结果
