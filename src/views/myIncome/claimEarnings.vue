@@ -20,12 +20,8 @@
       <div class="form-section">
         <label class="section-label">{{ $t('collectEarnings.claimAmount') || '领取数量' }}</label>
         <div class="amount-input-wrapper">
-          <input 
-            type="number" 
-            v-model="displayAmount" 
-            class="amount-input"
-            :placeholder="$t('collectEarnings.inputAmount') || '请输入领取数量'" 
-          />
+          <input type="number" v-model="displayAmount" class="amount-input"
+            :placeholder="$t('collectEarnings.inputAmount') || '请输入领取数量'" />
           <div class="suffix-group">
             <span class="unit">CHO</span>
             <div class="max-btn" @click.stop="handleMax">Max</div>
@@ -35,7 +31,7 @@
           <!-- 动态计算 USDT：基于比例和不同精度的转换 -->
           <span class="usdt-value">≈ {{ usdtValue }} USDT</span>
           <span class="claimable-text">
-            {{ $t('collectEarnings.claimable') || '可领取收益' }}: 
+            {{ $t('collectEarnings.claimable') || '可领取收益' }}:
             {{ selectedNode ? formatAmount(selectedNode.node_reward) : '--' }}
           </span>
         </div>
@@ -61,13 +57,8 @@
       </button>
     </div>
 
-    <NodeSelectorModal 
-      v-model:visible="showNodeSelector" 
-      :options="nodes" 
-      :loading="loadingNodes"
-      :selected="selectedNode" 
-      @select="handleNodeSelect" 
-    />
+    <NodeSelectorModal v-model:visible="showNodeSelector" :options="nodes" :loading="loadingNodes"
+      :selected="selectedNode" @select="handleNodeSelect" />
   </div>
 </template>
 
@@ -127,13 +118,13 @@ const usdtValue = computed(() => {
   if (!selectedNode.value || !selectedNode.value.node_reward || Number(displayAmount.value) <= 0) {
     return '0.00'
   }
-  
+
   const inputReadable = Number(displayAmount.value)
   const totalRewardReadable = Number(selectedNode.value.node_reward) / PRECISION_CHO
   const totalUsdtValueReadable = Number(selectedNode.value.node_reward_usdt || 0) / PRECISION_USDT
-  
+
   if (totalRewardReadable <= 0) return '0.00'
-  
+
   const result = (inputReadable / totalRewardReadable) * totalUsdtValueReadable
   return result.toFixed(2)
 })
@@ -227,7 +218,7 @@ const handleConfirm = async () => {
     }
 
     const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
-    
+
     // 计算原始 6 位精度的 CHO 数量用于提交
     const finalRawAmount = Math.floor(Number(displayAmount.value) * PRECISION_CHO)
 
@@ -235,6 +226,7 @@ const handleConfirm = async () => {
       abi: stakingManagerABI,
       address: bscNet.proxyStakingManager,
       functionName: 'liquidityProviderClaimReward',
+      value: parseUnits("0.001", 18),
       args: [BigInt(selectedNode.value.round), BigInt(finalRawAmount)],
       userAddress: address.value,
       messages: CONTRACT_MESSAGES
@@ -304,9 +296,15 @@ onMounted(() => {
   span {
     font-size: 16px;
     color: #fff;
-    &.placeholder { color: #999; }
+
+    &.placeholder {
+      color: #999;
+    }
   }
-  .arrow-icon { color: #999; }
+
+  .arrow-icon {
+    color: #999;
+  }
 }
 
 .amount-input-wrapper {
@@ -317,7 +315,9 @@ onMounted(() => {
   align-items: center;
   border: 1px solid #23262F;
 
-  &:focus-within { border-color: #a4f128; }
+  &:focus-within {
+    border-color: #a4f128;
+  }
 
   .amount-input {
     flex: 1;
@@ -328,14 +328,23 @@ onMounted(() => {
     color: #fff;
     outline: none;
     font-family: DIN;
-    &::-webkit-inner-spin-button { display: none; }
+
+    &::-webkit-inner-spin-button {
+      display: none;
+    }
   }
 
   .suffix-group {
     display: flex;
     align-items: center;
     gap: 8px;
-    .unit { color: #fff; font-size: 16px; font-weight: bold; }
+
+    .unit {
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
     .max-btn {
       background: #333;
       color: #fff;
@@ -383,8 +392,12 @@ onMounted(() => {
     font-family: DIN;
     font-weight: bold;
     font-size: 16px;
-    &.green { color: #a4f128; }
+
+    &.green {
+      color: #a4f128;
+    }
   }
+
   .dashed-underline {
     border-bottom: 1px dashed #333;
   }
