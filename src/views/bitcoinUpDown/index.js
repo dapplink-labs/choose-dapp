@@ -466,19 +466,14 @@ export default {
           page: 1,
           page_size: 2000,
           language_label: languageLabel,
+          sub_event_guid: currentEventGuid.value,
         });
         if (!isRespSuccess(res))
           throw new Error(res?.data?.message || "Fetch positions failed");
         const list = Array.isArray(res?.data?.data?.list)
           ? res.data.data.list
           : [];
-        positions.value = list
-          .filter(
-            (item) =>
-              !currentEventGuid.value ||
-              item?.event_guid === currentEventGuid.value,
-          )
-          .map(mapPositionCard);
+        positions.value = list.map(mapPositionCard);
       } catch (error) {
         console.error("Fetch positions failed", error);
         positions.value = [];
