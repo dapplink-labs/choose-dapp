@@ -646,7 +646,7 @@ const mapEventToCard = (e) => {
         avatar: e.logo || '',
         title: e.title || '',
         // 暂无胜率字段，用占位字符串保持布局
-        percentage: e.cluster_score ? `${e.cluster_score}%` : '0%',
+        percentage: `${subEvents[0].directions.filter((x) => x.outcome === 'YES')[0].chance}%`,
         maxLeverage: '--',
         maxReturn: '-- %',
         closeTime: e.close_time || '', // "2026-01-25 14:00:00" 用于倒计时
@@ -658,6 +658,7 @@ const mapEventToCard = (e) => {
         options: subEvents.map((sub) => ({
             text: sub.title || '',
             subEventGuid: sub.sub_event_guid || '',
+            percentage: `${sub.directions.filter((x) => x.outcome === 'YES')[0].chance}%`,
         })),
     };
 };
@@ -1006,6 +1007,7 @@ $gradient-mask-right: linear-gradient(to right,
                         max-height: 200px;
                         object-fit: cover;
                         display: block;
+                        border-radius: 12px;
                     }
                 }
 

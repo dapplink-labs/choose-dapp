@@ -79,7 +79,8 @@ export default {
     "withdraw": {
       "amountLabel": "出金数量",
       "completed": "出金済み",
-      "success": "出金成功"
+      "success": "出金成功",
+      "pending": "出金審査中"
     },
     "deposit": {
       "amountLabel": "入金数量",
@@ -486,6 +487,7 @@ export default {
       followBtn: "follow on X",
       breakingNews: "Breaking News",
     },
+    title:"突発事件"
   },
   detail: {
     viewResults: "View Results",
@@ -792,19 +794,26 @@ export default {
     quick90: "90日",
   },
   bill: {
-    title: "明細",
+    title: "請求書",
     filterType: "タイプ",
     filterAsset: "資産",
     filterDate: "日付",
     typeAll: "すべて",
-    typeRecharge: "入金",
+    typeRecharge: "チャージ",
     typeWithdraw: "出金",
     typePurchase: "購入イベント",
     typeSell: "売却イベント",
     assetAll: "すべて",
-    date7: "過去7日",
-    date30: "過去30日",
-    date90: "過去90日",
+    date7: "過去7日間",
+    date30: "過去30日間",
+    date90: "過去90日間",
+    status: {
+      PROCESSING: "処理中",
+      PENDING: "保留中",
+      COMPLETED: "完了",
+      FAILED: "失敗",
+      REJECTED: "拒否されました"
+    }
   },
   dashboard: {
     title: "ダッシュボード",

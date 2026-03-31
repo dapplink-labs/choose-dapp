@@ -298,6 +298,7 @@ const handleConfirm = async () => {
           network: selectedNetwork.value,
           networkFee: '0.00',
           txId: res.data.data?.guid || 'Processing',
+          status: res.data.data?.status || '',
           submitTime: new Date().toLocaleString('zh-CN', {
             year: 'numeric',
             month: '2-digit',

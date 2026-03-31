@@ -80,6 +80,7 @@ export default {
       amountLabel: "提币数量",
       completed: "已提取",
       success: "提币成功",
+      pending: "提币审核中",
     },
     deposit: {
       amountLabel: "充币数量",
@@ -479,6 +480,7 @@ export default {
       followBtn: "follow on X",
       breakingNews: "突发新闻",
     },
+    title:"突发事件"
   },
   detail: {
     viewResults: "查看结果",
@@ -797,6 +799,13 @@ export default {
     date7: "近7天",
     date30: "近30天",
     date90: "近90天",
+    status: {
+      PROCESSING: "处理中",
+      PENDING: "待处理",
+      COMPLETED: "已完成",
+      FAILED: "失败",
+      REJECTED: "已拒绝"
+    }
   },
   dashboard: {
     title: "仪表盘",
