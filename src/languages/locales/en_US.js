@@ -871,6 +871,12 @@ export default {
     allNodes: "All Nodes",
     claimNote: "You can claim earnings for all nodes or select a single node to claim",
     claimable: "Claimable Earnings",
+    requestingAuth: "Authorizing...",
+    approvalSuccess: "Authorization Successful",
+    userCancelledAuth: "User Cancelled Authorization",
+    approveTokenFailed: "Authorization Failed",
+    noClaimableReward: "No claimable rewards on-chain",
+    exceedOnChain: "Claim amount exceeds on-chain claimable balance",
   },
   searchPage: {
     searchPlaceholder: "Search",

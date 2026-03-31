@@ -67,7 +67,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAccount, useChainId } from '@wagmi/vue'
-import { switchChain } from '@wagmi/core'
+import { switchChain, readContract } from '@wagmi/core'
 import { config } from '@/wagmi'
 import { ElLoading } from 'element-plus'
 import { ArrowDown } from '@element-plus/icons-vue'
@@ -76,7 +76,7 @@ import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import NodeSelectorModal from '@/components/NodeSelectorModal.vue'
 import { getNodeStakingRecords, stakingclaimReward } from '@/api/API'
 import { formatDateTime } from '@/utils/format_date.js'
-import { writeContractOptimized } from '@/utils/requestWEB3.js'
+import { writeContractOptimized, checkAllowance, approveToken } from '@/utils/requestWEB3.js'
 import { formatChoAmount } from '@/utils/format_amount.js'
 import stakingManagerABI from '@/assets/abi/stakingManagerABI.json'
 import networks from '@/assets/json/networks.js'
@@ -221,15 +221,71 @@ const handleConfirm = async () => {
 
     const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
 
-    // 计算原始 6 位精度的 CHO 数量用于提交
-    const finalRawAmount = Math.floor(Number(displayAmount.value) * PRECISION_CHO)
+    // 使用 parseUnits 安全转换精度（与 predictionDetailH5 一致）
+    const amountString = String(displayAmount.value)
+    const amountBigInt = parseUnits(amountString, 6) // CHO 6位精度
+
+    // 链上预检查：读取合约中实际可领取的奖励
+    const lpInfo = await readContract(config, {
+      address: bscNet.proxyStakingManager,
+      abi: stakingManagerABI,
+      functionName: 'getLiquidityProviderInfo',
+      args: [address.value, BigInt(selectedNode.value.round)],
+    })
+    const onChainReward = lpInfo.rewardAmount ?? BigInt(0)
+    const onChainClaimed = lpInfo.claimedAmount ?? BigInt(0)
+    const onChainClaimable = onChainReward - onChainClaimed
+
+    console.log('On-chain LP info:', {
+      rewardAmount: onChainReward.toString(),
+      claimedAmount: onChainClaimed.toString(),
+      claimable: onChainClaimable.toString(),
+      requestAmount: amountBigInt.toString(),
+    })
+
+    if (onChainClaimable <= BigInt(0)) {
+      Message.error(t('collectEarnings.noClaimableReward') || '链上暂无可领取的奖励')
+      return
+    }
+
+    if (amountBigInt > onChainClaimable) {
+      Message.error(t('collectEarnings.exceedOnChain') || '领取数量超过链上可领取额度')
+      return
+    }
+
+    // 检查 CHO 授权
+    const choTokenAddress = bscNet.proxyChooseMeToken
+    const allowance = await checkAllowance(
+      choTokenAddress,
+      address.value,
+      bscNet.proxyStakingManager
+    )
+
+    if (allowance === BigInt(0) || allowance < amountBigInt) {
+      loading.text = t('collectEarnings.requestingAuth') || '授权中...'
+      try {
+        await approveToken({
+          tokenAddress: choTokenAddress,
+          spenderAddress: bscNet.proxyStakingManager,
+          amount: amountBigInt,
+          userAddress: address.value,
+          BRIDGE_MESSAGES: {
+            approvalSuccess: t('collectEarnings.approvalSuccess') || '授权成功',
+            userCancelledAuth: t('collectEarnings.userCancelledAuth') || '用户取消授权',
+            approveTokenFailed: t('collectEarnings.approveTokenFailed') || '授权失败',
+          },
+        })
+      } catch (approveError) {
+        return
+      }
+    }
 
     const txHash = await writeContractOptimized({
       abi: stakingManagerABI,
       address: bscNet.proxyStakingManager,
       functionName: 'liquidityProviderClaimReward',
       value: parseUnits("0.001", 18),
-      args: [BigInt(selectedNode.value.round), BigInt(finalRawAmount)],
+      args: [BigInt(selectedNode.value.round), amountBigInt],
       userAddress: address.value,
       messages: CONTRACT_MESSAGES
     })
@@ -239,7 +295,7 @@ const handleConfirm = async () => {
         user_address: address.value,
         request_tx_hash: txHash.hash,
         round: String(selectedNode.value.round),
-        raw_amount_token: String(finalRawAmount)
+        raw_amount_token: amountBigInt.toString()
       })
       Message.success(CONTRACT_MESSAGES.success())
       router.back()
