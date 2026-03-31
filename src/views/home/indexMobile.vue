@@ -197,7 +197,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                            }}</span>
+                                                }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -273,7 +273,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                                }}</span>
+                                            }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -343,7 +343,7 @@
                                                 <Avatar />
                                             </el-icon>
                                             <span class="participant-text">{{ item.participantCount.toLocaleString()
-                                                }}</span>
+                                            }}</span>
                                         </div>
                                         <span class="voi-amount">VOI：${{ item.amount }}</span>
                                     </div>
@@ -361,10 +361,10 @@
                         <div ref="loadMoreSentinel" class="load-more-sentinel" aria-hidden="true"></div>
                         <div class="load-more-footer">
                             <span v-if="loadingMore" class="load-more-text">{{ $t('home.loadingMore') || '加载中...'
-                                }}</span>
+                            }}</span>
                             <span v-else-if="cardList.length && !hasMore" class="load-more-text">{{ $t('home.noMore') ||
                                 '没有更多了'
-                                }}</span>
+                            }}</span>
                         </div>
                     </div>
                 </div>
@@ -646,7 +646,7 @@ const mapEventToCard = (e) => {
         avatar: e.logo || '',
         title: e.title || '',
         // 暂无胜率字段，用占位字符串保持布局
-        percentage: e.cluster_score ? `${e.cluster_score}%` : '0%',
+        percentage: `${subEvents[0].directions.filter((x) => x.outcome === 'YES')[0].chance}%`,
         maxLeverage: '--',
         maxReturn: '-- %',
         closeTime: e.close_time || '', // "2026-01-25 14:00:00" 用于倒计时
@@ -658,6 +658,7 @@ const mapEventToCard = (e) => {
         options: subEvents.map((sub) => ({
             text: sub.title || '',
             subEventGuid: sub.sub_event_guid || '',
+            percentage: `${sub.directions.filter((x) => x.outcome === 'YES')[0].chance}%`,
         })),
     };
 };

@@ -266,7 +266,7 @@ const fetchAssets = async () => {
     }
 
     // 预测为 getUserBalances 接口返回的 portfolio 字段
-    const portfolio = toNum(data.portfolio)
+    const portfolio = 0
     // 资金为所有币种价值之和 (getUserAssets 接口的 total_value_usdt)
     const fundsValue = toNum(assetsData.total_value_usdt)
 
