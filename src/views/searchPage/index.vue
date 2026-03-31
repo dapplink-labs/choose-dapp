@@ -148,43 +148,42 @@ const browseItems = computed(() => [
 
 // 主题部分数据
 const themeItems = computed(() => [
-    { key: 'crypto', label: t('searchPage.crypto'), thumbnail: si1, guid: 'crypto_guid' },
-    { key: 'sports', label: t('searchPage.sports'), thumbnail: si2, guid: 'sports_guid' },
-    { key: 'politics', label: t('searchPage.politics'), thumbnail: si3, guid: 'politics_guid' },
-    { key: 'science', label: t('searchPage.science'), thumbnail: si4, guid: 'science_guid' }
+    { key: 'crypto', label: t('searchPage.crypto'), thumbnail: si1, guid: 'CRYPTO' },
+    { key: 'sports', label: t('searchPage.sports'), thumbnail: si2, guid: 'SPORTS' },
+    { key: 'politics', label: t('searchPage.politics'), thumbnail: si3, guid: 'POLITICS' },
+    { key: 'science', label: t('searchPage.science'), thumbnail: si4, guid: 'TECHNOLOGY' }
 ])
 
 
-// 处理搜索
-const handleSearch = async () => {
-    const query = searchQuery.value.trim()
-    if (!query) {
-        results.value = []
-        return
-    }
-
+// 封装公共的请求和处理逻辑
+const fetchAndSetResults = async (customParams = {}, labelToSet = '') => {
     loading.value = true
     try {
         const lang = locale.value === 'zh-cn' ? 'zh' :
             locale.value === 'ko-kr' ? 'ko' :
                 locale.value === 'ja-jp' ? 'ja' : 'en'
 
-        const params = {
+        const baseParams = {
             language_label: lang,
             user_address: address.value || '',
-            search_key: query,
             page: 1,
             page_size: 50,
-            include_sub_events: true
+            include_sub_events: true,
+            ...customParams
         }
 
-        const res = await getEventList(params)
+        const res = await getEventList(baseParams)
         const list = res?.data?.data?.events || res?.data?.events || []
+
+        if (labelToSet) {
+            searchQuery.value = labelToSet
+        }
 
         results.value = list.map(e => {
             const subEvents = Array.isArray(e.sub_events) ? e.sub_events : []
-            const firstSub = subEvents[0] || {}
-            const percentage = firstSub.price ? Math.round(Number(firstSub.price) * 100) + '%' : '0%'
+            // 增加可选链判断，防止某些数据缺失导致报错
+            const yesDirection = subEvents[0]?.directions?.find((x) => x.outcome === 'YES')
+            const percentage = yesDirection ? `${yesDirection.chance}%` : '0%'
 
             return {
                 guid: e.event_guid,
@@ -194,10 +193,20 @@ const handleSearch = async () => {
             }
         })
     } catch (error) {
-        console.error('Search failed:', error)
+        console.error('Fetch events failed:', error)
     } finally {
         loading.value = false
     }
+}
+
+// 处理搜索
+const handleSearch = async () => {
+    const query = searchQuery.value.trim()
+    if (!query) {
+        results.value = []
+        return
+    }
+    await fetchAndSetResults({ search_key: query })
 }
 
 // 处理搜索输入
@@ -210,93 +219,25 @@ const handleSearchInput = () => {
 }
 
 const handleBrowseClick = async (item) => {
-    loading.value = true
-    try {
-        const lang = locale.value === 'zh-cn' ? 'zh' :
-            locale.value === 'ko-kr' ? 'ko' :
-                locale.value === 'ja-jp' ? 'ja' : 'en'
-
-        const params = {
-            language_label: lang,
-            user_address: address.value || '',
-            page: 1,
-            page_size: 50,
-            include_sub_events: true
-        }
-
-        // 根据不同的 key 设置排序
-        if (item.key === 'trends') {
-            params.sort_type = 2 // 假设 2 是 trends/成交量
-        } else if (item.key === 'popular') {
-            params.sort_type = 1 // 假设 1 是 popular/热门
-        } else if (item.key === 'liquidity') {
-            params.sort_type = 3 // 假设 3 是流动性
-        } else if (item.key === 'endingSoon') {
-            params.sort_type = 4 // 假设 4 是即将结束
-        }
-
-        const res = await getEventList(params)
-        const list = res?.data?.data?.events || res?.data?.events || []
-
-        searchQuery.value = item.label // 显示当前浏览的项目名
-        results.value = list.map(e => {
-            const subEvents = Array.isArray(e.sub_events) ? e.sub_events : []
-            const firstSub = subEvents[0] || {}
-            const percentage = firstSub.price ? Math.round(Number(firstSub.price) * 100) + '%' : '0%'
-
-            return {
-                guid: e.event_guid,
-                title: e.event_title || e.title,
-                avatar: e.logo || fallbackListImg,
-                percentage: percentage
-            }
-        })
-    } catch (error) {
-        console.error('Browse fetch failed:', error)
-    } finally {
-        loading.value = false
+    const params = {}
+    
+    // 根据不同的 key 设置排序
+    if (item.key === 'trends') {
+        params.sort_type = 'trade_volume' // 假设 trade_volume 是 trends/成交量
+    } else if (item.key === 'popular') {
+        params.sort_type = 'popularity' // 假设 popularity 是 popular/热门
+    } else if (item.key === 'liquidity') {
+        params.sort_type = 'liquidity' // 假设 liquidity 是流动性
+    } else if (item.key === 'endingSoon') {
+        params.sort_type = 'open_time' // 假设 open_time 是即将结束
     }
+
+    await fetchAndSetResults(params, item.label)
 }
 
 const handleThemeClick = async (theme) => {
-    loading.value = true
-    try {
-        const lang = locale.value === 'zh-cn' ? 'zh' :
-            locale.value === 'ko-kr' ? 'ko' :
-                locale.value === 'ja-jp' ? 'ja' : 'en'
-
-        const params = {
-            language_label: lang,
-            user_address: address.value || '',
-            page: 1,
-            page_size: 50,
-            include_sub_events: true
-        }
-
-        // 根据主题 key 映射 category_guid (这里需要根据实际情况配置)
-        // params.category_guid = theme.guid 
-
-        const res = await getEventList(params)
-        const list = res?.data?.data?.events || res?.data?.events || []
-
-        searchQuery.value = theme.label
-        results.value = list.map(e => {
-            const subEvents = Array.isArray(e.sub_events) ? e.sub_events : []
-            const firstSub = subEvents[0] || {}
-            const percentage = firstSub.price ? Math.round(Number(firstSub.price) * 100) + '%' : '0%'
-
-            return {
-                guid: e.event_guid,
-                title: e.event_title || e.title,
-                avatar: e.logo || fallbackListImg,
-                percentage: percentage
-            }
-        })
-    } catch (error) {
-        console.error('Theme fetch failed:', error)
-    } finally {
-        loading.value = false
-    }
+    // 根据主题 key 映射 category_code (这里需要根据实际情况配置)
+    await fetchAndSetResults({ category_code: theme.guid }, theme.label)
 }
 
 const navigateToDetail = (item) => {

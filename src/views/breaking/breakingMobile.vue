@@ -154,7 +154,7 @@ const fetchEventList = async () => {
         category_guid: e.category_guid || '',
         avatar: e.logo || '',
         title: e.title || '',
-        mainPercent: e.cluster_score || 0,
+        mainPercent: `${subEvents[0].directions.filter((x) => x.outcome === 'YES')[0].chance}`,
         changePercent: changePercent,
         changeClass: changePercent >= 0 ? 'positive' : 'negative',
         options: subEvents.map((sub) => ({
