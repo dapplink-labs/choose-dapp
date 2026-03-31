@@ -99,6 +99,7 @@ export default {
   },
   bitcoinUpDown: {
     title: "Bitcoin Up or Down",
+    openPrice: "Open price",
     priceToBeat: "Price to beat",
     currentPrice: "Current price",
     finalPrice: "Final price",
@@ -953,6 +954,7 @@ export default {
   },
   crypto: {
     upOrDown: "Up or Down",
+    openPrice: "OPEN PRICE",
     priceToBeat: "PRICE TO BEAT",
     currentPrice: "CURRENT PRICE",
     record: "Record",

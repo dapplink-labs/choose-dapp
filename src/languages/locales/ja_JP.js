@@ -99,6 +99,7 @@ export default {
   },
   "bitcoinUpDown": {
     "title": "Bitcoin Up or Down",
+    "openPrice": "始値",
     "priceToBeat": "達成価格",
     "currentPrice": "現在価格",
     "finalPrice": "最終価格",
@@ -954,6 +955,7 @@ export default {
   },
   "crypto": {
     "upOrDown": "上昇か下落か",
+    "openPrice": "始値",
     "priceToBeat": "目標価格",
     "currentPrice": "現在価格",
     "record": "履歴",

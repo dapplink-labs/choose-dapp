@@ -106,6 +106,7 @@ export default {
   },
   bitcoinUpDown: {
     title: "Bitcoin Up or Down",
+    openPrice: "시가",
     priceToBeat: "목표 가격",
     currentPrice: "현재 가격",
     finalPrice: "최종 가격",
@@ -958,6 +959,7 @@ export default {
   },
   crypto: {
     upOrDown: "상승 또는 하락",
+    openPrice: "시가",
     priceToBeat: "목표 가격",
     currentPrice: "현재 가격",
     record: "기록",

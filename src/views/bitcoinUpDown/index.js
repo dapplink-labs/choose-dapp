@@ -1134,6 +1134,12 @@ const fetchDetail = async () => {
     const noDirection = directions.find(item => (item?.outcome || '').toLowerCase() === 'no') || directions[1] || {}
 
     const targetPrice = firstFinite(
+      subEvent?.open_price,
+      subEvent?.opening_price,
+      subEvent?.start_price,
+      eventItem?.open_price,
+      eventItem?.opening_price,
+      eventItem?.start_price,
       subEvent?.target_price,
       subEvent?.reference_price,
       subEvent?.strike_price,

@@ -76,7 +76,7 @@
       <!-- 3. 价格看板 -->
       <div class="price-dashboard">
         <div class="price-item">
-          <div class="label">{{ $t('bitcoinUpDown.priceToBeat') }}</div>
+          <div class="label">{{ $t('bitcoinUpDown.openPrice') }}</div>
           <div class="value">{{ activeSegmentMode === 'future' ? '--' : formatPrice(displayTargetPrice) }}</div>
         </div>
 

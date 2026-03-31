@@ -99,6 +99,7 @@ export default {
   },
   bitcoinUpDown: {
     title: "Bitcoin Up or Down",
+    openPrice: "开盘价格",
     priceToBeat: "目标价格",
     currentPrice: "当前价格",
     finalPrice: "最终价格",
@@ -942,6 +943,7 @@ export default {
   },
   crypto: {
     upOrDown: "涨跌预测",
+    openPrice: "开盘价格",
     priceToBeat: "目标价格",
     currentPrice: "当前价格",
     record: "记录",
