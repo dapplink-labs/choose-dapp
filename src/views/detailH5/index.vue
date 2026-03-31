@@ -134,7 +134,14 @@
                             <div class="outcome-chance">{{ outcome.chance }}%</div>
                         </div>
                         <div class="outcome-divider">
-                            <span class="no">No 10 ·98.7 ¢</span>
+                            <template v-if="outcome.positions && outcome.positions.length">
+                                <span v-for="(pos, pIdx) in outcome.positions" :key="pIdx"
+                                    :class="(pos.outcome || '').toLowerCase()" style="margin-right: 8px;">
+                                    {{ pos.outcome === 'YES' ? 'Yes' : 'No' }} {{ Number(pos.shares) }} · {{
+                                        Number(pos.avg_price * 100).toFixed(1) }} ¢
+                                </span>
+                            </template>
+                            <span v-else style="visibility: hidden; display: inline-block; padding: 2px 6px;">-</span>
                         </div>
                         <div v-if="!isEventEnded" class="outcome-actions">
                             <button class="outcome-btn yes-btn" :class="{ active: outcome.selected === 'yes' }"
@@ -210,7 +217,7 @@
                             </el-icon>
                             <span class="about-label">{{ $t('detail.createDate') || '创建日期' }}</span>
                         </div>
-                        <span class="about-value">Jan 1, 2026, 23:22 UTC+8</span>
+                        <span class="about-value">{{ detailData.createDate }}</span>
                     </div>
                 </div>
             </div>
@@ -335,7 +342,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick, shallowRef } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, shallowRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Trophy, Clock, Calendar, ArrowUpBold, ArrowDownBold, Pointer } from '@element-plus/icons-vue'
@@ -344,7 +351,7 @@ import PaymentModal from '@/components/PaymentModal.vue'
 import NavBar2 from '@/components/navBar2.vue'
 import { useDark } from '@vueuse/core'
 import router from '@/router'
-import { getEventDetailItem, getEventActivity, getEventTopHolders, getEventCommentList, getEventPriceHistory, getSubEventDetail, toggleFavoriteEvent } from '@/api/APIEvent'
+import { getEventDetailItem, getEventActivity, getEventTopHolders, getEventCommentList, getEventPriceHistory, getSubEventDetail, toggleFavoriteEvent, getUserSubEventPositions } from '@/api/APIEvent'
 import fallbackAvatar from '@/assets/icon/LP1.png'
 import { ElMessage } from 'element-plus'
 import { useAccount } from "@wagmi/vue";
@@ -356,12 +363,12 @@ const { address } = useAccount()
 
 // --- 基础数据 ---
 const detailData = ref({
-    title: 'U.S. forces seize anotherVenezuela- linked oil ship by...?',
+    title: '',
     avatar: fallbackAvatar,
-    volume: '$153,642,644 Vol.',
-    closeDate: 'Dec 10, 2025',
-    maxLeverage: '10X',
-    maxReturn: '182%'
+    volume: '',
+    closeDate: '',
+    maxLeverage: '',
+    maxReturn: ''
 })
 
 const PALETTE = [isDarkMode.value ? '#2EBE69' : '#BBFF2E', '#E44096', '#3B82F6', '#F59E0B']
@@ -475,6 +482,7 @@ const mapSubEventsToOutcomes = (subEvents = []) => {
             selected: null,
             sub_event_guid: sub.sub_event_guid || '',
             subEventGuid: sub.sub_event_guid || '',
+            positions: []
         }
     })
 }
@@ -502,6 +510,7 @@ const fetchDetail = async () => {
             avatar: ev.logo || detailData.value.avatar,
             volume: formatVolume(ev.trade_volume),
             closeDate: ev.close_time || '',
+            createDate: ev.created_at || '',
             maxLeverage: '--',
             maxReturn: '--',
             isFavorite: !!ev.is_favorited
@@ -519,11 +528,35 @@ const fetchDetail = async () => {
         // 子事件映射为预测列表
         if (Array.isArray(ev.sub_events) && ev.sub_events.length) {
             outcomes.value = mapSubEventsToOutcomes(ev.sub_events)
+            fetchOutcomesPositions()
         }
     } catch (err) {
         console.error('Fetch event detail failed', err)
     } finally {
         loadingDetail.value = false
+    }
+}
+
+const fetchOutcomesPositions = async () => {
+    if (!address.value || !outcomes.value.length) return
+    const eventGuid = route.query.id || route.query.event_guid
+
+    for (let i = 0; i < outcomes.value.length; i++) {
+        const outcome = outcomes.value[i]
+        if (!outcome.sub_event_guid) continue
+
+        try {
+            const res = await getUserSubEventPositions({
+                event_guid: eventGuid,
+                sub_event_guid: outcome.sub_event_guid,
+                user_address: address.value
+            })
+            if (res?.data?.code === 2000 && res?.data?.data?.positions) {
+                outcome.positions = res.data.data.positions
+            }
+        } catch (err) {
+            console.error('Fetch outcome positions failed', err)
+        }
     }
 }
 
@@ -1101,6 +1134,13 @@ onMounted(async () => {
     const source = await fetchPriceHistory()
     initChart(source || generateData())
 })
+
+watch(() => address.value, (newAddr) => {
+    if (newAddr && outcomes.value.length) {
+        fetchOutcomesPositions()
+    }
+})
+
 onUnmounted(() => {
     clearInterval(countdownTimer)
     chartInstance.value?.dispose()
