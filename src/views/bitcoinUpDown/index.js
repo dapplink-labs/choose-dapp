@@ -354,7 +354,7 @@ const mapPositionCard = (item) => {
     profit: `${profitNum >= 0 ? '+' : '-'}${formatMoney(Math.abs(profitNum))}${costNum ? `(${profitPct >= 0 ? '+' : ''}${profitPct.toFixed(2)}%)` : ''}`,
     profitPositive: profitNum >= 0,
     raw: item,
-    outcome
+    outcome:item?.outcome
   }
 }
 
