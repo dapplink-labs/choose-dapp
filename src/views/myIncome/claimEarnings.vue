@@ -80,6 +80,8 @@ import { writeContractOptimized } from '@/utils/requestWEB3.js'
 import { formatChoAmount } from '@/utils/format_amount.js'
 import stakingManagerABI from '@/assets/abi/stakingManagerABI.json'
 import networks from '@/assets/json/networks.js'
+import { parseUnits } from "viem";
+
 
 const router = useRouter()
 const { t } = useI18n()
