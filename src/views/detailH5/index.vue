@@ -11,7 +11,7 @@
                         @error="(e) => (e.target.src = fallbackAvatar)" />
                     <h1 class="event-title">{{ detailData.title }}</h1>
                     <!-- 倒计时 -->
-                    <div class="event-countdown">
+                    <div v-if="!isEventEnded" class="event-countdown">
                         <div class="countdown-block">
                             <span class="countdown-num">{{ countdownDisplay.days }}</span>
                             <span class="countdown-label">{{ $t('detail.day') }}</span>
@@ -28,6 +28,9 @@
                             <span class="countdown-num">{{ countdownDisplay.seconds }}</span>
                             <span class="countdown-label">{{ $t('detail.second') }}</span>
                         </div>
+                    </div>
+                    <div v-else class="event-ended-badge">
+                        {{ $t('detail.eventEnded') || '已结束' }}
                     </div>
                 </div>
 
@@ -102,10 +105,11 @@
                         </div>
                         <!-- 浮动信息卡 -->
                         <div v-if="isDragging" class="custom-tooltip" :style="tooltipStyle">
+                            <div class="tt-time">{{ tooltipTimeLabel }}</div>
                             <div v-for="dot in activeDots" :key="'tt-' + dot.name" class="tt-row"
                                 :style="{ backgroundColor: dot.color, color: dot.textColor }">
                                 <span class="tt-name">{{ dot.name }}</span>
-                                <span class="tt-val">{{ dot.val }}%</span>
+                                <span class="tt-val">${{ dot.val }}</span>
                             </div>
                         </div>
                     </div>
@@ -132,7 +136,7 @@
                         <div class="outcome-divider">
                             <span class="no">No 10 ·98.7 ¢</span>
                         </div>
-                        <div class="outcome-actions">
+                        <div v-if="!isEventEnded" class="outcome-actions">
                             <button class="outcome-btn yes-btn" :class="{ active: outcome.selected === 'yes' }"
                                 @click="selectOutcome(index, 'yes')">
                                 {{ $t('detail.buyYes') }} {{ outcome.yesPrice }} ¢
@@ -142,12 +146,15 @@
                                 {{ $t('detail.buyNo') }} {{ outcome.noPrice }} ¢
                             </button>
                         </div>
+                        <div v-else class="outcome-actions-ended">
+                            {{ $t('detail.eventEnded') || '已结束' }}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 4. 查看结果模块 (折叠) -->
-            <div class="view-results-section">
+            <!-- 4. 查看结果模块 (折叠，仅事件结束后显示) -->
+            <div v-if="isEventEnded" class="view-results-section">
                 <div class="view-results-header" @click="showViewResultsExpanded = !showViewResultsExpanded">
                     <h3 class="view-results-title">{{ $t('detail.viewResults') }}</h3>
                     <span class="view-results-caret">
@@ -357,7 +364,7 @@ const detailData = ref({
     maxReturn: '182%'
 })
 
-const PALETTE = [isDarkMode ? '#2EBE69' : '#BBFF2E', '#E44096', '#3B82F6', '#F59E0B']
+const PALETTE = [isDarkMode.value ? '#2EBE69' : '#BBFF2E', '#E44096', '#3B82F6', '#F59E0B']
 
 // 预测列表数据（完全依赖接口返回的 sub_events，不再使用本地假数据）
 const outcomes = ref([])
@@ -398,19 +405,24 @@ const paymentOutcomeTitle = ref('')
 const paymentInitialOutcome = ref('YES')
 const paymentInitialSide = ref('buy')
 const timeRanges = [
-    { label: '1H', value: '1H' }, { label: '6H', value: '6H' },
-    { label: '1D', value: '1D' }, { label: '1W', value: '1W' },
-    { label: 'ALL', value: 'ALL' }
+    { label: '1D', value: '1d' },
+    { label: '1W', value: '1w' },
+    { label: '1M', value: '1m' },
+    { label: 'ALL', value: 'all' }
 ]
-const selectedTimeRange = ref('1W')
+const selectedTimeRange = ref('1w')
 
 // --- 倒计时 ---
 const countdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+const isEventEnded = ref(false)
 let countdownTimer = null
 const targetTime = ref(Date.now() + 3600000 * 5)
 
 const updateCountdown = () => {
-    const diff = Math.max(0, Math.floor((targetTime.value - Date.now()) / 1000))
+    const now = Date.now()
+    const diff = Math.max(0, Math.floor((targetTime.value - now) / 1000))
+    // targetTime 初始值为当前时间+5h，排除默认值导致的误判；只有 targetTime 被赋过服务器值后再判断
+    isEventEnded.value = diff === 0 && targetTime.value < now
     countdown.value = {
         days: Math.floor(diff / 86400),
         hours: Math.floor((diff % 86400) / 3600),
@@ -437,29 +449,32 @@ const formatVolume = (v) => {
 
 const mapSubEventsToOutcomes = (subEvents = []) => {
     const list = Array.isArray(subEvents) ? subEvents : []
-    return list.slice(0, 4).map((sub, idx) => {
+    return list.map((sub, idx) => {
         const directions = Array.isArray(sub.directions) ? sub.directions : []
-        const first = directions[0] || {}
-        const chanceNum = Number(first.chance ?? 0)
-        const yesPrice = first.new_bid_price || first.new_ask_price || '0'
-        const noPrice = first.new_ask_price || first.new_bid_price || '0'
-        const subEventGuid =
-            sub.sub_event_guid ||
-            sub.subEventGuid ||
-            sub.guid ||
-            sub.id ||
-            ''
+        const yesDir = directions.find(d => (d.outcome || '').toUpperCase() === 'YES') || directions[0] || {}
+        const noDir = directions.find(d => (d.outcome || '').toUpperCase() === 'NO') || directions[1] || directions[0] || {}
+
+        // 子事件列表概率字段：后端为 sub_events.directions.chance
+        // 兼容旧结构：若 sub.directions 仍是数组，则回退到 yesDir.chance
+        const chanceFromSubDirections = !Array.isArray(sub?.directions) ? sub?.directions?.chance : undefined
+        const chanceRaw = Number((chanceFromSubDirections ?? yesDir.chance ?? 0))
+        // chance 字段可能是 0-1 概率，也可能是 0-100，统一转为 0-100 显示
+        const chancePercent = Number.isFinite(chanceRaw) ? (chanceRaw <= 1 ? chanceRaw * 100 : chanceRaw) : 0
+
+        // 买 Yes/No 时均使用对应方向的 new_ask_price（卖价 = 市场报价）
+        const yesPrice = yesDir.new_ask_price || yesDir.new_bid_price || '0'
+        const noPrice = noDir.new_ask_price || noDir.new_bid_price || '0'
 
         return {
-            title: sub.title || first.title || first.name || '',
+            title: sub.title || '',
             volume: formatVolume(sub.trade_volume),
-            chance: Number.isFinite(chanceNum) ? chanceNum : 0,
+            chance: Number(chancePercent.toFixed(1)),
             yesPrice: String(yesPrice),
             noPrice: String(noPrice),
             color: PALETTE[idx % PALETTE.length],
             selected: null,
-            sub_event_guid: subEventGuid,
-            subEventGuid,
+            sub_event_guid: sub.sub_event_guid || '',
+            subEventGuid: sub.sub_event_guid || '',
         }
     })
 }
@@ -706,45 +721,27 @@ const isDragging = ref(false)
 const cursorX = ref(0)
 const activeDots = ref([])
 const tooltipStyle = ref({ left: '0px', top: '0px' })
+const tooltipTimeLabel = ref('')
 let gridRect = { x: 0, y: 0, width: 0, height: 0 }
 let chartSourceData = null
 const loadingPriceHistory = ref(false)
 
-// 后端枚举：
-// - range: 1d/1w/1m/all
-// - interval: 5m/1h/4h/1d
-// 说明：UI 的 1H/6H 在后端没有对应 range，因此统一请求 1d+5m 后在前端截取最后 N 个点。
-const TIME_RANGE_TO_HISTORY_REQ = {
-    '1H': { interval: '5m', range: '1d' },
-    '6H': { interval: '5m', range: '1d' },
-    '1D': { interval: '1h', range: '1d' },
-    '1W': { interval: '1h', range: '1w' },
-    'ALL': { interval: '1d', range: 'all' }
-}
-
-const sliceChartSourceLastN = (source, lastN) => {
-    if (!source?.xData?.length || !source?.xLabels?.length) return source
-    const len = source.xData.length
-    const n = Math.max(2, Math.min(len, Number(lastN) || len))
-    const start = len - n
-
-    const xLabels = source.xLabels.slice(start)
-    const xData = Array.from({ length: xLabels.length }, (_, i) => i)
-    const sData = (source.sData || []).map(s => ({
-        ...s,
-        data: Array.isArray(s.data) ? s.data.slice(start) : s.data
-    }))
-
-    return { ...source, xData, xLabels, sData }
-}
-
-const parseProbToPercent = (p) => {
+// 将价格字段标准化到 0~1 区间（兼容 0~1 和 0~100 两种来源）
+const parsePrice = (p) => {
     const n = Number(p)
-    if (!Number.isFinite(n)) return null
-    // 后端字段描述为 "概率/价格"，常见为 0~1 概率；也兼容 0~100 百分比
-    const percent = n <= 1 ? n * 100 : n
-    if (!Number.isFinite(percent)) return null
-    return Math.max(0, Math.min(100, percent))
+    if (!Number.isFinite(n) || Number.isNaN(n)) return null
+    // 后端字段描述为 "概率/价格"，0~1 直接使用，0~100 则除以 100
+    const normalized = n > 1 ? n / 100 : n
+    return Math.max(0, Math.min(1, normalized))
+}
+
+// 根据实际数据时间跨度自动决定 x 轴格式
+const getXAxisSpanMs = () => {
+    const labels = chartSourceData?.xLabels
+    if (!labels?.length) return 0
+    const first = new Date(labels[0]).getTime()
+    const last = new Date(labels[labels.length - 1]).getTime()
+    return Number.isFinite(last - first) ? last - first : 0
 }
 
 const formatXAxisLabel = (idx) => {
@@ -757,23 +754,52 @@ const formatXAxisLabel = (idx) => {
     const d = new Date(raw)
     if (Number.isNaN(d.getTime())) return String(raw)
 
-    const r = selectedTimeRange.value
     const locale = localStorage.getItem('app-locale') || navigator.language || 'en-US'
-    if (r === '1H' || r === '6H') {
+    const spanMs = getXAxisSpanMs()
+    const oneDayMs = 24 * 60 * 60 * 1000
+
+    if (spanMs <= oneDayMs) {
+        // 时间跨度 ≤ 1 天：显示 时:分
         return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(d)
     }
-    if (r === '1D') {
-        return new Intl.DateTimeFormat(locale, { hour: '2-digit' }).format(d)
-    }
+    // 时间跨度 > 1 天：显示 月/日
     return new Intl.DateTimeFormat(locale, { month: '2-digit', day: '2-digit' }).format(d)
+}
+
+// tooltip 需要展示“时间日期”，因此比 x 轴标签更完整一些：
+// - 1d：显示“月/日 + 时:分”
+// - 其他范围：显示“月/日”
+const formatTooltipXAxisLabel = (idx) => {
+    if (!chartSourceData?.xLabels?.length) return ''
+    const i = Number(idx)
+    if (!Number.isInteger(i) || i < 0 || i >= chartSourceData.xLabels.length) return ''
+
+    const raw = chartSourceData.xLabels[i]
+    if (!raw) return ''
+    const d = new Date(raw)
+    if (Number.isNaN(d.getTime())) return String(raw)
+
+    const locale = localStorage.getItem('app-locale') || navigator.language || 'en-US'
+    // “完整时间”：包含 年-月-日 时-分-秒
+    return new Intl.DateTimeFormat(locale, {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    }).format(d)
 }
 
 const buildChartSourceFromPriceHistory = (priceHistoryData) => {
     const points = Array.isArray(priceHistoryData?.data_points) ? priceHistoryData.data_points : []
     if (!points.length) return null
 
-    // x 轴时间：用第一条有效数据的时间做基准
-    const first = points.find(p => Array.isArray(p?.history) && p.history.length && Array.isArray(p.history[0]?.data) && p.history[0].data.length)
+    // x 轴时间：用第一条有非空 history.data 的数据做基准
+    const first = points.find(p => {
+        const histArr = Array.isArray(p?.history) ? p.history : []
+        return histArr.some(h => Array.isArray(h?.data) && h.data.length > 0)
+    })
     const firstHistory = first?.history?.find(h => (h?.outcome || '').toLowerCase() === 'yes') || first?.history?.[0]
     const baseData = Array.isArray(firstHistory?.data) ? firstHistory.data : []
     if (!baseData.length) return null
@@ -783,24 +809,35 @@ const buildChartSourceFromPriceHistory = (priceHistoryData) => {
     const xData = Array.from({ length: xLabels.length }, (_, i) => i)
     const timeIndex = new Map(xLabels.map((t, i) => [t, i]))
 
+    const currentOutcomes = outcomes.value
+
     const sData = points.slice(0, 4).map((p, idx) => {
         const historyArr = Array.isArray(p?.history) ? p.history : []
-        const picked = historyArr.find(h => (h?.outcome || '').toLowerCase() === 'yes') || historyArr[0] || {}
+        const picked = historyArr.find(h => (h?.outcome || '').toLowerCase() === 'yes') || {}
         const rawSeries = Array.isArray(picked?.data) ? picked.data : []
 
         const data = new Array(xLabels.length).fill(null)
         rawSeries.forEach(pt => {
             const i = timeIndex.get(pt?.t)
             if (i === undefined) return
-            const v = parseProbToPercent(pt?.p)
+            const v = parsePrice(pt?.p)
             if (v === null) return
-            data[i] = Number(v.toFixed(1))
+            data[i] = Number(v.toFixed(4))
         })
 
-        // 兜底：如果没有任何点能对齐，直接返回全空，ECharts 会断线显示
+        // 按 sub_event_guid / title 与 outcomes 对齐颜色索引，防止顺序不一致导致颜色错乱
+        let colorIdx = idx
+        if (currentOutcomes.length > 0) {
+            const matchIdx = currentOutcomes.findIndex(o =>
+                (p.sub_event_guid && (o.sub_event_guid === p.sub_event_guid || o.subEventGuid === p.sub_event_guid)) ||
+                (p.title && o.title === p.title)
+            )
+            if (matchIdx >= 0) colorIdx = matchIdx
+        }
+
         return {
             name: p?.title || '',
-            color: PALETTE[idx % PALETTE.length],
+            color: PALETTE[colorIdx % PALETTE.length],
             data
         }
     })
@@ -812,22 +849,22 @@ const generateData = () => {
     const points = 60
     const sData = outcomes.value.map(opt => {
         const line = []
-        let val = opt.chance
+        // chance 为 0-100 百分比，转为 0-1 价格区间
+        let val = opt.chance / 100
         for (let i = 0; i < points; i++) {
-            val += (Math.random() - 0.5) * 5
-            line.push(Number(Math.max(0, Math.min(100, val)).toFixed(1)))
+            val += (Math.random() - 0.5) * 0.05
+            line.push(Number(Math.max(0, Math.min(1, val)).toFixed(4)))
         }
-        line[points - 1] = opt.chance
+        line[points - 1] = Number((opt.chance / 100).toFixed(4))
         return { name: opt.title, color: opt.color, data: line }
     })
     const rangeMsMap = {
-        '1H': 60 * 60 * 1000,
-        '6H': 6 * 60 * 60 * 1000,
-        '1D': 24 * 60 * 60 * 1000,
-        '1W': 7 * 24 * 60 * 60 * 1000,
-        'ALL': 30 * 24 * 60 * 60 * 1000
+        '1d': 24 * 60 * 60 * 1000,
+        '1w': 7 * 24 * 60 * 60 * 1000,
+        '1m': 30 * 24 * 60 * 60 * 1000,
+        'all': 365 * 24 * 60 * 60 * 1000
     }
-    const rangeMs = rangeMsMap[selectedTimeRange.value] || rangeMsMap['1W']
+    const rangeMs = rangeMsMap[selectedTimeRange.value] || rangeMsMap['1w']
     const stepMs = Math.max(60 * 1000, Math.floor(rangeMs / Math.max(1, points - 1)))
     const end = Date.now()
     const start = end - stepMs * (points - 1)
@@ -836,19 +873,22 @@ const generateData = () => {
 }
 
 const updateOverlay = (idx) => {
-    if (!chartInstance.value) return
+    if (!chartInstance.value || !chartSourceData) return
     idx = Math.max(0, Math.min(chartSourceData.xData.length - 1, idx))
     const xPx = chartInstance.value.convertToPixel({ xAxisIndex: 0 }, idx)
     cursorX.value = xPx
+    tooltipTimeLabel.value = formatTooltipXAxisLabel(idx)
 
-    activeDots.value = chartSourceData.sData.map(line => ({
-        name: line.name.length > 8 ? line.name.slice(0, 8) + '...' : line.name,
-        val: Number.isFinite(line.data[idx]) ? line.data[idx].toFixed(1) : '--',
-        color: line.color,
-        textColor: line.color === '#BBFF2E' ? '#000' : '#fff',
-        x: xPx,
-        y: chartInstance.value.convertToPixel({ yAxisIndex: 0 }, line.data[idx])
-    })).sort((a, b) => b.val - a.val)
+    activeDots.value = chartSourceData.sData
+        .filter(line => Number.isFinite(line.data[idx]))
+        .map(line => ({
+            name: line.name,
+            val: line.data[idx].toFixed(4),
+            color: line.color,
+            textColor: (line.color === '#BBFF2E' || line.color === '#2EBE69') ? '#000' : '#fff',
+            x: xPx,
+            y: chartInstance.value.convertToPixel({ yAxisIndex: 0 }, line.data[idx])
+        })).sort((a, b) => b.val - a.val)
 
     tooltipStyle.value = {
         left: xPx > chartContainerRef.value.offsetWidth / 2 ? `${xPx - 130}px` : `${xPx + 15}px`,
@@ -867,25 +907,14 @@ const fetchPriceHistory = async () => {
     const eventGuid = route.query.id || route.query.event_guid
     if (!eventGuid) return null
 
-    const req = TIME_RANGE_TO_HISTORY_REQ[selectedTimeRange.value] || TIME_RANGE_TO_HISTORY_REQ['1W']
     loadingPriceHistory.value = true
     try {
         const res = await getEventPriceHistory({
             event_guid: eventGuid,
-            interval: req.interval,
-            range: req.range
+            range: selectedTimeRange.value
         })
         const data = res?.data?.data || {}
-        const built = buildChartSourceFromPriceHistory(data)
-        if (!built) return null
-
-        if (selectedTimeRange.value === '1H' && req.interval === '5m') {
-            return sliceChartSourceLastN(built, 12) // 60min / 5min
-        }
-        if (selectedTimeRange.value === '6H' && req.interval === '5m') {
-            return sliceChartSourceLastN(built, 72) // 360min / 5min
-        }
-        return built
+        return buildChartSourceFromPriceHistory(data)
     } catch (err) {
         console.error('Fetch price history failed', err)
         return null
@@ -896,7 +925,10 @@ const fetchPriceHistory = async () => {
 
 const initChart = (source = null) => {
     if (!chartRef.value) return
-    chartInstance.value = echarts.init(chartRef.value)
+    // 复用已有实例，避免切换时间范围时重复 init 报错
+    if (!chartInstance.value) {
+        chartInstance.value = echarts.init(chartRef.value)
+    }
     chartSourceData = source || chartSourceData || generateData()
 
     const series = []
@@ -925,12 +957,12 @@ const initChart = (source = null) => {
             }
         },
         yAxis: {
-            type: 'value', position: 'right', min: 0, max: 100,
-            axisLabel: { formatter: '{value}%', color: '#555' },
+            type: 'value', position: 'right', min: 0, max: 1,
+            axisLabel: { formatter: (value) => `$${value.toFixed(2)}`, color: '#555' },
             splitLine: { lineStyle: { color: isDarkMode.value ? '#23262F' : '#E0E0E0', type: 'dashed' } }
         },
         series
-    })
+    }, true)
 
     setTimeout(() => {
         const grid = chartInstance.value.getModel().getComponent('grid').coordinateSystem.getRect()
@@ -1056,17 +1088,18 @@ const openPredictionDetail = (outcome) => {
         },
     })
 }
-onMounted(() => {
-    fetchDetail()
+onMounted(async () => {
+    updateCountdown()
+    countdownTimer = setInterval(updateCountdown, 1000)
     if (SHOW_COMMENTS) fetchComments()
     fetchActivity()
     fetchTopHolders()
-    updateCountdown()
-    countdownTimer = setInterval(updateCountdown, 1000)
-    nextTick(async () => {
-        const source = await fetchPriceHistory()
-        initChart(source || generateData())
-    })
+    // 先等 detail 加载完毕，outcomes 有数据后再初始化图表，
+    // 以便 buildChartSourceFromPriceHistory 能按 guid/title 匹配正确颜色
+    await fetchDetail()
+    await nextTick()
+    const source = await fetchPriceHistory()
+    initChart(source || generateData())
 })
 onUnmounted(() => {
     clearInterval(countdownTimer)
@@ -1129,6 +1162,18 @@ onUnmounted(() => {
                 }
             }
         }
+
+        .event-ended-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--text-dark-gray);
+            background: var(--border-color);
+            white-space: nowrap;
+        }
     }
 
     .event-info-section {
@@ -1161,7 +1206,7 @@ onUnmounted(() => {
             color: var(--text-dark-gray);
 
             &.active {
-                color: #e44096;
+                color: var(--text-color-y);
             }
         }
 
@@ -1265,14 +1310,34 @@ onUnmounted(() => {
             gap: 6px;
             z-index: 20;
 
+            .tt-time {
+                font-size: 10px;
+                color: var(--text-dark-gray);
+                padding: 2px 4px;
+                white-space: nowrap;
+            }
+
             .tt-row {
                 padding: 4px 10px;
                 border-radius: 6px;
                 font-size: 11px;
                 font-weight: bold;
-                min-width: 100px;
+                min-width: 120px;
                 display: flex;
                 justify-content: space-between;
+                gap: 8px;
+
+                .tt-name {
+                    flex: 1;
+                    min-width: 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .tt-val {
+                    flex-shrink: 0;
+                }
             }
         }
     }
@@ -1363,6 +1428,18 @@ onUnmounted(() => {
                 background: var(--button-bg-n);
                 color: var(--text-color-n);
             }
+        }
+
+        .outcome-actions-ended {
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-dark-gray);
+            background: var(--border-color);
         }
     }
 }
