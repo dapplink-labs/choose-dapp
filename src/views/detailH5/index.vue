@@ -135,13 +135,16 @@
                         </div>
                         <div class="outcome-divider">
                             <template v-if="outcome.positions && outcome.positions.length">
-                                <span v-for="(pos, pIdx) in outcome.positions" :key="pIdx"
-                                    :class="(pos.outcome || '').toLowerCase()" style="margin-right: 8px;">
+                                <span
+                                    v-for="(pos, pIdx) in outcome.positions"
+                                    :key="pIdx"
+                                    :class="(pos.outcome || '').toLowerCase()"
+                                >
                                     {{ pos.outcome === 'YES' ? 'Yes' : 'No' }} {{ Number(pos.shares) }} · {{
                                         Number(pos.avg_price * 100).toFixed(1) }} ¢
                                 </span>
                             </template>
-                            <span v-else style="visibility: hidden; display: inline-block; padding: 2px 6px;">-</span>
+                            <span v-else class="outcome-divider-placeholder">-</span>
                         </div>
                         <div v-if="!isEventEnded" class="outcome-actions">
                             <button class="outcome-btn yes-btn" :class="{ active: outcome.selected === 'yes' }"
@@ -223,12 +226,10 @@
             </div>
 
             <!-- 6. 规则模块 -->
-            <div class="rules-section">
+            <div class="rules-section" v-if="detailData.rules">
                 <h3 class="section-block-title">{{ $t('detail.rules') || '规则' }}</h3>
                 <p class="rules-text">
-                    The FED interest rates are defined in this market by the upper bound of the target federal funds
-                    range. The
-                    decisions on the target
+                    {{ detailData.rules }}
                 </p>
             </div>
 
@@ -370,7 +371,8 @@ const detailData = ref({
     createDate: '--',
     maxLeverage: '--',
     maxReturn: '--',
-    isFavorite: false
+    isFavorite: false,
+    rules: ''
 })
 
 const PALETTE = [isDarkMode.value ? '#2EBE69' : '#BBFF2E', '#E44096', '#3B82F6', '#F59E0B']
@@ -516,7 +518,8 @@ const fetchDetail = async () => {
             createDate: ev.created_at || '',
             maxLeverage: '--',
             maxReturn: '--',
-            isFavorite: !!ev.is_favorited
+            isFavorite: !!ev.is_favorited,
+            rules: ev.rules || ''
         }
 
         // 使用 close_time 作为倒计时目标
@@ -1385,10 +1388,19 @@ onUnmounted(() => {
         .outcome-divider {
             font-size: 12px;
             margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 8px;
 
             span {
                 padding: 2px 6px;
                 border-radius: 6px;
+                white-space: nowrap;
+            }
+
+            .outcome-divider-placeholder {
+                visibility: hidden;
+                display: inline-block;
             }
 
             span.yes {
