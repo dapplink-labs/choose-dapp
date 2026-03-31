@@ -133,9 +133,7 @@
                             </div>
                             <div class="outcome-chance">{{ outcome.chance }}%</div>
                         </div>
-                        <div class="outcome-divider">
-                            <span class="no">No 10 ·98.7 ¢</span>
-                        </div>
+                        <div class="outcome-divider"></div>
                         <div v-if="!isEventEnded" class="outcome-actions">
                             <button class="outcome-btn yes-btn" :class="{ active: outcome.selected === 'yes' }"
                                 @click="selectOutcome(index, 'yes')">
@@ -210,7 +208,7 @@
                             </el-icon>
                             <span class="about-label">{{ $t('detail.createDate') || '创建日期' }}</span>
                         </div>
-                        <span class="about-value">Jan 1, 2026, 23:22 UTC+8</span>
+                        <span class="about-value">{{ detailData.createDate || '--' }}</span>
                     </div>
                 </div>
             </div>
@@ -356,12 +354,14 @@ const { address } = useAccount()
 
 // --- 基础数据 ---
 const detailData = ref({
-    title: 'U.S. forces seize anotherVenezuela- linked oil ship by...?',
+    title: '',
     avatar: fallbackAvatar,
-    volume: '$153,642,644 Vol.',
-    closeDate: 'Dec 10, 2025',
-    maxLeverage: '10X',
-    maxReturn: '182%'
+    volume: '--',
+    closeDate: '--',
+    createDate: '--',
+    maxLeverage: '--',
+    maxReturn: '--',
+    isFavorite: false
 })
 
 const PALETTE = [isDarkMode.value ? '#2EBE69' : '#BBFF2E', '#E44096', '#3B82F6', '#F59E0B']
@@ -369,10 +369,7 @@ const PALETTE = [isDarkMode.value ? '#2EBE69' : '#BBFF2E', '#E44096', '#3B82F6',
 // 预测列表数据（完全依赖接口返回的 sub_events，不再使用本地假数据）
 const outcomes = ref([])
 
-const viewResults = ref([
-    { title: '50+ bps decrease', volume: '$37,755,917 Vol.', result: 'no' },
-    { title: '25+ bps decrease', volume: '$37,755,917 Vol.', result: 'yes' }
-])
+const viewResults = ref([])
 
 // 评论列表（从 /api/v1/eventComment/list 获取）
 const commentsData = ref([])
@@ -416,12 +413,16 @@ const selectedTimeRange = ref('1w')
 const countdown = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 const isEventEnded = ref(false)
 let countdownTimer = null
-const targetTime = ref(Date.now() + 3600000 * 5)
+const targetTime = ref(0)
 
 const updateCountdown = () => {
+    if (!targetTime.value) {
+        isEventEnded.value = false
+        countdown.value = { days: 0, hours: 0, minutes: 0, seconds: 0 }
+        return
+    }
     const now = Date.now()
     const diff = Math.max(0, Math.floor((targetTime.value - now) / 1000))
-    // targetTime 初始值为当前时间+5h，排除默认值导致的误判；只有 targetTime 被赋过服务器值后再判断
     isEventEnded.value = diff === 0 && targetTime.value < now
     countdown.value = {
         days: Math.floor(diff / 86400),
@@ -502,6 +503,7 @@ const fetchDetail = async () => {
             avatar: ev.logo || detailData.value.avatar,
             volume: formatVolume(ev.trade_volume),
             closeDate: ev.close_time || '',
+            createDate: ev.create_time || '--',
             maxLeverage: '--',
             maxReturn: '--',
             isFavorite: !!ev.is_favorited
@@ -597,36 +599,6 @@ const formatTimeAgo = (value) => {
     if (minutes > 0) return `${minutes}m ago`
     return 'Just now'
 }
-
-const createMockComments = () => ([
-    {
-        name: 'Roger Watkins',
-        avatar: fallbackAvatar,
-        tag: '302.5K 50+ bps decrease',
-        type: 'yes',
-        time: '6d ago',
-        message: "Thanks for your feedback. We're reviewing it now",
-        likes: 888
-    },
-    {
-        name: 'Alex Chen',
-        avatar: fallbackAvatar,
-        tag: '152.1K No change',
-        type: 'no',
-        time: '3d ago',
-        message: 'Market is still underpricing the risk in my opinion.',
-        likes: 342
-    },
-    {
-        name: 'Julia Roberts',
-        avatar: fallbackAvatar,
-        tag: '98.3K 25+ bps decrease',
-        type: 'yes',
-        time: '1d ago',
-        message: 'Positioned for a cut next meeting. Let’s see.',
-        likes: 129
-    }
-])
 
 const mapCommentItem = (c) => ({
     name: c.user_name || '',
@@ -845,33 +817,6 @@ const buildChartSourceFromPriceHistory = (priceHistoryData) => {
     return { xData, xLabels, sData }
 }
 
-const generateData = () => {
-    const points = 60
-    const sData = outcomes.value.map(opt => {
-        const line = []
-        // chance 为 0-100 百分比，转为 0-1 价格区间
-        let val = opt.chance / 100
-        for (let i = 0; i < points; i++) {
-            val += (Math.random() - 0.5) * 0.05
-            line.push(Number(Math.max(0, Math.min(1, val)).toFixed(4)))
-        }
-        line[points - 1] = Number((opt.chance / 100).toFixed(4))
-        return { name: opt.title, color: opt.color, data: line }
-    })
-    const rangeMsMap = {
-        '1d': 24 * 60 * 60 * 1000,
-        '1w': 7 * 24 * 60 * 60 * 1000,
-        '1m': 30 * 24 * 60 * 60 * 1000,
-        'all': 365 * 24 * 60 * 60 * 1000
-    }
-    const rangeMs = rangeMsMap[selectedTimeRange.value] || rangeMsMap['1w']
-    const stepMs = Math.max(60 * 1000, Math.floor(rangeMs / Math.max(1, points - 1)))
-    const end = Date.now()
-    const start = end - stepMs * (points - 1)
-    const xLabels = Array.from({ length: points }, (_, i) => new Date(start + i * stepMs).toISOString())
-    return { xData: Array.from({ length: points }, (_, i) => i), xLabels, sData }
-}
-
 const updateOverlay = (idx) => {
     if (!chartInstance.value || !chartSourceData) return
     idx = Math.max(0, Math.min(chartSourceData.xData.length - 1, idx))
@@ -929,7 +874,13 @@ const initChart = (source = null) => {
     if (!chartInstance.value) {
         chartInstance.value = echarts.init(chartRef.value)
     }
-    chartSourceData = source || chartSourceData || generateData()
+    chartSourceData = source || null
+    if (!chartSourceData?.xData?.length || !chartSourceData?.sData?.length) {
+        activeDots.value = []
+        tooltipTimeLabel.value = ''
+        chartInstance.value.clear()
+        return
+    }
 
     const series = []
     chartSourceData.sData.forEach(line => {
@@ -980,12 +931,16 @@ const onChartTouchMove = (e) => {
     updateOverlay(idx)
 }
 const onChartTouchStart = (e) => { isDragging.value = true; onChartTouchMove(e); }
-const onChartTouchEnd = () => { isDragging.value = false; updateOverlay(chartSourceData.xData.length - 1); }
+const onChartTouchEnd = () => {
+    isDragging.value = false
+    if (!chartSourceData?.xData?.length) return
+    updateOverlay(chartSourceData.xData.length - 1)
+}
 
 const handleTimeRangeChange = async (v) => {
     selectedTimeRange.value = v
     const source = await fetchPriceHistory()
-    initChart(source || generateData())
+    initChart(source)
 }
 const selectOutcome = (i, type) => {
     const outcome = outcomes.value[i]
@@ -1041,7 +996,6 @@ const selectOutcome = (i, type) => {
 }
 
 const onOrderSuccess = (orderData) => {
-    console.log('Order success:', orderData)
     // 刷新相关数据
     fetchDetail()
     fetchActivity()
@@ -1099,7 +1053,7 @@ onMounted(async () => {
     await fetchDetail()
     await nextTick()
     const source = await fetchPriceHistory()
-    initChart(source || generateData())
+    initChart(source)
 })
 onUnmounted(() => {
     clearInterval(countdownTimer)
