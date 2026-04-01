@@ -178,10 +178,10 @@ const fetchFundsHistory = async () => {
 
       const statusStr = String(item.status).toLowerCase()
       console.log(statusStr)
-      if (statusStr === 'completed') {
+      if (statusStr === 'confirmed') {
         statusText = '已完成'
         statusColor = 'color-green'
-      } else if (statusStr === 'rejected') {
+      } else if (statusStr === 'failed') {
         statusText = '已失败'
         statusColor = 'color-red'
       }
