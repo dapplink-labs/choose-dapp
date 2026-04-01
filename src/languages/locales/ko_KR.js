@@ -806,6 +806,12 @@ export default {
     typeAll: "전체",
     typeRecharge: "충전",
     typeWithdraw: "출금",
+    typeBigWithdraw: "대액 출금",
+    typeBetFreeze: "Bet Freeze",
+    typeBetDeduct: "Bet Deduct",
+    typeBetCancel: "Bet Cancel",
+    typeSettleWin: "Settle Win",
+    typeSettleLose: "Settle Lose",
     typePurchase: "구매 이벤트",
     typeSell: "판매 이벤트",
     assetAll: "전체",
@@ -817,7 +823,8 @@ export default {
       PENDING: "대기 중",
       COMPLETED: "완료됨",
       FAILED: "실패",
-      REJECTED: "거부됨"
+      REJECTED: "거부됨",
+      CONFIRMED: "완료됨",
     }
   },
   dashboard: {
