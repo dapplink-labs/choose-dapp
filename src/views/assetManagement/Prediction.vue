@@ -50,7 +50,7 @@
     </div>
 
     <!-- 奖励领取部分 -->
-    <div class="reward-section">
+    <!-- <div class="reward-section">
       <div class="reward-box">
         <span class="reward-number">{{ rewardData.winnings }}</span>
         <span class="reward-amount positive">+{{ formatCurrency(rewardData.amount) }}</span>
@@ -58,7 +58,7 @@
           Claim
         </button>
       </div>
-    </div>
+    </div> -->
 
     <!-- 仓位列表 -->
     <PositionList />
@@ -355,47 +355,47 @@ const updateChart = () => {
   myChart.setOption(option)
 }
 
-// 处理领取奖励
-const handleClaim = async () => {
-  if (rewardData.value.winnings === 0) return
+// // 处理领取奖励
+// const handleClaim = async () => {
+//   if (rewardData.value.winnings === 0) return
 
 
-  const payload = {
-    amount: String(rewardData.value.winnings ?? ''),
-    asset_guid: rewardData.value.asset_guid,
-    event_guid: rewardData.value.event_guid,
-    outcome: String(rewardData.value.outcome || '').toUpperCase(),
-    sub_event_guid: rewardData.value.sub_event_guid,
-    user_address: address?.value || '',
-  }
+//   const payload = {
+//     amount: String(rewardData.value.winnings ?? ''),
+//     asset_guid: rewardData.value.asset_guid,
+//     event_guid: rewardData.value.event_guid,
+//     outcome: String(rewardData.value.outcome || '').toUpperCase(),
+//     sub_event_guid: rewardData.value.sub_event_guid,
+//     user_address: address?.value || '',
+//   }
 
-  const missing = ['amount', 'asset_guid', 'event_guid', 'sub_event_guid', 'user_address'].filter(
-    (k) => !payload[k],
-  )
-  if (missing.length) {
-    ElMessage.error(`Claim 参数缺失：${missing.join(', ')}`)
-    return
-  }
-  if (payload.outcome !== 'YES' && payload.outcome !== 'NO') {
-    ElMessage.error('Claim 参数错误：outcome 必须是 YES 或 NO')
-    return
-  }
+//   const missing = ['amount', 'asset_guid', 'event_guid', 'sub_event_guid', 'user_address'].filter(
+//     (k) => !payload[k],
+//   )
+//   if (missing.length) {
+//     ElMessage.error(`Claim 参数缺失：${missing.join(', ')}`)
+//     return
+//   }
+//   if (payload.outcome !== 'YES' && payload.outcome !== 'NO') {
+//     ElMessage.error('Claim 参数错误：outcome 必须是 YES 或 NO')
+//     return
+//   }
 
-  try {
-    const res = await claimOrder(payload)
-    const code = res?.data?.code
-    if (!(code === 0 || code === 200 || code === 2000)) {
-      throw new Error(res?.data?.message || 'Claim failed')
-    }
+//   try {
+//     const res = await claimOrder(payload)
+//     const code = res?.data?.code
+//     if (!(code === 0 || code === 200 || code === 2000)) {
+//       throw new Error(res?.data?.message || 'Claim failed')
+//     }
 
-    // 成功后：弹窗 + 清空可领取数量（具体策略可按产品调整）
-    showClaimSuccess.value = true
-    rewardData.value.winnings = 0
-    ElMessage.success(res?.data?.message || 'Claim success')
-  } catch (e) {
-    ElMessage.error(e?.message || 'Claim failed')
-  }
-}
+//     // 成功后：弹窗 + 清空可领取数量（具体策略可按产品调整）
+//     showClaimSuccess.value = true
+//     rewardData.value.winnings = 0
+//     ElMessage.success(res?.data?.message || 'Claim success')
+//   } catch (e) {
+//     ElMessage.error(e?.message || 'Claim failed')
+//   }
+// }
 
 // 窗口大小改变时调整图表
 const handleResize = () => {

@@ -502,7 +502,8 @@ const fetchDetail = async () => {
         const language = currentLocale.split('-')[0]
         const res = await getEventDetailItem({
             event_guid: eventGuid,
-            language_label: language
+            language_label: language,
+            user_address: address.value
         })
 
         const data = res?.data?.data || {}
