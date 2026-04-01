@@ -238,7 +238,7 @@ const fetchDetail = async () => {
         const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
         const language = currentLocale.split('-')[0]
         const [detailRes, subRes] = await Promise.all([
-            getEventDetailItem({ event_guid: eventGuid.value, language_label: language }),
+            getEventDetailItem({ event_guid: eventGuid.value, language_label: language, user_address: address.value }),
             getSubEventDetail({ event_guid: eventGuid.value, language_label: language }),
         ])
         const eventData = detailRes?.data?.data || {}
@@ -290,8 +290,8 @@ const fetchDetail = async () => {
             closeDate: subEvent.close_time || '',
             status: rawStatus,
             subEventGuidResolved: subEvent.sub_event_guid || subEventGuid.value,
-            yesBidPrice: formatCentText(yesDir.new_bid_price),
-            noBidPrice: formatCentText(noDir.new_bid_price),
+            yesBidPrice: formatCentText(Number(yesDir.new_bid_price)||yesDir.chance),
+            noBidPrice: formatCentText(Number(noDir.new_bid_price)||noDir.chance),
             yesAskPrice: formatCentText(firstFinite(yesDir.new_ask_price, yesDir.chance)),
             noAskPrice: formatCentText(firstFinite(noDir.new_ask_price, noDir.chance)),
             isFavorite: !!eventItem?.is_favorited,
