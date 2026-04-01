@@ -225,7 +225,14 @@ export function createIotMqttClient(options) {
       if (_destroyed) return
       // 补订之前排队的 topic
       if (_pendingTopics.size) {
-        client.subscribe([..._pendingTopics], { qos: 0 })
+        const list = [..._pendingTopics]
+        client.subscribe(list, { qos: 0 }, (err, granted) => {
+          if (err) {
+            console.error('[MqttClient] 订阅失败', err, { topics: list })
+            return
+          }
+          console.log('[MqttClient] 订阅成功', granted)
+        })
       }
       _scheduleCredRefresh()
       _emit('connect')
@@ -276,7 +283,13 @@ export function createIotMqttClient(options) {
     const arr = Array.isArray(topics) ? topics : [topics]
     arr.forEach((t) => _pendingTopics.add(t))
     if (_client?.connected) {
-      _client.subscribe(arr, { qos: 0 })
+      _client.subscribe(arr, { qos: 0 }, (err, granted) => {
+        if (err) {
+          console.error('[MqttClient] 订阅失败', err, { topics: arr })
+          return
+        }
+        console.log('[MqttClient] 订阅成功', granted)
+      })
     }
   }
 

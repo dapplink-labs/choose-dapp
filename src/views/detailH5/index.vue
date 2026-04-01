@@ -505,6 +505,24 @@ import {
 import fallbackAvatar from "@/assets/icon/LP1.png";
 import { ElMessage } from "element-plus";
 import { useAccount } from "@wagmi/vue";
+import { createIotMqttClient, hasWebCrypto } from "@/utils/mqttClient";
+
+// ── MQTT 配置 ──────────────────────────────────────────────────
+const IOT_REGION = import.meta.env.VITE_IOT_REGION || "ap-southeast-1";
+const IOT_ENDPOINT =
+  import.meta.env.VITE_IOT_ENDPOINT ||
+  "a3awip9q9thtco-ats.iot.ap-southeast-1.amazonaws.com";
+const COGNITO_IDENTITY_POOL_ID =
+  import.meta.env.VITE_COGNITO_IDENTITY_POOL_ID ||
+  "ap-southeast-1:ec400695-b709-4af1-a19b-455cded69acf";
+
+/** @type {ReturnType<typeof createIotMqttClient>|null} */
+let iotMqtt = null;
+let mqttDestroyed = false;
+
+const shouldUseMqtt = computed(
+  () => !!IOT_ENDPOINT && !!COGNITO_IDENTITY_POOL_ID && hasWebCrypto(),
+);
 
 const route = useRoute();
 const { t } = useI18n();
@@ -1181,7 +1199,140 @@ const initChart = (source = null) => {
       .coordinateSystem.getRect();
     gridRect = grid;
     updateOverlay(chartSourceData.xData.length - 1);
+    // 图表数据就绪后重建子事件 → sData 索引映射
+    rebuildSubEventIndexMap();
   }, 100);
+};
+
+// --- MQTT 实时价格推送合并到图表 ---
+// sub_event_guid → sData 数组下标的快速查找映射（每次 initChart 后重建）
+const subEventIndexMap = new Map();
+
+const rebuildSubEventIndexMap = () => {
+  subEventIndexMap.clear();
+  if (!chartSourceData) return;
+  outcomes.value.forEach((o, idx) => {
+    const guid = o.sub_event_guid || o.subEventGuid;
+    if (guid) subEventIndexMap.set(guid, idx);
+  });
+};
+
+/**
+ * 将 MQTT 推送的单个价格点合并到 chartSourceData 的对应 series。
+ * @param {string} subGuid - 子事件 GUID
+ * @param {string} t - ISO 时间字符串
+ * @param {number|string} p - 价格（0~1 或 0~100）
+ */
+const pushMqttPricePoint = (subGuid, t, p) => {
+  if (!chartSourceData) return;
+  const seriesIdx = subEventIndexMap.get(subGuid);
+  if (seriesIdx === undefined) return;
+
+  const price = parsePrice(p);
+  if (price === null) return;
+
+  const timeLabel = t || new Date().toISOString();
+
+  // 在 xLabels 中查找是否已有该时间戳
+  let xIdx = chartSourceData.xLabels.indexOf(timeLabel);
+  if (xIdx === -1) {
+    // 追加新时间点
+    chartSourceData.xLabels.push(timeLabel);
+    chartSourceData.xData.push(chartSourceData.xData.length);
+    xIdx = chartSourceData.xData.length - 1;
+    // 其余所有 series 在该位置补 null
+    chartSourceData.sData.forEach((line) => {
+      line.data.push(null);
+    });
+  }
+
+  // 更新目标 series 的价格
+  chartSourceData.sData[seriesIdx].data[xIdx] = Number(price.toFixed(4));
+
+  // 同步更新图例中的 chance（可选：更新 outcomes 百分比）
+  const chancePercent = price <= 1 ? price * 100 : price;
+  if (outcomes.value[seriesIdx]) {
+    outcomes.value[seriesIdx].chance = Number(chancePercent.toFixed(1));
+  }
+
+  // 重绘图表到最新一帧（不处于拖拽状态时）
+  if (!isDragging.value) {
+    updateOverlay(chartSourceData.xData.length - 1);
+  }
+};
+
+const handleMqttBusinessMessage = (data, _topic) => {
+  if (!data || typeof data !== "object") return;
+  const type = data.type;
+
+  if (type === "price_update" && data.prices) {
+    const subGuid = data.sub_event_guid || "";
+    // prices 格式: { YES: [{t, p}], NO: [{t, p}] }
+    // 本页每条折线对应一个子事件的 YES 方向概率
+    const yesPoints = Array.isArray(data.prices?.YES) ? data.prices.YES : [];
+    const latestYes = yesPoints[yesPoints.length - 1];
+    if (latestYes?.p && subGuid) {
+      pushMqttPricePoint(subGuid, latestYes.t || null, latestYes.p);
+    }
+
+    // 同时更新对应 outcome 的 yesPrice / noPrice
+    const noPoints = Array.isArray(data.prices?.NO) ? data.prices.NO : [];
+    const latestNo = noPoints[noPoints.length - 1];
+    const seriesIdx = subEventIndexMap.get(subGuid);
+    if (seriesIdx !== undefined && outcomes.value[seriesIdx]) {
+      if (latestYes?.p)
+        outcomes.value[seriesIdx].yesPrice = String(latestYes.p);
+      if (latestNo?.p) outcomes.value[seriesIdx].noPrice = String(latestNo.p);
+    }
+  }
+};
+
+const stopMqttStream = () => {
+  if (!iotMqtt) return;
+  iotMqtt.destroy();
+  iotMqtt = null;
+};
+
+const startMqttStream = async () => {
+  if (mqttDestroyed) return;
+  if (!shouldUseMqtt.value) return;
+  if (isEventEnded.value) return;
+  if (iotMqtt) return;
+
+  const eventGuid = route.query.id || route.query.event_guid;
+  if (!eventGuid) return;
+
+  // 为每个子事件订阅 price topic
+  const subGuids = outcomes.value
+    .map((o) => o.sub_event_guid || o.subEventGuid)
+    .filter(Boolean);
+  if (!subGuids.length) return;
+
+  const topics = subGuids.map((sg) => `price/${eventGuid}/${sg}`);
+
+  iotMqtt = createIotMqttClient({
+    region: IOT_REGION,
+    endpoint: IOT_ENDPOINT,
+    identityPoolId: COGNITO_IDENTITY_POOL_ID,
+  });
+
+  iotMqtt.on("connect", () => {
+    console.log("[MQTT detailH5] connected, subscribing", topics);
+    iotMqtt.subscribe(topics);
+  });
+
+  iotMqtt.on("message", (_topic, data) => {
+    if (mqttDestroyed) return;
+    handleMqttBusinessMessage(data, _topic);
+  });
+
+  try {
+    await iotMqtt.connect();
+  } catch (e) {
+    console.error("[MQTT detailH5] connect failed", e);
+    iotMqtt?.destroy();
+    iotMqtt = null;
+  }
 };
 
 // --- 事件 ---
@@ -1209,8 +1360,14 @@ const onChartTouchEnd = () => {
 
 const handleTimeRangeChange = async (v) => {
   selectedTimeRange.value = v;
+  // 切换时间范围：先断开旧的 MQTT，重新拉取历史数据后再重连
+  stopMqttStream();
   const source = await fetchPriceHistory();
   initChart(source);
+  // 图表初始化后（rebuildSubEventIndexMap 会在 setTimeout 100ms 内完成），重启 MQTT
+  if (shouldUseMqtt.value && !isEventEnded.value) {
+    setTimeout(() => startMqttStream(), 150);
+  }
 };
 const selectOutcome = (i, type) => {
   const outcome = outcomes.value[i];
@@ -1325,6 +1482,10 @@ onMounted(async () => {
   await nextTick();
   const source = await fetchPriceHistory();
   initChart(source);
+  // 启动 MQTT 实时推送
+  if (shouldUseMqtt.value && !isEventEnded.value) {
+    setTimeout(() => startMqttStream(), 150);
+  }
 });
 
 watch(
@@ -1336,8 +1497,14 @@ watch(
   },
 );
 
+watch(isEventEnded, (ended) => {
+  if (ended) stopMqttStream();
+});
+
 onUnmounted(() => {
   clearInterval(countdownTimer);
+  mqttDestroyed = true;
+  stopMqttStream();
   chartInstance.value?.dispose();
 });
 </script>

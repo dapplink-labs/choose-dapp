@@ -153,12 +153,6 @@ export default {
     const shouldUseMqtt = computed(() => {
       const enabled =
         !!IOT_ENDPOINT && !!COGNITO_IDENTITY_POOL_ID && hasWebCrypto();
-      console.log("[MQTT][debug] shouldUseMqtt", {
-        enabled,
-        IOT_ENDPOINT,
-        COGNITO_IDENTITY_POOL_ID,
-        hasWebCrypto: hasWebCrypto(),
-      });
       return enabled;
     });
 
@@ -644,6 +638,8 @@ export default {
     const futureSegments = computed(() => []);
     const selectedFutureId = ref(null);
     const livePrice = ref(null);
+    // 当前价格以接口返回的 on_time_data 为准（若存在则锁定，不被 MQTT / 订单簿 / 历史走势覆盖）
+    const onTimePrice = ref(null);
 
     // --- 数据衍生 ---
     const displayTargetPrice = computed(() => {
@@ -899,7 +895,10 @@ export default {
         label: point.label,
         totalPoints: liveSeriesPoints[outcomeKey].length,
       });
-      if (outcomeKey === "yes" || !Number.isFinite(livePrice.value)) {
+      if (
+        !Number.isFinite(onTimePrice.value) &&
+        (outcomeKey === "yes" || !Number.isFinite(livePrice.value))
+      ) {
         livePrice.value = point.value;
         detailData.value.currentPrice = point.value;
       }
@@ -968,8 +967,13 @@ export default {
         })
         .filter(Boolean);
       if (!items.length) return;
+      // 估算浮窗高度：上下 padding 20px + 时间行 20px + 每条数据行 22px
+      const tooltipHeight = 40 + items.length * 22;
       const tLeft = Math.min(Math.max(0, relX - 60), rect.width - 140);
-      const tTop = Math.max(8, relY - 88);
+      const tTop = Math.min(
+        Math.max(8, relY - 88),
+        rect.height - tooltipHeight - 8,
+      );
       chartDragState.value = {
         tooltipVisible: true,
         tooltipLeft: tLeft,
@@ -1273,18 +1277,7 @@ export default {
       if (yesKey || noKey) {
         if (yesKey) orderBookYes.value = normalizeOrderBookSide(yesKey);
         if (noKey) orderBookNo.value = normalizeOrderBookSide(noKey);
-        console.log("[OrderBook]", "applyOrderBookPayload 订单簿", {
-          yes: {
-            asks: orderBookYes.value.asks?.length,
-            bids: orderBookYes.value.bids?.length,
-            last_trade_price: orderBookYes.value.last_trade_price,
-          },
-          no: {
-            asks: orderBookNo.value.asks?.length,
-            bids: orderBookNo.value.bids?.length,
-            last_trade_price: orderBookNo.value.last_trade_price,
-          },
-        });
+        console.log("[OrderBook]", "applyOrderBookPayload 订单簿", payload);
         return;
       }
       if (!Array.isArray(payload.asks) && !Array.isArray(payload.bids)) return;
@@ -1294,11 +1287,6 @@ export default {
       } else {
         orderBookNo.value = normalizeOrderBookSide(payload);
       }
-      console.log("[OrderBook]", "applyOrderBookPayload 单侧订单簿", {
-        side,
-        asks: payload.asks?.length,
-        bids: payload.bids?.length,
-      });
     };
 
     // ── API 获取：订单簿快照（含最新成交价和成交量）──
@@ -1335,7 +1323,11 @@ export default {
           data?.yes?.last_trade_price,
           data?.no?.last_trade_price,
         );
-        if (Number.isFinite(latest) && !Number.isFinite(livePrice.value)) {
+        if (
+          !Number.isFinite(onTimePrice.value) &&
+          Number.isFinite(latest) &&
+          !Number.isFinite(livePrice.value)
+        ) {
           livePrice.value = latest;
           detailData.value.currentPrice = latest;
         }
@@ -1370,8 +1362,10 @@ export default {
         const latestFallback = liveChartSeries[0];
         const latestPoint = getLatestSeriesPoint(latestYes || latestFallback);
         if (latestPoint) {
-          livePrice.value = latestPoint.value;
-          detailData.value.currentPrice = latestPoint.value;
+          if (!Number.isFinite(onTimePrice.value)) {
+            livePrice.value = latestPoint.value;
+            detailData.value.currentPrice = latestPoint.value;
+          }
           if (activeSegmentMode.value === "live") {
             syncLiveChart();
           }
@@ -1398,10 +1392,12 @@ export default {
           getEventDetailItem({
             event_guid: currentEventGuid.value,
             language_label: language,
+            user_address: address.value || "",
           }),
           getSubEventDetail({
             event_guid: currentEventGuid.value,
             language_label: language,
+            user_address: address.value || "",
           }),
         ]);
         const eventData = detailRes?.data?.data || {};
@@ -1442,7 +1438,15 @@ export default {
           eventItem?.target_price,
           route.query.target_price,
         );
-        const currentPrice = firstFinite(
+        // 当前价格：以 getEventDetailItem 返回的 on_time_data 为准（若存在）
+        const onTimeDataPrice = firstFinite(eventItem?.on_time_data);
+        if (Number.isFinite(onTimeDataPrice)) {
+          onTimePrice.value = onTimeDataPrice;
+        }
+        // 这里的价格是实时价格，默认会从 MQTT / 订单簿 / 走势兜底更新
+        const currentPrice = Number.isFinite(onTimeDataPrice)
+          ? onTimeDataPrice
+          : firstFinite(
           subEvent?.current_price,
           subEvent?.last_price,
           yesDirection?.last_price,
@@ -1530,14 +1534,6 @@ export default {
     // 将 MQTT 推送的订单合并到本地挂单/历史订单列表
     const mergeOpenOrderFromPush = (order) => {
       const next = mapOpenOrder(order);
-      console.log("[Amount]", "mergeOpenOrderFromPush 订单", {
-        id: next?.id,
-        price: next?.price,
-        cost: next?.cost,
-        total: next?.total,
-        filled: next?.filled,
-        side: next?.side,
-      });
       // 如果订单没有 ID，则不进行合并
       if (!next?.id) return;
       const idx = openOrders.value.findIndex((x) => x.id === next.id);
@@ -1563,6 +1559,7 @@ export default {
     // 根据 MQTT 消息类型分发处理逻辑
     const handleMqttBusinessMessage = (data, topic) => {
       if (!data || typeof data !== "object") return;
+      console.log("handleMqttBusinessMessage=======================", data, topic);
       const type = data.type;
       // ── price_update：实时价格推送，更新走势图表与底部按钮价格 ──
       if (type === "price_update" && data.prices) {
@@ -1704,14 +1701,6 @@ export default {
 
     // 初始化并启动 MQTT 连接，订阅当前事件相关 topic
     const startMqttStream = async () => {
-      console.log("[MQTT][debug] startMqttStream called", {
-        mqttDestroyed,
-        shouldUseMqtt: shouldUseMqtt.value,
-        isEventEnded: isEventEnded.value,
-        eventGuid: currentEventGuid.value,
-        subEventGuid: resolvedSubEventGuid.value,
-        hasClient: !!iotMqtt,
-      });
       if (mqttDestroyed) return;
       if (!shouldUseMqtt.value) return;
       // 非实时模式不启动 MQTT（用户切到历史/未来时会断开）
@@ -1725,9 +1714,11 @@ export default {
         `price/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
         `orderbook/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
         `trade/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
-        `orders/${userGuid}`,
-        `user/${userGuid}/positions`,
       ];
+      // 用户私有 topic：仅在已拿到地址时订阅，避免出现 `orders/`、`user//positions`
+      if (userGuid) {
+        topics.push(`orders/${userGuid}`, `user/${userGuid}/positions`);
+      }
 
       iotMqtt = createIotMqttClient({
         region: IOT_REGION,
@@ -1735,17 +1726,30 @@ export default {
         identityPoolId: COGNITO_IDENTITY_POOL_ID,
       });
 
+      // 连接成功时订阅主题
       iotMqtt.on("connect", () => {
-        console.log("[MQTT][debug] connected, subscribing topics", topics);
+        console.log("[MQTT] Connected, subscribing topics", topics);
         iotMqtt.subscribe(topics);
       });
 
+      iotMqtt.on("disconnect", () => {
+        if (mqttDestroyed) return;
+        console.warn("[MQTT] Disconnected");
+      });
+
+      iotMqtt.on("error", (err) => {
+        if (mqttDestroyed) return;
+        console.error("[MQTT] Error", err);
+      });
+
+      // 收到消息时处理业务逻辑
       iotMqtt.on("message", (topic, data) => {
         if (mqttDestroyed) return;
         console.log("[MQTT] Message received 收到 MQTT 消息", topic, data);
         handleMqttBusinessMessage(data, topic);
       });
 
+      // 连接MQTT
       try {
         await iotMqtt.connect();
       } catch (e) {
