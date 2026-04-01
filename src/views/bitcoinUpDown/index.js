@@ -1398,6 +1398,7 @@ export default {
           getEventDetailItem({
             event_guid: currentEventGuid.value,
             language_label: language,
+            user_address: address.value,
           }),
           getSubEventDetail({
             event_guid: currentEventGuid.value,
