@@ -182,9 +182,9 @@
                                 </div>
                                 <div class="new-user-actions">
                                     <button class="new-user-action-btn"
-                                        @click="navigateToDetail(item, 'yes')">Yes</button>
+                                        @click="navigateToDetail(item, item.options[0]?.directions[1]?.outcome)">{{item.options[0]?.directions[1]?.outcome}}</button>
                                     <button class="new-user-action-btn"
-                                        @click="navigateToDetail(item, 'no')">No</button>
+                                        @click="navigateToDetail(item, item.options[0]?.directions[0]?.outcome)">{{item.options[0]?.directions[0]?.outcome}}</button>
                                 </div>
                                 <div class="new-user-footer">
                                     <div class="amount-left">
@@ -251,8 +251,8 @@
                                 </div>
                                 <div class="item-actions">
                                     <button class="action-btn yes-btn"
-                                        @click="navigateToDetail(item, 'yes')">Yes</button>
-                                    <button class="action-btn no-btn" @click="navigateToDetail(item, 'no')">No</button>
+                                        @click="navigateToDetail(item,item.options[0]?.directions[1]?.outcome )">{{item.options[0]?.directions[1]?.outcome}}</button>
+                                    <button class="action-btn no-btn" @click="navigateToDetail(item, item.options[0]?.directions[0]?.outcome)">{{item.options[0]?.directions[0]?.outcome}}</button>
                                 </div>
                                 <div class="item-amount">
                                     <div class="amount-left">
@@ -318,9 +318,9 @@
                                         </div>
                                         <div class="option-buttons">
                                             <button class="option-btn yes-btn"
-                                                @click.stop="navigateToDetail(item, 'yes', opt.subEventGuid)">Yes</button>
+                                                @click.stop="navigateToDetail(item, opt?.directions[1]?.outcome, opt.subEventGuid)">{{opt?.directions[1]?.outcome}}</button>
                                             <button class="option-btn no-btn"
-                                                @click.stop="navigateToDetail(item, 'no', opt.subEventGuid)">No</button>
+                                                @click.stop="navigateToDetail(item, opt?.directions[0]?.outcome, opt.subEventGuid)">{{ opt?.directions[0]?.outcome }}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -646,7 +646,7 @@ const mapEventToCard = (e) => {
         avatar: e.logo || '',
         title: e.title || '',
         // 暂无胜率字段，用占位字符串保持布局
-        percentage: `${subEvents[0]?.directions?.filter((x) => x.outcome === 'YES')[0]?.chance || '--'}%`,
+        percentage: `${subEvents[0]?.directions?.filter((x) => [ 'YES','Up'].includes(x.outcome))[0]?.chance || '--'}%`,
         maxLeverage: '--',
         maxReturn: '-- %',
         closeTime: e.close_time || '', // "2026-01-25 14:00:00" 用于倒计时
@@ -657,8 +657,13 @@ const mapEventToCard = (e) => {
         isFavorite: !!e.is_favorited,
         options: subEvents.map((sub) => ({
             text: sub.title || '',
+            directions:sub?.directions||[{
+                outcome:'NO'
+            },{
+                outcome:'YES'
+            }],
             subEventGuid: sub.sub_event_guid || '',
-            percentage: `${sub?.directions?.filter((x) => x.outcome === 'YES')[0]?.chance || '--'}%`,
+            percentage: `${sub?.directions?.filter((x) => [ 'YES','Up'].includes(x.outcome))[0]?.chance || '--'}%`,
         })),
     };
 };

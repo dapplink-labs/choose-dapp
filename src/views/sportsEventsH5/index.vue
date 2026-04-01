@@ -191,8 +191,8 @@
                                 <span class="option-percent">{{ opt.percent }}</span>
                             </div>
                             <div class="option-btns">
-                                <button class="opt-btn yes" @click="openPayment(item, 'yes')">Yes</button>
-                                <button class="opt-btn no" @click="openPayment(item, 'no')">No</button>
+                                <button class="opt-btn yes" @click="openPayment(item, 'yes')">{{ opt.directions[1]?.outcome || '-' }}</button>
+                                <button class="opt-btn no" @click="openPayment(item, 'no')">{{ opt.directions[0]?.outcome || '-' }}</button>
                             </div>
                         </div>
                     </div>
@@ -250,8 +250,8 @@
                                 <span class="option-percent">{{ opt.percent }}</span>
                             </div>
                             <div class="option-btns">
-                                <button class="opt-btn yes" @click="openPayment(item, 'yes')">Yes</button>
-                                <button class="opt-btn no" @click="openPayment(item, 'no')">No</button>
+                                <button class="opt-btn yes" @click="openPayment(item, 'yes')">{{ opt.directions[1]?.outcome || '' }}</button>
+                                <button class="opt-btn no" @click="openPayment(item, 'no')">{{ opt.directions[0]?.outcome || '' }}</button>
                             </div>
                         </div>
                     </div>
@@ -613,6 +613,7 @@ const mapApiToPlayerItem = (e) => {
     const totalPrice = subEvents.reduce((sum, s) => sum + Number(s.price || 0), 0)
     const options = subEvents.map(s => ({
         name: s.title || '',
+        directions: s?.directions || [{ outcome: 'NO' }, { outcome: 'YES' }],
         percent: totalPrice > 0
             ? Math.round((Number(s.price || 0) / totalPrice) * 100) + '%'
             : '--'

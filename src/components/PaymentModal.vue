@@ -31,9 +31,8 @@
                         <h3 class="target-title">{{ eventTitle }}</h3>
                         <div class="target-row">
                             <div class="outcome-badge"
-                                :class="{ 'outcome-yes': outcomeBadge === 'YES', 'outcome-no': outcomeBadge === 'NO' }">
-                                <!-- {{ outcomeTitle }} | -->
-                                 {{ outcomeBadge === 'YES' ? $t('common.yes') : $t('common.no') }}
+                                :class="{ 'outcome-yes': outcomeBadge === yesOutcome, 'outcome-no': outcomeBadge === noOutcome }">
+                                 {{ outcomeBadge === yesOutcome ? (yesOutcome || '') : (noOutcome || '') }}
                                 <span class="icon" aria-hidden="true" style="display: inline-flex;"
                                     @click="toggleOutcome">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="11.997"
@@ -182,6 +181,9 @@ const props = defineProps({
     initialOutcome: { type: String, default: 'YES' },
     // 初始交易动作 buy / sell
     initialSide: { type: String, default: 'buy' },
+    // yes / no 自定义文本
+    yesOutcome: { type: String, default: '' },
+    noOutcome: { type: String, default: '' },
 })
 const emit = defineEmits(['update:modelValue', 'order-success'])
 
@@ -191,7 +193,7 @@ const orderType = ref('market')
 const price = ref(48)
 const inputValue = ref('')
 const leverage = ref(2)
-const outcomeBadge = ref('no') // 'yes' | 'no'
+const outcomeBadge = ref('') // 'yes' | 'no'
 const enableExpiry = ref(false)
 const expiryPreset = ref('5m') // '5m' | '1h' | '12h' | '24h' | 'eod' | 'custom'
 const customExpiryMinutes = ref(5)
@@ -230,7 +232,6 @@ const displayTotal = computed(() => {
         // 市价卖出：使用 orderBook 的 bids 预测
         const sideStr = outcomeBadge.value.toLowerCase() // 'yes' or 'no'
         const bids = orderBookData.value?.[sideStr]?.bids || []
-        console.log(sideStr)
         if (bids.length > 0) {
             const estPrice = Number(bids[0].price) || 0
             const s = Number(inputValue.value) || 0
@@ -266,18 +267,19 @@ const canSubmit = computed(() => {
 
 // 执行按钮文案
 const executeLabel = computed(() => {
+    console.log(props.yesOutcome)
     const sideText = activeSide.value === 'buy'
         ? (t('payment.buy') || 'Buy')
         : (t('payment.sell') || 'Sell')
-    const ynText = outcomeBadge.value === 'YES'
-        ? (t('common.yes') || 'Yes')
-        : (t('common.no') || 'No')
+    const ynText = outcomeBadge.value === props.yesOutcome
+        ? (props.yesOutcome || '')
+        : (props.noOutcome || '')
     return `${sideText} ${ynText}`
 })
 
 // ===================== 方法 =====================
 function toggleOutcome() {
-    outcomeBadge.value = outcomeBadge.value === 'YES' ? 'NO' : 'YES'
+    outcomeBadge.value = outcomeBadge.value === props.yesOutcome ? props.noOutcome || '' : props.yesOutcome || ''
 }
 
 function switchSide(side) {
@@ -513,7 +515,7 @@ function handleClose() {
 watch(() => props.modelValue, (val) => {
     if (val) {
         activeSide.value = props.initialSide || 'buy'
-        outcomeBadge.value = (props.initialOutcome || 'YES').toUpperCase()
+        outcomeBadge.value = (props.initialOutcome || '')
         orderType.value = 'market'
         inputValue.value = ''
         fetchBalance()

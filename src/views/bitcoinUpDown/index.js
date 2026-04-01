@@ -279,6 +279,8 @@ export default {
       noBidPrice: "--",
       subEventGuidResolved: "",
       eventStatus: "", // 事件状态（settled/ended/closed 等表示已结束）
+      yesOutcome: "",
+      noOutcome: "",
     });
 
     // 已解析的子事件 GUID
@@ -350,7 +352,7 @@ export default {
     // 打开支付弹窗，根据方向设置初始 outcome
     const openPayment = (side) => {
       paymentOutcomeTitle.value = detailData.value.title || "";
-      paymentInitialOutcome.value = side === "up" ? "YES" : "NO";
+      paymentInitialOutcome.value = side === "up" ? detailData.value.yesOutcome || "" : detailData.value.noOutcome || "";
       paymentInitialSide.value = "buy";
       showPayment.value = true;
     };
@@ -373,20 +375,8 @@ export default {
     // 将服务端持仓数据映射为页面展示格式
     const mapPositionCard = (item) => {
       const outcome = outcomeToTrend(item?.outcome);
-      const shares = Number(
-        item?.shares ??
-          item?.position_size ??
-          item?.size ??
-          item?.quantity ??
-          0,
-      );
-      const costNum =
-        firstFinite(
-          item?.bet_amount,
-          item?.dealed_cost,
-          item?.cost,
-          item?.position_value,
-        ) || 0;
+      const shares = Number(item?.shares ?? 0);
+      const costNum = firstFinite(item?.bet_amount) || 0;
       const currentNum = firstFinite(item?.position_value) || 0;
       // 可赢金额 to_win_amount：作为 profit 的兜底来源之一
       const profitNum =
@@ -401,7 +391,7 @@ export default {
       return {
         id: item?.guid,
         title: item?.sub_event_name || t("crypto.yesOrNo"),
-        tagLabel: `${outcome === "up" ? t("crypto.yes") : t("crypto.no")} | ${shares || 0} ${t("sports.shares")}`,
+        tagLabel: `${outcome === "up" ? detailData.value.yesOutcome || "YES" : detailData.value.noOutcome || "NO"} | ${shares || 0} ${t("sports.shares")}`,
         avgPrice: formatCentText(item?.avg_price || 0),
         cost: formatMoney(costNum),
         positionValue: formatMoney(currentNum),
@@ -516,7 +506,7 @@ export default {
           status: "",
           is_settled: "",
           event_guid: currentEventGuid.value,
-          sub_event_guid: resolvedSubEventGuid.value ,
+          sub_event_guid: resolvedSubEventGuid.value,
         });
         if (!isRespSuccess(res))
           throw new Error(res?.data?.message || "Fetch order history failed");
@@ -1419,14 +1409,14 @@ export default {
           ? subEvent.directions
           : [];
         const yesDirection =
-          directions.find(
-            (item) => (item?.outcome || "").toLowerCase() === "yes",
+          directions.find((item) =>
+            ["yes", "up"].includes((item?.outcome || "").toLowerCase()),
           ) ||
           directions[0] ||
           {};
         const noDirection =
-          directions.find(
-            (item) => (item?.outcome || "").toLowerCase() === "no",
+          directions.find((item) =>
+            ["no", "down"].includes((item?.outcome || "").toLowerCase()),
           ) ||
           directions[1] ||
           {};
@@ -1447,12 +1437,12 @@ export default {
         const currentPrice = Number.isFinite(onTimeDataPrice)
           ? onTimeDataPrice
           : firstFinite(
-          subEvent?.current_price,
-          subEvent?.last_price,
-          yesDirection?.last_price,
-          yesDirection?.new_bid_price,
-          yesDirection?.new_ask_price,
-        );
+              subEvent?.current_price,
+              subEvent?.last_price,
+              yesDirection?.last_price,
+              yesDirection?.new_bid_price,
+              yesDirection?.new_ask_price,
+            );
         const startTime = subEvent?.open_time || eventItem?.open_time || "";
         const closeTime = subEvent?.close_time || eventItem?.close_time || "";
         if (closeTime) {
@@ -1517,6 +1507,8 @@ export default {
           subEventGuidResolved:
             subEvent?.sub_event_guid || requestedSubEventGuid.value || "",
           eventStatus: rawStatus,
+          yesOutcome: yesDirection?.outcome || "YES",
+          noOutcome: noDirection?.outcome || "NO",
         };
 
         if (Number.isFinite(currentPrice)) {
@@ -1559,7 +1551,11 @@ export default {
     // 根据 MQTT 消息类型分发处理逻辑
     const handleMqttBusinessMessage = (data, topic) => {
       if (!data || typeof data !== "object") return;
-      console.log("handleMqttBusinessMessage=======================", data, topic);
+      console.log(
+        "handleMqttBusinessMessage=======================",
+        data,
+        topic,
+      );
       const type = data.type;
       // ── price_update：实时价格推送，更新走势图表与底部按钮价格 ──
       if (type === "price_update" && data.prices) {

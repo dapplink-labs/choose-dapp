@@ -45,7 +45,7 @@
 
                 <div class="event-chance-row">
                     <div class="event-chance-left">
-                        <div class="event-yes-label">Yes</div>
+                        <div class="event-yes-label">{{ detailData.yesOutcome || 'YES' }}</div>
                         <div class="event-chance-block">
                             <div class="event-chance-main">{{ detailData.yesChance }}</div>
                             <div class="event-change-row">
@@ -80,7 +80,7 @@
                             <div class="cdt-time">{{ chartDragState.tooltipTime }}</div>
                             <div class="cdt-row">
                                 <span class="cdt-dot" :style="{ background: chartColors.primary }"></span>
-                                <span class="cdt-name">Yes</span>
+                                <span class="cdt-name">{{ detailData.yesOutcome || 'YES' }}</span>
                                 <span class="cdt-price">{{ chartDragState.tooltipPrice }}</span>
                             </div>
                         </div>
@@ -97,11 +97,11 @@
                 <div class="orderbook-tabs">
                     <button type="button" class="orderbook-tab" :class="{ active: activeOrderbookSide === 'yes' }"
                         @click="activeOrderbookSide = 'yes'">
-                        {{ $t('detail.tradeYes') }}
+                        {{ detailData.yesOutcome || 'YES' }}
                     </button>
                     <button type="button" class="orderbook-tab" :class="{ active: activeOrderbookSide === 'no' }"
                         @click="activeOrderbookSide = 'no'">
-                        {{ $t('detail.tradeNo') }}
+                        {{ detailData.noOutcome || 'NO' }}
                     </button>
                 </div>
 
@@ -112,17 +112,19 @@
         </div>
         <!-- 底部预测操作栏 -->
         <div class="bottom-dock-actions">
-            <button class="trade-btn up" @click="openPayment('yes')">{{ $t('common.buy') }} Yes {{
+            <button class="trade-btn up" @click="openPayment('yes')">{{ $t('common.buy') }} {{ detailData.yesOutcome || 'YES' }} {{
                 detailData.yesBidPrice }}</button>
-            <button class="trade-btn down" @click="openPayment('no')">{{ $t('common.buy') }} No {{ detailData.noBidPrice
+            <button class="trade-btn down" @click="openPayment('no')">{{ $t('common.buy') }} {{ detailData.noOutcome || 'NO' }} {{ detailData.noBidPrice
                 }}</button>
         </div>
 
         <!-- 购买弹窗 -->
         <PaymentModal v-model="showPayment" :event-title="detailData.title"
-            :outcome-title="paymentInitialOutcome === 'YES' ? 'Yes' : 'No'" :event-guid="eventGuid"
+            :outcome-title="paymentInitialOutcome === 'YES' ? detailData.yesOutcome : detailData.noOutcome" :event-guid="eventGuid"
             :sub-event-guid="detailData.subEventGuidResolved || subEventGuid" :initial-outcome="paymentInitialOutcome"
-            :initial-side="paymentInitialSide" @order-success="onOrderSuccess" />
+            :initial-side="paymentInitialSide" 
+            :yes-outcome="detailData.yesOutcome" :no-outcome="detailData.noOutcome"
+            @order-success="onOrderSuccess" />
     </div>
 </template>
 
@@ -261,8 +263,8 @@ const fetchDetail = async () => {
         }
 
         const directions = Array.isArray(subEvent.directions) ? subEvent.directions : []
-        const yesDir = directions.find(d => (d.outcome || '').toLowerCase() === 'yes') || {}
-        const noDir = directions.find(d => (d.outcome || '').toLowerCase() === 'no') || {}
+        const yesDir = directions.find(d => ['yes','up'].includes((d.outcome || '').toLowerCase())) || {}
+        const noDir = directions.find(d => ['no','down'].includes((d.outcome || '').toLowerCase())) || {}
 
         // 事件结束状态判断（兼容多字段名）
         const rawStatus = subEvent?.status || eventItem?.status || ''
@@ -300,6 +302,8 @@ const fetchDetail = async () => {
             isFavorite: !!eventItem?.is_favorited,
             tradeVolume,
             rulesDescription: (eventItem?.rules ?? subEvent?.rules ?? '') || '',
+            yesOutcome: yesDir.outcome || 'YES',
+            noOutcome: noDir.outcome || 'NO',
         }
     } catch (err) {
         console.error('[Detail] fetchDetail failed', err)

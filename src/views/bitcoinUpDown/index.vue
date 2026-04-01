@@ -261,7 +261,7 @@
             <div class="order-left">
               <div class="order-side" :class="order.side">
                 {{ $t('common.buy') }}
-                <span class="side-text">{{ order.side === 'up' ? $t('crypto.yes') : $t('crypto.no') }}</span>
+                <span class="side-text">{{ order.side === 'up' ? (detailData.yesOutcome || '') : (detailData.noOutcome || '') }}</span>
               </div>
               <div :class="['order-chip', order.side === 'up' ? 'up' : 'down']">
                 <span class="chip-price">{{ order.price }} ¢</span>
@@ -292,7 +292,7 @@
               <div class="history-text">
                 {{ $t('common.buy') }}
                 <span class="history-side" :class="item.side">
-                  {{ item.shares }} {{ item.side === 'up' ? $t('crypto.yes') : $t('crypto.no') }}
+                  {{ item.shares }} {{ item.side === 'up' ? (detailData.yesOutcome || '') : (detailData.noOutcome || '') }}
                 </span>
                 at {{ item.price }}¢ <span class="muted">(${{ item.notional }})</span>
               </div>
@@ -315,10 +315,12 @@
 
       <div v-if="isBookOpen" class="book-body">
         <div class="orderbook-tabs">
-          <button class="orderbook-tab" :class="{ active: orderBookTab === 'yes' }" @click="orderBookTab = 'yes'">{{
-            $t('detail.tradeYes') }}</button>
-          <button class="orderbook-tab" :class="{ active: orderBookTab === 'no' }" @click="orderBookTab = 'no'">{{
-            $t('detail.tradeNo') }}</button>
+          <button class="orderbook-tab" :class="{ active: orderBookTab === 'yes' }" @click="orderBookTab = 'yes'">
+            {{ detailData.yesOutcome || '' }}
+          </button>
+          <button class="orderbook-tab" :class="{ active: orderBookTab === 'no' }" @click="orderBookTab = 'no'">
+            {{ detailData.noOutcome || '' }}
+          </button>
         </div>
         <OrderBookMobile :active-side="orderBookTab" :asks="currentOrderBook.asks" :bids="currentOrderBook.bids"
           :last-trade-price="currentOrderBook.last_trade_price" :loading="orderBookLoading"
@@ -336,10 +338,10 @@
       <!-- 事件未结束时显示购买按钮 -->
       <template v-if="!isEventEnded">
         <button class="trade-btn up" type="button" @click="openPayment('up')">
-          {{ $t('common.buy') }} {{ $t('crypto.yes') }} {{ upTradePriceText }}
+          {{ $t('common.buy') }} {{ detailData.yesOutcome || '' }} {{ upTradePriceText }}
         </button>
         <button class="trade-btn down" type="button" @click="openPayment('down')">
-          {{ $t('common.buy') }} {{ $t('crypto.no') }} {{ downTradePriceText }}
+          {{ $t('common.buy') }} {{ detailData.noOutcome || '' }} {{ downTradePriceText }}
         </button>
       </template>
       <!-- 事件已结束时显示提示 -->
@@ -350,7 +352,7 @@
 
     <PaymentModal v-model="showPayment" :event-title="detailData.title" :outcome-title="paymentOutcomeTitle"
       :event-guid="currentEventGuid" :sub-event-guid="resolvedSubEventGuid" :initial-outcome="paymentInitialOutcome"
-      :initial-side="paymentInitialSide" @order-success="onOrderSuccess" />
+      :initial-side="paymentInitialSide" :yes-outcome="detailData.yesOutcome" :no-outcome="detailData.noOutcome" @order-success="onOrderSuccess" />
 
     <CashoutModal v-model="showCashoutModal" :position="cashoutPosition" :event-guid="currentEventGuid"
       :sub-event-guid="resolvedSubEventGuid" @order-success="onOrderSuccess" />
