@@ -796,14 +796,20 @@ export default {
   },
   bill: {
     title: "請求書",
-    filterType: "タイプ",
+    filterType: "種類",
     filterAsset: "資産",
     filterDate: "日付",
     typeAll: "すべて",
     typeRecharge: "チャージ",
     typeWithdraw: "出金",
+    typeBigWithdraw: "高額出金",
+    typeBetFreeze: "Bet Freeze",
+    typeBetDeduct: "Bet Deduct",
+    typeBetCancel: "Bet Cancel",
+    typeSettleWin: "Settle Win",
+    typeSettleLose: "Settle Lose",
     typePurchase: "購入イベント",
-    typeSell: "売却イベント",
+    typeSell: "販売イベント",
     assetAll: "すべて",
     date7: "過去7日間",
     date30: "過去30日間",
@@ -813,7 +819,8 @@ export default {
       PENDING: "保留中",
       COMPLETED: "完了",
       FAILED: "失敗",
-      REJECTED: "拒否されました"
+      REJECTED: "拒否されました",
+      CONFIRMED: "完了",
     }
   },
   dashboard: {

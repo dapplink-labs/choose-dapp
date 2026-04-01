@@ -792,8 +792,14 @@ export default {
     filterAsset: "资产",
     filterDate: "日期",
     typeAll: "全部",
-    typeRecharge: "充值",
-    typeWithdraw: "提现",
+    typeRecharge: "充值入账",
+    typeWithdraw: "提现扣减",
+    typeBigWithdraw: "大额提现",
+    typeBetFreeze: "下注冻结",
+    typeBetDeduct: "下注实际扣款",
+    typeBetCancel: "撤单退回",
+    typeSettleWin: "结算盈利",
+    typeSettleLose: "结算亏损",
     typePurchase: "购买事件",
     typeSell: "卖出事件",
     assetAll: "全部",
@@ -802,10 +808,11 @@ export default {
     date90: "近90天",
     status: {
       PROCESSING: "处理中",
-      PENDING: "待处理",
+      PENDING: "待审核/待处理",
       COMPLETED: "已完成",
       FAILED: "失败",
-      REJECTED: "已拒绝"
+      REJECTED: "已拒绝",
+      CONFIRMED: "已完成",
     }
   },
   dashboard: {

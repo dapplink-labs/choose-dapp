@@ -65,10 +65,10 @@
                     <div class="bill-amount" :class="item.amount >= 0 ? 'inflow' : 'outflow'">
                         {{ item.amount >= 0 ? '+' : '-' }}{{ item.amountFormatted }} {{ item.currency_code || 'USD' }}
                     </div>
-                    <div v-if="['FIAT_WITHDRAW', 'FIAT_BIG_WITHDRAW'].includes(item.type)" class="bill-status">
+                    <div v-if="item.status" class="bill-status">
                         {{ item.status ? $t(`bill.status.${item.status}`) : '' }}
                     </div>
-                    <div v-if="['FIAT_WITHDRAW', 'FIAT_BIG_WITHDRAW'].includes(item.type) && ['REJECTED'].includes(item.status) && item.remark"
+                    <div v-if="['REJECTED'].includes(item.status) && item.remark"
                         class="bill-remark">
                         {{ item.remark }}
                     </div>
@@ -123,7 +123,13 @@ const selectedDateRange = ref(null)
 const typeOptions = computed(() => [
     { value: 'all', label: t('bill.typeAll') },
     { value: 'FIAT_DEPOSIT', label: t('bill.typeRecharge') },
-    { value: 'FIAT_WITHDRAW', label: t('bill.typeWithdraw') }
+    { value: 'FIAT_WITHDRAW', label: t('bill.typeWithdraw') },
+    { value: 'FIAT_BIG_WITHDRAW', label: t('bill.typeBigWithdraw') },
+    { value: 'BET_FREEZE', label: t('bill.typeBetFreeze') },
+    { value: 'BET_DEDUCT', label: t('bill.typeBetDeduct') },
+    { value: 'BET_CANCEL', label: t('bill.typeBetCancel') },
+    { value: 'SETTLE_WIN', label: t('bill.typeSettleWin') },
+    { value: 'SETTLE_LOSE', label: t('bill.typeSettleLose') }
 ])
 
 const assetOptions = computed(() => {
@@ -221,6 +227,12 @@ const formatTime = (item) => item?.created_at || ''
 const TYPE_LABEL_KEY_MAP = {
     FIAT_DEPOSIT: 'bill.typeRecharge',
     FIAT_WITHDRAW: 'bill.typeWithdraw',
+    FIAT_BIG_WITHDRAW: 'bill.typeBigWithdraw',
+    BET_FREEZE: 'bill.typeBetFreeze',
+    BET_DEDUCT: 'bill.typeBetDeduct',
+    BET_CANCEL: 'bill.typeBetCancel',
+    SETTLE_WIN: 'bill.typeSettleWin',
+    SETTLE_LOSE: 'bill.typeSettleLose',
 }
 
 const getSignedAmount = (tx) => {
@@ -228,8 +240,8 @@ const getSignedAmount = (tx) => {
     const amt = Number.isFinite(n) ? n : 0
     const type = String(tx?.type || '').toUpperCase()
     // 充值为流入，提现为流出；其它类型默认按正数展示（可后续补映射）
-    if (['FIAT_WITHDRAW', 'FIAT_BIG_WITHDRAW'].includes(type)) return -Math.abs(amt)
-    if (['FIAT_DEPOSIT'].includes(type)) return Math.abs(amt)
+    if (['FIAT_WITHDRAW', 'FIAT_BIG_WITHDRAW', 'BET_FREEZE', 'BET_DEDUCT', 'SETTLE_LOSE'].includes(type)) return -Math.abs(amt)
+    if (['FIAT_DEPOSIT', 'BET_CANCEL', 'SETTLE_WIN'].includes(type)) return Math.abs(amt)
     return amt
 }
 

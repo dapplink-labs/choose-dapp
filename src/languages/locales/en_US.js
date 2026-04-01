@@ -805,6 +805,12 @@ export default {
     typeAll: "All",
     typeRecharge: "Deposit",
     typeWithdraw: "Withdraw",
+    typeBigWithdraw: "Large Withdraw",
+    typeBetFreeze: "Bet Freeze",
+    typeBetDeduct: "Bet Deduct",
+    typeBetCancel: "Bet Cancel",
+    typeSettleWin: "Settle Win",
+    typeSettleLose: "Settle Lose",
     typePurchase: "Purchase Event",
     typeSell: "Sell Event",
     assetAll: "All",
@@ -816,7 +822,8 @@ export default {
       PENDING: "Pending",
       COMPLETED: "Completed",
       FAILED: "Failed",
-      REJECTED: "Rejected"
+      REJECTED: "Rejected",
+      CONFIRMED: "Completed",
     }
   },
   dashboard: {

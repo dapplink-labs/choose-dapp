@@ -314,7 +314,7 @@
                                         @click="handleOptionRowClick(item, opt)">
                                         <div class="option-text">
                                             <span>{{ opt.text }}</span>
-                                            <span>{{ item.percentage }}</span>
+                                            <span>{{ opt.percentage }}</span>
                                         </div>
                                         <div class="option-buttons">
                                             <button class="option-btn yes-btn"

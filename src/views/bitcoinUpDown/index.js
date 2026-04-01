@@ -460,7 +460,7 @@ export default {
           page: 1,
           page_size: 2000,
           language_label: languageLabel,
-          sub_event_guid: currentEventGuid.value,
+          sub_event_guid: resolvedSubEventGuid.value || undefined,
         });
         if (!isRespSuccess(res))
           throw new Error(res?.data?.message || "Fetch positions failed");
@@ -516,7 +516,7 @@ export default {
           status: "",
           is_settled: "",
           event_guid: currentEventGuid.value,
-          sub_event_guid: resolvedSubEventGuid.value || undefined,
+          sub_event_guid: resolvedSubEventGuid.value ,
         });
         if (!isRespSuccess(res))
           throw new Error(res?.data?.message || "Fetch order history failed");
@@ -1346,7 +1346,7 @@ export default {
       try {
         const res = await getEventPriceHistory({
           event_guid: currentEventGuid.value,
-          sub_event_guid: resolvedSubEventGuid.value || undefined,
+          sub_event_guid: resolvedSubEventGuid.value,
           interval: "5m",
           range: "1d",
         });
@@ -1392,7 +1392,7 @@ export default {
           getEventDetailItem({
             event_guid: currentEventGuid.value,
             language_label: language,
-            user_address: address.value || "",
+            user_address: address.value,
           }),
           getSubEventDetail({
             event_guid: currentEventGuid.value,
