@@ -917,6 +917,12 @@ export default {
     allNodes: "全ノード",
     claimNote: "全ノードの収益を受け取るか、単一ノードの収益を選択して受け取ることができます",
     claimable: "受取可能な収益",
+    requestingAuth: "承認中...",
+    approvalSuccess: "承認成功",
+    userCancelledAuth: "ユーザーが承認をキャンセルしました",
+    approveTokenFailed: "承認失敗",
+    noClaimableReward: "オンチェーンに受取可能な報酬がありません",
+    exceedOnChain: "受取数量がオンチェーンの受取可能額を超えています",
   },
   searchPage: {
     searchPlaceholder: "Search",

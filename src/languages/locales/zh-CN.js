@@ -905,6 +905,12 @@ export default {
     claimable: "可领取收益",
     inputAmount: "请输入领取数量",
     exceedMax: "输入数量超过可领取收益",
+    requestingAuth: "授权中...",
+    approvalSuccess: "授权成功",
+    userCancelledAuth: "用户取消授权",
+    approveTokenFailed: "授权失败",
+    noClaimableReward: "链上暂无可领取的奖励",
+    exceedOnChain: "领取数量超过链上可领取额度",
   },
   searchPage: {
     searchPlaceholder: "搜索",

@@ -921,6 +921,12 @@ export default {
     allNodes: "모든 노드",
     claimNote: "모든 노드 수익을 수령하거나 단일 노드 수익을 선택하여 수령할 수 있습니다",
     claimable: "수령 가능한 수익",
+    requestingAuth: "승인 중...",
+    approvalSuccess: "승인 성공",
+    userCancelledAuth: "사용자가 승인을 취소했습니다",
+    approveTokenFailed: "승인 실패",
+    noClaimableReward: "온체인에 수령 가능한 보상이 없습니다",
+    exceedOnChain: "수령 금액이 온체인 수령 가능 한도를 초과합니다",
   },
   searchPage: {
     searchPlaceholder: "Search",

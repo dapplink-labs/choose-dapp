@@ -20,12 +20,8 @@
       <div class="form-section">
         <label class="section-label">{{ $t('collectEarnings.claimAmount') || '领取数量' }}</label>
         <div class="amount-input-wrapper">
-          <input 
-            type="number" 
-            v-model="displayAmount" 
-            class="amount-input"
-            :placeholder="$t('collectEarnings.inputAmount') || '请输入领取数量'" 
-          />
+          <input type="number" v-model="displayAmount" class="amount-input"
+            :placeholder="$t('collectEarnings.inputAmount') || '请输入领取数量'" />
           <div class="suffix-group">
             <span class="unit">CHO</span>
             <div class="max-btn" @click.stop="handleMax">Max</div>
@@ -35,7 +31,7 @@
           <!-- 动态计算 USDT：基于比例和不同精度的转换 -->
           <span class="usdt-value">≈ {{ usdtValue }} USDT</span>
           <span class="claimable-text">
-            {{ $t('collectEarnings.claimable') || '可领取收益' }}: 
+            {{ $t('collectEarnings.claimable') || '可领取收益' }}:
             {{ selectedNode ? formatAmount(selectedNode.node_reward) : '--' }}
           </span>
         </div>
@@ -61,13 +57,8 @@
       </button>
     </div>
 
-    <NodeSelectorModal 
-      v-model:visible="showNodeSelector" 
-      :options="nodes" 
-      :loading="loadingNodes"
-      :selected="selectedNode" 
-      @select="handleNodeSelect" 
-    />
+    <NodeSelectorModal v-model:visible="showNodeSelector" :options="nodes" :loading="loadingNodes"
+      :selected="selectedNode" @select="handleNodeSelect" />
   </div>
 </template>
 
@@ -76,7 +67,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAccount, useChainId } from '@wagmi/vue'
-import { switchChain } from '@wagmi/core'
+import { switchChain, readContract } from '@wagmi/core'
 import { config } from '@/wagmi'
 import { ElLoading } from 'element-plus'
 import { ArrowDown } from '@element-plus/icons-vue'
@@ -85,10 +76,12 @@ import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import NodeSelectorModal from '@/components/NodeSelectorModal.vue'
 import { getNodeStakingRecords, stakingclaimReward } from '@/api/API'
 import { formatDateTime } from '@/utils/format_date.js'
-import { writeContractOptimized } from '@/utils/requestWEB3.js'
+import { writeContractOptimized, checkAllowance, approveToken } from '@/utils/requestWEB3.js'
 import { formatChoAmount } from '@/utils/format_amount.js'
 import stakingManagerABI from '@/assets/abi/stakingManagerABI.json'
 import networks from '@/assets/json/networks.js'
+import { parseUnits } from "viem";
+
 
 const router = useRouter()
 const { t } = useI18n()
@@ -127,13 +120,13 @@ const usdtValue = computed(() => {
   if (!selectedNode.value || !selectedNode.value.node_reward || Number(displayAmount.value) <= 0) {
     return '0.00'
   }
-  
+
   const inputReadable = Number(displayAmount.value)
   const totalRewardReadable = Number(selectedNode.value.node_reward) / PRECISION_CHO
   const totalUsdtValueReadable = Number(selectedNode.value.node_reward_usdt || 0) / PRECISION_USDT
-  
+
   if (totalRewardReadable <= 0) return '0.00'
-  
+
   const result = (inputReadable / totalRewardReadable) * totalUsdtValueReadable
   return result.toFixed(2)
 })
@@ -227,15 +220,72 @@ const handleConfirm = async () => {
     }
 
     const bscNet = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
-    
-    // 计算原始 6 位精度的 CHO 数量用于提交
-    const finalRawAmount = Math.floor(Number(displayAmount.value) * PRECISION_CHO)
+
+    // 使用 parseUnits 安全转换精度（与 predictionDetailH5 一致）
+    const amountString = String(displayAmount.value)
+    const amountBigInt = parseUnits(amountString, 6) // CHO 6位精度
+
+    // 链上预检查：读取合约中实际可领取的奖励
+    const lpInfo = await readContract(config, {
+      address: bscNet.proxyStakingManager,
+      abi: stakingManagerABI,
+      functionName: 'getLiquidityProviderInfo',
+      args: [address.value, BigInt(selectedNode.value.round)],
+    })
+    const onChainReward = lpInfo.rewardAmount ?? BigInt(0)
+    const onChainClaimed = lpInfo.claimedAmount ?? BigInt(0)
+    const onChainClaimable = onChainReward - onChainClaimed
+
+    console.log('On-chain LP info:', {
+      rewardAmount: onChainReward.toString(),
+      claimedAmount: onChainClaimed.toString(),
+      claimable: onChainClaimable.toString(),
+      requestAmount: amountBigInt.toString(),
+    })
+
+    if (onChainClaimable <= BigInt(0)) {
+      Message.error(t('collectEarnings.noClaimableReward') || '链上暂无可领取的奖励')
+      return
+    }
+
+    if (amountBigInt > onChainClaimable) {
+      Message.error(t('collectEarnings.exceedOnChain') || '领取数量超过链上可领取额度')
+      return
+    }
+
+    // 检查 CHO 授权
+    const choTokenAddress = bscNet.proxyChooseMeToken
+    const allowance = await checkAllowance(
+      choTokenAddress,
+      address.value,
+      bscNet.proxyStakingManager
+    )
+
+    if (allowance === BigInt(0) || allowance < amountBigInt) {
+      loading.text = t('collectEarnings.requestingAuth') || '授权中...'
+      try {
+        await approveToken({
+          tokenAddress: choTokenAddress,
+          spenderAddress: bscNet.proxyStakingManager,
+          amount: amountBigInt,
+          userAddress: address.value,
+          BRIDGE_MESSAGES: {
+            approvalSuccess: t('collectEarnings.approvalSuccess') || '授权成功',
+            userCancelledAuth: t('collectEarnings.userCancelledAuth') || '用户取消授权',
+            approveTokenFailed: t('collectEarnings.approveTokenFailed') || '授权失败',
+          },
+        })
+      } catch (approveError) {
+        return
+      }
+    }
 
     const txHash = await writeContractOptimized({
       abi: stakingManagerABI,
       address: bscNet.proxyStakingManager,
       functionName: 'liquidityProviderClaimReward',
-      args: [BigInt(selectedNode.value.round), BigInt(finalRawAmount)],
+      value: parseUnits("0.001", 18),
+      args: [BigInt(selectedNode.value.round), amountBigInt],
       userAddress: address.value,
       messages: CONTRACT_MESSAGES
     })
@@ -245,7 +295,7 @@ const handleConfirm = async () => {
         user_address: address.value,
         request_tx_hash: txHash.hash,
         round: String(selectedNode.value.round),
-        raw_amount_token: String(finalRawAmount)
+        raw_amount_token: amountBigInt.toString()
       })
       Message.success(CONTRACT_MESSAGES.success())
       router.back()
@@ -304,9 +354,15 @@ onMounted(() => {
   span {
     font-size: 16px;
     color: #fff;
-    &.placeholder { color: #999; }
+
+    &.placeholder {
+      color: #999;
+    }
   }
-  .arrow-icon { color: #999; }
+
+  .arrow-icon {
+    color: #999;
+  }
 }
 
 .amount-input-wrapper {
@@ -317,7 +373,9 @@ onMounted(() => {
   align-items: center;
   border: 1px solid #23262F;
 
-  &:focus-within { border-color: #a4f128; }
+  &:focus-within {
+    border-color: #a4f128;
+  }
 
   .amount-input {
     flex: 1;
@@ -328,14 +386,23 @@ onMounted(() => {
     color: #fff;
     outline: none;
     font-family: DIN;
-    &::-webkit-inner-spin-button { display: none; }
+
+    &::-webkit-inner-spin-button {
+      display: none;
+    }
   }
 
   .suffix-group {
     display: flex;
     align-items: center;
     gap: 8px;
-    .unit { color: #fff; font-size: 16px; font-weight: bold; }
+
+    .unit {
+      color: #fff;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
     .max-btn {
       background: #333;
       color: #fff;
@@ -383,8 +450,12 @@ onMounted(() => {
     font-family: DIN;
     font-weight: bold;
     font-size: 16px;
-    &.green { color: #a4f128; }
+
+    &.green {
+      color: #a4f128;
+    }
   }
+
   .dashed-underline {
     border-bottom: 1px dashed #333;
   }
