@@ -1264,9 +1264,13 @@ export default {
 
     // 将 MQTT 或 REST 推送的订单簿数据应用到响应式状态
     const applyOrderBookPayload = (payload, outcome = "") => {
-      if (!payload || typeof payload !== "object") return;
-      const yesKey = payload.yes || payload.YES;
-      const noKey = payload.no || payload.NO;
+      // if (!payload || typeof payload !== "object") return;
+      const yesKey = payload.filter((item) =>
+        ["yes", "YES", "Up"].includes(item.direction),
+      )[0]||[];
+      const noKey = payload.filter((item) =>
+        ["no", "NO", "Down"].includes(item.direction),
+      )[1]||[];
       if (yesKey || noKey) {
         if (yesKey) orderBookYes.value = normalizeOrderBookSide(yesKey);
         if (noKey) orderBookNo.value = normalizeOrderBookSide(noKey);
@@ -1298,7 +1302,8 @@ export default {
         });
         if (!isRespSuccess(res))
           throw new Error(res?.data?.message || "Fetch order book failed");
-        const data = res?.data?.data || {};
+        console.log(res);
+        const data = res?.data?.data?.order_book_data_list || {};
         applyOrderBookPayload(data);
         const volFromBook = firstFinite(
           data?.trade_volume,
