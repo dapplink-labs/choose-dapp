@@ -218,7 +218,7 @@
         <div v-if="positions.length">
           <div v-for="(pos, index) in positions" :key="pos.id" class="pos-card">
             <h3 v-if="index === 0" class="pos-title">{{ detailData.title || pos.title || $t('crypto.yesOrNo') }}</h3>
-            <span class="pos-tag" :class="pos.outcome">{{ pos.tagLabel }}</span>
+            <span class="pos-tag" :class="pos.outcome===detailData.yesOutcome?'up':'down'">{{ pos.tagLabel }}</span>
             <div class="pos-grid">
               <div class="grid-item">
                 <div class="g-label">{{ $t('crypto.avgPrice') }}</div>
