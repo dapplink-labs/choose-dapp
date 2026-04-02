@@ -28,7 +28,7 @@
                 <div class="trade-body">
                     <!-- 2. 标题与余额 -->
                     <div class="target-info">
-                        <h3 class="target-title">{{ eventTitle }}</h3>
+                        <h3 class="target-title">{{ outcomeTitle }}</h3>
                         <div class="target-row">
                             <div class="outcome-badge"
                                 :class="{ 'outcome-yes': outcomeBadge === yesOutcome, 'outcome-no': outcomeBadge === noOutcome }">

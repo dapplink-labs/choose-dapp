@@ -199,9 +199,9 @@
               <span
                 v-for="(pos, pIdx) in outcome.positions"
                 :key="pIdx"
-                :class="(pos.outcome || '').toLowerCase()"
+                :class="(['YES','UP','Up'].includes(pos.outcome || '')?'yes':'no').toLowerCase()"
               >
-                {{ pos.outcome === "YES" ? "Yes" : "No" }}
+                {{ pos.outcome}}
                 {{ Number(pos.shares) }} ·
                 {{ Number(pos.avg_price * 100).toFixed(1) }} ¢
               </span>
@@ -213,14 +213,14 @@
                 :class="{ active: outcome.selected === 'yes' }"
                 @click="selectOutcome(index, 'yes')"
               >
-                {{ $t("detail.buyYes") }} {{ outcome.yesPrice }} ¢
+                {{ outcome.yesOutcome }} {{ outcome.yesPrice }} ¢
               </button>
               <button
                 class="outcome-btn no-btn"
                 :class="{ active: outcome.selected === 'no' }"
                 @click="selectOutcome(index, 'no')"
               >
-                {{ $t("detail.buyNo") }} {{ outcome.noPrice }} ¢
+                {{ outcome.noOutcome }} {{ outcome.noPrice }} ¢
               </button>
             </div>
             <div v-else class="outcome-actions-ended">
@@ -461,6 +461,8 @@
         :sub-event-guid="paymentSubEventGuid"
         :initial-outcome="paymentInitialOutcome"
         :initial-side="paymentInitialSide"
+        :yes-outcome="paymentInitYesOutcome" 
+        :no-outcome="paymentInitNoOutcome"
         @order-success="onOrderSuccess"
       />
     </div>
@@ -586,6 +588,8 @@ const paymentSubEventGuid = ref("");
 const paymentOutcomeTitle = ref("");
 const paymentInitialOutcome = ref("YES");
 const paymentInitialSide = ref("buy");
+const paymentInitYesOutcome = ref("YES");
+const paymentInitNoOutcome = ref("NO");
 const timeRanges = [
   { label: "1D", value: "1d" },
   { label: "1W", value: "1w" },
@@ -638,9 +642,9 @@ const mapSubEventsToOutcomes = (subEvents = []) => {
   return list.map((sub, idx) => {
     const directions = Array.isArray(sub.directions) ? sub.directions : [];
     const yesDir =
-      directions.find((d) => (d.outcome || "").toUpperCase() === "YES") || {};
+      directions.find((d) => ['YES','UP'].includes((d.outcome || "").toUpperCase())) || {};
     const noDir =
-      directions.find((d) => (d.outcome || "").toUpperCase() === "NO") || {};
+      directions.find((d) => ['NO','DOWN'].includes((d.outcome || "").toUpperCase())) || {};
 
     // 子事件列表概率字段：后端为 sub_events.directions.chance
     // 兼容旧结构：若 sub.directions 仍是数组，则回退到 yesDir.chance
@@ -670,6 +674,8 @@ const mapSubEventsToOutcomes = (subEvents = []) => {
       sub_event_guid: sub.sub_event_guid || "",
       subEventGuid: sub.sub_event_guid || "",
       positions: [],
+      yesOutcome: yesDir?.outcome || "YES",
+      noOutcome: noDir?.outcome || "NO",
     };
   });
 };
@@ -1372,7 +1378,7 @@ const handleTimeRangeChange = async (v) => {
 const selectOutcome = (i, type) => {
   const outcome = outcomes.value[i];
   if (!outcome) return;
-
+  console.log(outcome)
   // 优先使用已经解析好的 subEventGuid
   let subGuid = outcome.subEventGuid || outcome.sub_event_guid || "";
 
@@ -1417,9 +1423,12 @@ const selectOutcome = (i, type) => {
     outcome.selected = type;
     paymentSubEventGuid.value = subGuid;
     paymentOutcomeTitle.value = outcome.title || "";
-    paymentInitialOutcome.value = type === "yes" ? "YES" : "NO";
+    paymentInitialOutcome.value = type === "yes" ? outcome.yesOutcome : outcome.noOutcome;
     paymentInitialSide.value = "buy";
+    paymentInitYesOutcome.value = outcome.yesOutcome;
+    paymentInitNoOutcome.value = outcome.noOutcome;
     showPayment.value = true;
+    console.log(paymentOutcomeTitle.value, paymentInitialOutcome.value)
   });
 };
 
