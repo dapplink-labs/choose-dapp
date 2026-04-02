@@ -658,10 +658,10 @@ export default {
       let target;
       if (activeSegmentMode.value === "past") {
         current = selectedPastRecord.value?.finalPrice;
-        target = selectedPastRecord.value?.open_price;
+        target = selectedPastRecord.value?.targetPrice;
       } else if (activeSegmentMode.value === "live") {
         current = livePrice.value;
-        target = liveSegment.value.open_price;
+        target = liveSegment.value.targetPrice;
       } else {
         return { status: "", value: "--" };
       }
