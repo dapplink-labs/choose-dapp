@@ -124,7 +124,7 @@ import { useAccount } from '@wagmi/vue'
 import { useThemeStore } from '@/stores/theme'
 import { View, Hide, ArrowRight, Document, CaretBottom } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
-import { getUserBalances, getFundsHistory, getUserAssets, getExchangeRateCho } from '@/api/APIEvent'
+import { getUserBalances, getFundsHistory, getUserAssets, getExchangeRateCho, getUserPositionsSummary } from '@/api/APIEvent'
 import { getMyIncome } from "@/api/API"
 
 const router = useRouter()
@@ -250,23 +250,25 @@ const fetchAssets = async () => {
 
   try {
     loadingAssets.value = true
-    const [res, assetsRes, incomeRes, priceRes] = await Promise.all([
+    const [res, assetsRes, incomeRes, priceRes, summaryRes] = await Promise.all([
       getUserBalances({ user_address: address.value }),
       getUserAssets({ user_address: address.value }),
       getMyIncome({ address: address.value }),
-      getExchangeRateCho()
+      getExchangeRateCho(),
+      getUserPositionsSummary({ user_address: address.value })
     ])
 
     const data = res?.data?.data || {}
     const assetsData = assetsRes?.data?.data || {}
+    const summaryData = summaryRes?.data?.data || {}
 
     const toNum = (v) => {
       const n = Number(v)
       return Number.isFinite(n) ? n : 0
     }
 
-    // 预测为 getUserBalances 接口返回的 portfolio 字段
-    const portfolio = 0
+    // 预测账户值取total_position_value字段
+    const portfolio = toNum(summaryData.total_position_value)
     // 资金为所有币种价值之和 (getUserAssets 接口的 total_value_usdt)
     const fundsValue = toNum(assetsData.total_value_usdt)
 
