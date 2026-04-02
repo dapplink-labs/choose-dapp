@@ -118,9 +118,9 @@ const chartColors = computed(() => {
 const showAssets = ref(true)
 
 // 数据
-const predictionTotal = ref(1263.23)
-const todayProfit = ref(800.00)
-const todayProfitRate = ref(200)
+const predictionTotal = ref(0)
+const todayProfit = ref(0)
+const todayProfitRate = ref(0)
 
 // 时间周期选择
 const timePeriods = computed(() => [
@@ -132,7 +132,7 @@ const timePeriods = computed(() => [
 const selectedPeriod = ref('all')
 
 // 收益金额
-const profitAmount = ref(220.00)
+const profitAmount = ref(0)
 const pnlPoints = ref([])
 const statLoading = ref(false)
 const statSummary = ref({})
@@ -280,18 +280,18 @@ const updateChart = () => {
   const labels = points.map(p => formatXAxisLabel(p?.timestamp))
   // 模拟数据 - 面积图数据
   const data = [
-    { value: 0 },
-    { value: 0 },
-    { value: 0 },
-    { value: 50 },
-    { value: 50 },
-    { value: 120 },
-    { value: 120 },
-    { value: 120 },
-    { value: 110 },
-    { value: 120 },
-    { value: 120 },
-    { value: 120 }
+    // { value: 0 },
+    // { value: 0 },
+    // { value: 0 },
+    // { value: 50 },
+    // { value: 50 },
+    // { value: 120 },
+    // { value: 120 },
+    // { value: 120 },
+    // { value: 110 },
+    // { value: 120 },
+    // { value: 120 },
+    // { value: 120 }
   ]
 
   const colors = chartColors.value
