@@ -352,7 +352,10 @@ export default {
     // 打开支付弹窗，根据方向设置初始 outcome
     const openPayment = (side) => {
       paymentOutcomeTitle.value = detailData.value.title || "";
-      paymentInitialOutcome.value = side === "up" ? detailData.value.yesOutcome || "" : detailData.value.noOutcome || "";
+      paymentInitialOutcome.value =
+        side === "up"
+          ? detailData.value.yesOutcome || ""
+          : detailData.value.noOutcome || "";
       paymentInitialSide.value = "buy";
       showPayment.value = true;
     };
@@ -655,10 +658,10 @@ export default {
       let target;
       if (activeSegmentMode.value === "past") {
         current = selectedPastRecord.value?.finalPrice;
-        target = selectedPastRecord.value?.targetPrice;
+        target = selectedPastRecord.value?.open_price;
       } else if (activeSegmentMode.value === "live") {
         current = livePrice.value;
-        target = liveSegment.value.targetPrice;
+        target = liveSegment.value.open_price;
       } else {
         return { status: "", value: "--" };
       }
@@ -1421,13 +1424,7 @@ export default {
           directions[1] ||
           {};
 
-        const targetPrice = firstFinite(
-          subEvent?.target_price,
-          subEvent?.reference_price,
-          subEvent?.strike_price,
-          eventItem?.target_price,
-          route.query.target_price,
-        );
+        const targetPrice = firstFinite(subEvent?.open_price);
         // 当前价格：以 getEventDetailItem 返回的 on_time_data 为准（若存在）
         const onTimeDataPrice = firstFinite(eventItem?.on_time_data);
         if (Number.isFinite(onTimeDataPrice)) {
