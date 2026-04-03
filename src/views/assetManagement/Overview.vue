@@ -210,7 +210,7 @@ const accountList = ref([
   { name: '资金', value: 0 },
   { name: '质押', value: 0 },
   { name: '预测', value: 0 },
-  { name: '预测金额', value: 0 }
+  // { name: '预测金额', value: 0 }
 ])
 
 // 格式化数字（添加千分位）
@@ -303,7 +303,7 @@ const fetchAssets = async () => {
       { name: t('assetManagement.funds') || '资金', value: fundsValue },
       { name: t('assetManagement.staking') || '质押', value: stakingValue },
       { name: t('assetManagement.prediction') || '预测', value: portfolio },
-      { name: t('assetManagement.predictionAmount') || '预测金额', value: funds.value }
+      // { name: t('assetManagement.predictionAmount') || '预测金额', value: funds.value }
     ]
 
     // 顶部总资产为资金、质押、预测之和
@@ -338,7 +338,7 @@ const fetchAssets = async () => {
       { name: t('assetManagement.funds') || '资金', value: 0 },
       { name: t('assetManagement.staking') || '质押', value: 0 },
       { name: t('assetManagement.prediction') || '预测', value: 0 },
-      { name: t('assetManagement.predictionAmount') || '预测金额', value: 0 }
+      // { name: t('assetManagement.predictionAmount') || '预测金额', value: 0 }
     ]
   } finally {
     loadingAssets.value = false

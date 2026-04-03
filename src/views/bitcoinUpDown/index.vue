@@ -15,10 +15,18 @@
           <span class="top-volume">{{ topVolumeText }}</span>
         </div>
         <button class="top-btn bookmark-btn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </button>
       </div>
@@ -26,48 +34,82 @@
 
     <!-- 滚动容器 -->
     <div class="content-scroller" @scroll="handleScroll">
-
       <!-- 2. 吸顶标题区与倒计时 -->
       <div class="asset-profile-wrapper" :class="{ 'is-sticky': isSticky }">
         <div class="asset-profile">
           <div class="asset-logo">
             <svg viewBox="0 0 32 32" width="100%" height="100%">
-              <path fill="#fff"
-                d="M21.7 14.3c.3-2-1.2-3.1-3.3-3.8l.7-2.7-1.6-.4-.7 2.6c-.4-.1-.9-.2-1.3-.3l.7-2.6-1.6-.4-.7 2.7c-.3-.1-.7-.2-1-.2v-.1l-2.2-.6-.4 1.7s1.2.3 1.2.3c.7.2.8.6.8 1l-.8 3.1c0 0 .1 0 .2.1h-.2l-1.1 4.4c-.1.2-.3.5-.8.4 0 0-1.2-.3-1.2-.3l-.8 1.8 2.1.5c.4.1.8.2 1.2.3l-.7 2.8 1.6.4.7-2.7c.4.1.9.2 1.3.3l-.7 2.7 1.6.4.7-2.8c2.9.5 5.1.3 6-2.3.8-2.1 0-3.3-1.5-4.1 1.1-.2 1.9-1 2.1-2.5zm-3.8 5.3c-.5 2.2-4.2 1-5.4.7l1-3.9c1.2.3 5 .9 4.4 3.2zm.6-5.3c-.5 2-3.5.9-4.5.7l.9-3.5c1 .2 4.1.7 3.6 2.8z" />
+              <path
+                fill="#fff"
+                d="M21.7 14.3c.3-2-1.2-3.1-3.3-3.8l.7-2.7-1.6-.4-.7 2.6c-.4-.1-.9-.2-1.3-.3l.7-2.6-1.6-.4-.7 2.7c-.3-.1-.7-.2-1-.2v-.1l-2.2-.6-.4 1.7s1.2.3 1.2.3c.7.2.8.6.8 1l-.8 3.1c0 0 .1 0 .2.1h-.2l-1.1 4.4c-.1.2-.3.5-.8.4 0 0-1.2-.3-1.2-.3l-.8 1.8 2.1.5c.4.1.8.2 1.2.3l-.7 2.8 1.6.4.7-2.7c.4.1.9.2 1.3.3l-.7 2.7 1.6.4.7-2.8c2.9.5 5.1.3 6-2.3.8-2.1 0-3.3-1.5-4.1 1.1-.2 1.9-1 2.1-2.5zm-3.8 5.3c-.5 2.2-4.2 1-5.4.7l1-3.9c1.2.3 5 .9 4.4 3.2zm.6-5.3c-.5 2-3.5.9-4.5.7l.9-3.5c1 .2 4.1.7 3.6 2.8z"
+              />
             </svg>
           </div>
           <div class="asset-text">
             <h2>
-              <span>{{ detailData.eventTitle || $t('bitcoinUpDown.questionTitle') }}</span>
-              <span v-if="showBaopeiTag" class="baopei-tag">{{ $t('bitcoinUpDown.baopei') }}</span>
+              <span>{{
+                detailData.eventTitle || $t("bitcoinUpDown.questionTitle")
+              }}</span>
+              <span v-if="showBaopeiTag" class="baopei-tag">{{
+                $t("bitcoinUpDown.baopei")
+              }}</span>
             </h2>
-            <p v-if="titleTimeRangeText" class="asset-time-range">{{ titleTimeRangeText }}</p>
+            <p v-if="titleTimeRangeText" class="asset-time-range">
+              {{ titleTimeRangeText }}
+            </p>
           </div>
           <!-- 倒计时规则：进入历史视图隐藏；剩余时间超过 24h 隐藏 -->
-          <div class="timer" v-show="activeSegmentMode !== 'past' && shouldShowCountDown">
+          <div
+            class="timer"
+            v-show="activeSegmentMode !== 'past' && shouldShowCountDown"
+          >
             <div class="time-block">
               <div class="time-value">
-                <span class="digit-wrapper" v-for="(char, i) in countDown.hours.split('')" :key="'h' + i">
-                  <transition name="fast-roll"><span class="digit unit" :key="char">{{ char }}</span></transition>
+                <span
+                  class="digit-wrapper"
+                  v-for="(char, i) in countDown.hours.split('')"
+                  :key="'h' + i"
+                >
+                  <transition name="fast-roll"
+                    ><span class="digit unit" :key="char">{{
+                      char
+                    }}</span></transition
+                  >
                 </span>
               </div>
-              <span class="label">{{ $t('bitcoinUpDown.hrs') }}</span>
+              <span class="label">{{ $t("bitcoinUpDown.hrs") }}</span>
             </div>
             <div class="time-block">
               <div class="time-value">
-                <span class="digit-wrapper" v-for="(char, i) in countDown.minutes.split('')" :key="'m' + i">
-                  <transition name="fast-roll"><span class="digit unit" :key="char">{{ char }}</span></transition>
+                <span
+                  class="digit-wrapper"
+                  v-for="(char, i) in countDown.minutes.split('')"
+                  :key="'m' + i"
+                >
+                  <transition name="fast-roll"
+                    ><span class="digit unit" :key="char">{{
+                      char
+                    }}</span></transition
+                  >
                 </span>
               </div>
-              <span class="label">{{ $t('bitcoinUpDown.mins') }}</span>
+              <span class="label">{{ $t("bitcoinUpDown.mins") }}</span>
             </div>
             <div class="time-block">
               <div class="time-value">
-                <span class="digit-wrapper" v-for="(char, i) in countDown.seconds.split('')" :key="'s' + i">
-                  <transition name="fast-roll"><span class="digit unit" :key="char">{{ char }}</span></transition>
+                <span
+                  class="digit-wrapper"
+                  v-for="(char, i) in countDown.seconds.split('')"
+                  :key="'s' + i"
+                >
+                  <transition name="fast-roll"
+                    ><span class="digit unit" :key="char">{{
+                      char
+                    }}</span></transition
+                  >
                 </span>
               </div>
-              <span class="label">{{ $t('bitcoinUpDown.secs') }}</span>
+              <span class="label">{{ $t("bitcoinUpDown.secs") }}</span>
             </div>
           </div>
         </div>
@@ -76,22 +118,39 @@
       <!-- 3. 价格看板 -->
       <div class="price-dashboard">
         <div class="price-item">
-          <div class="label">{{ $t('bitcoinUpDown.openPrice') }}</div>
-          <div class="value">{{ activeSegmentMode === 'future' ? '--' : formatPrice(displayTargetPrice) }}</div>
+          <div class="label">{{ $t("bitcoinUpDown.openPrice") }}</div>
+          <div class="value">
+            {{
+              activeSegmentMode === "future"
+                ? "--"
+                : formatPrice(displayTargetPrice)
+            }}
+          </div>
         </div>
 
         <div class="price-item current">
           <div class="label">
-            {{ activeSegmentMode === 'past' ? $t('bitcoinUpDown.finalPrice') : $t('bitcoinUpDown.currentPrice') }}
-            <span v-if="activeSegmentMode !== 'future'" :class="['diff', diffData.status]">
+            {{
+              activeSegmentMode === "past"
+                ? $t("bitcoinUpDown.finalPrice")
+                : $t("bitcoinUpDown.currentPrice")
+            }}
+            <span
+              v-if="activeSegmentMode !== 'future'"
+              :class="['diff', diffData.status]"
+            >
               <span class="svg-icon-wrapper diff-icon" :class="diffData.status">
                 <svg v-if="diffData.status === 'up'" viewBox="0 0 12 12">
-                  <path d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
-                    fill="currentColor" />
+                  <path
+                    d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
+                    fill="currentColor"
+                  />
                 </svg>
                 <svg v-else viewBox="0 0 12 12">
-                  <path d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
-                    fill="currentColor" />
+                  <path
+                    d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
+                    fill="currentColor"
+                  />
                 </svg>
               </span>
               ${{ diffData.value }}
@@ -100,13 +159,17 @@
           <div class="value price-value">
             <span class="symbol">$</span>
             <template v-if="activeSegmentMode === 'past'">
-              <span class="digit-static">{{ selectedPastRecord?.finalPrice.toLocaleString('en-US', {
-                minimumFractionDigits: 2
-              }) }}</span>
+              <span class="digit-static">{{
+                selectedPastRecord?.finalPrice.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                })
+              }}</span>
             </template>
             <template v-else>
-              <template v-for="(char, i) in currentPriceChars" :key="'p'+i">
-                <span v-if="['.', ','].includes(char)" class="symbol">{{ char }}</span>
+              <template v-for="(char, i) in currentPriceChars" :key="'p' + i">
+                <span v-if="['.', ','].includes(char)" class="symbol">{{
+                  char
+                }}</span>
                 <span v-else class="digit-wrapper">
                   <transition name="fast-roll">
                     <span class="digit" :key="char">{{ char }}</span>
@@ -121,14 +184,31 @@
       <!-- 4. 图表与工具栏 -->
       <div class="chart-section">
         <div class="chart-container">
-          <div ref="chartRef" class="main-chart" style="touch-action: none;"></div>
+          <div
+            ref="chartRef"
+            class="main-chart"
+            style="touch-action: none"
+          ></div>
           <!-- 拖拽价格浮窗 -->
           <transition name="cdt">
-            <div v-if="chartDragState.tooltipVisible" class="chart-drag-tooltip"
-              :style="{ left: chartDragState.tooltipLeft + 'px', top: chartDragState.tooltipTop + 'px' }">
+            <div
+              v-if="chartDragState.tooltipVisible"
+              class="chart-drag-tooltip"
+              :style="{
+                left: chartDragState.tooltipLeft + 'px',
+                top: chartDragState.tooltipTop + 'px',
+              }"
+            >
               <div class="cdt-time">{{ chartDragState.tooltipTime }}</div>
-              <div v-for="item in chartDragState.tooltipItems" :key="item.name" class="cdt-row">
-                <span class="cdt-dot" :style="{ background: item.color }"></span>
+              <div
+                v-for="item in chartDragState.tooltipItems"
+                :key="item.name"
+                class="cdt-row"
+              >
+                <span
+                  class="cdt-dot"
+                  :style="{ background: item.color }"
+                ></span>
                 <span class="cdt-name">{{ item.name }}</span>
                 <span class="cdt-price">${{ item.price }}</span>
               </div>
@@ -138,39 +218,80 @@
 
         <div class="chart-toolbar">
           <!-- 下拉菜单：选择历史记录 -->
-          <el-dropdown trigger="click" placement="bottom-start" @command="selectPastRecord"
-            popper-class="custom-history-dropdown">
+          <el-dropdown
+            trigger="click"
+            placement="bottom-start"
+            @command="selectPastRecord"
+            popper-class="custom-history-dropdown"
+          >
             <div class="record-capsule">
               <div class="record-selector">
-                {{ $t('bitcoinUpDown.past') }} <el-icon>
+                {{ $t("bitcoinUpDown.past") }}
+                <el-icon>
                   <ArrowDown />
                 </el-icon>
               </div>
               <div class="trend-markers">
-                <span v-for="res in lastThreeResults" :key="res.id" class="svg-icon-wrapper" :class="res.result">
-                  <svg v-if="res.result === 'up'" style="width:12px;height:12px" viewBox="0 0 12 12">
-                    <path d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
-                      fill="currentColor" />
+                <span
+                  v-for="res in lastThreeResults"
+                  :key="res.id"
+                  class="svg-icon-wrapper"
+                  :class="res.result"
+                >
+                  <svg
+                    v-if="res.result === 'up'"
+                    style="width: 12px; height: 12px"
+                    viewBox="0 0 12 12"
+                  >
+                    <path
+                      d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
+                      fill="currentColor"
+                    />
                   </svg>
-                  <svg v-else style="width:12px;height:12px" viewBox="0 0 12 12">
-                    <path d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
-                      fill="currentColor" />
+                  <svg
+                    v-else
+                    style="width: 12px; height: 12px"
+                    viewBox="0 0 12 12"
+                  >
+                    <path
+                      d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
+                      fill="currentColor"
+                    />
                   </svg>
                 </span>
               </div>
             </div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item v-for="record in pastRecords" :key="record.id" :command="record">
+                <el-dropdown-item
+                  v-for="record in pastRecords"
+                  :key="record.id"
+                  :command="record"
+                >
                   <div class="drop-item-content">
-                    <span class="svg-icon-wrapper dropdown-icon" :class="record.result">
-                      <svg v-if="record.result === 'up'" style="width:14px;height:14px" viewBox="0 0 12 12">
-                        <path d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
-                          fill="currentColor" />
+                    <span
+                      class="svg-icon-wrapper dropdown-icon"
+                      :class="record.result"
+                    >
+                      <svg
+                        v-if="record.result === 'up'"
+                        style="width: 14px; height: 14px"
+                        viewBox="0 0 12 12"
+                      >
+                        <path
+                          d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
+                          fill="currentColor"
+                        />
                       </svg>
-                      <svg v-else style="width:14px;height:14px" viewBox="0 0 12 12">
-                        <path d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
-                          fill="currentColor" />
+                      <svg
+                        v-else
+                        style="width: 14px; height: 14px"
+                        viewBox="0 0 12 12"
+                      >
+                        <path
+                          d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
+                          fill="currentColor"
+                        />
                       </svg>
                     </span>
                     {{ record.label }}
@@ -183,19 +304,33 @@
           <!-- 🔥 动态时间轴按钮逻辑 🔥 -->
           <div class="time-segments">
             <!-- 1. 最左侧：临时生成的历史记录游标 (仅在选择历史且存在时显示) -->
-            <span v-if="activeSegmentMode === 'past' && selectedPastRecord" class="time-pill active past-active">
-              {{ $t('bitcoinUpDown.ended') }}: {{ selectedPastRecord.date }}
+            <span
+              v-if="activeSegmentMode === 'past' && selectedPastRecord"
+              class="time-pill active past-active"
+            >
+              {{ $t("bitcoinUpDown.ended") }}: {{ selectedPastRecord.date }}
             </span>
 
             <!-- 2. 中间：常驻实时按钮 (点击清除历史游标) -->
-            <span class="time-pill" :class="{ active: activeSegmentMode === 'live' }" @click="selectLiveSegment">
+            <span
+              class="time-pill"
+              :class="{ active: activeSegmentMode === 'live' }"
+              @click="selectLiveSegment"
+            >
               <i class="dot breathing-dot"></i> {{ liveSegment.label }}
             </span>
 
             <!-- 3. 右侧：当天未来按钮 (只有一个) -->
-            <span v-for="ft in futureSegments" :key="ft.id" class="time-pill "
-              :class="{ active: activeSegmentMode === 'future' && selectedFutureId === ft.id }"
-              @click="selectFutureSegment(ft)">
+            <span
+              v-for="ft in futureSegments"
+              :key="ft.id"
+              class="time-pill"
+              :class="{
+                active:
+                  activeSegmentMode === 'future' && selectedFutureId === ft.id,
+              }"
+              @click="selectFutureSegment(ft)"
+            >
               {{ ft.label }}
             </span>
           </div>
@@ -204,55 +339,94 @@
 
       <!-- 5. 底部业务逻辑 -->
       <div class="business-tabs">
-        <div class="tab-item" :class="{ active: activeTab === 'Positions' }" @click="activeTab = 'Positions'">{{
-          $t('crypto.positions') }}</div>
-        <div class="tab-item" :class="{ active: activeTab === 'Orders' }" @click="activeTab = 'Orders'">{{
-          $t('crypto.orders')
-          }}</div>
-        <div class="tab-item" :class="{ active: activeTab === 'History' }" @click="activeTab = 'History'">{{
-          $t('crypto.history') }}</div>
+        <div
+          class="tab-item"
+          :class="{ active: activeTab === 'Positions' }"
+          @click="activeTab = 'Positions'"
+        >
+          {{ $t("crypto.positions") }}
+        </div>
+        <div
+          class="tab-item"
+          :class="{ active: activeTab === 'Orders' }"
+          @click="activeTab = 'Orders'"
+        >
+          {{ $t("crypto.orders") }}
+        </div>
+        <div
+          class="tab-item"
+          :class="{ active: activeTab === 'History' }"
+          @click="activeTab = 'History'"
+        >
+          {{ $t("crypto.history") }}
+        </div>
       </div>
 
       <!-- Positions -->
       <div v-if="activeTab === 'Positions'" class="position-content">
         <div v-if="positions.length">
           <div v-for="(pos, index) in positions" :key="pos.id" class="pos-card">
-            <h3 v-if="index === 0" class="pos-title">{{ detailData.title || pos.title || $t('crypto.yesOrNo') }}</h3>
-            <span class="pos-tag" :class="pos.outcome===detailData.yesOutcome?'up':'down'">{{ pos.tagLabel }}</span>
+            <h3 v-if="index === 0" class="pos-title">
+              {{ detailData.title || pos.title || $t("crypto.yesOrNo") }}
+            </h3>
+            <span
+              class="pos-tag"
+              :class="pos.outcome === detailData.yesOutcome ? 'up' : 'down'"
+              >{{ pos.tagLabel }}</span
+            >
             <div class="pos-grid">
               <div class="grid-item">
-                <div class="g-label">{{ $t('crypto.avgPrice') }}</div>
+                <div class="g-label">{{ $t("crypto.avgPrice") }}</div>
                 <div class="g-val">{{ pos.avgPrice }}</div>
               </div>
               <div class="grid-item">
-                <div class="g-label">{{ $t('crypto.cost') }}</div>
+                <div class="g-label">{{ $t("crypto.cost") }}</div>
                 <div class="g-val">{{ pos.cost }}</div>
               </div>
               <div class="grid-item">
-                <div class="g-label">{{ $t('crypto.current') }}</div>
+                <div class="g-label">{{ $t("crypto.current") }}</div>
                 <div class="g-val">{{ pos.positionValue }}</div>
               </div>
               <div class="grid-item">
-                <div class="g-label">{{ $t('crypto.profit') }}</div>
-                <div class="g-val" :class="{ 'neon': pos.profitPositive, 'hot-pink': !pos.profitPositive }">{{
-                  pos.profit }}
+                <div class="g-label">{{ $t("crypto.profit") }}</div>
+                <div
+                  class="g-val"
+                  :class="{
+                    neon: pos.profitPositive,
+                    'hot-pink': !pos.profitPositive,
+                  }"
+                >
+                  {{ pos.profit }}
                 </div>
               </div>
             </div>
-            <button class="withdraw-hero-btn" :class="pos.outcome" type="button" @click="handlePositionWithdraw(pos)">{{
-              $t('crypto.withdraw')
-              }}</button>
+            <button
+              class="withdraw-hero-btn"
+              :class="pos.outcome"
+              type="button"
+              :disabled="Number(pos?.raw?.shares) === 0"
+              @click="handlePositionWithdraw(pos)"
+            >
+              {{ $t("crypto.withdraw") }}
+            </button>
           </div>
         </div>
-        <div v-else class="orders-empty">{{ $t('common.noData') || '暂无数据...' }}</div>
+        <div v-else class="orders-empty">
+          {{ $t("common.noData") || "暂无数据..." }}
+        </div>
       </div>
 
       <!-- Orders -->
       <div v-else-if="activeTab === 'Orders'" class="orders-content">
         <div class="orders-header-row">
-          <div class="orders-title">{{ $t('crypto.openOrders') }}</div>
-          <button class="cancel-all-btn" type="button" v-if="openOrders.length" @click="handleCancelAllOrders">
-            {{ $t('crypto.cancelAll') }}
+          <div class="orders-title">{{ $t("crypto.openOrders") }}</div>
+          <button
+            class="cancel-all-btn"
+            type="button"
+            v-if="openOrders.length"
+            @click="handleCancelAllOrders"
+          >
+            {{ $t("crypto.cancelAll") }}
           </button>
         </div>
 
@@ -260,8 +434,12 @@
           <div v-for="order in openOrders" :key="order.id" class="order-row">
             <div class="order-left">
               <div class="order-side" :class="order.side">
-                {{ $t('common.buy') }}
-                <span class="side-text">{{ order.side === 'up' ? (detailData.yesOutcome || '') : (detailData.noOutcome || '') }}</span>
+                {{ $t("common.buy") }}
+                <span class="side-text">{{
+                  order.side === "up"
+                    ? detailData.yesOutcome || ""
+                    : detailData.noOutcome || ""
+                }}</span>
               </div>
               <div :class="['order-chip', order.side === 'up' ? 'up' : 'down']">
                 <span class="chip-price">{{ order.price }} ¢</span>
@@ -271,40 +449,59 @@
             </div>
             <div class="order-right">
               <div>
-                <div class="order-progress">{{ order.filled }}/{{ order.total }}</div>
-                <div class="order-until" v-if="order.untilCancel">{{ $t('crypto.untilCancel') }}</div>
+                <div class="order-progress">
+                  {{ order.filled }}/{{ order.total }}
+                </div>
+                <div class="order-until" v-if="order.untilCancel">
+                  {{ $t("crypto.untilCancel") }}
+                </div>
               </div>
-              <button class="order-cancel-btn" type="button" @click="handleCancelOrder(order.id)" aria-label="cancel">
+              <button
+                class="order-cancel-btn"
+                type="button"
+                @click="handleCancelOrder(order.id)"
+                aria-label="cancel"
+              >
                 ✕
               </button>
             </div>
           </div>
         </div>
-        <div v-else class="orders-empty">{{ $t('common.noData') || '暂无数据...' }}</div>
+        <div v-else class="orders-empty">
+          {{ $t("common.noData") || "暂无数据..." }}
+        </div>
       </div>
 
       <!-- History -->
       <div v-else-if="activeTab === 'History'" class="history-content">
-        <div class="history-header">{{ $t('crypto.history') }}</div>
+        <div class="history-header">{{ $t("crypto.history") }}</div>
         <div v-if="orderHistory.length" class="history-list">
           <div v-for="item in orderHistory" :key="item.id" class="history-row">
             <div class="history-main">
               <div class="history-text">
-                {{ $t('common.buy') }}
+                {{ $t("common.buy") }}
                 <span class="history-side" :class="item.side">
-                  {{ item.shares }} {{ item.side === 'up' ? (detailData.yesOutcome || '') : (detailData.noOutcome || '') }}
+                  {{ item.shares }}
+                  {{
+                    item.side === "up"
+                      ? detailData.yesOutcome || ""
+                      : detailData.noOutcome || ""
+                  }}
                 </span>
-                at {{ item.price }}¢ <span class="muted">(${{ item.notional }})</span>
+                at {{ item.price }}¢
+                <span class="muted">(${{ item.notional }})</span>
               </div>
             </div>
             <div class="history-time">{{ item.timeAgo }}</div>
           </div>
         </div>
-        <div v-else class="orders-empty">{{ $t('common.noData') || '暂无数据...' }}</div>
+        <div v-else class="orders-empty">
+          {{ $t("common.noData") || "暂无数据..." }}
+        </div>
       </div>
 
       <div class="orderbook-header" @click="isBookOpen = !isBookOpen">
-        <span>{{ $t('sports.orderBook') }}</span>
+        <span>{{ $t("sports.orderBook") }}</span>
         <div class="header-right">
           <span class="vol">{{ orderBookVolumeText }}</span>
           <el-icon :class="{ rotate: isBookOpen }">
@@ -315,20 +512,33 @@
 
       <div v-if="isBookOpen" class="book-body">
         <div class="orderbook-tabs">
-          <button class="orderbook-tab" :class="{ active: orderBookTab === 'yes' }" @click="orderBookTab = 'yes'">
-            {{ detailData.yesOutcome || '' }}
+          <button
+            class="orderbook-tab"
+            :class="{ active: orderBookTab === 'yes' }"
+            @click="orderBookTab = 'yes'"
+          >
+            {{ detailData.yesOutcome || "" }}
           </button>
-          <button class="orderbook-tab" :class="{ active: orderBookTab === 'no' }" @click="orderBookTab = 'no'">
-            {{ detailData.noOutcome || '' }}
+          <button
+            class="orderbook-tab"
+            :class="{ active: orderBookTab === 'no' }"
+            @click="orderBookTab = 'no'"
+          >
+            {{ detailData.noOutcome || "" }}
           </button>
         </div>
-        <OrderBookMobile :active-side="orderBookTab" :asks="currentOrderBook.asks" :bids="currentOrderBook.bids"
-          :last-trade-price="currentOrderBook.last_trade_price" :loading="orderBookLoading"
-          :use-mock-fallback="false" />
+        <OrderBookMobile
+          :active-side="orderBookTab"
+          :asks="currentOrderBook.asks"
+          :bids="currentOrderBook.bids"
+          :last-trade-price="currentOrderBook.last_trade_price"
+          :loading="orderBookLoading"
+          :use-mock-fallback="false"
+        />
       </div>
 
       <div v-if="detailData.rulesDescription" class="rules-footer">
-        <h4>{{ $t('detail.rules') }}</h4>
+        <h4>{{ $t("detail.rules") }}</h4>
         <p>{{ detailData.rulesDescription }}</p>
       </div>
     </div>
@@ -338,24 +548,44 @@
       <!-- 事件未结束时显示购买按钮 -->
       <template v-if="!isEventEnded">
         <button class="trade-btn up" type="button" @click="openPayment('up')">
-          {{ $t('common.buy') }} {{ detailData.yesOutcome || '' }} {{ upTradePriceText }}
+          {{ $t("common.buy") }} {{ detailData.yesOutcome || "" }}
+          {{ upTradePriceText }}
         </button>
-        <button class="trade-btn down" type="button" @click="openPayment('down')">
-          {{ $t('common.buy') }} {{ detailData.noOutcome || '' }} {{ downTradePriceText }}
+        <button
+          class="trade-btn down"
+          type="button"
+          @click="openPayment('down')"
+        >
+          {{ $t("common.buy") }} {{ detailData.noOutcome || "" }}
+          {{ downTradePriceText }}
         </button>
       </template>
       <!-- 事件已结束时显示提示 -->
       <div v-else class="event-ended-tip">
-        {{ $t('bitcoinUpDown.eventEnded') }}
+        {{ $t("bitcoinUpDown.eventEnded") }}
       </div>
     </div>
 
-    <PaymentModal v-model="showPayment" :event-title="detailData.title" :outcome-title="paymentOutcomeTitle"
-      :event-guid="currentEventGuid" :sub-event-guid="resolvedSubEventGuid" :initial-outcome="paymentInitialOutcome"
-      :initial-side="paymentInitialSide" :yes-outcome="detailData.yesOutcome" :no-outcome="detailData.noOutcome" @order-success="onOrderSuccess" />
+    <PaymentModal
+      v-model="showPayment"
+      :event-title="detailData.title"
+      :outcome-title="paymentOutcomeTitle"
+      :event-guid="currentEventGuid"
+      :sub-event-guid="resolvedSubEventGuid"
+      :initial-outcome="paymentInitialOutcome"
+      :initial-side="paymentInitialSide"
+      :yes-outcome="detailData.yesOutcome"
+      :no-outcome="detailData.noOutcome"
+      @order-success="onOrderSuccess"
+    />
 
-    <CashoutModal v-model="showCashoutModal" :position="cashoutPosition" :event-guid="currentEventGuid"
-      :sub-event-guid="resolvedSubEventGuid" @order-success="onOrderSuccess" />
+    <CashoutModal
+      v-model="showCashoutModal"
+      :position="cashoutPosition"
+      :event-guid="currentEventGuid"
+      :sub-event-guid="resolvedSubEventGuid"
+      @order-success="onOrderSuccess"
+    />
   </div>
 </template>
 
@@ -520,7 +750,11 @@ $primary-blue: #5073e5;
     line-height: 16px;
     font-weight: 600;
     color: #000;
-    background: linear-gradient(90deg, rgb(62, 195, 197) 0%, rgb(153, 89, 189) 100%);
+    background: linear-gradient(
+      90deg,
+      rgb(62, 195, 197) 0%,
+      rgb(153, 89, 189) 100%
+    );
     white-space: nowrap;
   }
 
@@ -539,7 +773,7 @@ $primary-blue: #5073e5;
     .unit {
       font-size: 20px;
       font-weight: 700;
-      color: #F6465D;
+      color: #f6465d;
       line-height: 1;
       transition: font-size 0.3s ease;
     }
@@ -583,7 +817,9 @@ $primary-blue: #5073e5;
 
 .fast-roll-enter-active,
 .fast-roll-leave-active {
-  transition: transform 0.25s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.2s linear;
+  transition:
+    transform 0.25s cubic-bezier(0.33, 1, 0.68, 1),
+    opacity 0.2s linear;
 }
 
 .fast-roll-enter-from {
@@ -714,7 +950,9 @@ $primary-blue: #5073e5;
 
 .cdt-enter-active,
 .cdt-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
 }
 
 .cdt-enter-from,
@@ -825,7 +1063,6 @@ $primary-blue: #5073e5;
         background: var(--bg-page);
         color: var(--bg-opposite);
       }
-
     }
   }
 }
@@ -867,7 +1104,7 @@ $primary-blue: #5073e5;
       color: var(--bg-opposite);
 
       &::after {
-        content: '';
+        content: "";
         position: absolute;
         bottom: -1px;
         left: 0;
@@ -968,7 +1205,7 @@ $primary-blue: #5073e5;
   }
 
   /* stacked progress block on right */
-  .order-right>div {
+  .order-right > div {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -1005,7 +1242,6 @@ $primary-blue: #5073e5;
   .history-side.down {
     color: $hot-pink;
   }
-
 }
 
 .orders-empty {
