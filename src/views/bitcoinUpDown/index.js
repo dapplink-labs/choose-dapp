@@ -1259,22 +1259,24 @@ export default {
             quantity: l?.quantity ?? l?.size ?? l?.shares ?? l?.qty,
           }))
         : [],
-      last_trade_price: String(book?.last_trade_price ?? book?.lastPrice ?? ""),
+      last_trade_price: String(book?.last_trade_price ?? ""),
     });
 
     // 将 MQTT 或 REST 推送的订单簿数据应用到响应式状态
     const applyOrderBookPayload = (payload, outcome = "") => {
       // if (!payload || typeof payload !== "object") return;
-      const yesKey = payload.filter((item) =>
-        ["yes", "YES", "Up"].includes(item.direction),
-      )[0]||[];
-      const noKey = payload.filter((item) =>
-        ["no", "NO", "Down"].includes(item.direction),
-      )[1]||[];
+      const yesKey =
+        payload.filter((item) =>
+          ["yes", "YES", "Up", "UP"].includes(item.direction),
+        )[0] || [];
+      const noKey =
+        payload.filter((item) =>
+          ["no", "NO", "Down", "DOWN"].includes(item.direction),
+        )[0] || [];
       if (yesKey || noKey) {
         if (yesKey) orderBookYes.value = normalizeOrderBookSide(yesKey);
         if (noKey) orderBookNo.value = normalizeOrderBookSide(noKey);
-        console.log("[OrderBook]", "applyOrderBookPayload 订单簿", payload);
+        // console.log("[OrderBook]", "applyOrderBookPayload 订单簿", payload);
         return;
       }
       if (!Array.isArray(payload.asks) && !Array.isArray(payload.bids)) return;
