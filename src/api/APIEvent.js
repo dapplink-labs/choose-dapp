@@ -153,6 +153,11 @@ export const getUserSubEventPositions = (data) => {
   return request.post('/api/v1/user/positions/subEvent', data)
 }
 
+// 获取用户持仓汇总
+export const getUserPositionsSummary = (data) => {
+  return request.post('/api/v1/user/positions/summary', data)
+}
+
 // 法币提现（出金）
 export const fiatWithdraw = (data) => {
   return request.post('/api/v1/user/fiat/withdraw', data)

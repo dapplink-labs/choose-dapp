@@ -352,7 +352,10 @@ export default {
     // 打开支付弹窗，根据方向设置初始 outcome
     const openPayment = (side) => {
       paymentOutcomeTitle.value = detailData.value.title || "";
-      paymentInitialOutcome.value = side === "up" ? detailData.value.yesOutcome || "" : detailData.value.noOutcome || "";
+      paymentInitialOutcome.value =
+        side === "up"
+          ? detailData.value.yesOutcome || ""
+          : detailData.value.noOutcome || "";
       paymentInitialSide.value = "buy";
       showPayment.value = true;
     };
@@ -1256,18 +1259,24 @@ export default {
             quantity: l?.quantity ?? l?.size ?? l?.shares ?? l?.qty,
           }))
         : [],
-      last_trade_price: String(book?.last_trade_price ?? book?.lastPrice ?? ""),
+      last_trade_price: String(book?.last_trade_price ?? ""),
     });
 
     // 将 MQTT 或 REST 推送的订单簿数据应用到响应式状态
     const applyOrderBookPayload = (payload, outcome = "") => {
-      if (!payload || typeof payload !== "object") return;
-      const yesKey = payload.yes || payload.YES;
-      const noKey = payload.no || payload.NO;
+      // if (!payload || typeof payload !== "object") return;
+      const yesKey =
+        payload.filter((item) =>
+          ["yes", "YES", "Up", "UP"].includes(item.direction),
+        )[0] || [];
+      const noKey =
+        payload.filter((item) =>
+          ["no", "NO", "Down", "DOWN"].includes(item.direction),
+        )[0] || [];
       if (yesKey || noKey) {
         if (yesKey) orderBookYes.value = normalizeOrderBookSide(yesKey);
         if (noKey) orderBookNo.value = normalizeOrderBookSide(noKey);
-        console.log("[OrderBook]", "applyOrderBookPayload 订单簿", payload);
+        // console.log("[OrderBook]", "applyOrderBookPayload 订单簿", payload);
         return;
       }
       if (!Array.isArray(payload.asks) && !Array.isArray(payload.bids)) return;
@@ -1295,7 +1304,8 @@ export default {
         });
         if (!isRespSuccess(res))
           throw new Error(res?.data?.message || "Fetch order book failed");
-        const data = res?.data?.data || {};
+        console.log(res);
+        const data = res?.data?.data?.order_book_data_list || {};
         applyOrderBookPayload(data);
         const volFromBook = firstFinite(
           data?.trade_volume,
@@ -1421,13 +1431,7 @@ export default {
           directions[1] ||
           {};
 
-        const targetPrice = firstFinite(
-          subEvent?.target_price,
-          subEvent?.reference_price,
-          subEvent?.strike_price,
-          eventItem?.target_price,
-          route.query.target_price,
-        );
+        const targetPrice = firstFinite(subEvent?.open_price);
         // 当前价格：以 getEventDetailItem 返回的 on_time_data 为准（若存在）
         const onTimeDataPrice = firstFinite(eventItem?.on_time_data);
         if (Number.isFinite(onTimeDataPrice)) {

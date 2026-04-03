@@ -124,7 +124,7 @@ import { useAccount } from '@wagmi/vue'
 import { useThemeStore } from '@/stores/theme'
 import { View, Hide, ArrowRight, Document, CaretBottom } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
-import { getUserBalances, getFundsHistory, getUserAssets, getExchangeRateCho } from '@/api/APIEvent'
+import { getUserBalances, getFundsHistory, getUserAssets, getExchangeRateCho, getUserPositionsSummary } from '@/api/APIEvent'
 import { getMyIncome } from "@/api/API"
 
 const router = useRouter()
@@ -210,7 +210,7 @@ const accountList = ref([
   { name: '资金', value: 0 },
   { name: '质押', value: 0 },
   { name: '预测', value: 0 },
-  { name: '预测金额', value: 0 }
+  // { name: '预测金额', value: 0 }
 ])
 
 // 格式化数字（添加千分位）
@@ -250,23 +250,25 @@ const fetchAssets = async () => {
 
   try {
     loadingAssets.value = true
-    const [res, assetsRes, incomeRes, priceRes] = await Promise.all([
+    const [res, assetsRes, incomeRes, priceRes, summaryRes] = await Promise.all([
       getUserBalances({ user_address: address.value }),
       getUserAssets({ user_address: address.value }),
       getMyIncome({ address: address.value }),
-      getExchangeRateCho()
+      getExchangeRateCho(),
+      getUserPositionsSummary({ user_address: address.value })
     ])
 
     const data = res?.data?.data || {}
     const assetsData = assetsRes?.data?.data || {}
+    const summaryData = summaryRes?.data?.data || {}
 
     const toNum = (v) => {
       const n = Number(v)
       return Number.isFinite(n) ? n : 0
     }
 
-    // 预测为 getUserBalances 接口返回的 portfolio 字段
-    const portfolio = 0
+    // 预测账户值取total_position_value字段
+    const portfolio = toNum(summaryData.total_position_value)
     // 资金为所有币种价值之和 (getUserAssets 接口的 total_value_usdt)
     const fundsValue = toNum(assetsData.total_value_usdt)
 
@@ -301,7 +303,7 @@ const fetchAssets = async () => {
       { name: t('assetManagement.funds') || '资金', value: fundsValue },
       { name: t('assetManagement.staking') || '质押', value: stakingValue },
       { name: t('assetManagement.prediction') || '预测', value: portfolio },
-      { name: t('assetManagement.predictionAmount') || '预测金额', value: funds.value }
+      // { name: t('assetManagement.predictionAmount') || '预测金额', value: funds.value }
     ]
 
     // 顶部总资产为资金、质押、预测之和
@@ -336,7 +338,7 @@ const fetchAssets = async () => {
       { name: t('assetManagement.funds') || '资金', value: 0 },
       { name: t('assetManagement.staking') || '质押', value: 0 },
       { name: t('assetManagement.prediction') || '预测', value: 0 },
-      { name: t('assetManagement.predictionAmount') || '预测金额', value: 0 }
+      // { name: t('assetManagement.predictionAmount') || '预测金额', value: 0 }
     ]
   } finally {
     loadingAssets.value = false

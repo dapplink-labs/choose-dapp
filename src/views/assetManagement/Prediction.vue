@@ -39,7 +39,9 @@
         </div>
       </div>
       <div class="profit-value">
-        <span class="value-number positive">+ {{ formatCurrency(profitAmount) }}</span>
+        <span :class="['value-number', profitAmount >= 0 ? 'positive' : 'negative']">
+          {{ profitAmount > 0 ? '+' : (profitAmount < 0 ? '-' : '') }} {{ formatCurrency(Math.abs(profitAmount)) }}
+        </span>
       </div>
       <div class="history-label">历史累计</div>
     </div>
@@ -77,7 +79,7 @@ import * as echarts from 'echarts'
 import { useAccount } from '@wagmi/vue'
 import PositionList from './PositionList.vue'
 import ClaimSuccess from './ClaimSuccess.vue'
-import { claimOrder, getUserPnl, getUserStat } from '@/api/APIEvent'
+import { claimOrder, getUserPnl, getUserStat, getUserPositionsSummary } from '@/api/APIEvent'
 import { ElMessage } from 'element-plus'
 
 const { t } = useI18n()
@@ -116,9 +118,9 @@ const chartColors = computed(() => {
 const showAssets = ref(true)
 
 // 数据
-const predictionTotal = ref(1263.23)
-const todayProfit = ref(800.00)
-const todayProfitRate = ref(200)
+const predictionTotal = ref(0)
+const todayProfit = ref(0)
+const todayProfitRate = ref(0)
 
 // 时间周期选择
 const timePeriods = computed(() => [
@@ -130,7 +132,7 @@ const timePeriods = computed(() => [
 const selectedPeriod = ref('all')
 
 // 收益金额
-const profitAmount = ref(220.00)
+const profitAmount = ref(0)
 const pnlPoints = ref([])
 const statLoading = ref(false)
 const statSummary = ref({})
@@ -246,7 +248,26 @@ const fetchUserStat = async () => {
   }
 }
 
+const fetchSummaryData = async () => {
+  const addr = address?.value || ''
+  if (!addr) return
+
+  try {
+    const res = await getUserPositionsSummary({
+      user_address: addr
+    })
+    const code = res?.data?.code
+    if (code === 0 || code === 200 || code === 2000) {
+      const summary = res.data.data || {}
+      predictionTotal.value = toNumber(summary.total_position_value)
+    }
+  } catch (e) {
+    console.error('fetch summary failed', e)
+  }
+}
+
 const refreshPredictionData = async () => {
+  await fetchSummaryData()
   await fetchUserStat()
   await fetchPnlAndRender()
 }
@@ -259,18 +280,18 @@ const updateChart = () => {
   const labels = points.map(p => formatXAxisLabel(p?.timestamp))
   // 模拟数据 - 面积图数据
   const data = [
-    { value: 0 },
-    { value: 0 },
-    { value: 0 },
-    { value: 50 },
-    { value: 50 },
-    { value: 120 },
-    { value: 120 },
-    { value: 120 },
-    { value: 110 },
-    { value: 120 },
-    { value: 120 },
-    { value: 120 }
+    // { value: 0 },
+    // { value: 0 },
+    // { value: 0 },
+    // { value: 50 },
+    // { value: 50 },
+    // { value: 120 },
+    // { value: 120 },
+    // { value: 120 },
+    // { value: 110 },
+    // { value: 120 },
+    // { value: 120 },
+    // { value: 120 }
   ]
 
   const colors = chartColors.value
@@ -586,8 +607,15 @@ watch(() => address?.value, () => {
     .value-number {
       font-size: 24px;
       font-weight: 700;
-      color: #2FBC87;
       line-height: 1.2;
+      
+      &.positive {
+        color: #2FBC87;
+      }
+      
+      &.negative {
+        color: #E22828;
+      }
     }
   }
 

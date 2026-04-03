@@ -1050,6 +1050,7 @@ export default {
     buyYes: "Buy Yes",
     missingIds: "缺少事件或子事件ID",
     insufficientBalance: "余额不足",
+    insufficientShares: "持仓不足",
     receive: "收到",
     sellingShares: "卖出 {shares} 股 {'@'} {avgPrice}",
     editOrder: "编辑订单",
