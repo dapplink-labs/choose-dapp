@@ -200,7 +200,7 @@ const enableExpiry = ref(false)
 const expiryPreset = ref('5m') // '5m' | '1h' | '12h' | '24h' | 'eod' | 'custom'
 const customExpiryMinutes = ref(5)
 
-const orderBookData = ref(null)
+const orderBookData = ref<OrderBookData | null>(null)
 
 const expiryOptions = computed(() => ([
     { key: '5m', label: t('payment.expiry5m') || '5m' },
@@ -216,8 +216,25 @@ const userBalance = ref('0.00')
 const balanceLoading = ref(false)
 const submitting = ref(false)
 
+type UserPosition = {
+    outcome: string
+    shares: string | number
+}
+
+type OrderBookPriceLevel = {
+    price: string | number
+    [key: string]: unknown
+}
+
+type OrderBookSide = {
+    bids?: OrderBookPriceLevel[]
+    asks?: OrderBookPriceLevel[]
+}
+
+type OrderBookData = Record<string, OrderBookSide>
+
 // 用户当前事件的持仓
-const userPositions = ref([])
+const userPositions = ref<UserPosition[]>([])
 
 // ===================== 计算属性 =====================
 const isMarketBuy = computed(() => activeSide.value === 'buy' && orderType.value === 'market')
