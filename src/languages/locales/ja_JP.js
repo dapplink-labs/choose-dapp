@@ -352,6 +352,7 @@ export default {
     "sortAll": "すべて",
     "sortOpenTime": "開始時間",
     "sortTradeVolume": "取引量",
+    "tradeNotOpen": "取引はまだ開始されていません",
     "allFrequency": "すべての頻度",
     "daily": "毎日",
     "weekly": "毎週",

@@ -156,6 +156,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { ElMessage } from 'element-plus'
 import tyIcon01 from '@/assets/icon/tyIcon01.png'
 import tyIcon02 from '@/assets/icon/tyIcon02.png'
 import logoIcon from '@/assets/icon/logoIcon.png'
@@ -217,6 +218,40 @@ const fetchEventDetail = async () => {
     if (!eventGuid) return
 
     loadingDetail.value = true
+
+    const applyMockEventDetail = () => {
+        // 用于接口尚未就绪/返回空时的兜底展示
+        const now = new Date()
+        const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en-US'
+        const dateLabel = new Intl.DateTimeFormat(currentLocale, { month: 'short', day: 'numeric' }).format(now)
+        const timeLabel = new Intl.DateTimeFormat(currentLocale, { hour: '2-digit', minute: '2-digit' }).format(now)
+
+        matchData.value = {
+            title: 'LeBron James total points vs Knicks',
+            date: dateLabel,
+            time: timeLabel,
+            volume: '$1,280',
+            status: 'mock',
+            eventPeriod: '',
+            isLive: false,
+            team1: {
+                name: 'Knicks',
+                record: '',
+                logo: tyIcon01,
+                bidPrice: '62 ¢',
+                askPrice: '62 ¢',
+            },
+            team2: {
+                name: 'Lakers',
+                record: '',
+                logo: tyIcon02,
+                bidPrice: '38 ¢',
+                askPrice: '38 ¢',
+            },
+            stats: { team1Percent: 62, team2Percent: 38 },
+        }
+    }
+
     try {
         const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
         const language = currentLocale.split('-')[0]
@@ -228,7 +263,10 @@ const fetchEventDetail = async () => {
 
         const payload = res?.data?.data || {}
         const ev = Array.isArray(payload.events) ? payload.events[0] : null
-        if (!ev) return
+        if (!ev) {
+            applyMockEventDetail()
+            return
+        }
 
         // 基本信息
         const title = ev.title || ''
@@ -283,6 +321,7 @@ const fetchEventDetail = async () => {
         }
     } catch (err) {
         console.error('Fetch sports event detail failed', err)
+        applyMockEventDetail()
     } finally {
         loadingDetail.value = false
     }
@@ -373,8 +412,8 @@ const toggleTotalOrderBook = () => {
 }
 
 const handleBet = (side) => {
-    selectedBetSide.value = side
-    showPayment.value = true
+    // 体育事件下注/购买功能当前尚未开放
+    ElMessage.warning('暂未开启')
 }
 
 onMounted(() => {

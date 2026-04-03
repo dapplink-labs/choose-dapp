@@ -352,6 +352,7 @@ export default {
     sortAll: "All",
     sortOpenTime: "Open time",
     sortTradeVolume: "Trade volume",
+    tradeNotOpen: "Trading not available yet",
     allFrequency: "All Frequencies",
     daily: "Daily",
     weekly: "Weekly",

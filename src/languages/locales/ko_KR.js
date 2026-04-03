@@ -359,6 +359,7 @@ export default {
     sortAll: "전체",
     sortOpenTime: "오픈 시간",
     sortTradeVolume: "거래량",
+    tradeNotOpen: "아직 거래가 열리지 않았습니다",
     allFrequency: "전체 빈도",
     daily: "매일",
     weekly: "매주",

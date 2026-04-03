@@ -161,6 +161,7 @@ import { Wallet } from '@element-plus/icons-vue'
 import { useAccount } from '@wagmi/vue'
 import { getUserBalances, makeOrder, getOrderBook } from '@/api/APIEvent'
 import { ElMessage } from 'element-plus'
+import { isTradeBlockedForEvent } from '@/utils/blockedTradeEventGuids'
 
 
 const { address } = useAccount()
@@ -433,6 +434,12 @@ async function handleConfirm() {
 
     if (!props.eventGuid || !props.subEventGuid) {
         ElMessage.error(t('payment.missingIds') || 'Missing event or sub-event id')
+        return
+    }
+
+    // 兜底拦截：部分事件尚未开放交易（包含 event_guid / sub_event_guid 命中配置）
+    if (isTradeBlockedForEvent(props.eventGuid) || isTradeBlockedForEvent(props.subEventGuid)) {
+        ElMessage.warning(t('home.tradeNotOpen') || '暂未开启')
         return
     }
 

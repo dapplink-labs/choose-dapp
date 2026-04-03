@@ -237,6 +237,7 @@ import router from "@/router";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { ElMessage } from "element-plus";
+import { isTradeBlockedForEvent } from "@/utils/blockedTradeEventGuids";
 import { useAccount } from "@wagmi/vue";
 import { getCategoryList, getEventList, getFavoriteList, toggleFavoriteEvent } from "@/api/APIEvent";
 
@@ -304,6 +305,10 @@ const navigateToEarnings = () => {
 
 // 跳转到详情页面
 const navigateToDetail = (item, choice) => {
+    if (isTradeBlockedForEvent(item?.id)) {
+        ElMessage.warning(t("home.tradeNotOpen") || "暂未开启");
+        return;
+    }
     // 如果当前通过导航条处于“加密货币”场景，则进入加密货币详情页
     if (route.query.nav === 'crypto' || route.query.nav === 'crypto-chinese') {
         router.push({

@@ -60,6 +60,8 @@ import breakingBanner from '@/assets/images/sudden.png'
 import { getCategoryList, getEventList } from "@/api/APIEvent"
 import { useAccount } from "@wagmi/vue"
 import { useI18n } from "vue-i18n"
+import { ElMessage } from "element-plus"
+import { isTradeBlockedForEvent } from "@/utils/blockedTradeEventGuids"
 
 const router = useRouter()
 const { address } = useAccount()
@@ -176,6 +178,12 @@ const fetchEventList = async () => {
 // 事件点击处理
 const handleEventClick = (item) => {
   const fallbackSubEventGuid = item?.options?.[0]?.subEventGuid || '';
+
+  // 部分列表可能你配置的 GUID 实际落在 sub_event_guid 上
+  if (isTradeBlockedForEvent(item?.id) || isTradeBlockedForEvent(fallbackSubEventGuid)) {
+    ElMessage.warning(t('home.tradeNotOpen') || '暂未开启')
+    return
+  }
 
   // 优先按事件 code 分流，兜底再用 category code
   const eventCode = String(item.code || '').toUpperCase();

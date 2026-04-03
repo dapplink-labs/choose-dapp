@@ -124,7 +124,7 @@ onMounted(async () => {
 <style scoped lang="scss">
 .navbar2 {
   width: 100%;
-  background-color: #000; // 背景调深，更显发光效果
+  background-color: var(--bg-page-h5); // 背景调深，更显发光效果
   height: 48px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
@@ -173,11 +173,11 @@ onMounted(async () => {
 
       &:hover .nav-text,
       &.active .nav-text {
-        color: #fff;
+        color: var(--bg-opposite);
       }
 
       &.active .nav-icon {
-        color: #fff;
+        color: var(--bg-opposite);
       }
 
       // --- 核心优化：新用户包赔样式 ---
@@ -218,7 +218,6 @@ onMounted(async () => {
 @media (max-width: 768px) {
   .navbar2 {
     height: 44px;
-    background-color: #000;
 
     .navbar-container {
       padding: 0;

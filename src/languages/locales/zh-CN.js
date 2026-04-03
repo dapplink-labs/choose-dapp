@@ -347,6 +347,7 @@ export default {
     sortAll: "全部",
     sortOpenTime: "开盘时间",
     sortTradeVolume: "交易量",
+    tradeNotOpen: "暂未开启",
     allFrequency: "全部频率",
     daily: "每日",
     weekly: "每周",

@@ -121,6 +121,8 @@ import si4 from '@/assets/images/searchIcon04.png'
 import { getEventList } from '@/api/APIEvent'
 import fallbackListImg from '@/assets/images/searchIcon01.png'
 import { useAccount } from '@wagmi/vue'
+import { ElMessage } from 'element-plus'
+import { isTradeBlockedForEvent } from '@/utils/blockedTradeEventGuids'
 
 const router = useRouter()
 const { t, locale } = useI18n()
@@ -241,6 +243,10 @@ const handleThemeClick = async (theme) => {
 }
 
 const navigateToDetail = (item) => {
+    if (isTradeBlockedForEvent(item?.guid)) {
+        ElMessage.warning(t('home.tradeNotOpen') || '暂未开启')
+        return
+    }
     router.push({
         path: '/prediction-detail-h5',
         query: { guid: item.guid }

@@ -392,6 +392,7 @@ import { getNoticeData } from "@/api/API";
 import { getHomeBanner, getEcosystemList, getCategoryList, getEventList, getFavoriteList, toggleFavoriteEvent, getPeriodList } from "@/api/APIEvent";
 import { useAccount } from "@wagmi/vue";
 import { ElMessage } from 'element-plus';
+import { isTradeBlockedForEvent } from '@/utils/blockedTradeEventGuids';
 
 // 获取用户地址
 const { address } = useAccount();
@@ -759,6 +760,12 @@ let loadMoreObserver = null;
 const navigateToDetail = (item, choice, subEventGuid) => {
     const fallbackSubEventGuid = item?.options?.[0]?.subEventGuid || '';
     const finalSubEventGuid = subEventGuid || fallbackSubEventGuid;
+
+    // 部分列表可能你配置的 GUID 实际落在 sub_event_guid 上
+    if (isTradeBlockedForEvent(item?.id) || isTradeBlockedForEvent(finalSubEventGuid)) {
+        ElMessage.warning(t('home.tradeNotOpen') || '暂未开启');
+        return;
+    }
     // 优先按事件 code 分流，兜底再用 category code
     const eventCode = String(item.code || '').toUpperCase();
     const categoryCode = String(
