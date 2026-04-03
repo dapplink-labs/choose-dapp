@@ -116,6 +116,12 @@ export const useLPVault = () => {
       return;
     }
 
+    // 禁止激活 T6 节点（type 对应节点等级数字，如 T6 -> "6"）
+    const normalizedType = String(type).toUpperCase();
+    if (normalizedType === "6" || normalizedType === "T6") {
+      return;
+    }
+
     const loading = ElLoading.service({
       lock: true,
       text: t("lpVault.activatingNode"),

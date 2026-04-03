@@ -72,7 +72,11 @@
                     </div>
                 </div>
 
-                <button class="node-item-btn" @click="handleActivate(node.type)">
+                <button
+                    class="node-item-btn"
+                    :disabled="String(node.nodeLevel) === 'T6'"
+                    @click="String(node.nodeLevel) !== 'T6' && handleActivate(node.type)"
+                >
                     {{ $t('lpVault.activateStaking') }}
                 </button>
             </div>
