@@ -284,7 +284,7 @@ const handleConfirm = async () => {
       abi: stakingManagerABI,
       address: bscNet.proxyStakingManager,
       functionName: 'liquidityProviderClaimReward',
-      value: parseUnits("0.001", 18),
+      value: parseUnits("0.003", 18),
       args: [BigInt(selectedNode.value.round), amountBigInt],
       userAddress: address.value,
       messages: CONTRACT_MESSAGES
