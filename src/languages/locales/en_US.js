@@ -1061,6 +1061,7 @@ export default {
     buyYes: "Buy Yes",
     missingIds: "Missing event or sub-event id",
     insufficientBalance: "Insufficient balance",
+    insufficientShares: "Insufficient shares",
     receive: "Receive",
     sellingShares: "Selling {shares} shares {'@'} {avgPrice}",
     editOrder: "Edit order",

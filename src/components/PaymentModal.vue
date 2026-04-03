@@ -154,13 +154,14 @@
     </transition>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Wallet } from '@element-plus/icons-vue'
 import { useAccount } from '@wagmi/vue'
-import { getUserBalances, makeOrder, getOrderBook } from '@/api/APIEvent'
+import { getUserBalances, makeOrder, getOrderBook, getUserPositions } from '@/api/APIEvent'
 import { ElMessage } from 'element-plus'
+import { AxiosResponse } from 'axios'
 
 
 const { address } = useAccount()
@@ -213,6 +214,9 @@ const expiryOptions = computed(() => ([
 const userBalance = ref('0.00')
 const balanceLoading = ref(false)
 const submitting = ref(false)
+
+// 用户当前事件的持仓
+const userPositions = ref([])
 
 // ===================== 计算属性 =====================
 const isMarketBuy = computed(() => activeSide.value === 'buy' && orderType.value === 'market')
@@ -282,19 +286,19 @@ function toggleOutcome() {
     outcomeBadge.value = outcomeBadge.value === props.yesOutcome ? props.noOutcome || '' : props.yesOutcome || ''
 }
 
-function switchSide(side) {
+function switchSide(side: string) {
     if (activeSide.value === side) return
     activeSide.value = side
     inputValue.value = ''
 }
 
-function switchOrderType(type) {
+function switchOrderType(type: string) {
     if (orderType.value === type) return
     orderType.value = type
     inputValue.value = ''
 }
 
-function stepPrice(delta) {
+function stepPrice(delta: number) {
     price.value = Math.min(99, Math.max(1, (Number(price.value) || 1) + delta))
 }
 
@@ -305,7 +309,7 @@ function clampPrice() {
     else price.value = Math.floor(v)
 }
 
-function adjustInput(val) {
+function adjustInput(val: number) {
     const current = Number(inputValue.value) || 0
     inputValue.value = String(Math.max(0, current + val))
 }
@@ -350,12 +354,34 @@ async function fetchOrderBookData() {
     }
 }
 
-const isRespSuccess = (res) => {
+async function fetchUserPositions() {
+    if (!props.subEventGuid) return
+    try {
+        const currentLocale = localStorage.getItem("app-locale") || navigator.language || "en"
+        const languageLabel = currentLocale.split("-")[0]
+        const res = await getUserPositions({
+            user_address: address.value || "",
+            status: "holding",
+            page: 1,
+            page_size: 2000,
+            language_label: languageLabel,
+            sub_event_guid: props.subEventGuid,
+        })
+        if (isRespSuccess(res)) {
+            const list = Array.isArray(res?.data?.data?.list) ? res.data.data.list : []
+            userPositions.value = list
+        }
+    } catch (err) {
+        console.error('Fetch positions failed in modal', err)
+    }
+}
+
+const isRespSuccess = (res: { data: { code: any } }) => {
     const code = res?.data?.code
     return code === 200 || code === 2000
 }
 
-const isOrderSuccess = (res) => {
+const isOrderSuccess = (res: AxiosResponse<any, any, {}>) => {
     const code = res?.data?.code
     const msg = String(res?.data?.message || '').toLowerCase()
     // 后端目前有多种成功码：0 / 200 / 2000，且 message="order created successfully"
@@ -417,7 +443,7 @@ function buildExpireAt() {
         target = new Date(now.getTime() + minutes * 60 * 1000)
     }
 
-    const pad = (n) => String(n).padStart(2, '0')
+    const pad = (n: number) => String(n).padStart(2, '0')
     const y = target.getFullYear()
     const m = pad(target.getMonth() + 1)
     const d = pad(target.getDate())
@@ -454,9 +480,21 @@ async function handleConfirm() {
         }
     }
 
+    // 校验持仓 (Check positions for sell orders)
+    if (activeSide.value === 'sell') {
+        const sellShares = Number(inputValue.value) || 0
+        const position = userPositions.value.find(p => String(p.outcome).toUpperCase() === String(outcomeBadge.value).toUpperCase())
+        const holdingShares = position ? Number(position.shares) : 0
+        
+        if (sellShares > holdingShares) {
+            ElMessage.error(t('payment.insufficientShares') || 'Insufficient shares')
+            return
+        }
+    }
+
     submitting.value = true
     try {
-        const orderParams = {
+        const orderParams:any = {
             event_guid: props.eventGuid,
             sub_event_guid: props.subEventGuid,
             outcome: outcomeBadge.value,
@@ -520,8 +558,10 @@ watch(() => props.modelValue, (val) => {
         inputValue.value = ''
         fetchBalance()
         fetchOrderBookData()
+        fetchUserPositions()
     } else {
         orderBookData.value = null
+        userPositions.value = []
     }
 })
 </script>

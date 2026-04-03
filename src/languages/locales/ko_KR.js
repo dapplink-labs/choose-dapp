@@ -1072,6 +1072,13 @@ export default {
     orderSuccess: "주문 성공",
     orderFailed: "주문 실패",
     insufficientBalance: "잔액 부족",
+    insufficientShares: "주식 수 부족",
+    receive: "받기", 
+    sellingShares: "{shares} 주 판매 {'@'} {avgPrice}",
+    editOrder: "주문 편집",
+    cancel: "취소",
+    cashing: "현금화 중...",
+    cashout: "현금화",
   },
   datePicker: {
     title: "날짜 범위로 필터",
