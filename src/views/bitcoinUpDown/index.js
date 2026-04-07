@@ -1264,21 +1264,31 @@ export default {
 
     // 将 MQTT 或 REST 推送的订单簿数据应用到响应式状态
     const applyOrderBookPayload = (payload, outcome = "") => {
-      // if (!payload || typeof payload !== "object") return;
-      const yesKey =
-        payload.filter((item) =>
-          ["yes", "YES", "Up", "UP"].includes(item.direction),
-        )[0] || [];
-      const noKey =
-        payload.filter((item) =>
-          ["no", "NO", "Down", "DOWN"].includes(item.direction),
-        )[0] || [];
-      if (yesKey || noKey) {
-        if (yesKey) orderBookYes.value = normalizeOrderBookSide(yesKey);
-        if (noKey) orderBookNo.value = normalizeOrderBookSide(noKey);
-        // console.log("[OrderBook]", "applyOrderBookPayload 订单簿", payload);
+      if (!payload || typeof payload !== "object") return;
+
+      // MQTT orderbook：{ type: "orderbook", YES: {...}, NO: {...} }；REST 常见：{ yes, no }
+      const yesBook = payload.YES ?? payload.yes;
+      const noBook = payload.NO ?? payload.no;
+      if (yesBook || noBook) {
+        if (yesBook) orderBookYes.value = normalizeOrderBookSide(yesBook);
+        if (noBook) orderBookNo.value = normalizeOrderBookSide(noBook);
         return;
       }
+
+      // 数组形态：每项带 direction（兼容旧接口）
+      if (Array.isArray(payload)) {
+        const yesKey = payload.find((item) =>
+          ["yes", "YES", "Up", "UP"].includes(item?.direction),
+        );
+        const noKey = payload.find((item) =>
+          ["no", "NO", "Down", "DOWN"].includes(item?.direction),
+        );
+        if (yesKey) orderBookYes.value = normalizeOrderBookSide(yesKey);
+        if (noKey) orderBookNo.value = normalizeOrderBookSide(noKey);
+        if (yesKey || noKey) return;
+      }
+
+      // 单侧快照：根级 asks / bids
       if (!Array.isArray(payload.asks) && !Array.isArray(payload.bids)) return;
       const side = outcome === "no" ? "no" : "yes";
       if (side === "yes") {
@@ -1625,13 +1635,6 @@ export default {
           data?.volume,
         );
         if (Number.isFinite(vol) && vol > 0) detailData.value.tradeVolume = vol;
-        console.log("[OrderBook][Amount]", "orderbook", {
-          yesAskPrice: detailData.value.yesAskPrice,
-          noAskPrice: detailData.value.noAskPrice,
-          tradeVolume: detailData.value.tradeVolume,
-          yesCount: (data?.YES || data?.yes)?.asks?.length,
-          noCount: (data?.NO || data?.no)?.asks?.length,
-        });
         return;
       }
       // ── trade：成交推送，更新订单簿最新成交价，并将成交价推入走势图表 ──

@@ -544,12 +544,12 @@ const detailData = ref({
   rules: "",
 });
 
-const PALETTE = [
+const PALETTE = computed(() => [
   isDarkMode.value ? "#2EBE69" : "#BBFF2E",
   "#E44096",
   "#3B82F6",
   "#F59E0B",
-];
+]);
 
 // 预测列表数据（完全依赖接口返回的 sub_events，不再使用本地假数据）
 const outcomes = ref([]);
@@ -634,7 +634,9 @@ const loadingDetail = ref(false);
 const formatVolume = (v) => {
   const num = Number(v);
   if (!Number.isFinite(num)) return "$0 Vol.";
-  return `$${num.toLocaleString()} Vol.`;
+  if (num >= 1_000_000) return `$${(num / 1_000_000).toFixed(1)}M Vol.`;
+  if (num >= 1_000) return `$${(num / 1_000).toFixed(1)}K Vol.`;
+  return `$${num.toFixed(2)} Vol.`;
 };
 
 const mapSubEventsToOutcomes = (subEvents = []) => {
@@ -646,13 +648,8 @@ const mapSubEventsToOutcomes = (subEvents = []) => {
     const noDir =
       directions.find((d) => ['NO','DOWN'].includes((d.outcome || "").toUpperCase())) || {};
 
-    // 子事件列表概率字段：后端为 sub_events.directions.chance
-    // 兼容旧结构：若 sub.directions 仍是数组，则回退到 yesDir.chance
-    const chanceFromSubDirections = !Array.isArray(sub?.directions)
-      ? sub?.directions?.chance
-      : undefined;
-    const chanceRaw = Number(chanceFromSubDirections ?? yesDir.chance ?? 0);
     // chance 字段可能是 0-1 概率，也可能是 0-100，统一转为 0-100 显示
+    const chanceRaw = Number(yesDir.chance ?? 0);
     const chancePercent = Number.isFinite(chanceRaw)
       ? chanceRaw <= 1
         ? chanceRaw * 100
@@ -669,7 +666,7 @@ const mapSubEventsToOutcomes = (subEvents = []) => {
       chance: Number(chancePercent.toFixed(1)),
       yesPrice: String(yesPrice),
       noPrice: String(noPrice),
-      color: PALETTE[idx % PALETTE.length],
+      color: PALETTE.value[idx % PALETTE.value.length],
       selected: null,
       sub_event_guid: sub.sub_event_guid || "",
       subEventGuid: sub.sub_event_guid || "",
@@ -681,7 +678,7 @@ const mapSubEventsToOutcomes = (subEvents = []) => {
 };
 
 const fetchDetail = async () => {
-  const eventGuid = route.query.id || route.query.event_guid;
+  const eventGuid = currentEventGuid.value;
   if (!eventGuid) return;
 
   loadingDetail.value = true;
@@ -698,6 +695,12 @@ const fetchDetail = async () => {
     const data = res?.data?.data || {};
     const ev = Array.isArray(data.events) ? data.events[0] : null;
     if (!ev) return;
+
+    // 检查事件是否已结束
+    const ENDED_STATUSES = ['settled', 'ended', 'closed', 'resolved', 'expired', 'finished', 'completed'];
+    if (ENDED_STATUSES.includes(String(ev.status || '').toLowerCase()) || ev.is_settled) {
+      isEventEnded.value = true;
+    }
 
     // 头部基本信息
     detailData.value = {
@@ -735,7 +738,7 @@ const fetchDetail = async () => {
 
 const fetchOutcomesPositions = async () => {
   if (!address.value || !outcomes.value.length) return;
-  const eventGuid = route.query.id || route.query.event_guid;
+  const eventGuid = currentEventGuid.value;
 
   for (let i = 0; i < outcomes.value.length; i++) {
     const outcome = outcomes.value[i];
@@ -770,14 +773,14 @@ const mapActivityItem = (item) => {
     name: item.user_name || "",
     outcome: item.outcome || "",
     amount: formattedCost,
-    time: item.timestamp || "",
+    time: formatTimeAgo(item.timestamp || ""),
     avatar: item.avatar || fallbackAvatar,
     result: (item.outcome || "").toLowerCase() === "yes" ? "yes" : "no",
   };
 };
 
 const fetchActivity = async (append = false) => {
-  const eventGuid = route.query.id || route.query.event_guid;
+  const eventGuid = currentEventGuid.value;
   if (!eventGuid) return;
   if (append && (loadingActivity.value || !hasMoreActivity.value)) return;
 
@@ -845,7 +848,7 @@ const mapCommentItem = (c) => ({
 });
 
 const fetchComments = async (append = false) => {
-  const eventGuid = route.query.id || route.query.event_guid;
+  const eventGuid = currentEventGuid.value;
   if (!eventGuid) return;
   if (append && (loadingComments.value || !hasMoreComments.value)) return;
 
@@ -900,7 +903,7 @@ const mapHolderItem = (item) => ({
 });
 
 const fetchTopHolders = async () => {
-  const eventGuid = route.query.id || route.query.event_guid;
+  const eventGuid = currentEventGuid.value;
   if (!eventGuid) return;
   try {
     const res = await getEventTopHolders({
@@ -1061,7 +1064,7 @@ const buildChartSourceFromPriceHistory = (priceHistoryData) => {
 
     return {
       name: p?.title || "",
-      color: PALETTE[colorIdx % PALETTE.length],
+      color: PALETTE.value[colorIdx % PALETTE.value.length],
       data,
     };
   });
@@ -1106,7 +1109,7 @@ const updateOverlay = (idx) => {
 };
 
 const fetchPriceHistory = async () => {
-  const eventGuid = route.query.id || route.query.event_guid;
+  const eventGuid = currentEventGuid.value;
   if (!eventGuid) return null;
 
   loadingPriceHistory.value = true;
@@ -1305,7 +1308,7 @@ const startMqttStream = async () => {
   if (isEventEnded.value) return;
   if (iotMqtt) return;
 
-  const eventGuid = route.query.id || route.query.event_guid;
+  const eventGuid = currentEventGuid.value;
   if (!eventGuid) return;
 
   // 为每个子事件订阅 price topic
@@ -1378,7 +1381,6 @@ const handleTimeRangeChange = async (v) => {
 const selectOutcome = (i, type) => {
   const outcome = outcomes.value[i];
   if (!outcome) return;
-  console.log(outcome)
   // 优先使用已经解析好的 subEventGuid
   let subGuid = outcome.subEventGuid || outcome.sub_event_guid || "";
 
@@ -1428,7 +1430,6 @@ const selectOutcome = (i, type) => {
     paymentInitYesOutcome.value = outcome.yesOutcome;
     paymentInitNoOutcome.value = outcome.noOutcome;
     showPayment.value = true;
-    console.log(paymentOutcomeTitle.value, paymentInitialOutcome.value)
   });
 };
 
@@ -1436,6 +1437,7 @@ const onOrderSuccess = (orderData) => {
   // 刷新相关数据
   fetchDetail();
   fetchActivity();
+  fetchTopHolders();
 };
 
 // --- 收藏/取消收藏 ---
@@ -1445,7 +1447,7 @@ const handleBookmark = async () => {
     return;
   }
 
-  const eventGuid = route.query.id || route.query.event_guid;
+  const eventGuid = currentEventGuid.value;
   if (!eventGuid) return;
 
   try {
@@ -1463,6 +1465,8 @@ const handleBookmark = async () => {
           ? t("favoriteSuccess") || "Favorite success"
           : t("unfavoriteSuccess") || "Unfavorite success",
       );
+    } else {
+      ElMessage.error(payload?.msg || t("operateFailed") || "Operation failed");
     }
   } catch (err) {
     console.error("Toggle favorite failed", err);
@@ -1474,7 +1478,7 @@ const openPredictionDetail = (outcome) => {
   router.push({
     name: "predictionDetailH5",
     query: {
-      id: route.query.id || route.query.event_guid || "",
+      id: currentEventGuid.value,
       sub_event_guid: outcome.sub_event_guid || "",
     },
   });
