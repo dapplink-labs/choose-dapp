@@ -413,9 +413,10 @@ export default {
 
     // 将服务端挂单数据映射为页面展示格式
     const mapOpenOrder = (item) => ({
-      id: item?.guid || item?.order_guid || "",
-      orderGuid: item?.guid || item?.order_guid || "",
-      side: outcomeToTrend(item?.outcome),
+      id: item?.guid  || "",
+      orderGuid: item?.order_guid || "",
+      side:item.side,
+      outcome:item.outcome,
       price: formatCentValue(item?.price),
       cost: Number(firstFinite(item?.cost, item?.dealed_cost) || 0).toFixed(2),
       filled: Number(firstFinite(item?.dealed_size) || 0).toFixed(0),
@@ -426,7 +427,8 @@ export default {
     // 将服务端历史订单数据映射为页面展示格式
     const mapOrderHistoryItem = (item) => ({
       id: item?.order_guid || item?.guid || "",
-      side: outcomeToTrend(item?.outcome),
+      side: item?.side,
+      outcome:item?.outcome,
       shares: Number(firstFinite(item?.dealed_size, item?.size) || 0).toFixed(
         0,
       ),

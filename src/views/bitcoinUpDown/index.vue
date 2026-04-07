@@ -433,15 +433,13 @@
         <div v-if="openOrders.length" class="orders-list">
           <div v-for="order in openOrders" :key="order.id" class="order-row">
             <div class="order-left">
-              <div class="order-side" :class="order.side">
-                {{ $t("common.buy") }}
+              <div class="order-side" :class="outcomeToTrend(order.outcome)">
+                {{ order.side==="BUY"? $t("common.buy"): $t("common.sell")}}
                 <span class="side-text">{{
-                  order.side === "up"
-                    ? detailData.yesOutcome || ""
-                    : detailData.noOutcome || ""
+                  order.outcome
                 }}</span>
               </div>
-              <div :class="['order-chip', order.side === 'up' ? 'up' : 'down']">
+              <div :class="['order-chip',outcomeToTrend(order.outcome)]">
                 <span class="chip-price">{{ order.price }} ¢</span>
                 <span class="chip-sep">|</span>
                 <span class="chip-cost">${{ order.cost }}</span>
@@ -479,13 +477,11 @@
           <div v-for="item in orderHistory" :key="item.id" class="history-row">
             <div class="history-main">
               <div class="history-text">
-                {{ $t("common.buy") }}
-                <span class="history-side" :class="item.side">
+                    {{ item.side==="BUY"? $t("common.buy"): $t("common.sell")}}
+                <span class="history-side" :class="outcomeToTrend(item.outcome)">
                   {{ item.shares }}
                   {{
-                    item.side === "up"
-                      ? detailData.yesOutcome || ""
-                      : detailData.noOutcome || ""
+                   item.outcome  
                   }}
                 </span>
                 at {{ item.price }}¢
