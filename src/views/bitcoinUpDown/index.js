@@ -434,7 +434,7 @@ export default {
       notional: Number(firstFinite(item?.dealed_cost, item?.cost) || 0).toFixed(
         2,
       ),
-      timeAgo: formatAgo(item?.dealed_at || item?.created_at),
+      timeAgo: formatAgo(item?.created_at || item?.dealed_at),
     });
 
     // 拉取当前用户在本事件下的持仓列表
@@ -506,16 +506,17 @@ export default {
           user_address: address.value || "",
           page: 1,
           page_size: 20,
-          status: "",
+          status: "FULLY_FILLED",
           is_settled: "",
           event_guid: currentEventGuid.value,
           sub_event_guid: resolvedSubEventGuid.value,
         });
         if (!isRespSuccess(res))
           throw new Error(res?.data?.message || "Fetch order history failed");
-        const list = Array.isArray(res?.data?.data?.orders)
+        let list = Array.isArray(res?.data?.data?.orders)
           ? res.data.data.orders
           : [];
+        list = list.filter((item) => item.status === "FULLY_FILLED");
         orderHistory.value = list.map(mapOrderHistoryItem);
       } catch (error) {
         console.error("Fetch order history failed", error);
