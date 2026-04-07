@@ -47,7 +47,8 @@
                                 <el-icon>
                                     <Wallet />
                                 </el-icon>
-                                <span>{{ $t('payment.balance') }}{{ balanceLoading ? '...' : `$${userBalance}` }}</span>
+                                <span v-if="activeSide === 'buy'">{{ $t('payment.balance') }}{{ balanceLoading ? '...' : `$${userBalance}` }}</span>
+                                <span v-else>{{ $t('payment.shares') || 'Shares' }}: {{ currentHoldingShares }}</span>
                             </div>
                         </div>
                     </div>
@@ -235,6 +236,11 @@ type OrderBookData = Record<string, OrderBookSide>
 
 // 用户当前事件的持仓
 const userPositions = ref<UserPosition[]>([])
+
+const currentHoldingShares = computed(() => {
+    const position = userPositions.value.find(p => String(p.outcome).toUpperCase() === String(outcomeBadge.value).toUpperCase())
+    return position ? Number(position.shares) : 0
+})
 
 // ===================== 计算属性 =====================
 const isMarketBuy = computed(() => activeSide.value === 'buy' && orderType.value === 'market')
@@ -507,8 +513,7 @@ async function handleConfirm() {
     // 校验持仓 (Check positions for sell orders)
     if (activeSide.value === 'sell') {
         const sellShares = Number(inputValue.value) || 0
-        const position = userPositions.value.find(p => String(p.outcome).toUpperCase() === String(outcomeBadge.value).toUpperCase())
-        const holdingShares = position ? Number(position.shares) : 0
+        const holdingShares = currentHoldingShares.value
         
         if (sellShares > holdingShares) {
             ElMessage.error(t('payment.insufficientShares') || 'Insufficient shares')
