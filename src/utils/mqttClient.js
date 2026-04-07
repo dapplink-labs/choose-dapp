@@ -59,6 +59,8 @@ async function getSignedMqttUrl(endpoint, region, creds) {
   const algorithm = 'AWS4-HMAC-SHA256'
   const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`
 
+  // AWS IoT Core WebSocket 特殊要求：X-Amz-Security-Token 不参与签名，
+  // 在签名完成后追加到 URL 末尾，否则握手会失败。
   const canonicalQuerystring = [
     `X-Amz-Algorithm=${algorithm}`,
     `X-Amz-Credential=${encodeURIComponent(`${creds.accessKeyId}/${credentialScope}`)}`,
@@ -214,7 +216,7 @@ export function createIotMqttClient(options) {
     const client = mqtt.connect(wssUrl, {
       protocolVersion: 4,
       clean: true,
-      connectTimeout: 10000,
+      connectTimeout: 30000,
       keepalive: 60,
       reconnectPeriod: 0,
       clientId,
@@ -249,6 +251,7 @@ export function createIotMqttClient(options) {
     })
 
     client.on('error', (err) => {
+      console.error('[MqttClient] mqtt.js error', err?.message || err, err)
       _emit('error', err)
       try { client.end(true) } catch { /* ignore */ }
     })
