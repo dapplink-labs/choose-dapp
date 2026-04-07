@@ -16,7 +16,7 @@
  *
  *   await client.connect()
  *   client.on('message', (topic, data) => { ... })
- *   client.subscribe(['price/evt/sub', 'orders/user_guid'])
+ *   client.subscribe(['price/evt/sub', 'user/user_guid/orders'])
  *   client.destroy()
  */
 
@@ -226,7 +226,7 @@ export function createIotMqttClient(options) {
       // 补订之前排队的 topic
       if (_pendingTopics.size) {
         const list = [..._pendingTopics]
-        client.subscribe(list, { qos: 0 }, (err, granted) => {
+        client.subscribe(list, { qos: 1 }, (err, granted) => {
           if (err) {
             console.error('[MqttClient] 订阅失败', err, { topics: list })
             return
@@ -283,7 +283,7 @@ export function createIotMqttClient(options) {
     const arr = Array.isArray(topics) ? topics : [topics]
     arr.forEach((t) => _pendingTopics.add(t))
     if (_client?.connected) {
-      _client.subscribe(arr, { qos: 0 }, (err, granted) => {
+      _client.subscribe(arr, { qos: 1 }, (err, granted) => {
         if (err) {
           console.error('[MqttClient] 订阅失败', err, { topics: arr })
           return

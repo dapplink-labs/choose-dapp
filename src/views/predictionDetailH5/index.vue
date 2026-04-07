@@ -874,7 +874,7 @@ const startMqttStream = async () => {
         `price/${eventGuid.value}/${resolvedSubEventGuid.value}`,
         `orderbook/${eventGuid.value}/${resolvedSubEventGuid.value}`,
         `trade/${eventGuid.value}/${resolvedSubEventGuid.value}`,
-        `orders/${userGuid}`,
+        `user/${userGuid}/orders`,
         `user/${userGuid}/positions`,
     ]
 

@@ -32,8 +32,7 @@ QoS:            0
 | `price/#` | 价格走势推送 | `price_update` |
 | `orderbook/#` | 订单簿快照推送 | `orderbook` |
 | `trade/#` | 成交推送 | `trade` |
-| `orders/#` | 用户订单状态推送 | `user_order` |
-| `user/#` | 用户持仓推送 | `user_position` |
+| `user/#` | 用户订单状态推送 + 用户持仓推送 | `user_order`, `user_position` |
 | `test/#` | 测试用 topic | - |
 
 ### Topic 格式
@@ -42,7 +41,7 @@ QoS:            0
 trade/{event_guid}/{sub_event_guid}
 price/{event_guid}/{sub_event_guid}
 orderbook/{event_guid}/{sub_event_guid}
-orders/{user_guid}
+user/{user_guid}/orders
 user/{user_guid}/positions
 ```
 
@@ -111,7 +110,7 @@ Topic: `trade/{event_guid}/{sub_event_guid}`
 
 ### user_order
 
-Topic: `orders/{user_guid}`
+Topic: `user/{user_guid}/orders`
 更新策略: 单条订单状态更新
 
 ```json

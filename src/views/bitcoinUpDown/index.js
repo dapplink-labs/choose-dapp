@@ -1552,6 +1552,10 @@ export default {
       else openOrders.value = [next, ...openOrders.value].slice(0, 50);
     };
 
+    // trade 消息去重（QoS 1 可能重复投递）
+    const _seenTradeGuids = new Set();
+    const MAX_SEEN_TRADES = 500;
+
     // 根据 MQTT 消息类型分发处理逻辑
     const handleMqttBusinessMessage = (data, topic) => {
       if (!data || typeof data !== "object") return;
@@ -1641,6 +1645,16 @@ export default {
           count: data.trades.length,
         });
         data.trades.forEach((tr) => {
+          // QoS 1 去重：跳过已处理的 trade
+          const guid = tr?.trade_guid;
+          if (guid) {
+            if (_seenTradeGuids.has(guid)) return;
+            _seenTradeGuids.add(guid);
+            if (_seenTradeGuids.size > MAX_SEEN_TRADES) {
+              const first = _seenTradeGuids.values().next().value;
+              _seenTradeGuids.delete(first);
+            }
+          }
           const price = firstFinite(tr?.price);
           if (!Number.isFinite(price)) return;
           orderBookYes.value.last_trade_price = String(price);
@@ -1683,7 +1697,7 @@ export default {
         return;
       }
 
-      if (typeof topic === "string" && topic.startsWith("orders/")) {
+      if (typeof topic === "string" && topic.includes("/orders")) {
         if (data?.order) mergeOpenOrderFromPush(data.order);
       }
     };
@@ -1715,9 +1729,9 @@ export default {
         `orderbook/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
         `trade/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
       ];
-      // 用户私有 topic：仅在已拿到地址时订阅，避免出现 `orders/`、`user//positions`
+      // 用户私有 topic：仅在已拿到地址时订阅，避免出现 `user//orders`、`user//positions`
       if (userGuid) {
-        topics.push(`orders/${userGuid}`, `user/${userGuid}/positions`);
+        topics.push(`user/${userGuid}/orders`, `user/${userGuid}/positions`);
       }
 
       iotMqtt = createIotMqttClient({

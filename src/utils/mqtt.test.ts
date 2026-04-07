@@ -17,7 +17,7 @@ import * as crypto from 'crypto';
 const IOT_REGION = 'ap-southeast-1';
 const IOT_ENDPOINT = 'a3awip9q9thtco-ats.iot.ap-southeast-1.amazonaws.com';
 const COGNITO_IDENTITY_POOL_ID = 'ap-southeast-1:ec400695-b709-4af1-a19b-455cded69acf';
-const TOPICS = ['price/#', 'orderbook/#', 'trade/#', 'orders/#', 'user/#', 'test/#'];
+const TOPICS = ['price/#', 'orderbook/#', 'trade/#', 'user/#', 'test/#'];
 
 // LISTEN=1 开启长连接模式，持续监听不退出
 const LISTEN_MODE = process.env.LISTEN === '1';
