@@ -710,9 +710,7 @@ watch(
   (val) => {
     if (val) {
       activeSide.value = props.initialSide || "buy";
-      outcomeBadge.value = ["YES", "NO"].includes(props.initialOutcome)
-        ? props.initialOutcome
-        : "YES";
+      outcomeBadge.value = props.initialOutcome;
       orderType.value = "market";
       inputValue.value = "";
       fetchBalance();

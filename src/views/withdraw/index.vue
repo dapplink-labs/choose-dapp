@@ -48,7 +48,7 @@
 
     <!-- 底部固定：交易摘要 + 确定提币 -->
     <div class="fixed-bottom">
-      <div class="summary-section" v-if="canSubmit">
+      <!-- <div class="summary-section" v-if="canSubmit">
         <div class="summary-row">
           <span class="summary-label">{{ $t('withdraw.youWillReceive') }}</span>
           <span class="summary-value receive">{{ displayReceiveAmount }} {{ selectedCurrency?.asset_symbol }}</span>
@@ -57,7 +57,7 @@
           <span class="summary-label">{{ $t('withdraw.feePercent', { percent: feeRate }) }}</span>
           <span class="summary-value">{{ feeAmount }} {{ selectedCurrency?.asset_symbol }}</span>
         </div>
-      </div>
+      </div> -->
       <button class="confirm-btn" :disabled="!canSubmit" @click="handleConfirm">
         {{ $t('withdraw.confirmWithdraw') }}
       </button>
