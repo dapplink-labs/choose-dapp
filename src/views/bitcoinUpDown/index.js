@@ -1681,8 +1681,19 @@ export default {
         });
         return;
       }
+      // ── asset_price：标的资产实时价格推送，更新页面当前价格 ──
+      if (type === "asset_price" && data.asset_price) {
+        const price = Number(data.asset_price);
+        if (Number.isFinite(price)) {
+          livePrice.value = price;
+          detailData.value.currentPrice = price;
+        }
+        return;
+      }
       if (type === "orderbook") {
-        applyOrderBookPayload(data);
+        // MQTT 可能直接带 YES/NO，也可能带 order_book_data_list 数组
+        const obPayload = data?.order_book_data_list || data;
+        applyOrderBookPayload(obPayload);
         const pickBestAsk = (asks = []) => {
           const prices = (Array.isArray(asks) ? asks : [])
             .map((l) => firstFinite(l?.price))
@@ -1698,8 +1709,14 @@ export default {
           return Math.max(...prices);
         };
 
-        const yesBook = data?.YES || data?.yes;
-        const noBook = data?.NO || data?.no;
+        let yesBook, noBook;
+        if (Array.isArray(obPayload)) {
+          yesBook = obPayload.find((item) => ["yes", "YES", "Up", "UP"].includes(item?.direction));
+          noBook = obPayload.find((item) => ["no", "NO", "Down", "DOWN"].includes(item?.direction));
+        } else {
+          yesBook = obPayload?.YES || obPayload?.yes;
+          noBook = obPayload?.NO || obPayload?.no;
+        }
         const yesBestAsk = pickBestAsk(yesBook?.asks);
         const noBestAsk = pickBestAsk(noBook?.asks);
         const yesBestBid = pickBestBid(yesBook?.bids);
@@ -1815,6 +1832,7 @@ export default {
         `price/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
         `orderbook/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
         `trade/${currentEventGuid.value}/${resolvedSubEventGuid.value}`,
+        `asset_price/${currentEventGuid.value}`,
       ];
       // 用户私有 topic：仅在已拿到地址时订阅，避免出现 `user//orders`、`user//positions`
       if (userGuid) {
