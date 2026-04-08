@@ -352,7 +352,7 @@ export default {
     // 打开支付弹窗，根据方向设置初始 outcome
     const openPayment = (side) => {
       paymentOutcomeTitle.value = detailData.value.title || "";
-      paymentInitialOutcome.value = side === "up" ? "YES" : "NO";
+      paymentInitialOutcome.value = side === "up" ? detailData.value.yesOutcome || "YES" : detailData.value.noOutcome || "NO";
       paymentInitialSide.value = "buy";
       showPayment.value = true;
     };
@@ -1330,7 +1330,7 @@ export default {
         const res = await getOrderBook({
           event_guid: currentEventGuid.value,
           sub_event_guid: resolvedSubEventGuid.value,
-          outcome: "all",
+          outcome: "",
         });
         if (!isRespSuccess(res))
           throw new Error(res?.data?.message || "Fetch order book failed");

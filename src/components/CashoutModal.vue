@@ -102,16 +102,16 @@ const handleConfirm = async () => {
     submitting.value = true
     try {
         const rawOutcome = item?.outcome || '';
-        const mappedOutcome = ['up', 'yes'].includes(String(rawOutcome).toLowerCase()) 
-            ? 'YES' 
-            : ['down', 'no'].includes(String(rawOutcome).toLowerCase()) 
-                ? 'NO' 
-                : rawOutcome;
+        // const mappedOutcome = ['up', 'yes'].includes(String(rawOutcome).toLowerCase()) 
+        //     ? 'YES' 
+        //     : ['down', 'no'].includes(String(rawOutcome).toLowerCase()) 
+        //         ? 'NO' 
+        //         : rawOutcome;
 
         const orderParams = {
             event_guid: props.eventGuid,
             sub_event_guid: props.subEventGuid || props.position?.raw?.sub_event_guid,
-            outcome: mappedOutcome,
+            outcome: rawOutcome,
             side: 'sell',
             order_type: 'market',
             user_address: address.value,
