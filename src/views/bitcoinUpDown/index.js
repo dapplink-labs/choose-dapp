@@ -1661,10 +1661,12 @@ export default {
       const type = data.type;
       // ── price_update：实时价格推送，更新走势图表与底部按钮价格 ──
       if (type === "price_update" && data.prices) {
-        const yesPoints = Array.isArray(data.prices?.YES)
-          ? data.prices.YES
+        const yesPoints = Array.isArray(data.prices?.YES || data.prices?.Up || data.prices?.yes || data.prices?.up)
+          ? (data.prices?.YES || data.prices?.Up || data.prices?.yes || data.prices?.up)
           : [];
-        const noPoints = Array.isArray(data.prices?.NO) ? data.prices.NO : [];
+        const noPoints = Array.isArray(data.prices?.NO || data.prices?.Down || data.prices?.no || data.prices?.down)
+          ? (data.prices?.NO || data.prices?.Down || data.prices?.no || data.prices?.down)
+          : [];
         const latestYes = yesPoints[yesPoints.length - 1];
         const latestNo = noPoints[noPoints.length - 1];
         if (latestYes?.p) pushPricePoint(latestYes.p, latestYes.t, "yes");
@@ -1673,11 +1675,20 @@ export default {
           detailData.value.yesAskPrice = formatCentText(latestYes.p);
         if (latestNo?.p)
           detailData.value.noAskPrice = formatCentText(latestNo.p);
+        // 用 asset_price 更新页面当前价格
+        if (data.asset_price) {
+          const ap = Number(data.asset_price);
+          if (Number.isFinite(ap)) {
+            livePrice.value = ap;
+            detailData.value.currentPrice = ap;
+          }
+        }
         console.log("[Chart][Amount]", "price_update", {
           yesPick: latestYes,
           noPick: latestNo,
           yesAskPrice: detailData.value.yesAskPrice,
           noAskPrice: detailData.value.noAskPrice,
+          assetPrice: data.asset_price,
         });
         return;
       }
