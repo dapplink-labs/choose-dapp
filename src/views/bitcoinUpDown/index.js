@@ -1413,10 +1413,18 @@ export default {
             tradeVolume: volFromBook,
           });
         }
-        const latest = firstFinite(
-          data?.yes?.last_trade_price,
-          data?.no?.last_trade_price,
-        );
+        // 从 orderbook 取 last_trade_price，兼容数组和对象两种格式
+        let yesLtp, noLtp;
+        if (Array.isArray(data)) {
+          const upItem = data.find((item) => ["yes", "YES", "Up", "UP"].includes(item?.direction));
+          const downItem = data.find((item) => ["no", "NO", "Down", "DOWN"].includes(item?.direction));
+          yesLtp = upItem?.last_trade_price;
+          noLtp = downItem?.last_trade_price;
+        } else {
+          yesLtp = data?.yes?.last_trade_price || data?.YES?.last_trade_price;
+          noLtp = data?.no?.last_trade_price || data?.NO?.last_trade_price;
+        }
+        const latest = firstFinite(yesLtp, noLtp);
         if (
           !Number.isFinite(onTimePrice.value) &&
           Number.isFinite(latest) &&
