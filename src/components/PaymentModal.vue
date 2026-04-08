@@ -49,14 +49,12 @@
               <div
                 class="outcome-badge"
                 :class="{
-                  'outcome-yes': outcomeBadge === 'YES',
-                  'outcome-no': outcomeBadge === 'NO',
+                  'outcome-yes': ['yes','up'].includes(outcomeBadge.toLowerCase()),
+                  'outcome-no': ['no','down'].includes(outcomeBadge.toLowerCase()),
                 }"
               >
                 {{
-                  outcomeBadge === "YES"
-                    ? yesOutcome || "YES"
-                    : noOutcome || "NO"
+                  outcomeBadge 
                 }}
                 <span
                   class="icon"
@@ -404,15 +402,13 @@ const executeLabel = computed(() => {
       ? t("payment.buy") || "Buy"
       : t("payment.sell") || "Sell";
   const ynText =
-    outcomeBadge.value === "YES"
-      ? props.yesOutcome || "YES"
-      : props.noOutcome || "NO";
+    outcomeBadge.value;
   return `${sideText} ${ynText}`;
 });
 
 // ===================== 方法 =====================
 function toggleOutcome() {
-  outcomeBadge.value = outcomeBadge.value === "YES" ? "NO" : "YES";
+//   outcomeBadge.value = outcomeBadge.value === "YES" ? "NO" : "YES";
 }
 
 function switchSide(side: string) {

@@ -352,7 +352,7 @@ export default {
     // 打开支付弹窗，根据方向设置初始 outcome
     const openPayment = (side) => {
       paymentOutcomeTitle.value = detailData.value.title || "";
-      paymentInitialOutcome.value = side === "up" ? detailData.value.yesOutcome || "YES" : detailData.value.noOutcome || "NO";
+      paymentInitialOutcome.value = side === "up" ? detailData.value.yesOutcome || "" : detailData.value.noOutcome || "";
       paymentInitialSide.value = "buy";
       showPayment.value = true;
     };
@@ -1438,7 +1438,7 @@ export default {
           directions.find((item) =>
             ["no", "down"].includes((item?.outcome || "").toLowerCase()),
           ) ||
-          directions[1] ||
+          directions[0] ||
           {};
 
         const targetPrice = firstFinite(subEvent?.open_price);
