@@ -360,7 +360,7 @@ const displayTotal = computed(() => {
         : "$0.00";
     }
     // 市价卖出：使用 orderBook 的 bids 预测
-    const sideStr = outcomeBadge.value.toLowerCase(); // 'yes' or 'no'
+    const sideStr = outcomeBadge.value?.toLowerCase() || ""; // 'yes' or 'no'
     const bids = orderBookData.value?.[sideStr]?.bids || [];
     if (bids.length > 0) {
       const estPrice = Number(bids[0].price) || 0;

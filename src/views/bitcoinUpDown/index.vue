@@ -371,7 +371,11 @@
             </h3>
             <span
               class="pos-tag"
-              :class="['yes','up'].includes(pos.outcome.toLowerCase()) ? 'up' : 'down'"
+              :class="
+                ['yes', 'up'].includes(pos.outcome?.toLowerCase())
+                  ? 'up'
+                  : 'down'
+              "
               >{{ pos.tagLabel }}</span
             >
             <div class="pos-grid">
@@ -402,7 +406,11 @@
             </div>
             <button
               class="withdraw-hero-btn"
-              :class="['yes','up'].includes(pos.outcome.toLowerCase()) ? 'up' : 'down'"
+              :class="
+                ['yes', 'up'].includes(pos.outcome?.toLowerCase())
+                  ? 'up'
+                  : 'down'
+              "
               type="button"
               :disabled="Number(pos?.raw?.shares) === 0"
               @click="handlePositionWithdraw(pos)"
@@ -429,8 +437,23 @@
           >
             <span v-if="cancelAllLoading" class="loading-icon">
               <svg viewBox="0 0 24 24" width="1em" height="1em" class="spinner">
-                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4" stroke-linecap="round">
-                  <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" values="0 12 12;360 12 12"/>
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3"
+                  stroke-dasharray="31.4 31.4"
+                  stroke-linecap="round"
+                >
+                  <animateTransform
+                    attributeName="transform"
+                    type="rotate"
+                    repeatCount="indefinite"
+                    dur="1s"
+                    values="0 12 12;360 12 12"
+                  />
                 </circle>
               </svg>
             </span>
@@ -442,12 +465,16 @@
           <div v-for="order in openOrders" :key="order.id" class="order-row">
             <div class="order-left">
               <div class="order-side" :class="outcomeToTrend(order.outcome)">
-                {{ order.side==="BUY"? $t("common.buy"): $t("common.sell")}}
+                {{
+                  order.side === "BUY" ? $t("common.buy") : $t("common.sell")
+                }}
                 <span class="side-text">{{
-                  ['yes','up'].includes(order.outcome.toLowerCase())?detailData.yesOutcome:detailData.noOutcome
+                  ["yes", "up"].includes(order.outcome?.toLowerCase())
+                    ? detailData.yesOutcome
+                    : detailData.noOutcome
                 }}</span>
               </div>
-              <div :class="['order-chip',outcomeToTrend(order.outcome)]">
+              <div :class="['order-chip', outcomeToTrend(order.outcome)]">
                 <span class="chip-price">{{ order.price }} ¢</span>
                 <span class="chip-sep">|</span>
                 <span class="chip-cost">${{ order.cost }}</span>
@@ -469,10 +496,33 @@
                 @click="handleCancelOrder(order.id)"
                 aria-label="cancel"
               >
-                <span v-if="cancelingId === order.orderGuid" class="loading-icon">
-                  <svg viewBox="0 0 24 24" width="1em" height="1em" class="spinner">
-                    <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4" stroke-linecap="round">
-                      <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" values="0 12 12;360 12 12"/>
+                <span
+                  v-if="cancelingId === order.orderGuid"
+                  class="loading-icon"
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="1em"
+                    height="1em"
+                    class="spinner"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="3"
+                      stroke-dasharray="31.4 31.4"
+                      stroke-linecap="round"
+                    >
+                      <animateTransform
+                        attributeName="transform"
+                        type="rotate"
+                        repeatCount="indefinite"
+                        dur="1s"
+                        values="0 12 12;360 12 12"
+                      />
                     </circle>
                   </svg>
                 </span>
@@ -493,11 +543,17 @@
           <div v-for="item in orderHistory" :key="item.id" class="history-row">
             <div class="history-main">
               <div class="history-text">
-                    {{ item.side==="BUY"? $t("common.buy"): $t("common.sell")}}
-                <span class="history-side" :class="outcomeToTrend(item.outcome)">
+                {{ item.side === "BUY" ? $t("common.buy") : $t("common.sell") }}
+                <span
+                  class="history-side"
+                  :class="outcomeToTrend(item.outcome)"
+                >
                   {{ item.shares }}
                   {{
-                   ['yes','up'].includes(item.outcome.toLowerCase())?detailData.yesOutcome:detailData.noOutcome                  }}
+                    ["yes", "up"].includes(item.outcome?.toLowerCase() || "")
+                      ? detailData.yesOutcome
+                      : detailData.noOutcome
+                  }}
                 </span>
                 at {{ item.price }}¢
                 <span class="muted">(${{ item.notional }})</span>
