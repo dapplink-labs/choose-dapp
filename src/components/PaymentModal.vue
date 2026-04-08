@@ -31,8 +31,8 @@
                         <h3 class="target-title">{{ outcomeTitle }}</h3>
                         <div class="target-row">
                             <div class="outcome-badge"
-                                :class="{ 'outcome-yes': outcomeBadge === yesOutcome, 'outcome-no': outcomeBadge === noOutcome }">
-                                 {{ outcomeBadge === yesOutcome ? (yesOutcome || '') : (noOutcome || '') }}
+                                :class="{ 'outcome-yes': outcomeBadge === 'YES', 'outcome-no': outcomeBadge === 'NO' }">
+                                 {{ outcomeBadge === 'YES' ? (yesOutcome || 'YES') : (noOutcome || 'NO') }}
                                 <span class="icon" aria-hidden="true" style="display: inline-flex;"
                                     @click="toggleOutcome">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="11.997"
@@ -295,19 +295,18 @@ const canSubmit = computed(() => {
 
 // 执行按钮文案
 const executeLabel = computed(() => {
-    console.log(props.yesOutcome)
     const sideText = activeSide.value === 'buy'
         ? (t('payment.buy') || 'Buy')
         : (t('payment.sell') || 'Sell')
-    const ynText = outcomeBadge.value === props.yesOutcome
-        ? (props.yesOutcome || '')
-        : (props.noOutcome || '')
+    const ynText = outcomeBadge.value === 'YES'
+        ? (props.yesOutcome || 'YES')
+        : (props.noOutcome || 'NO')
     return `${sideText} ${ynText}`
 })
 
 // ===================== 方法 =====================
 function toggleOutcome() {
-    outcomeBadge.value = outcomeBadge.value === props.yesOutcome ? props.noOutcome || '' : props.yesOutcome || ''
+    outcomeBadge.value = outcomeBadge.value === 'YES' ? 'NO' : 'YES'
 }
 
 function switchSide(side: string) {
@@ -582,7 +581,7 @@ function handleClose() {
 watch(() => props.modelValue, (val) => {
     if (val) {
         activeSide.value = props.initialSide || 'buy'
-        outcomeBadge.value = (props.initialOutcome || '')
+        outcomeBadge.value = ['YES', 'NO'].includes(props.initialOutcome) ? props.initialOutcome : 'YES'
         orderType.value = 'market'
         inputValue.value = ''
         fetchBalance()

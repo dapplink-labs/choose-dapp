@@ -1425,7 +1425,7 @@ const selectOutcome = (i, type) => {
     outcome.selected = type;
     paymentSubEventGuid.value = subGuid;
     paymentOutcomeTitle.value = outcome.title || "";
-    paymentInitialOutcome.value = type === "yes" ? outcome.yesOutcome : outcome.noOutcome;
+    paymentInitialOutcome.value = type === "yes" ? "YES" : "NO";
     paymentInitialSide.value = "buy";
     paymentInitYesOutcome.value = outcome.yesOutcome;
     paymentInitNoOutcome.value = outcome.noOutcome;

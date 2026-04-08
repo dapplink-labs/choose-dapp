@@ -352,10 +352,7 @@ export default {
     // 打开支付弹窗，根据方向设置初始 outcome
     const openPayment = (side) => {
       paymentOutcomeTitle.value = detailData.value.title || "";
-      paymentInitialOutcome.value =
-        side === "up"
-          ? detailData.value.yesOutcome || ""
-          : detailData.value.noOutcome || "";
+      paymentInitialOutcome.value = side === "up" ? "YES" : "NO";
       paymentInitialSide.value = "buy";
       showPayment.value = true;
     };

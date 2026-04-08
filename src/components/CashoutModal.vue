@@ -63,7 +63,7 @@ const { address } = useAccount()
 const submitting = ref(false)
 
 const outcomeLabel = computed(() => {
-    const outcome = props.position?.outcome
+    const outcome = props.position?.tagLabel || ''
     return outcome || ''
 })
 
@@ -101,10 +101,17 @@ const handleConfirm = async () => {
     const item = props.position?.raw || {}
     submitting.value = true
     try {
+        const rawOutcome = item?.outcome || '';
+        const mappedOutcome = ['up', 'yes'].includes(String(rawOutcome).toLowerCase()) 
+            ? 'YES' 
+            : ['down', 'no'].includes(String(rawOutcome).toLowerCase()) 
+                ? 'NO' 
+                : rawOutcome;
+
         const orderParams = {
             event_guid: props.eventGuid,
             sub_event_guid: props.subEventGuid || props.position?.raw?.sub_event_guid,
-            outcome: item?.outcome || '',
+            outcome: mappedOutcome,
             side: 'sell',
             order_type: 'market',
             user_address: address.value,

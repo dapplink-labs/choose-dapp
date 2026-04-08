@@ -120,7 +120,7 @@
 
         <!-- 购买弹窗 -->
         <PaymentModal v-model="showPayment" :event-title="detailData.title"
-            :outcome-title="paymentInitialOutcome === 'YES' ? detailData.yesOutcome : detailData.noOutcome" :event-guid="eventGuid"
+            :outcome-title="detailData.title" :event-guid="eventGuid"
             :sub-event-guid="detailData.subEventGuidResolved || subEventGuid" :initial-outcome="paymentInitialOutcome"
             :initial-side="paymentInitialSide" 
             :yes-outcome="detailData.yesOutcome" :no-outcome="detailData.noOutcome"

@@ -367,11 +367,11 @@
         <div v-if="positions.length">
           <div v-for="(pos, index) in positions" :key="pos.id" class="pos-card">
             <h3 v-if="index === 0" class="pos-title">
-              {{ detailData.title || pos.title || $t("crypto.yesOrNo") }}
+              {{ detailData.title || pos.title }}
             </h3>
             <span
               class="pos-tag"
-              :class="pos.outcome === detailData.yesOutcome ? 'up' : 'down'"
+              :class="['yes','up'].includes(pos.outcome.toLowerCase()) ? 'up' : 'down'"
               >{{ pos.tagLabel }}</span
             >
             <div class="pos-grid">
@@ -402,7 +402,7 @@
             </div>
             <button
               class="withdraw-hero-btn"
-              :class="pos.outcome"
+              :class="['yes','up'].includes(pos.outcome.toLowerCase()) ? 'up' : 'down'"
               type="button"
               :disabled="Number(pos?.raw?.shares) === 0"
               @click="handlePositionWithdraw(pos)"
@@ -436,7 +436,7 @@
               <div class="order-side" :class="outcomeToTrend(order.outcome)">
                 {{ order.side==="BUY"? $t("common.buy"): $t("common.sell")}}
                 <span class="side-text">{{
-                  order.outcome
+                  ['yes','up'].includes(order.outcome.toLowerCase())?detailData.yesOutcome:detailData.noOutcome
                 }}</span>
               </div>
               <div :class="['order-chip',outcomeToTrend(order.outcome)]">
@@ -481,8 +481,7 @@
                 <span class="history-side" :class="outcomeToTrend(item.outcome)">
                   {{ item.shares }}
                   {{
-                   item.outcome  
-                  }}
+                   ['yes','up'].includes(item.outcome.toLowerCase())?detailData.yesOutcome:detailData.noOutcome                  }}
                 </span>
                 at {{ item.price }}¢
                 <span class="muted">(${{ item.notional }})</span>
