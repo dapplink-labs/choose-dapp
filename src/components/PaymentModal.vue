@@ -408,7 +408,23 @@ const executeLabel = computed(() => {
 
 // ===================== 方法 =====================
 function toggleOutcome() {
-//   outcomeBadge.value = outcomeBadge.value === "YES" ? "NO" : "YES";
+  const current = outcomeBadge.value;
+  const yesText = props.yesOutcome || "YES";
+  const noText = props.noOutcome || "NO";
+
+  if (current === yesText) {
+    outcomeBadge.value = noText;
+  } else if (current === noText) {
+    outcomeBadge.value = yesText;
+  } else {
+    // fallback based on common values
+    const lower = current.toLowerCase();
+    if (["yes", "up"].includes(lower)) {
+      outcomeBadge.value = lower === "up" ? "DOWN" : "NO";
+    } else {
+      outcomeBadge.value = lower === "down" ? "UP" : "YES";
+    }
+  }
 }
 
 function switchSide(side: string) {
