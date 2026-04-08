@@ -409,17 +409,23 @@ export default {
     };
 
     // 将服务端挂单数据映射为页面展示格式
-    const mapOpenOrder = (item) => ({
-      id: item?.guid  || "",
-      orderGuid: item?.order_guid || "",
-      side:item.side,
-      outcome:item.outcome,
-      price: formatCentValue(item?.price),
-      cost: Number(firstFinite(item?.cost, item?.dealed_cost) || 0).toFixed(2),
-      filled: Number(firstFinite(item?.dealed_size) || 0).toFixed(0),
-      total: Number(firstFinite(item?.size) || 0).toFixed(0),
-      untilCancel: !item?.expire_at,
-    });
+    // 说明：不同接口/推送消息里“订单撤销所需的 guid 字段名”可能不一致（order_guid / guid / orderGuid）
+    // 因此这里做兜底，避免点击取消时因为 orderGuid 为空直接 return 而表现为“没反应”。
+    const mapOpenOrder = (item) => {
+      const orderGuid =
+        item?.order_guid || item?.guid || item?.orderGuid || "";
+      return {
+        id: orderGuid,
+        orderGuid,
+        side: item?.side,
+        outcome: item?.outcome,
+        price: formatCentValue(item?.price),
+        cost: Number(firstFinite(item?.cost, item?.dealed_cost) || 0).toFixed(2),
+        filled: Number(firstFinite(item?.dealed_size) || 0).toFixed(0),
+        total: Number(firstFinite(item?.size) || 0).toFixed(0),
+        untilCancel: !item?.expire_at,
+      };
+    };
 
     // 将服务端历史订单数据映射为页面展示格式
     const mapOrderHistoryItem = (item) => ({
@@ -525,8 +531,17 @@ export default {
 
     // 取消单笔挂单
     const handleCancelOrder = async (id) => {
-      const order = openOrders.value.find((item) => item.id === id);
-      if (!order?.orderGuid) return;
+      const order = openOrders.value.find(
+        (item) => String(item.id) === String(id),
+      );
+      if (!order) {
+        ElMessage.error(t("common.noData") || "Order not found");
+        return;
+      }
+      if (!order?.orderGuid) {
+        ElMessage.error(t("assetManagement.cancelMissingOrderGuid") || "Missing order guid");
+        return;
+      }
       try {
         const res = await cancelOrder({
           order_guid: order.orderGuid,
@@ -546,7 +561,12 @@ export default {
       const orderGuids = openOrders.value
         .map((item) => item.orderGuid)
         .filter(Boolean);
-      if (!orderGuids.length) return;
+      if (!orderGuids.length) {
+        ElMessage.error(
+          t("assetManagement.cancelMissingOrderGuid") || "Missing order guid",
+        );
+        return;
+      }
       try {
         await Promise.all(
           orderGuids.map((orderGuid) =>
@@ -1542,7 +1562,7 @@ export default {
       const next = mapOpenOrder(order);
       // 如果订单没有 ID，则不进行合并
       if (!next?.id) return;
-      const idx = openOrders.value.findIndex((x) => x.id === next.id);
+      const idx = openOrders.value.findIndex((x) => String(x.id) === String(next.id));
       const status = String(order?.status || "").toUpperCase();
       // 如果订单状态为已成交、已取消、已拒绝、已过期，则从挂单列表中移除，并添加到历史订单列表
       if (
