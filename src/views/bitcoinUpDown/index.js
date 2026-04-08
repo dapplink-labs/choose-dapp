@@ -3,7 +3,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { ArrowLeft, ArrowDown, Trophy } from "@element-plus/icons-vue";
 import * as echarts from "echarts";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { createIotMqttClient, hasWebCrypto } from "@/utils/mqttClient";
 import OrderBookMobile from "@/components/OrderBookMobile.vue";
 import PaymentModal from "@/components/PaymentModal.vue";
@@ -529,6 +529,10 @@ export default {
       }
     };
 
+    // 正在取消的订单ID和批量取消加载状态
+    const cancelingId = ref("");
+    const cancelAllLoading = ref(false);
+
     // 取消单笔挂单
     const handleCancelOrder = async (id) => {
       const order = openOrders.value.find(
@@ -542,6 +546,25 @@ export default {
         ElMessage.error(t("assetManagement.cancelMissingOrderGuid") || "Missing order guid");
         return;
       }
+
+      try {
+        await ElMessageBox.confirm(
+          t("assetManagement.cancelOrderConfirm") || "Confirm cancel this order?",
+          t("common.tip") || "Tip",
+          {
+            confirmButtonText: t("common.confirm") || "Confirm",
+            cancelButtonText: t("common.cancel") || "Cancel",
+            type: "warning",
+            customClass: "cancel-order-confirm",
+          },
+        );
+      } catch {
+        return;
+      }
+
+      if (cancelingId.value) return;
+      cancelingId.value = order.orderGuid;
+
       try {
         const res = await cancelOrder({
           order_guid: order.orderGuid,
@@ -553,6 +576,8 @@ export default {
         await fetchOpenOrders();
       } catch (error) {
         ElMessage.error(error?.message || "Cancel failed");
+      } finally {
+        cancelingId.value = "";
       }
     };
 
@@ -562,24 +587,63 @@ export default {
         .map((item) => item.orderGuid)
         .filter(Boolean);
       if (!orderGuids.length) {
-        ElMessage.error(
-          t("assetManagement.cancelMissingOrderGuid") || "Missing order guid",
+        ElMessage.info(
+          t("assetManagement.noOpenOrdersToCancel") || "No open orders",
         );
         return;
       }
+
       try {
-        await Promise.all(
-          orderGuids.map((orderGuid) =>
-            cancelOrder({
-              order_guid: orderGuid,
-              user_address: address.value || "",
-            }),
-          ),
+        await ElMessageBox.confirm(
+          t("assetManagement.cancelAllOrdersConfirm") || "Confirm cancel all orders?",
+          t("common.tip") || "Tip",
+          {
+            confirmButtonText: t("common.confirm") || "Confirm",
+            cancelButtonText: t("common.cancel") || "Cancel",
+            type: "warning",
+            customClass: "cancel-order-confirm",
+          },
         );
-        ElMessage.success(t("assetManagement.cancelSuccess") || "Canceled");
+      } catch {
+        return;
+      }
+
+      if (cancelAllLoading.value) return;
+      cancelAllLoading.value = true;
+
+      try {
+        let successCount = 0;
+        let failCount = 0;
+        await Promise.all(
+          orderGuids.map(async (orderGuid) => {
+            try {
+              const res = await cancelOrder({
+                order_guid: orderGuid,
+                user_address: address.value || "",
+              });
+              if (!isRespSuccess(res)) throw new Error(res?.data?.message || "Cancel failed");
+              successCount++;
+            } catch {
+              failCount++;
+            }
+          }),
+        );
+        
+        if (successCount > 0) {
+          ElMessage.success(
+            t("assetManagement.cancelAllSuccess", { n: successCount }) || `Canceled ${successCount}`,
+          );
+        }
+        if (failCount > 0) {
+          ElMessage.warning(
+            t("assetManagement.cancelAllFailed", { n: failCount }) || `Failed ${failCount}`,
+          );
+        }
         await fetchOpenOrders();
       } catch (error) {
         ElMessage.error(error?.message || "Cancel failed");
+      } finally {
+        cancelAllLoading.value = false;
       }
     };
 
@@ -1984,6 +2048,8 @@ export default {
       fetchOrderHistory,
       handleCancelOrder,
       handleCancelAllOrders,
+      cancelingId,
+      cancelAllLoading,
       isSticky,
       handleScroll,
       targetTime,

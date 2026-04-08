@@ -424,8 +424,16 @@
             class="cancel-all-btn"
             type="button"
             v-if="openOrders.length"
+            :disabled="cancelAllLoading"
             @click="handleCancelAllOrders"
           >
+            <span v-if="cancelAllLoading" class="loading-icon">
+              <svg viewBox="0 0 24 24" width="1em" height="1em" class="spinner">
+                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4" stroke-linecap="round">
+                  <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" values="0 12 12;360 12 12"/>
+                </circle>
+              </svg>
+            </span>
             {{ $t("crypto.cancelAll") }}
           </button>
         </div>
@@ -457,10 +465,18 @@
               <button
                 class="order-cancel-btn"
                 type="button"
+                :disabled="cancelingId === order.orderGuid"
                 @click="handleCancelOrder(order.id)"
                 aria-label="cancel"
               >
-                ✕
+                <span v-if="cancelingId === order.orderGuid" class="loading-icon">
+                  <svg viewBox="0 0 24 24" width="1em" height="1em" class="spinner">
+                    <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="31.4 31.4" stroke-linecap="round">
+                      <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" values="0 12 12;360 12 12"/>
+                    </circle>
+                  </svg>
+                </span>
+                <span v-else>✕</span>
               </button>
             </div>
           </div>
@@ -1206,6 +1222,12 @@ $primary-blue: #5073e5;
     align-items: flex-end;
     gap: 4px;
     margin-right: 6px;
+  }
+
+  .loading-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .order-chip.up {
