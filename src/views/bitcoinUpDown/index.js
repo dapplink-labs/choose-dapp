@@ -111,6 +111,7 @@ export default {
     const activeTab = ref("Positions");
     const isBookOpen = ref(false);
     const orderBookTab = ref("yes");
+    let hasAutoOpenedBook = false;
 
     const isRespSuccess = (res) => {
       const code = res?.data?.code;
@@ -1428,6 +1429,19 @@ export default {
         console.log(res);
         const data = res?.data?.data?.order_book_data_list || {};
         applyOrderBookPayload(data);
+
+        // 如果有数据且尚未自动展开过，则将订单薄设为展开状态
+        if (
+          !hasAutoOpenedBook &&
+          (orderBookYes.value.asks.length > 0 ||
+            orderBookYes.value.bids.length > 0 ||
+            orderBookNo.value.asks.length > 0 ||
+            orderBookNo.value.bids.length > 0)
+        ) {
+          isBookOpen.value = true;
+          hasAutoOpenedBook = true;
+        }
+
         const volFromBook = firstFinite(
           data?.trade_volume,
           data?.total_volume,
