@@ -251,8 +251,8 @@ const MOCK_BUY = [
     display: flex;
     justify-content: space-between;
     padding: 8px 0;
-    color: rgba(255, 255, 255, 0.7);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-dark-gray);
+    border-top: 1px solid var(--border-color);
 }
 
 .obm-spread-label {
