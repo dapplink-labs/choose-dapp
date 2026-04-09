@@ -287,6 +287,7 @@ export default {
     tip: "提示",
     confirm: "确定",
     cancel: "取消",
+    reset: "重置",
     loading: "加载中...",
     continue: "继续",
     search: "搜索",

@@ -86,7 +86,7 @@
         </div>
 
         <!-- 日期范围选择弹层 -->
-        <DateRangePicker v-model="showDateRangePicker" @confirm="handleDateConfirm" />
+        <DateRangePicker v-model="showDateRangePicker" @confirm="handleDateConfirm" @reset="handleDateReset" />
     </div>
 </template>
 
@@ -355,6 +355,13 @@ function handleDateConfirm(payload) {
     const start = startStr ? startStr.split(' ')[0] : ''
     const end = endStr ? endStr.split(' ')[0] : ''
     customDateLabel.value = start && end ? `${start}-${end}` : customDateLabel.value
+    resetAndFetch()
+}
+
+function handleDateReset() {
+    selectedDateRange.value = null
+    customDateLabel.value = ''
+    resetAndFetch()
 }
 
 function formatDateForLabel(date) {

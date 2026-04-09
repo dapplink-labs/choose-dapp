@@ -300,6 +300,7 @@ export default {
     tip: "안내",
     confirm: "확인",
     cancel: "취소",
+    reset: "초기화",
     loading: "로딩 중...",
     continue: "계속",
     search: "검색",

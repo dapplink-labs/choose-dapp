@@ -293,6 +293,7 @@ export default {
     tip: "Tip",
     confirm: "OK",
     cancel: "Cancel",
+    reset: "Reset",
     loading: "Loading...",
     continue: "Continue",
     search: "Search",

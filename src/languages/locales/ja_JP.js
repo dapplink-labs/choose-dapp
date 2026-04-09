@@ -293,6 +293,7 @@ export default {
     "tip": "ヒント",
     "confirm": "確定",
     "cancel": "キャンセル",
+    "reset": "リセット",
     "loading": "読み込み中...",
     "continue": "続ける",
     "search": "検索",
