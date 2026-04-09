@@ -365,6 +365,7 @@ export default {
         fetchOpenOrders(),
         fetchOrderHistory(),
         fetchOrderBook(),
+        fetchPriceHistory(),
       ]);
     };
 
@@ -433,7 +434,7 @@ export default {
       side: item?.side,
       outcome:item?.outcome,
       shares: Number(firstFinite(item?.dealed_size, item?.size) || 0).toFixed(
-        0,
+        2,
       ),
       price: formatCentValue(item?.dealed_price ?? item?.price),
       notional: Number(firstFinite(item?.dealed_cost, item?.cost) || 0).toFixed(
