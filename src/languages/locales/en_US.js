@@ -55,6 +55,7 @@ export default {
     receiveAddress: "Receiving Address",
     receiveAddressPlaceholder: "Enter or paste receiving address",
     selectCurrency: "Select Currency",
+    selectToken: "Select Token",
     withdrawNetwork: "Withdrawal Network",
     withdrawAmount: "Withdrawal Amount",
     withdrawAmountPlaceholder: "Enter amount",
@@ -70,6 +71,7 @@ export default {
     yourAddress: "Your deposit address",
     copy: "Copy",
     selectCurrency: "Select Currency",
+    selectToken: "Select Token",
     selectNetwork: "Select Network",
     amountLabel: "Deposit Amount",
     confirmBtn: "Confirm Deposit"

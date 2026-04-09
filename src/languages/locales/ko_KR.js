@@ -55,6 +55,7 @@ export default {
     receiveAddress: "수신 주소",
     receiveAddressPlaceholder: "수신 주소를 입력하거나 붙여넣기",
     selectCurrency: "통화 선택",
+    selectToken: "코인 선택",
     withdrawNetwork: "출금 네트워크",
     withdrawAmount: "출금 수량",
     withdrawAmountPlaceholder: "수량 입력",
@@ -70,6 +71,7 @@ export default {
     yourAddress: "당신의 입금 주소",
     copy: "복사",
     selectCurrency: "통화 선택",
+    selectToken: "코인 선택",
     selectNetwork: "네트워크 선택",
     amountLabel: "입금 수량",
     confirmBtn: "입금 확인"

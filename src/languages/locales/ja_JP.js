@@ -55,6 +55,7 @@ export default {
     "receiveAddress": "受取アドレス",
     "receiveAddressPlaceholder": "受取アドレスを入力または貼り付け",
     "selectCurrency": "通貨を選択",
+    "selectToken": "トークンを選択",
     "withdrawNetwork": "出金ネットワーク",
     "withdrawAmount": "出金数量",
     "withdrawAmountPlaceholder": "数量を入力",
@@ -70,6 +71,7 @@ export default {
     "yourAddress": "入金アドレス",
     "copy": "コピー",
     "selectCurrency": "通貨を選択",
+    "selectToken": "トークンを選択",
     "selectNetwork": "ネットワークを選択",
     "amountLabel": "入金数量",
     "confirmBtn": "入金を確認"

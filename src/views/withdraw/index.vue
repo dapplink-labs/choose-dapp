@@ -14,7 +14,7 @@
 
       <!-- 选择币种 -->
       <div class="form-group">
-        <label class="form-label">{{ $t('withdraw.selectCurrency') }}</label>
+        <label class="form-label">{{ $t('withdraw.selectToken') }}</label>
         <div class="input-wrap select-wrap" @click="showCurrencyPicker = true">
           <span class="input-value">{{ selectedCurrency?.asset_symbol || 'Select Currency' }}</span>
           <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -67,7 +67,7 @@
     <div v-if="showCurrencyPicker" class="picker-overlay" @click.self="showCurrencyPicker = false">
       <div class="picker-panel">
         <div class="picker-header">
-          <span class="picker-title">{{ $t('withdraw.selectCurrency') }}</span>
+          <span class="picker-title">{{ $t('withdraw.selectToken') }}</span>
           <span class="picker-close" @click="showCurrencyPicker = false">×</span>
         </div>
         <div class="picker-list">
