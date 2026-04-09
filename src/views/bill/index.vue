@@ -63,7 +63,7 @@
                 </div>
                 <div class="bill-right">
                     <div class="bill-amount" :class="item.amount >= 0 ? 'inflow' : 'outflow'">
-                        {{ item.amount >= 0 ? '+' : '-' }}{{ item.amountFormatted }} {{ item.currency_code || 'USD' }}
+                        {{ item.amount >= 0 ? '+' : '-' }}{{ item.amountFormatted }} {{  'USDT' }}
                     </div>
                     <div v-if="item.status" class="bill-status">
                         {{ item.status ? $t(`bill.status.${item.status}`) : '' }}
