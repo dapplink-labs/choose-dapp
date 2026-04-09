@@ -352,7 +352,10 @@ export default {
     // 打开支付弹窗，根据方向设置初始 outcome
     const openPayment = (side) => {
       paymentOutcomeTitle.value = detailData.value.title || "";
-      paymentInitialOutcome.value = side === "up" ? detailData.value.yesOutcome || "" : detailData.value.noOutcome || "";
+      paymentInitialOutcome.value =
+        side === "up"
+          ? detailData.value.yesOutcome || ""
+          : detailData.value.noOutcome || "";
       paymentInitialSide.value = "buy";
       showPayment.value = true;
     };
@@ -392,7 +395,7 @@ export default {
       return {
         id: item?.guid,
         title: item?.sub_event_name || t("crypto.yesOrNo"),
-        tagLabel: `${outcome === "up" ? detailData.value.yesOutcome || "YES" : detailData.value.noOutcome || "NO"} | ${shares || 0} ${t("sports.shares")}`,
+        tagLabel: `${outcome === "up" ? detailData.value.yesOutcome || "YES" : detailData.value.noOutcome || "NO"} | ${shares.toFixed(2) || 0} ${t("sports.shares")}`,
         avgPrice: formatCentText(item?.avg_price || 0),
         cost: formatMoney(costNum),
         positionValue: formatMoney(currentNum),
@@ -413,15 +416,16 @@ export default {
     // 说明：不同接口/推送消息里“订单撤销所需的 guid 字段名”可能不一致（order_guid / guid / orderGuid）
     // 因此这里做兜底，避免点击取消时因为 orderGuid 为空直接 return 而表现为“没反应”。
     const mapOpenOrder = (item) => {
-      const orderGuid =
-        item?.order_guid || item?.guid || item?.orderGuid || "";
+      const orderGuid = item?.order_guid || item?.guid || item?.orderGuid || "";
       return {
         id: orderGuid,
         orderGuid,
         side: item?.side,
         outcome: item?.outcome,
         price: formatCentValue(item?.price),
-        cost: Number(firstFinite(item?.cost, item?.dealed_cost) || 0).toFixed(2),
+        cost: Number(firstFinite(item?.cost, item?.dealed_cost) || 0).toFixed(
+          2,
+        ),
         filled: Number(firstFinite(item?.dealed_size) || 0).toFixed(0),
         total: Number(firstFinite(item?.size) || 0).toFixed(0),
         untilCancel: !item?.expire_at,
@@ -432,7 +436,7 @@ export default {
     const mapOrderHistoryItem = (item) => ({
       id: item?.order_guid || item?.guid || "",
       side: item?.side,
-      outcome:item?.outcome,
+      outcome: item?.outcome,
       shares: Number(firstFinite(item?.dealed_size, item?.size) || 0).toFixed(
         2,
       ),
@@ -544,13 +548,16 @@ export default {
         return;
       }
       if (!order?.orderGuid) {
-        ElMessage.error(t("assetManagement.cancelMissingOrderGuid") || "Missing order guid");
+        ElMessage.error(
+          t("assetManagement.cancelMissingOrderGuid") || "Missing order guid",
+        );
         return;
       }
 
       try {
         await ElMessageBox.confirm(
-          t("assetManagement.cancelOrderConfirm") || "Confirm cancel this order?",
+          t("assetManagement.cancelOrderConfirm") ||
+            "Confirm cancel this order?",
           t("common.tip") || "Tip",
           {
             confirmButtonText: t("common.confirm") || "Confirm",
@@ -596,7 +603,8 @@ export default {
 
       try {
         await ElMessageBox.confirm(
-          t("assetManagement.cancelAllOrdersConfirm") || "Confirm cancel all orders?",
+          t("assetManagement.cancelAllOrdersConfirm") ||
+            "Confirm cancel all orders?",
           t("common.tip") || "Tip",
           {
             confirmButtonText: t("common.confirm") || "Confirm",
@@ -622,22 +630,25 @@ export default {
                 order_guid: orderGuid,
                 user_address: address.value || "",
               });
-              if (!isRespSuccess(res)) throw new Error(res?.data?.message || "Cancel failed");
+              if (!isRespSuccess(res))
+                throw new Error(res?.data?.message || "Cancel failed");
               successCount++;
             } catch {
               failCount++;
             }
           }),
         );
-        
+
         if (successCount > 0) {
           ElMessage.success(
-            t("assetManagement.cancelAllSuccess", { n: successCount }) || `Canceled ${successCount}`,
+            t("assetManagement.cancelAllSuccess", { n: successCount }) ||
+              `Canceled ${successCount}`,
           );
         }
         if (failCount > 0) {
           ElMessage.warning(
-            t("assetManagement.cancelAllFailed", { n: failCount }) || `Failed ${failCount}`,
+            t("assetManagement.cancelAllFailed", { n: failCount }) ||
+              `Failed ${failCount}`,
           );
         }
         await fetchOpenOrders();
@@ -1417,8 +1428,12 @@ export default {
         // 从 orderbook 取 last_trade_price，兼容数组和对象两种格式
         let yesLtp, noLtp;
         if (Array.isArray(data)) {
-          const upItem = data.find((item) => ["yes", "YES", "Up", "UP"].includes(item?.direction));
-          const downItem = data.find((item) => ["no", "NO", "Down", "DOWN"].includes(item?.direction));
+          const upItem = data.find((item) =>
+            ["yes", "YES", "Up", "UP"].includes(item?.direction),
+          );
+          const downItem = data.find((item) =>
+            ["no", "NO", "Down", "DOWN"].includes(item?.direction),
+          );
           yesLtp = upItem?.last_trade_price;
           noLtp = downItem?.last_trade_price;
         } else {
@@ -1635,7 +1650,9 @@ export default {
       const next = mapOpenOrder(order);
       // 如果订单没有 ID，则不进行合并
       if (!next?.id) return;
-      const idx = openOrders.value.findIndex((x) => String(x.id) === String(next.id));
+      const idx = openOrders.value.findIndex(
+        (x) => String(x.id) === String(next.id),
+      );
       const status = String(order?.status || "").toUpperCase();
       // 如果订单状态为已成交、已取消、已拒绝、已过期，则从挂单列表中移除，并添加到历史订单列表
       if (
@@ -1670,11 +1687,27 @@ export default {
       const type = data.type;
       // ── price_update：实时价格推送，更新走势图表与底部按钮价格 ──
       if (type === "price_update" && data.prices) {
-        const yesPoints = Array.isArray(data.prices?.YES || data.prices?.Up || data.prices?.yes || data.prices?.up)
-          ? (data.prices?.YES || data.prices?.Up || data.prices?.yes || data.prices?.up)
+        const yesPoints = Array.isArray(
+          data.prices?.YES ||
+            data.prices?.Up ||
+            data.prices?.yes ||
+            data.prices?.up,
+        )
+          ? data.prices?.YES ||
+            data.prices?.Up ||
+            data.prices?.yes ||
+            data.prices?.up
           : [];
-        const noPoints = Array.isArray(data.prices?.NO || data.prices?.Down || data.prices?.no || data.prices?.down)
-          ? (data.prices?.NO || data.prices?.Down || data.prices?.no || data.prices?.down)
+        const noPoints = Array.isArray(
+          data.prices?.NO ||
+            data.prices?.Down ||
+            data.prices?.no ||
+            data.prices?.down,
+        )
+          ? data.prices?.NO ||
+            data.prices?.Down ||
+            data.prices?.no ||
+            data.prices?.down
           : [];
         const latestYes = yesPoints[yesPoints.length - 1];
         const latestNo = noPoints[noPoints.length - 1];
@@ -1731,8 +1764,12 @@ export default {
 
         let yesBook, noBook;
         if (Array.isArray(obPayload)) {
-          yesBook = obPayload.find((item) => ["yes", "YES", "Up", "UP"].includes(item?.direction));
-          noBook = obPayload.find((item) => ["no", "NO", "Down", "DOWN"].includes(item?.direction));
+          yesBook = obPayload.find((item) =>
+            ["yes", "YES", "Up", "UP"].includes(item?.direction),
+          );
+          noBook = obPayload.find((item) =>
+            ["no", "NO", "Down", "DOWN"].includes(item?.direction),
+          );
         } else {
           yesBook = obPayload?.YES || obPayload?.yes;
           noBook = obPayload?.NO || obPayload?.no;
