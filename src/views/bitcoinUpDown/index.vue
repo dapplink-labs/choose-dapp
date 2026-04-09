@@ -337,235 +337,237 @@
         </div>
       </div>
 
-      <!-- 5. 底部业务逻辑 -->
-      <div class="business-tabs">
-        <div
-          class="tab-item"
-          :class="{ active: activeTab === 'Positions' }"
-          @click="activeTab = 'Positions'"
-        >
-          {{ $t("crypto.positions") }}
-        </div>
-        <div
-          class="tab-item"
-          :class="{ active: activeTab === 'Orders' }"
-          @click="activeTab = 'Orders'"
-        >
-          {{ $t("crypto.orders") }}
-        </div>
-        <div
-          class="tab-item"
-          :class="{ active: activeTab === 'History' }"
-          @click="activeTab = 'History'"
-        >
-          {{ $t("crypto.history") }}
-        </div>
-      </div>
-
-      <!-- Positions -->
-      <div v-if="activeTab === 'Positions'" class="position-content">
-        <div v-if="positions.length">
-          <div v-for="(pos, index) in positions" :key="pos.id" class="pos-card">
-            <h3 v-if="index === 0" class="pos-title">
-              {{ detailData.title || pos.title }}
-            </h3>
-            <span
-              class="pos-tag"
-              :class="
-                ['yes', 'up'].includes(pos.outcome?.toLowerCase())
-                  ? 'up'
-                  : 'down'
-              "
-              >{{ pos.tagLabel }}</span
-            >
-            <div class="pos-grid">
-              <div class="grid-item">
-                <div class="g-label">{{ $t("crypto.avgPrice") }}</div>
-                <div class="g-val">{{ pos.avgPrice }}</div>
-              </div>
-              <div class="grid-item">
-                <div class="g-label">{{ $t("crypto.cost") }}</div>
-                <div class="g-val">{{ pos.cost }}</div>
-              </div>
-              <div class="grid-item">
-                <div class="g-label">{{ $t("crypto.current") }}</div>
-                <div class="g-val">{{ pos.positionValue }}</div>
-              </div>
-              <div class="grid-item">
-                <div class="g-label">{{ $t("crypto.profit") }}</div>
-                <div
-                  class="g-val"
-                  :class="{
-                    neon: pos.profitPositive,
-                    'hot-pink': !pos.profitPositive,
-                  }"
-                >
-                  {{ pos.profit }}
-                </div>
-              </div>
-            </div>
-            <button
-              class="withdraw-hero-btn"
-              :class="
-                ['yes', 'up'].includes(pos.outcome?.toLowerCase())
-                  ? 'up'
-                  : 'down'
-              "
-              type="button"
-              :disabled="Number(pos?.raw?.shares) === 0"
-              @click="handlePositionWithdraw(pos)"
-            >
-              {{ $t("crypto.withdraw") }}
-            </button>
+      <template v-if="hasBusinessData">
+        <!-- 5. 底部业务逻辑 -->
+        <div class="business-tabs">
+          <div
+            class="tab-item"
+            :class="{ active: activeTab === 'Positions' }"
+            @click="activeTab = 'Positions'"
+          >
+            {{ $t("crypto.positions") }}
+          </div>
+          <div
+            class="tab-item"
+            :class="{ active: activeTab === 'Orders' }"
+            @click="activeTab = 'Orders'"
+          >
+            {{ $t("crypto.orders") }}
+          </div>
+          <div
+            class="tab-item"
+            :class="{ active: activeTab === 'History' }"
+            @click="activeTab = 'History'"
+          >
+            {{ $t("crypto.history") }}
           </div>
         </div>
-        <div v-else class="orders-empty">
-          {{ $t("common.noData") || "暂无数据..." }}
-        </div>
-      </div>
 
-      <!-- Orders -->
-      <div v-else-if="activeTab === 'Orders'" class="orders-content">
-        <div class="orders-header-row">
-          <div class="orders-title">{{ $t("crypto.openOrders") }}</div>
-          <button
-            class="cancel-all-btn"
-            type="button"
-            v-if="openOrders.length"
-            :disabled="cancelAllLoading"
-            @click="handleCancelAllOrders"
-          >
-            <span v-if="cancelAllLoading" class="loading-icon">
-              <svg viewBox="0 0 24 24" width="1em" height="1em" class="spinner">
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="3"
-                  stroke-dasharray="31.4 31.4"
-                  stroke-linecap="round"
-                >
-                  <animateTransform
-                    attributeName="transform"
-                    type="rotate"
-                    repeatCount="indefinite"
-                    dur="1s"
-                    values="0 12 12;360 12 12"
-                  />
-                </circle>
-              </svg>
-            </span>
-            {{ $t("crypto.cancelAll") }}
-          </button>
-        </div>
-
-        <div v-if="openOrders.length" class="orders-list">
-          <div v-for="order in openOrders" :key="order.id" class="order-row">
-            <div class="order-left">
-              <div class="order-side" :class="outcomeToTrend(order.outcome)">
-                {{
-                  order.side === "BUY" ? $t("common.buy") : $t("common.sell")
-                }}
-                <span class="side-text">{{
-                  ["yes", "up"].includes(order.outcome?.toLowerCase())
-                    ? detailData.yesOutcome
-                    : detailData.noOutcome
-                }}</span>
-              </div>
-              <div :class="['order-chip', outcomeToTrend(order.outcome)]">
-                <span class="chip-price">{{ order.price }} ¢</span>
-                <span class="chip-sep">|</span>
-                <span class="chip-cost">${{ order.cost }}</span>
-              </div>
-            </div>
-            <div class="order-right">
-              <div>
-                <div class="order-progress">
-                  {{ order.filled }}/{{ order.total }}
+        <!-- Positions -->
+        <div v-if="activeTab === 'Positions'" class="position-content">
+          <div v-if="positions.length">
+            <div v-for="(pos, index) in positions" :key="pos.id" class="pos-card">
+              <h3 v-if="index === 0" class="pos-title">
+                {{ detailData.title || pos.title }}
+              </h3>
+              <span
+                class="pos-tag"
+                :class="
+                  ['yes', 'up'].includes(pos.outcome?.toLowerCase())
+                    ? 'up'
+                    : 'down'
+                "
+                >{{ pos.tagLabel }}</span
+              >
+              <div class="pos-grid">
+                <div class="grid-item">
+                  <div class="g-label">{{ $t("crypto.avgPrice") }}</div>
+                  <div class="g-val">{{ pos.avgPrice }}</div>
                 </div>
-                <div class="order-until" v-if="order.untilCancel">
-                  {{ $t("crypto.untilCancel") }}
+                <div class="grid-item">
+                  <div class="g-label">{{ $t("crypto.cost") }}</div>
+                  <div class="g-val">{{ pos.cost }}</div>
+                </div>
+                <div class="grid-item">
+                  <div class="g-label">{{ $t("crypto.current") }}</div>
+                  <div class="g-val">{{ pos.positionValue }}</div>
+                </div>
+                <div class="grid-item">
+                  <div class="g-label">{{ $t("crypto.profit") }}</div>
+                  <div
+                    class="g-val"
+                    :class="{
+                      neon: pos.profitPositive,
+                      'hot-pink': !pos.profitPositive,
+                    }"
+                  >
+                    {{ pos.profit }}
+                  </div>
                 </div>
               </div>
               <button
-                class="order-cancel-btn"
+                class="withdraw-hero-btn"
+                :class="
+                  ['yes', 'up'].includes(pos.outcome?.toLowerCase())
+                    ? 'up'
+                    : 'down'
+                "
                 type="button"
-                :disabled="cancelingId === order.orderGuid"
-                @click="handleCancelOrder(order.id)"
-                aria-label="cancel"
+                :disabled="Number(pos?.raw?.shares) === 0"
+                @click="handlePositionWithdraw(pos)"
               >
-                <span
-                  v-if="cancelingId === order.orderGuid"
-                  class="loading-icon"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="1em"
-                    height="1em"
-                    class="spinner"
-                  >
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="3"
-                      stroke-dasharray="31.4 31.4"
-                      stroke-linecap="round"
-                    >
-                      <animateTransform
-                        attributeName="transform"
-                        type="rotate"
-                        repeatCount="indefinite"
-                        dur="1s"
-                        values="0 12 12;360 12 12"
-                      />
-                    </circle>
-                  </svg>
-                </span>
-                <span v-else>✕</span>
+                {{ $t("crypto.withdraw") }}
               </button>
             </div>
           </div>
-        </div>
-        <div v-else class="orders-empty">
-          {{ $t("common.noData") || "暂无数据..." }}
-        </div>
-      </div>
-
-      <!-- History -->
-      <div v-else-if="activeTab === 'History'" class="history-content">
-        <div class="history-header">{{ $t("crypto.history") }}</div>
-        <div v-if="orderHistory.length" class="history-list">
-          <div v-for="item in orderHistory" :key="item.id" class="history-row">
-            <div class="history-main">
-              <div class="history-text">
-                {{ item.side === "BUY" ? $t("common.buy") : $t("common.sell") }}
-                <span
-                  class="history-side"
-                  :class="outcomeToTrend(item.outcome)"
-                >
-                  {{ item.shares }}
-                  {{
-                    ["yes", "up"].includes(item.outcome?.toLowerCase() || "")
-                      ? detailData.yesOutcome
-                      : detailData.noOutcome
-                  }}
-                </span>
-                at {{ item.price }}¢
-                <span class="muted">(${{ item.notional }})</span>
-              </div>
-            </div>
-            <div class="history-time">{{ item.timeAgo }}</div>
+          <div v-else class="orders-empty">
+            {{ $t("common.noData") || "暂无数据..." }}
           </div>
         </div>
-        <div v-else class="orders-empty">
-          {{ $t("common.noData") || "暂无数据..." }}
+
+        <!-- Orders -->
+        <div v-else-if="activeTab === 'Orders'" class="orders-content">
+          <div class="orders-header-row">
+            <div class="orders-title">{{ $t("crypto.openOrders") }}</div>
+            <button
+              class="cancel-all-btn"
+              type="button"
+              v-if="openOrders.length"
+              :disabled="cancelAllLoading"
+              @click="handleCancelAllOrders"
+            >
+              <span v-if="cancelAllLoading" class="loading-icon">
+                <svg viewBox="0 0 24 24" width="1em" height="1em" class="spinner">
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-dasharray="31.4 31.4"
+                    stroke-linecap="round"
+                  >
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      repeatCount="indefinite"
+                      dur="1s"
+                      values="0 12 12;360 12 12"
+                    />
+                  </circle>
+                </svg>
+              </span>
+              {{ $t("crypto.cancelAll") }}
+            </button>
+          </div>
+
+          <div v-if="openOrders.length" class="orders-list">
+            <div v-for="order in openOrders" :key="order.id" class="order-row">
+              <div class="order-left">
+                <div class="order-side" :class="outcomeToTrend(order.outcome)">
+                  {{
+                    order.side === "BUY" ? $t("common.buy") : $t("common.sell")
+                  }}
+                  <span class="side-text">{{
+                    ["yes", "up"].includes(order.outcome?.toLowerCase())
+                      ? detailData.yesOutcome
+                      : detailData.noOutcome
+                  }}</span>
+                </div>
+                <div :class="['order-chip', outcomeToTrend(order.outcome)]">
+                  <span class="chip-price">{{ order.price }} ¢</span>
+                  <span class="chip-sep">|</span>
+                  <span class="chip-cost">${{ order.cost }}</span>
+                </div>
+              </div>
+              <div class="order-right">
+                <div>
+                  <div class="order-progress">
+                    {{ order.filled }}/{{ order.total }}
+                  </div>
+                  <div class="order-until" v-if="order.untilCancel">
+                    {{ $t("crypto.untilCancel") }}
+                  </div>
+                </div>
+                <button
+                  class="order-cancel-btn"
+                  type="button"
+                  :disabled="cancelingId === order.orderGuid"
+                  @click="handleCancelOrder(order.id)"
+                  aria-label="cancel"
+                >
+                  <span
+                    v-if="cancelingId === order.orderGuid"
+                    class="loading-icon"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      height="1em"
+                      class="spinner"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        stroke-dasharray="31.4 31.4"
+                        stroke-linecap="round"
+                      >
+                        <animateTransform
+                          attributeName="transform"
+                          type="rotate"
+                          repeatCount="indefinite"
+                          dur="1s"
+                          values="0 12 12;360 12 12"
+                        />
+                      </circle>
+                    </svg>
+                  </span>
+                  <span v-else>✕</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div v-else class="orders-empty">
+            {{ $t("common.noData") || "暂无数据..." }}
+          </div>
         </div>
-      </div>
+
+        <!-- History -->
+        <div v-else-if="activeTab === 'History'" class="history-content">
+          <div class="history-header">{{ $t("crypto.history") }}</div>
+          <div v-if="orderHistory.length" class="history-list">
+            <div v-for="item in orderHistory" :key="item.id" class="history-row">
+              <div class="history-main">
+                <div class="history-text">
+                  {{ item.side === "BUY" ? $t("common.buy") : $t("common.sell") }}
+                  <span
+                    class="history-side"
+                    :class="outcomeToTrend(item.outcome)"
+                  >
+                    {{ item.shares }}
+                    {{
+                      ["yes", "up"].includes(item.outcome?.toLowerCase() || "")
+                        ? detailData.yesOutcome
+                        : detailData.noOutcome
+                    }}
+                  </span>
+                  at {{ item.price }}¢
+                  <span class="muted">(${{ item.notional }})</span>
+                </div>
+              </div>
+              <div class="history-time">{{ item.timeAgo }}</div>
+            </div>
+          </div>
+          <div v-else class="orders-empty">
+            {{ $t("common.noData") || "暂无数据..." }}
+          </div>
+        </div>
+      </template>
 
       <div class="orderbook-header" @click="isBookOpen = !isBookOpen">
         <span>{{ $t("sports.orderBook") }}</span>

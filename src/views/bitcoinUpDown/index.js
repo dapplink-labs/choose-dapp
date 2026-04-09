@@ -188,10 +188,10 @@ export default {
     const formatMoney = (value, digits = 2) => {
       const num = Number(value);
       if (!Number.isFinite(num)) return "--";
-      return `${num.toLocaleString("en-US", {
+      return `$${num.toLocaleString("en-US", {
         minimumFractionDigits: digits,
         maximumFractionDigits: digits,
-      })}$`;
+      })}`;
     };
 
     const formatPrice = (value) => {
@@ -294,13 +294,21 @@ export default {
     const topVolumeText = computed(() =>
       formatVolumeText(detailData.value.tradeVolume),
     );
+    const formatTradeCentText = (value) => {
+      const text = String(value ?? "").trim();
+      if (!text || text === "--") return "--";
+      const matched = text.match(/-?\d+(\.\d+)?/);
+      const num = matched ? Number(matched[0]) : Number.NaN;
+      if (!Number.isFinite(num)) return "--";
+      return `${Math.round(num)}¢`;
+    };
     // 买入 YES 价格文本
     const upTradePriceText = computed(
-      () => detailData.value.yesAskPrice || "--",
+      () => formatTradeCentText(detailData.value.yesAskPrice),
     );
     // 买入 NO 价格文本
     const downTradePriceText = computed(
-      () => detailData.value.noAskPrice || "--",
+      () => formatTradeCentText(detailData.value.noAskPrice),
     );
 
     // 持仓列表（同一子事件下可能包含 YES / NO 多条）
@@ -309,6 +317,13 @@ export default {
     const openOrders = ref([]);
     // 历史订单列表
     const orderHistory = ref([]);
+    // 底部业务板块是否有任一数据
+    const hasBusinessData = computed(
+      () =>
+        positions.value.length > 0 ||
+        openOrders.value.length > 0 ||
+        orderHistory.value.length > 0,
+    );
     // 订单簿加载状态
     const orderBookLoading = ref(false);
     // 订单簿 YES 方向
@@ -2101,6 +2116,7 @@ export default {
       positions,
       openOrders,
       orderHistory,
+      hasBusinessData,
       orderBookLoading,
       orderBookYes,
       orderBookNo,

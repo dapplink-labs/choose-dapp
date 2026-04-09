@@ -20,13 +20,13 @@
                             :style="{ width: `${(order.shares / maxSellShares) * 100}%` }" />
                     </div>
                     <div class="obm-cell obm-price-cell obm-price-sell">
-                        ${{ order.price }}
+                        {{ formatCentText(order.price) }}
                     </div>
                     <div class="obm-cell obm-shares-cell">
                         {{ formatNumber(order.shares) }}
                     </div>
                     <div class="obm-cell obm-total-cell">
-                        ${{ formatNumber(order.total) }}
+                        {{ formatDollarText(order.total) }}
                     </div>
                 </div>
             </div>
@@ -35,10 +35,10 @@
         <!-- 中间：最后价格与价差 -->
         <div class="obm-last-row">
             <div class="obm-last-label">
-                {{ t('detail.last') || '最后' }}: ${{ lastPrice }}
+                {{ t('detail.last') || '最后' }}: {{ formatCentText(lastPrice) }}
             </div>
             <div class="obm-spread-label">
-                {{ t('detail.spread') || '价差' }}: ${{ spread }}
+                {{ t('detail.spread') || '价差' }}: {{ formatCentText(spread) }}
             </div>
         </div>
 
@@ -51,13 +51,13 @@
                             :style="{ width: `${(order.shares / maxBuyShares) * 100}%` }" />
                     </div>
                     <div class="obm-cell obm-price-cell obm-price-buy">
-                        ${{ order.price }}
+                        {{ formatCentText(order.price) }}
                     </div>
                     <div class="obm-cell obm-shares-cell">
                         {{ formatNumber(order.shares) }}
                     </div>
                     <div class="obm-cell obm-total-cell">
-                        ${{ formatNumber(order.total) }}
+                        {{ formatDollarText(order.total) }}
                     </div>
                 </div>
             </div>
@@ -92,9 +92,9 @@ const sellOrders = computed(() => {
     return [...list]
         .sort((a, b) => Number(b.price) - Number(a.price))
         .map(o => ({
-            price: Number(o.price).toFixed(4),
+            price: Number(o.price),
             shares: Number(o.quantity),
-            total: (Number(o.price) * Number(o.quantity)).toFixed(2)
+            total: Number(o.price) * Number(o.quantity)
         }))
 })
 
@@ -104,14 +104,14 @@ const buyOrders = computed(() => {
     return [...list]
         .sort((a, b) => Number(b.price) - Number(a.price))
         .map(o => ({
-            price: Number(o.price).toFixed(4),
+            price: Number(o.price),
             shares: Number(o.quantity),
-            total: (Number(o.price) * Number(o.quantity)).toFixed(2)
+            total: Number(o.price) * Number(o.quantity)
         }))
 })
 
 const lastPrice = computed(() => {
-    if (props.lastTradePrice) return Number(props.lastTradePrice).toFixed(4)
+    if (props.lastTradePrice) return Number(props.lastTradePrice)
     // 取买一价作为兜底
     return buyOrders.value[0]?.price || '--'
 })
@@ -120,7 +120,7 @@ const spread = computed(() => {
     const best_ask = Number(sellOrders.value[sellOrders.value.length - 1]?.price || 0)
     const best_bid = Number(buyOrders.value[0]?.price || 0)
     if (!best_ask || !best_bid) return '--'
-    return Math.abs(best_ask - best_bid).toFixed(4)
+    return Math.abs(best_ask - best_bid)
 })
 
 const maxSellShares = computed(() =>
@@ -135,6 +135,18 @@ const formatNumber = (num) => {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     })
+}
+
+const formatCentText = (value) => {
+    const num = Number(value)
+    if (!Number.isFinite(num)) return '--'
+    return `${Math.round(num * 100)}¢`
+}
+
+const formatDollarText = (value) => {
+    const num = Number(value)
+    if (!Number.isFinite(num)) return '--'
+    return `$${formatNumber(num)}`
 }
 
 // 占位 mock 数据（无真实数据时展示）
