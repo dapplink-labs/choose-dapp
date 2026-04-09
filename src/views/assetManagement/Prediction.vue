@@ -275,6 +275,7 @@ const refreshPredictionData = async () => {
 // 更新图表
 const updateChart = () => {
   if (!myChart) return
+  console.log('pnlPoints', pnlPoints.value)
   const points = pnlPoints.value
   const values = points.map(p => toNumber(p?.profit_lost))
   const labels = points.map(p => formatXAxisLabel(p?.timestamp))
@@ -342,7 +343,7 @@ const updateChart = () => {
       {
         type: 'line',
         step: 'start', // 实现阶梯线效果
-        data: data.map(item => item.value),
+        data: values,
         itemStyle: {
           color: '#2FBC87'
         },
