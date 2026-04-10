@@ -408,7 +408,7 @@ const mapPositionToRow = (p) => {
     const pnlAbs = Number(p?.profit_loss)
     const pnlPct = (Number.isFinite(bet) && bet !== 0 && Number.isFinite(pnlAbs))
         ? (pnlAbs / bet) * 100
-        : Number(p?.lost_rate) * 100
+        : Number(p?.lost_rate)
 
     const positionValue = Number(p?.position_value)
     const time = (p?.trade_at || p?.updated_at || p?.created_at || '').replace('T', ' ').replace('Z', '')
