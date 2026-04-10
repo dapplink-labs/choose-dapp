@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowDown, Trophy } from "@element-plus/icons-vue";
 import * as echarts from "echarts";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { createIotMqttClient, hasWebCrypto } from "@/utils/mqttClient";
+import defaultLogo from "@/assets/icon/LP1.png";
 import OrderBookMobile from "@/components/OrderBookMobile.vue";
 import PaymentModal from "@/components/PaymentModal.vue";
 import CashoutModal from "@/components/CashoutModal.vue";
@@ -55,6 +56,8 @@ export default {
         fromFlag === "1" || fromFlag === "true" || nav === "NEW_USER_EVENTS"
       );
     });
+
+    const assetLogoSrc = computed(() => detailData.value.log || defaultLogo);
 
     const parseDateSafe = (value) => {
       if (!value) return null;
@@ -1639,6 +1642,7 @@ export default {
         }
 
         detailData.value = {
+          log: eventItem?.log || subEvent?.log || "",
           eventTitle: eventItem?.title || "",
           title: subEvent?.title || "",
           tradeVolume:
@@ -2131,6 +2135,7 @@ export default {
       firstFinite,
       outcomeToTrend,
       detailData,
+      assetLogoSrc,
       resolvedSubEventGuid,
       topVolumeText,
       upTradePriceText,

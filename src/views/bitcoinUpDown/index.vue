@@ -38,12 +38,12 @@
       <div class="asset-profile-wrapper" :class="{ 'is-sticky': isSticky }">
         <div class="asset-profile">
           <div class="asset-logo">
-            <svg viewBox="0 0 32 32" width="100%" height="100%">
-              <path
-                fill="#fff"
-                d="M21.7 14.3c.3-2-1.2-3.1-3.3-3.8l.7-2.7-1.6-.4-.7 2.6c-.4-.1-.9-.2-1.3-.3l.7-2.6-1.6-.4-.7 2.7c-.3-.1-.7-.2-1-.2v-.1l-2.2-.6-.4 1.7s1.2.3 1.2.3c.7.2.8.6.8 1l-.8 3.1c0 0 .1 0 .2.1h-.2l-1.1 4.4c-.1.2-.3.5-.8.4 0 0-1.2-.3-1.2-.3l-.8 1.8 2.1.5c.4.1.8.2 1.2.3l-.7 2.8 1.6.4.7-2.7c.4.1.9.2 1.3.3l-.7 2.7 1.6.4.7-2.8c2.9.5 5.1.3 6-2.3.8-2.1 0-3.3-1.5-4.1 1.1-.2 1.9-1 2.1-2.5zm-3.8 5.3c-.5 2.2-4.2 1-5.4.7l1-3.9c1.2.3 5 .9 4.4 3.2zm.6-5.3c-.5 2-3.5.9-4.5.7l.9-3.5c1 .2 4.1.7 3.6 2.8z"
-              />
-            </svg>
+            <img
+              class="asset-logo-img"
+              :src="assetLogoSrc"
+              alt=""
+              referrerpolicy="no-referrer"
+            />
           </div>
           <div class="asset-text">
             <h2>
@@ -788,6 +788,14 @@ $primary-blue: #5073e5;
   .asset-text {
     flex: 1;
     min-width: 0;
+  }
+
+  .asset-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+    display: block;
   }
 
   .asset-text h2 {
