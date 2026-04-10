@@ -1034,6 +1034,7 @@ export default {
   "payment": {
     "buy": "買い",
     "sell": "売り",
+    "redeem": "換金",
     "sellSuccess": "売却が成功しました",
     "tradeSuccess": "取引が成功しました",
     "tradeFailed": "取引に失敗しました",

@@ -1033,6 +1033,7 @@ export default {
   payment: {
     buy: "Buy",
     sell: "Sell",
+    redeem: "Redeem",
     sellSuccess: "Sell successfully",
     tradeSuccess: "Trade successful",
     tradeFailed: "Trade failed",

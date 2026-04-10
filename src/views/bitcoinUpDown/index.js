@@ -1014,7 +1014,7 @@ export default {
 
     const chartColors = computed(() => ({
       axisLabel: themeStore.isDark ? "#666" : "#888",
-      splitLine: themeStore.isDark ? "#2a2f34" : "#e0e0e0",
+      splitLine: themeStore.isDark ? "#111" : "#eee",
       primary: "#5073e5",
     }));
 
@@ -1156,7 +1156,7 @@ export default {
                   type: "dashed",
                   color: "#888",
                   width: 1,
-                  opacity: 0.6,
+                  opacity: 0.15,
                 },
               }
             : undefined,
@@ -1169,8 +1169,8 @@ export default {
         animationDurationUpdate: 2000,
         animationEasingUpdate: "linear",
         grid: {
-          left: "2%",
-          right: "15%",
+          left: "0",
+          right: "10%",
           top: "15%",
           bottom: "12%",
           containLabel: false,
@@ -1262,7 +1262,7 @@ export default {
                   type: "dashed",
                   color: "#888",
                   width: 1,
-                  opacity: 0.3,
+                  opacity: 0.05,
                 },
               }
             : undefined;
@@ -1316,8 +1316,8 @@ export default {
         backgroundColor: "transparent",
         animation: false,
         grid: {
-          left: "2%",
-          right: "15%",
+          left: "0",
+          right: "10%",
           top: "15%",
           bottom: "12%",
           containLabel: false,

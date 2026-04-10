@@ -1021,6 +1021,7 @@ export default {
   payment: {
     buy: "买入",
     sell: "卖出",
+    redeem: "兑换",
     sellSuccess: "卖出成功",
     tradeSuccess: "交易成功",
     tradeFailed: "交易失败",
