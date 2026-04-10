@@ -428,6 +428,14 @@ export default {
       showCashoutModal.value = true;
     };
 
+    // 判断提现按钮是否激活：根据订单薄有无相同方向的买单数据
+    const canWithdraw = (pos) => {
+      if (!pos || !pos.outcome) return false;
+      const isYes = ["yes", "up"].includes(pos.outcome.toLowerCase());
+      const book = isYes ? orderBookYes.value : orderBookNo.value;
+      return book.bids && book.bids.length > 0;
+    };
+
     // 将服务端挂单数据映射为页面展示格式
     // 说明：不同接口/推送消息里“订单撤销所需的 guid 字段名”可能不一致（order_guid / guid / orderGuid）
     // 因此这里做兜底，避免点击取消时因为 orderGuid 为空直接 return 而表现为“没反应”。
@@ -2146,6 +2154,7 @@ export default {
       onOrderSuccess,
       mapPositionCard,
       handlePositionWithdraw,
+      canWithdraw,
       mapOpenOrder,
       mapOrderHistoryItem,
       fetchPositions,

@@ -804,6 +804,7 @@ export default {
     typeBetCancel: "撤单退回",
     typeSettleWin: "结算盈利",
     typeSettleLose: "结算亏损",
+    typeBetSettle:"下注结算",
     typePurchase: "购买事件",
     typeSell: "卖出事件",
     assetAll: "全部",

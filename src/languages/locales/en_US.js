@@ -815,6 +815,7 @@ export default {
     typeBetCancel: "Bet Cancel",
     typeSettleWin: "Settle Win",
     typeSettleLose: "Settle Lose",
+    typeBetSettle: "Bet Settle",
     typePurchase: "Purchase Event",
     typeSell: "Sell Event",
     assetAll: "All",

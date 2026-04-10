@@ -129,7 +129,8 @@ const typeOptions = computed(() => [
     { value: 'BET_DEDUCT', label: t('bill.typeBetDeduct') },
     { value: 'BET_CANCEL', label: t('bill.typeBetCancel') },
     { value: 'SETTLE_WIN', label: t('bill.typeSettleWin') },
-    { value: 'SETTLE_LOSE', label: t('bill.typeSettleLose') }
+    { value: 'SETTLE_LOSE', label: t('bill.typeSettleLose') },
+    { value: 'BET_SETTLE', label: t('bill.typeBetSettle') },
 ])
 
 const assetOptions = computed(() => {

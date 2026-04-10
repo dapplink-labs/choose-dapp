@@ -407,13 +407,12 @@
               </div>
               <button
                 class="withdraw-hero-btn"
-                :class="
-                  ['yes', 'up'].includes(pos.outcome?.toLowerCase())
-                    ? 'up'
-                    : 'down'
-                "
+                :class="[
+                  ['yes', 'up'].includes(pos.outcome?.toLowerCase()) ? 'up' : 'down',
+                  { disabled: Number(pos?.raw?.shares) === 0 || !canWithdraw(pos) }
+                ]"
                 type="button"
-                :disabled="Number(pos?.raw?.shares) === 0"
+                :disabled="Number(pos?.raw?.shares) === 0 || !canWithdraw(pos)"
                 @click="handlePositionWithdraw(pos)"
               >
                 {{ $t("crypto.withdraw") }}
@@ -1452,6 +1451,22 @@ $primary-blue: #5073e5;
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;
+
+    &.up {
+      background: var(--text-color-y);
+    }
+
+    &.down {
+      background: var(--text-color-n);
+    }
+
+    &:disabled,
+    &.disabled {
+      background: var(--border-color) !important;
+      color: var(--text-dark-gray) !important;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
   }
 }
 
