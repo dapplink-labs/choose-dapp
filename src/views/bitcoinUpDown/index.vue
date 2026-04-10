@@ -48,7 +48,7 @@
           <div class="asset-text">
             <h2>
               <span>{{
-                detailData.eventTitle || $t("bitcoinUpDown.questionTitle")
+                detailData.eventTitle 
               }}</span>
               <span v-if="showBaopeiTag" class="baopei-tag">{{
                 $t("bitcoinUpDown.baopei")

@@ -49,13 +49,15 @@
               <div
                 class="outcome-badge"
                 :class="{
-                  'outcome-yes': ['yes','up'].includes(outcomeBadge.toLowerCase()),
-                  'outcome-no': ['no','down'].includes(outcomeBadge.toLowerCase()),
+                  'outcome-yes': ['yes', 'up'].includes(
+                    outcomeBadge.toLowerCase(),
+                  ),
+                  'outcome-no': ['no', 'down'].includes(
+                    outcomeBadge.toLowerCase(),
+                  ),
                 }"
               >
-                {{
-                  outcomeBadge 
-                }}
+                {{ outcomeBadge }}
                 <span
                   class="icon"
                   aria-hidden="true"
@@ -401,8 +403,7 @@ const executeLabel = computed(() => {
     activeSide.value === "buy"
       ? t("payment.buy") || "Buy"
       : t("payment.sell") || "Sell";
-  const ynText =
-    outcomeBadge.value;
+  const ynText = outcomeBadge.value;
   return `${sideText} ${ynText}`;
 });
 
@@ -680,7 +681,9 @@ async function handleConfirm() {
     const res = await makeOrder(orderParams);
     if (!res || !res.data) {
       ElMessage.error(
-        orderType.value === "market" ? t("payment.orderFailed") : t("payment.tradeFailed"),
+        orderType.value === "market"
+          ? t("payment.orderFailed")
+          : t("payment.tradeFailed"),
       );
       return;
     }
@@ -688,9 +691,7 @@ async function handleConfirm() {
     if (isOrderSuccess(res)) {
       emit("order-success", res.data.data);
       ElMessage.success(
-        orderType.value === "market"
-          ? t("payment.orderSuccess")
-          : t("payment.tradeSuccess"),
+        orderType.value === "market" ? "" : t("payment.tradeSuccess"),
       );
       fetchBalance(); // 交易成功后刷新用户余额
     } else {

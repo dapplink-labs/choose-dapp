@@ -110,7 +110,7 @@ import networks from "@/assets/json/networks.js";
 const BSC_CHAIN_ID = 56;
 
 const { locale, t } = useI18n();
-const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
+const isComingSoon = computed(() => true);
 
 // 批量导入 icon 资源，减少单独 import
 const iconModules = import.meta.glob("@/assets/icon/*.{png,svg}", {

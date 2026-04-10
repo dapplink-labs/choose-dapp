@@ -10,8 +10,6 @@ const devContracts = {
   proxyNodeManager: "0xCBac353e2Df407F3e517C11514542fE02466B252",
   proxyStakingManager: "0x09B165F7504782CcC83A9aF68fb2C0835497e554",
   proxySubTokenFundingManager: "0xC96d2399a3b70d898EEb29Ce6f318F71D8A2Ac27",
-};
-const usdtDevContracts = {
   deployer: "0x2323f5aab64c382ae942fd7c040c7aeaa6a9f333",
   proxyAdminFeeVault: "0x15c0af26f622897946724eab0ab8087a4027001f",
   proxyFeeVaultManager: "0x64e583a70ec522df0f5fc9f68b761daef661b528",
@@ -20,6 +18,7 @@ const usdtDevContracts = {
   proxyFundingPod: "0x036434106b09a0d091a2a5d71d1282ab0208c517",
   mockERC20: "0x5da415dfaef8086225ffef7a6110a755606ad064",
 };
+
 // 生产环境合约地址
 const prodContracts = {
   proxyAirdropManager: "0x68e242c1fc985Df810CB2a7dcf69F11728187dF3",
@@ -44,18 +43,16 @@ const prodContracts = {
   proxySubTokenFundingManager: "0x80B9AaF5728E5A7b5d58C4bf1910d1F9E30fDE3E",
   proxyTechManager: "0x7E942089CD1e5A8b264bCE27c37EeAD611406af9",
   usdtTokenAddress: "0x55d398326f99059fF775485246999027B3197955",
+  deployer: "0xF87e27905341De179151852A23cb4B21765278B4",
+  proxyAdminFeeVault: "0x1069553074E903EB534724F2fB19a2D28Fa8527c",
+  proxyFeeVaultManager: "0x634BE05Fbbf02583A815A346F9616d816C0BC05A",
+  proxyFundingManager: "0xEf036F78FF1A439823188f44dD558E457703F9A8",
+  proxyFeeVaultPod: "0xfB552dAfAd317A1c26012BD04157b3223CCBb4d7",
+  proxyFundingPod: "0x11bbfFB81d0bBE3Bf70bcd199A61d203154F99BB",
+  mockERC20: "0x00822665924c14dE9D13b584839cC62A0e1684Cd",
+  proxyPromoteManager: "0xE3b9138D8dd202EA60B9E72A7664ba0261b5Ff14",
 };
 
-const usdtProdContracts = {
-  deployer: 0xf87e27905341de179151852a23cb4b21765278b4,
-  proxyAdminFeeVault: 0x1069553074e903eb534724f2fb19a2d28fa8527c,
-  proxyFeeVaultManager: 0x634be05fbbf02583a815a346f9616d816c0bc05a,
-  proxyFundingManager: 0xef036f78ff1a439823188f44dd558e457703f9a8,
-  proxyFeeVaultPod: 0xfb552dafad317a1c26012bd04157b3223ccbb4d7,
-  proxyFundingPod: 0x11bbffb81d0bbe3bf70bcd199a61d203154f99bb,
-  mockERC20: 0x00822665924c14de9d13b584839cc62a0e1684cd,
-  proxyPromoteManager: 0xe3b9138d8dd202ea60b9e72a7664ba0261b5ff14,
-};
 export default [
   {
     name: "Sepolia TestNet",
@@ -122,8 +119,12 @@ export default [
     cpContract: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
     ethContract: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
     bridgeContract: "0x0000000000000000000000000000000000000000",
-    ...(import.meta.env.VITE_MANAGER_ADDRESS_PROD !== "true"
-      ? usdtDevContracts
-      : usdtProdContracts),
+    deployer: "0x2323f5aab64c382ae942fd7c040c7aeaa6a9f333",
+    proxyAdminFeeVault: "0x15c0af26f622897946724eab0ab8087a4027001f",
+    proxyFeeVaultManager: "0x64e583a70ec522df0f5fc9f68b761daef661b528",
+    proxyFundingManager: "0x23b011a77a29e79c539114f1c506cfa4ea902648",
+    proxyFeeVaultPod: "0x4178fd8b30d48faa65de8a75681ca6a39db74193",
+    proxyFundingPod: "0x036434106b09a0d091a2a5d71d1282ab0208c517",
+    mockERC20: "0x5da415dfaef8086225ffef7a6110a755606ad064",
   },
 ];
