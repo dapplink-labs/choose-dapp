@@ -40,13 +40,13 @@
             <span class="detail-value">{{ network }}</span>
           </div>
         </div>
-
+<!-- 
         <div v-if="isWithdraw" class="detail-item">
           <span class="detail-label">{{ $t('transactionSuccess.networkFee') }}</span>
           <span class="detail-value">{{ networkFee }} {{ currency }}</span>
-        </div>
+        </div> -->
 
-        <div class="detail-item">
+        <!-- <div class="detail-item">
           <span class="detail-label">{{ $t('transactionSuccess.txId') }}</span>
           <div class="detail-value-wrap">
             <span class="detail-value">{{ txId }}</span>
@@ -58,14 +58,14 @@
               </svg>
             </button>
           </div>
-        </div>
+        </div> -->
 
         <div class="detail-item">
           <span class="detail-label">{{ $t('transactionSuccess.submitTime') }}</span>
           <span class="detail-value">{{ submitTime }}</span>
         </div>
 
-        <div class="detail-item">
+        <!-- <div class="detail-item">
           <span class="detail-label">{{ $t('transactionSuccess.referenceNo') }}</span>
           <div class="detail-value-wrap">
             <span class="detail-value">{{ referenceNo }}</span>
@@ -77,7 +77,7 @@
               </svg>
             </button>
           </div>
-        </div>
+        </div> -->
 
         <div v-if="isDeposit" class="detail-item">
           <span class="detail-label">{{ $t('transactionSuccess.depositAccount') }}</span>
