@@ -1039,6 +1039,7 @@ export default {
   payment: {
     buy: "매수",
     sell: "매도",
+    redeem: "환전",
     sellSuccess: "매도가 성공했습니다",
     tradeSuccess: "거래가 성공했습니다",
     tradeFailed: "거래에 실패했습니다",

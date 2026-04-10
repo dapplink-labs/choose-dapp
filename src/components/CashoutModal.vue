@@ -1,41 +1,46 @@
 <template>
-    <transition name="fade">
-        <div v-if="modelValue" class="trade-overlay" @click.self="handleClose">
-            <transition name="slide-up" appear>
-                <div class="trade-modal cashout-modal">
-                    <!-- 顶部拉条 -->
-                    <div class="grabber" />
-
-                    <div class="trade-body">
-                        <div class="target-info">
-                            <h3 class="target-title">{{ t('payment.sell') }} {{ outcomeLabel }}</h3>
-                            <div class="target-row">
-                                <span class="date-text">{{ dateText }}</span>
-                            </div>
+    <Teleport to="body">
+        <transition name="fade">
+            <div v-if="modelValue" class="cashout-overlay" @click.self="handleClose">
+                <transition name="modal-scale" appear>
+                    <div class="trade-modal cashout-modal" @click.stop>
+                        <div class="modal-header">
+                            <h3 class="target-title">{{ t('payment.redeem') }} {{ shortOutcomeLabel }}</h3>
+                            <button
+                                type="button"
+                                class="close-btn"
+                                :disabled="submitting"
+                                :aria-label="t('payment.cancel')"
+                                @click="handleClose"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                    <path d="M18 6L6 18M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
 
-                        <div class="cashout-summary">
+                        <p v-if="eventSubtitle" class="event-subtitle">{{ eventSubtitle }}</p>
+
+                        <div class="cashout-summary" :class="{ 'cashout-summary--no-sub': !eventSubtitle }">
                             <div class="receive-row">
                                 <span class="label">{{ t('payment.receive') }}</span>
                                 <span class="value receive-value">{{ positionValue }}</span>
                             </div>
                             <div class="shares-row">
-                                <span class="label">{{ t('payment.sellingShares', { shares, avgPrice }) }}</span>
+                                {{ t('payment.sellingShares', { shares, avgPrice }) }}
                             </div>
                         </div>
 
-                        <div class="action-buttons">
-                            <button class="edit-btn" @click="handleClose">{{ t('payment.cancel') }}</button>
-                            <button class="cashing-btn" :disabled="submitting" @click="handleConfirm">
-                                <span v-if="submitting" class="loading-icon"></span>
-                                {{ submitting ? t('payment.cashing') : t('payment.cashout') }}
-                            </button>
-                        </div>
+                        <button class="cashing-btn cashing-btn--full" type="button" :disabled="submitting" @click="handleConfirm">
+                            <span v-if="submitting" class="loading-icon"></span>
+                            <template v-if="submitting">{{ t('payment.cashing') }}</template>
+                            <template v-else>{{ t('payment.cashout') }} {{ positionValue }}</template>
+                        </button>
                     </div>
-                </div>
-            </transition>
-        </div>
-    </transition>
+                </transition>
+            </div>
+        </transition>
+    </Teleport>
 </template>
 
 <script setup>
@@ -52,7 +57,9 @@ const props = defineProps({
         default: () => ({})
     },
     eventGuid: { type: String, default: '' },
-    subEventGuid: { type: String, default: '' }
+    subEventGuid: { type: String, default: '' },
+    /** 主事件标题，与子事件名组合为图二风格的灰色副标题 */
+    eventTitle: { type: String, default: '' }
 })
 
 const emit = defineEmits(['update:modelValue', 'order-success'])
@@ -62,15 +69,19 @@ const { address } = useAccount()
 
 const submitting = ref(false)
 
-const outcomeLabel = computed(() => {
-    const outcome = props.position?.tagLabel || ''
-    return outcome || ''
+/** 标题仅展示方向/结果（与 tagLabel 中「|」前一致），份额放在下方说明行 */
+const shortOutcomeLabel = computed(() => {
+    const tag = props.position?.tagLabel || ''
+    if (!tag) return ''
+    const head = tag.split('|')[0]?.trim()
+    return head || tag
 })
 
-const dateText = computed(() => {
-    const d = new Date()
-    const monthKeys = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
-    return `${t('detail.months.' + monthKeys[d.getMonth()])} ${d.getDate()}`
+const eventSubtitle = computed(() => {
+    const main = (props.eventTitle || '').trim()
+    const sub = (props.position?.title || '').trim()
+    if (main && sub) return `${main} - ${sub}`
+    return sub || main || ''
 })
 
 const positionValue = computed(() => {
@@ -86,9 +97,13 @@ const avgPrice = computed(() => {
     return props.position?.avgPrice || '0¢'
 })
 
+const closeModal = () => {
+    emit('update:modelValue', false)
+}
+
 const handleClose = () => {
     if (submitting.value) return
-    emit('update:modelValue', false)
+    closeModal()
 }
 
 const handleConfirm = async () => {
@@ -131,7 +146,7 @@ const handleConfirm = async () => {
         if (isSuccess) {
             emit('order-success', res.data.data)
             ElMessage.success(t('payment.tradeSuccess') || 'Trade successful')
-            handleClose()
+            closeModal()
         } else {
             ElMessage.error(res.data.message || t('payment.tradeFailed') || 'Trade failed')
         }
@@ -145,101 +160,124 @@ const handleConfirm = async () => {
 </script>
 
 <style scoped>
-.trade-overlay {
+/* 挂到 body，避免页面内 transform/滚动层导致 fixed 贴在容器底部 */
+.cashout-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    inset: 0;
+    z-index: 2100;
     display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.55);
 }
 
 .trade-modal.cashout-modal {
-    background: var(--card-bg, #1a1b1e);
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    padding: 16px 24px 32px;
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg-page);
+    border-radius: 16px;
+    padding: 20px 20px 24px;
     color: #fff;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
 }
 
-.grabber {
-    width: 40px;
-    height: 4px;
-    background: #333;
-    border-radius: 2px;
-    margin: 0 auto 24px;
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
 }
 
 .target-title {
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.3;
+    flex: 1;
+    min-width: 0;
 }
 
-.date-text {
+.close-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin: -6px -6px 0 0;
+    padding: 0;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+}
+
+.close-btn:hover:not(:disabled) {
+    color: #e5e7eb;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.close-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.event-subtitle {
+    margin: 0 0 20px 0;
     font-size: 14px;
-    color: #888;
+    line-height: 1.45;
+    color: #9ca3af;
+    font-weight: 400;
 }
 
 .cashout-summary {
-    margin: 24px 0;
+    margin-bottom: 24px;
+}
+
+.cashout-summary--no-sub {
+    margin-top: 8px;
 }
 
 .receive-row {
     display: flex;
-    align-items: center;
-    font-size: 20px;
+    align-items: baseline;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    font-size: 17px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .receive-row .label {
-    margin-right: 8px;
+    color: #fff;
 }
 
 .receive-value {
-    color: #2e8b57;
-    /* or match the image green */
+    color: #34d399;
+    font-size: 20px;
+    font-weight: 700;
 }
 
 .shares-row {
     font-size: 14px;
-    color: #888;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 12px;
-    margin-top: 32px;
-}
-
-.edit-btn {
-    flex: 1;
-    padding: 14px;
-    border-radius: 12px;
-    background: #2a2f34;
-    border: none;
-    color: #fff;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
+    line-height: 1.4;
+    color: #9ca3af;
 }
 
 .cashing-btn {
-    flex: 1;
-    padding: 14px;
+    width: 100%;
+    padding: 15px 16px;
     border-radius: 12px;
-    background: #1a73e8;
-    /* matches button blue */
+    background: var(--text-color-y);
     border: none;
-    color: #fff;
+    color: #000;
     font-size: 16px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -247,8 +285,12 @@ const handleConfirm = async () => {
     gap: 8px;
 }
 
+.cashing-btn--full {
+    margin-top: 0;
+}
+
 .cashing-btn:disabled {
-    opacity: 0.7;
+    opacity: 0.75;
     cursor: not-allowed;
 }
 
@@ -267,15 +309,15 @@ const handleConfirm = async () => {
     }
 }
 
-/* Slide Up Transition */
-.slide-up-enter-active,
-.slide-up-leave-active {
-    transition: transform 0.3s ease-out;
+.modal-scale-enter-active,
+.modal-scale-leave-active {
+    transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
-.slide-up-enter-from,
-.slide-up-leave-to {
-    transform: translateY(100%);
+.modal-scale-enter-from,
+.modal-scale-leave-to {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
 }
 
 .fade-enter-active,

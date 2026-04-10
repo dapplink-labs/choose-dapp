@@ -650,6 +650,7 @@
     <CashoutModal
       v-model="showCashoutModal"
       :position="cashoutPosition"
+      :event-title="detailData.title"
       :event-guid="currentEventGuid"
       :sub-event-guid="resolvedSubEventGuid"
       @order-success="onOrderSuccess"
@@ -959,7 +960,6 @@ $primary-blue: #5073e5;
   position: relative;
   height: 220px;
   background: transparent;
-  border-bottom: 1px solid var(--border-color);
 
   .main-chart {
     width: 100%;
