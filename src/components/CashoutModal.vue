@@ -80,7 +80,7 @@ const shortOutcomeLabel = computed(() => {
 const eventSubtitle = computed(() => {
     const main = (props.eventTitle || '').trim()
     const sub = (props.position?.title || '').trim()
-    if (main && sub) return `${main} - ${sub}`
+    // if (main && sub) return `${main} - ${sub}`
     return sub || main || ''
 })
 
