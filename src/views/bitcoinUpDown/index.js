@@ -381,10 +381,10 @@ export default {
       await Promise.allSettled([
         fetchDetail(),
         fetchPositions(),
-        fetchOpenOrders(),
+        // fetchOpenOrders(),
         fetchOrderHistory(),
-        fetchOrderBook(),
-        fetchPriceHistory(),
+        // fetchOrderBook(),
+        // fetchPriceHistory(),
       ]);
     };
 
