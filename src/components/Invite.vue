@@ -4,6 +4,7 @@
       <div v-if="visible" class="invite-overlay" @click="handleClose">
       <div class="invite-card" @click.stop>
         <div class="card-handle"></div>
+        <div class="skip-btn" @click="handleClose">{{ $t('common.skip') || '跳过' }}</div>
 
         <h2 class="card-title">{{ $t('invite.title') }}</h2>
 
@@ -265,6 +266,22 @@ const handleConfirm = async () => {
   box-sizing: border-box;
   box-shadow: var(--invite-card-shadow);
   border: 1px solid var(--invite-card-border);
+  position: relative;
+}
+
+.skip-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-size: 14px;
+  color: var(--invite-tip);
+  cursor: pointer;
+  padding: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.skip-btn:hover {
+  opacity: 0.8;
 }
 
 .card-handle {

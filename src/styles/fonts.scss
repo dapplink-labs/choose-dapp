@@ -1,94 +1,82 @@
 /* TT Hoves Pro 字体 */
 
-
 /* PingFang 字体 */
 @font-face {
-    font-family   : 'PingFang';
-    src           : url('/src/assets/PingFang/PingFang_Regular.ttf') format('truetype');
-    font-weight   : normal;
-    font-display  : swap;
-    
+  font-family: "PingFang";
+  src: url("/src/assets/PingFang/PingFang_Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family   : 'PingFang';
-    src           : url('/src/assets/PingFang/PingFang_Medium.ttf') format('truetype');
-    font-weight   : 500;
-    font-display  : swap;
-   
+  font-family: "PingFang";
+  src: url("/src/assets/PingFang/PingFang_Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-display: swap;
 }
 
 /* PingFang Bold 字体 */
 @font-face {
-    font-family   : 'PingFang';
-    src           : url('/src/assets/PingFang/PingFang_Bold.ttf') format('truetype');
-    font-weight   : bold;
-    font-display  : swap;
-   
+  font-family: "PingFang";
+  src: url("/src/assets/PingFang/PingFang_Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-display: swap;
 }
 
+@font-face {
+  font-family: "TT_Hoves_Pro";
+  src: url("/src/assets/TT/T_Hoves_Pro_Trial_Regular.ttf") format("truetype");
+  font-weight: normal; /* Regular */
+  font-display: swap;
+}
 
 @font-face {
-    font-family: 'TT_Hoves_Pro';
-    src: url('/src/assets/TT/T_Hoves_Pro_Trial_Regular.ttf') format('truetype');
-    font-weight: normal; /* Regular */
-    font-display: swap;
-    
-  }
-  
-  @font-face {
-    font-family: 'TT_Hoves_Pro';
-    src: url('/src/assets/TT/TT_Hoves_Pro_Trial_Medium.ttf') format('truetype');
-    font-weight: 500; /* Medium */
-    font-display: swap;
-   
-  }
-  
-  @font-face {
-    font-family: 'TT_Hoves_Pro';
-    src: url('/src/assets/TT/TT_Hoves_Pro_Trial_DemiBold.ttf') format('truetype');
-    font-weight: 600; /* DemiBold */
-    font-display: swap;
-   
-  }
-  .name1 ,.num,.name4{
-    font-family: 'TT_Hoves_Pro', sans-serif;
-  }
-  .num  {
-    
-    
-  }
+  font-family: "TT_Hoves_Pro";
+  src: url("/src/assets/TT/TT_Hoves_Pro_Trial_Medium.ttf") format("truetype");
+  font-weight: 500; /* Medium */
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TT_Hoves_Pro";
+  src: url("/src/assets/TT/TT_Hoves_Pro_Trial_DemiBold.ttf") format("truetype");
+  font-weight: 600; /* DemiBold */
+  font-display: swap;
+}
+.name1,
+.num,
+.name4 {
+  font-family: "TT_Hoves_Pro", sans-serif;
+}
+.num {
+}
 
 /* Noto Sans SC 字体（简体中文） */
 @font-face {
-    font-family: 'Noto Sans SC';
-    src: url('/src/assets/PingFang/Noto_sans_sc.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
+  font-family: "Noto Sans SC";
+  src: url("/src/assets/PingFang/Noto_sans_sc.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
-html[data-lang='zh-cn'] body {
-    /* 默认中文优先使用 Noto Sans SC，其次 PingFang */
-    font-family: 'Noto Sans SC', 'PingFang', sans-serif;
-    // font-family: 'PingFang_Regularr', sans-serif;
-}
-
-/* 英文使用 TT Hoves Pro */
-html[data-lang='en-us'] body {
-    font-family: 'TT_Hoves_Pro', sans-serif;
-}
-
-/* 韩语：优先使用系统韩文字体，避免 TT_Hoves_Pro 缺字导致首次渲染延迟 */
-html[data-lang='ko-kr'] body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', 'Segoe UI', sans-serif;
-}
-
-/* 日语：优先使用系统日文字体 */
-html[data-lang='ja-jp'] body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', 'Noto Sans JP', 'Segoe UI', sans-serif;
-}
 body {
+  /* 全局字体回退顺序：英文 -> 中文 -> 韩文 -> 日文 */
+  font-family:
+    "PingFang",
+    "TT_Hoves_Pro",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Apple SD Gothic Neo",
+    "Malgun Gothic",
+    "Noto Sans KR",
+    "Hiragino Sans",
+    "Hiragino Kaku Gothic ProN",
+    "Yu Gothic",
+    "Meiryo",
+    "Noto Sans JP",
+    "Segoe UI",
+    sans-serif;
   overflow: auto;
   scrollbar-gutter: stable;
 }
