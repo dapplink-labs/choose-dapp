@@ -124,22 +124,48 @@
             <!-- 上拉加载哨兵 -->
             <div ref="loadMoreSentinel" class="load-more-sentinel" aria-hidden="true"></div>
 
-            <!-- 底部加载 / 无更多 文案 -->
-            <div v-if="filteredList.length > 0" class="load-more-footer">
-                <span v-if="loading && hasMore" class="load-more-text">
-                    {{ t('common.loading') || 'Loading...' }}
-                </span>
-                <span v-else-if="!loading && !hasMore" class="load-more-text">
-                    {{ t('common.noMoreData') || 'No more data' }}
-                </span>
-            </div>
+        <!-- 底部加载 / 无更多 文案 -->
+        <div v-if="filteredList.length > 0" class="load-more-footer">
+            <span v-if="loading && hasMore" class="load-more-text">
+                {{ t('common.loading') || 'Loading...' }}
+            </span>
+            <span v-else-if="!loading && !hasMore" class="load-more-text">
+                {{ t('common.noMoreData') || 'No more data' }}
+            </span>
+        </div>
 
-            <!-- 为空态 -->
-            <div v-if="!loading && filteredList.length === 0" class="list-empty">
-                {{ t('common.noData') || 'No data' }}
-            </div>
+        <!-- 为空态 -->
+        <div v-if="!loading && filteredList.length === 0" class="list-empty">
+            {{ t('common.noData') || 'No data' }}
         </div>
     </div>
+
+    <!-- 自定义底部取消挂单弹窗 -->
+    <transition name="slide-up-modal">
+        <div v-if="cancelDialogVisible" class="custom-bottom-modal-overlay" @click.self="onCancelClose">
+            <div class="custom-bottom-modal">
+                <div class="modal-handle"></div>
+                <div class="modal-icon">
+                    <svg width="56" height="56" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="24" r="22" stroke="#f3a228" stroke-width="4" fill="none" />
+                        <path d="M24 14V26" stroke="#f3a228" stroke-width="4" stroke-linecap="square"/>
+                        <circle cx="24" cy="34" r="2.5" fill="#f3a228"/>
+                    </svg>
+                </div>
+                <div class="modal-title">
+                    {{ cancelDialogType === 'all' ? ($t('assetManagement.cancelAllOrdersConfirm') || '是否取消所有挂单？') : ($t('assetManagement.cancelOrderConfirm') || '是否取消该挂单？') }}
+                </div>
+                <div class="modal-subtitle">
+                    {{ $t('assetManagement.cancelOrderSubTitle') || '挂单取消后，金额将返还到资金账户' }}
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-cancel" @click="onCancelClose">{{ $t('common.cancel') || '取消' }}</button>
+                    <button class="btn-confirm" @click="onCancelConfirm">{{ $t('common.confirm') || '确认' }}</button>
+                </div>
+            </div>
+        </div>
+    </transition>
+</div>
 </template>
 
 <script setup>
@@ -229,6 +255,31 @@ const isRespSuccess = (res) => {
 const cancelingId = ref('')
 const cancelAllLoading = ref(false)
 
+// 自定义取消挂单弹窗逻辑
+const cancelDialogVisible = ref(false)
+const cancelDialogType = ref('single') // 'single' 或 'all'
+const cancelResolve = ref(null)
+const cancelReject = ref(null)
+
+const showCustomConfirm = (type) => {
+    cancelDialogType.value = type
+    cancelDialogVisible.value = true
+    return new Promise((resolve, reject) => {
+        cancelResolve.value = resolve
+        cancelReject.value = reject
+    })
+}
+
+const onCancelConfirm = () => {
+    cancelDialogVisible.value = false
+    if (cancelResolve.value) cancelResolve.value()
+}
+
+const onCancelClose = () => {
+    cancelDialogVisible.value = false
+    if (cancelReject.value) cancelReject.value()
+}
+
 const onCancelPending = async (item) => {
     if (activeTab.value !== 'pending') return
     const order_guid = item?.id || item?.raw?.guid || ''
@@ -238,16 +289,7 @@ const onCancelPending = async (item) => {
     }
 
     try {
-        await ElMessageBox.confirm(
-            t('assetManagement.cancelOrderConfirm') || 'Confirm cancel this order?',
-            t('common.tip') || 'Tip',
-            {
-                confirmButtonText: t('common.confirm') || 'Confirm',
-                cancelButtonText: t('common.cancel') || 'Cancel',
-                type: 'warning',
-                customClass: 'cancel-order-confirm',
-            },
-        )
+        await showCustomConfirm('single')
     } catch {
         return
     }
@@ -303,6 +345,12 @@ const fetchAllOpenOrderGuids = async () => {
 const onCancelAllPending = async () => {
     if (activeTab.value !== 'pending') return
     if (cancelAllLoading.value) return
+
+    try {
+        await showCustomConfirm('all')
+    } catch {
+        return
+    }
 
     cancelAllLoading.value = true
     try {
@@ -1029,6 +1077,105 @@ onBeforeUnmount(() => {
 
     .value-text {
         margin-right: 8px;
+    }
+}
+
+/* 自定义底部弹窗样式 */
+.custom-bottom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.custom-bottom-modal {
+    width: 100%;
+    background: var(--bg-page-h5, #1e1e1e);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    padding: 24px 20px 32px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+
+    .modal-handle {
+        width: 40px;
+        height: 4px;
+        background: var(--border-color, #444);
+        border-radius: 2px;
+        margin-bottom: 24px;
+        position: absolute;
+        top: 12px;
+    }
+
+    .modal-icon {
+        margin-bottom: 20px;
+        margin-top: 10px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--bg-opposite, #fff);
+        margin-bottom: 12px;
+    }
+
+    .modal-subtitle {
+        font-size: 14px;
+        color: var(--text-dark-gray, #888);
+        margin-bottom: 32px;
+    }
+
+    .modal-actions {
+        width: 100%;
+        display: flex;
+        gap: 16px;
+
+        button {
+            flex: 1;
+            height: 48px;
+            border-radius: 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background: var(--bg-pn, #2a2a2a);
+            color: var(--bg-opposite, #fff);
+        }
+
+        .btn-confirm {
+            background: var(--text-color-y, #b8ff22);
+            color: #000;
+        }
+    }
+}
+
+.slide-up-modal-enter-active,
+.slide-up-modal-leave-active {
+    transition: opacity 0.3s;
+
+    .custom-bottom-modal {
+        transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+    }
+}
+
+.slide-up-modal-enter-from,
+.slide-up-modal-leave-to {
+    opacity: 0;
+
+    .custom-bottom-modal {
+        transform: translateY(100%);
     }
 }
 </style>
