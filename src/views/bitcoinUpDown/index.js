@@ -605,6 +605,31 @@ export default {
     const cancelingId = ref("");
     const cancelAllLoading = ref(false);
 
+    // 自定义取消挂单弹窗逻辑
+    const cancelDialogVisible = ref(false);
+    const cancelDialogType = ref("single"); // 'single' 或 'all'
+    const cancelResolve = ref(null);
+    const cancelReject = ref(null);
+
+    const showCustomConfirm = (type) => {
+      cancelDialogType.value = type;
+      cancelDialogVisible.value = true;
+      return new Promise((resolve, reject) => {
+        cancelResolve.value = resolve;
+        cancelReject.value = reject;
+      });
+    };
+
+    const onCancelConfirm = () => {
+      cancelDialogVisible.value = false;
+      if (cancelResolve.value) cancelResolve.value();
+    };
+
+    const onCancelClose = () => {
+      cancelDialogVisible.value = false;
+      if (cancelReject.value) cancelReject.value();
+    };
+
     // 取消单笔挂单
     const handleCancelOrder = async (id) => {
       const order = openOrders.value.find(
@@ -622,17 +647,7 @@ export default {
       }
 
       try {
-        await ElMessageBox.confirm(
-          t("assetManagement.cancelOrderConfirm") ||
-            "Confirm cancel this order?",
-          t("common.tip") || "Tip",
-          {
-            confirmButtonText: t("common.confirm") || "Confirm",
-            cancelButtonText: t("common.cancel") || "Cancel",
-            type: "warning",
-            customClass: "cancel-order-confirm",
-          },
-        );
+        await showCustomConfirm("single");
       } catch {
         return;
       }
@@ -669,17 +684,7 @@ export default {
       }
 
       try {
-        await ElMessageBox.confirm(
-          t("assetManagement.cancelAllOrdersConfirm") ||
-            "Confirm cancel all orders?",
-          t("common.tip") || "Tip",
-          {
-            confirmButtonText: t("common.confirm") || "Confirm",
-            cancelButtonText: t("common.cancel") || "Cancel",
-            type: "warning",
-            customClass: "cancel-order-confirm",
-          },
-        );
+        await showCustomConfirm("all");
       } catch {
         return;
       }
@@ -2182,6 +2187,10 @@ export default {
       orderHistory,
       hasBusinessData,
       orderBookLoading,
+      cancelDialogVisible,
+      cancelDialogType,
+      onCancelConfirm,
+      onCancelClose,
       orderBookYes,
       orderBookNo,
       currentOrderBook,

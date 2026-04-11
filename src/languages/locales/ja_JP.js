@@ -51,7 +51,8 @@ export default {
     predictionAmount: '予測金額',
     historyCumulative: '歴史的累積',
     fetchPnlFailed: '収益データの取得に失敗しました',
-    fetchStatFailed: '統計データの取得に失敗しました'
+    fetchStatFailed: '統計データの取得に失敗しました',
+    cancelOrderSubTitle: '注文をキャンセルすると、金額が返還されます'
   },
   withdraw: {
     title: '出金',

@@ -51,7 +51,8 @@ export default {
     predictionAmount: '예측 금액',
     historyCumulative: '역사적 누적',
     fetchPnlFailed: '수익 데이터 불러오기 실패',
-    fetchStatFailed: '통계 데이터 불러오기 실패'
+    fetchStatFailed: '통계 데이터 불러오기 실패',
+    cancelOrderSubTitle: '주문 취소 후 금액이 자금 계정으로 반환됩니다'
   },
   withdraw: {
     title: '출금',

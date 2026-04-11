@@ -51,7 +51,8 @@ export default {
     predictionAmount: "预测金额",
     historyCumulative: "历史累计",
     fetchPnlFailed: "获取收益数据失败",
-    fetchStatFailed: "获取统计数据失败"
+    fetchStatFailed: "获取统计数据失败",
+    cancelOrderSubTitle: "挂单取消后，金额将返还到资金账户"
   },
   withdraw: {
     title: "提币",

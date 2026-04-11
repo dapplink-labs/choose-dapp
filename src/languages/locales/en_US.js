@@ -51,7 +51,8 @@ export default {
     predictionAmount: 'Prediction Amount',
     historyCumulative: 'Historical Cumulative',
     fetchPnlFailed: 'Fetch PnL failed',
-    fetchStatFailed: 'Fetch stat failed'
+    fetchStatFailed: 'Fetch stat failed',
+    cancelOrderSubTitle: 'Order will be canceled and amount will be returned to your account'
   },
   withdraw: {
     title: 'Withdraw',
