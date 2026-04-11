@@ -381,7 +381,7 @@ const displayTotal = computed(() => {
         : "$0.00";
     }
     // 市价卖出：使用 orderBook 的 bids 预测
-    const sideStr = outcomeBadge.value?.toLowerCase() || ""; // 'yes' or 'no'
+    const sideStr = outcomeBadge.value || ""; // 'yes' or 'no'
     const bids = orderBookData.value?.[sideStr]?.bids || [];
     if (bids.length > 0) {
       const estPrice = Number(bids[0].price) || 0;
@@ -501,7 +501,7 @@ async function fetchOrderBookData() {
     const res = await getOrderBook({
       event_guid: props.eventGuid,
       sub_event_guid: props.subEventGuid,
-      outcome: "all",
+      outcome: "",
     });
     const code = res?.data?.code;
     console.log(res);
@@ -668,9 +668,10 @@ async function handleConfirm() {
 
   // 市价单购买流动性警告校验
   if (activeSide.value === "buy" && orderType.value === "market") {
-    const sideStr = outcomeBadge.value?.toLowerCase() || "";
+    const sideStr = outcomeBadge.value || "";
     // 判断订单薄是否有反方向(卖单/asks)挂单
     const asks = orderBookData.value?.[sideStr]?.asks || [];
+    console.log(orderBookData.value)
     if (asks.length === 0) {
       showMarketWarning.value = true;
       return;

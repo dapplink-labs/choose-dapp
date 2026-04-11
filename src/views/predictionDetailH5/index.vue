@@ -387,7 +387,7 @@ const fetchOrderBook = async () => {
         const res = await getOrderBook({
             event_guid: eventGuid.value,
             sub_event_guid: sid,
-            outcome: 'all',
+            outcome: '',
         })
         const data = res?.data?.data || {}
         if (!isRespSuccess(res) && !data.yes && !data.no && !data.asks) throw new Error(res?.data?.message || 'Fetch order book failed')
