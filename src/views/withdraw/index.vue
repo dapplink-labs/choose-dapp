@@ -16,7 +16,7 @@
       <div class="form-group">
         <label class="form-label">{{ $t('withdraw.selectToken') }}</label>
         <div class="input-wrap select-wrap" @click="showCurrencyPicker = true">
-          <span class="input-value">{{ selectedCurrency?.asset_symbol || 'Select Currency' }}</span>
+          <span class="input-value">{{ selectedCurrency?.asset_symbol || $t('withdraw.selectCurrency') }}</span>
           <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round" />
@@ -108,10 +108,10 @@ const showCurrencyPicker = ref(false)
 const currencyList = ref([])
 
 const selectedNetwork = computed(() => {
-  if (!selectedCurrency.value) return 'BNB Smart Chain(BEP20)'
+  if (!selectedCurrency.value) return t('withdraw.defaultNetwork')
   const targetChainId = Number(selectedCurrency.value.chain_id)
   const net = networks.find(n => Number(n.chainId) === targetChainId)
-  return net ? net.name : 'Unknown Network'
+  return net ? net.name : t('withdraw.unknownNetwork')
 })
 
 // 处理键盘弹出时的滚动问题
@@ -256,7 +256,7 @@ const handleConfirm = async () => {
 
   const loading = ElLoading.service({
     lock: true,
-    text: 'Processing...',
+    text: t('commonManagement.processing'),
     background: 'rgba(0, 0, 0, 0.7)',
   })
 
@@ -268,13 +268,13 @@ const handleConfirm = async () => {
 
     const withdrawAmt = parseFloat(withdrawAmount.value) || 0
     if (withdrawAmt <= 0) {
-      Message.error('Please enter a valid amount')
+      Message.error(t('withdraw.pleaseEnterValidAmount'))
       return
     }
 
     const tokenAddress = selectedCurrency.value.asset_address
 
-    loading.text = 'Withdrawing...'
+    loading.text = t('withdraw.withdrawing')
 
     // 调用后端提现接口
     const res = await userWithdraw({
@@ -287,7 +287,7 @@ const handleConfirm = async () => {
 
     if (res.data?.code === 2000) {
       withdrawAmount.value = ''
-      Message.success('Withdraw successful!')
+      Message.success(t('withdraw.withdrawSuccess'))
       router.push({
         path: '/transaction-success',
         query: {
@@ -297,7 +297,7 @@ const handleConfirm = async () => {
           address: receiveAddress.value.trim(),
           network: selectedNetwork.value,
           networkFee: '0.00',
-          txId: res.data.data?.guid || 'Processing',
+          txId: res.data.data?.guid || t('commonManagement.processing'),
           status: res.data.data?.status || '',
           submitTime: new Date().toLocaleString('zh-CN', {
             year: 'numeric',
@@ -311,12 +311,12 @@ const handleConfirm = async () => {
         }
       })
     } else {
-      Message.error(res.data?.message || 'Withdraw Failed')
+      Message.error(res.data?.message || t('withdraw.withdrawFailed'))
     }
 
   } catch (error) {
     console.error('Withdraw error:', error)
-    Message.error('Withdraw error')
+    Message.error(t('withdraw.withdrawError'))
   } finally {
     loading.close()
   }

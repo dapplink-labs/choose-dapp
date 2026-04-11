@@ -247,16 +247,16 @@ const fetchFundsHistory = async () => {
       const isDeposit = item.type === "deposit" || String(item.type) === "1";
       const typeStr = isDeposit ? "deposit" : "withdraw";
 
-      let statusText = "处理中";
+      let statusText = t("commonManagement.processing") || "处理中";
       let statusColor = "color-green";
 
       const statusStr = String(item.status).toLowerCase();
       console.log(statusStr);
       if (statusStr === "confirmed") {
-        statusText = "已完成";
+        statusText = t("commonManagement.confirmed") || "已完成";
         statusColor = "color-green";
       } else if (statusStr === "failed") {
-        statusText = "已失败";
+        statusText = t("commonManagement.failed") || "已失败";
         statusColor = "color-red";
       }
 

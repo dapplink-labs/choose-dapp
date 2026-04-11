@@ -63,7 +63,14 @@ export default {
     balance: 'Balance',
     youWillReceive: 'You will receive',
     feePercent: 'Service Fee ({percent}%)',
-    confirmWithdraw: 'Confirm Withdrawal'
+    confirmWithdraw: 'Confirm Withdrawal',
+    defaultNetwork: 'BNB Smart Chain(BEP20)',
+    unknownNetwork: 'Unknown Network',
+    pleaseEnterValidAmount: 'Please enter a valid amount',
+    withdrawing: 'Withdrawing...',
+    withdrawSuccess: 'Withdraw successful!',
+    withdrawFailed: 'Withdraw Failed',
+    withdrawError: 'Withdraw error'
   },
   deposit: {
     title: 'Deposit',
@@ -74,7 +81,20 @@ export default {
     selectToken: 'Select Token',
     selectNetwork: 'Select Network',
     amountLabel: 'Deposit Amount',
-    confirmBtn: 'Confirm Deposit'
+    confirmBtn: 'Confirm Deposit',
+    defaultNetwork: 'BNB Smart Chain(BEP20)',
+    unknownNetwork: 'Unknown Network',
+    pleaseSelectCurrency: 'Please select a currency',
+    pleaseEnterValidAmount: 'Please enter a valid amount',
+    contractNotFound: 'Contract address not found for this network',
+    requestingApproval: 'Requesting Approval...',
+    depositing: 'Depositing...',
+    depositSuccess: 'Deposit successful!'
+  },
+  commonManagement: {
+    processing: "Processing",
+    confirmed: "Completed",
+    failed: "Failed",
   },
   transactionSuccess: {
     title: 'Transaction Successful',

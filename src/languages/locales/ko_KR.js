@@ -63,7 +63,14 @@ export default {
     balance: '잔액',
     youWillReceive: '수령 예정',
     feePercent: '수수료({percent}%)',
-    confirmWithdraw: '출금 확인'
+    confirmWithdraw: '출금 확인',
+    defaultNetwork: 'BNB Smart Chain(BEP20)',
+    unknownNetwork: '알 수 없는 네트워크',
+    pleaseEnterValidAmount: '유효한 금액을 입력하세요',
+    withdrawing: '출금 중...',
+    withdrawSuccess: '출금 성공!',
+    withdrawFailed: '출금 실패',
+    withdrawError: '출금 오류'
   },
   deposit: {
     title: '입금',
@@ -74,7 +81,20 @@ export default {
     selectToken: '코인 선택',
     selectNetwork: '네트워크 선택',
     amountLabel: '입금 수량',
-    confirmBtn: '입금 확인'
+    confirmBtn: '입금 확인',
+    defaultNetwork: 'BNB Smart Chain(BEP20)',
+    unknownNetwork: '알 수 없는 네트워크',
+    pleaseSelectCurrency: '통화를 선택하세요',
+    pleaseEnterValidAmount: '유효한 금액을 입력하세요',
+    contractNotFound: '이 네트워크의 컨트랙트 주소를 찾을 수 없습니다',
+    requestingApproval: '승인 요청 중...',
+    depositing: '입금 중...',
+    depositSuccess: '입금 성공!'
+  },
+  commonManagement: {
+    processing: "처리 중",
+    confirmed: "완료",
+    failed: "실패",
   },
   transactionSuccess: {
     title: '거래 성공',

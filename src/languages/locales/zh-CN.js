@@ -64,6 +64,13 @@ export default {
     youWillReceive: "你将收到",
     feePercent: "手续费({percent}%)",
     confirmWithdraw: "确定提币",
+    defaultNetwork: "BNB Smart Chain(BEP20)",
+    unknownNetwork: "未知网络",
+    pleaseEnterValidAmount: "请输入有效数量",
+    withdrawing: "提币中...",
+    withdrawSuccess: "提币成功！",
+    withdrawFailed: "提币失败",
+    withdrawError: "提币发生错误"
   },
   deposit: {
     title: "充币",
@@ -75,6 +82,19 @@ export default {
     selectNetwork: "选择网络",
     amountLabel: "充币数量",
     confirmBtn: "确定充币",
+    defaultNetwork: "BNB Smart Chain(BEP20)",
+    unknownNetwork: "未知网络",
+    pleaseSelectCurrency: "请选择币种",
+    pleaseEnterValidAmount: "请输入有效数量",
+    contractNotFound: "该网络未找到合约地址",
+    requestingApproval: "请求授权中...",
+    depositing: "充币中...",
+    depositSuccess: "充币成功！"
+  },
+  commonManagement: {
+    processing: "处理中",
+    confirmed: "已完成",
+    failed: "已失败",
   },
   transactionSuccess: {
     title: "交易成功",

@@ -63,7 +63,14 @@ export default {
     balance: '残高',
     youWillReceive: '受取額',
     feePercent: '手数料({percent}%)',
-    confirmWithdraw: '出金を確定'
+    confirmWithdraw: '出金を確定',
+    defaultNetwork: 'BNB Smart Chain(BEP20)',
+    unknownNetwork: '不明なネットワーク',
+    pleaseEnterValidAmount: '有効な金額を入力してください',
+    withdrawing: '出金中...',
+    withdrawSuccess: '出金成功！',
+    withdrawFailed: '出金失敗',
+    withdrawError: '出金エラー'
   },
   deposit: {
     title: '入金',
@@ -74,7 +81,20 @@ export default {
     selectToken: 'トークンを選択',
     selectNetwork: 'ネットワークを選択',
     amountLabel: '入金数量',
-    confirmBtn: '入金を確認'
+    confirmBtn: '入金を確認',
+    defaultNetwork: 'BNB Smart Chain(BEP20)',
+    unknownNetwork: '不明なネットワーク',
+    pleaseSelectCurrency: '通貨を選択してください',
+    pleaseEnterValidAmount: '有効な金額を入力してください',
+    contractNotFound: 'このネットワークのコントラクトアドレスが見つかりません',
+    requestingApproval: '承認をリクエスト中...',
+    depositing: '入金中...',
+    depositSuccess: '入金成功！'
+  },
+  commonManagement: {
+    processing: "処理中",
+    confirmed: "完了",
+    failed: "失敗",
   },
   transactionSuccess: {
     title: '取引成功',

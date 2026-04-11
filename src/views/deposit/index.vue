@@ -7,7 +7,7 @@
       <div class="form-group">
         <label class="form-label">{{ $t('deposit.selectToken') }}</label>
         <div class="input-wrap select-wrap" @click="showCurrencyPicker = true">
-          <span class="input-value">{{ selectedCurrency?.asset_symbol || 'Select Currency' }}</span>
+          <span class="input-value">{{ selectedCurrency?.asset_symbol || $t('deposit.selectCurrency') }}</span>
           <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round" />
@@ -93,10 +93,10 @@ const { address } = useAccount()
 
 const selectedCurrency = ref(null)
 const selectedNetwork = computed(() => {
-  if (!selectedCurrency.value) return 'BNB Smart Chain(BEP20)'
+  if (!selectedCurrency.value) return t('deposit.defaultNetwork')
   const targetChainId = Number(selectedCurrency.value.chain_id)
   const net = networks.find(n => Number(n.chainId) === targetChainId)
-  return net ? net.name : 'Unknown Network'
+  return net ? net.name : t('deposit.unknownNetwork')
 })
 const amount = ref('')
 const minAmount = ref('0.01')
@@ -142,7 +142,7 @@ const handleDeposit = async () => {
 
   const loading = ElLoading.service({
     lock: true,
-    text: 'Processing...',
+    text: t('commonManagement.processing'),
     background: 'rgba(0, 0, 0, 0.7)',
   })
   try {
@@ -152,13 +152,13 @@ const handleDeposit = async () => {
     }
 
     if (!selectedCurrency.value) {
-      Message.error('Please select a currency')
+      Message.error(t('deposit.pleaseSelectCurrency'))
       return
     }
 
     const depositAmount = parseFloat(amount.value) || 0
     if (depositAmount <= 0) {
-      Message.error('Please enter a valid amount')
+      Message.error(t('deposit.pleaseEnterValidAmount'))
       return
     }
 
@@ -184,7 +184,7 @@ const handleDeposit = async () => {
     const proxyFundingManager = netConfig?.proxyFundingPod
 
     if (!proxyFundingManager) {
-      Message.error('Contract address not found for this network')
+      Message.error(t('deposit.contractNotFound'))
       return
     }
 
@@ -198,7 +198,7 @@ const handleDeposit = async () => {
     )
 
     if (userBalance < amountBigInt) {
-      Message.error('Insufficient balance')
+      Message.error(t('commonManagement.insufficientBalance') || 'Insufficient balance')
       return
     }
 
@@ -214,7 +214,7 @@ const handleDeposit = async () => {
       )
 
       if (allowance === BigInt(0) || allowance < amountBigInt) {
-        loading.text = 'Requesting Approval...'
+        loading.text = t('deposit.requestingApproval')
         try {
           await approveToken({
             tokenAddress: tokenAddress,
@@ -222,9 +222,9 @@ const handleDeposit = async () => {
             amount: amountBigInt,
             userAddress: address.value,
             BRIDGE_MESSAGES: {
-              approvalSuccess: 'Approval Success',
-              userCancelledAuth: 'User Cancelled',
-              approveTokenFailed: 'Approval Failed',
+              approvalSuccess: t('commonManagement.approvalSuccess') || 'Approval Success',
+              userCancelledAuth: t('commonManagement.userCancelledAuth') || 'User Cancelled',
+              approveTokenFailed: t('commonManagement.approveTokenFailed') || 'Approval Failed',
             },
           })
         } catch (approveError) {
@@ -234,7 +234,7 @@ const handleDeposit = async () => {
       }
     }
 
-    loading.text = 'Depositing...'
+    loading.text = t('deposit.depositing')
     // Call contract deposit
     const result = await writeContractOptimized({
       abi: fundingPodABI,
@@ -244,15 +244,15 @@ const handleDeposit = async () => {
       userAddress: address.value,
       value: isNative ? amountBigInt : parseUnits("0", 18),
       messages: {
-        success: 'Deposit Success',
-        failed: 'Deposit Failed',
-        rejected: 'Deposit Cancelled',
+        success: t('commonManagement.confirmed') || 'Deposit Success',
+        failed: t('commonManagement.failed') || 'Deposit Failed',
+        rejected: t('commonManagement.rejected') || 'Deposit Cancelled',
       },
     })
 
     if (result && result.hash) {
       amount.value = ''
-      Message.success('Deposit successful!')
+      Message.success(t('deposit.depositSuccess'))
     }
 
   } catch (error) {
