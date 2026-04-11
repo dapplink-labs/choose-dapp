@@ -182,9 +182,9 @@
                                 </div>
                                 <div class="new-user-actions">
                                     <button class="new-user-action-btn"
-                                        @click="navigateToDetail(item, item.options[0]?.directions[1]?.outcome)">{{item.options[0]?.directions[1]?.outcome}}</button>
+                                        @click="navigateToDetail(item, item.options[0]?.directions[1]?.outcome)">{{ getDisplayOutcome(item.options[0]?.directions[1]?.outcome) }}</button>
                                     <button class="new-user-action-btn"
-                                        @click="navigateToDetail(item, item.options[0]?.directions[0]?.outcome)">{{item.options[0]?.directions[0]?.outcome}}</button>
+                                        @click="navigateToDetail(item, item.options[0]?.directions[0]?.outcome)">{{ getDisplayOutcome(item.options[0]?.directions[0]?.outcome) }}</button>
                                 </div>
                                 <div class="new-user-footer">
                                     <div class="amount-left">
@@ -251,8 +251,8 @@
                                 </div>
                                 <div class="item-actions">
                                     <button class="action-btn yes-btn"
-                                        @click="navigateToDetail(item,item.options[0]?.directions[1]?.outcome )">{{item.options[0]?.directions[1]?.outcome}}</button>
-                                    <button class="action-btn no-btn" @click="navigateToDetail(item, item.options[0]?.directions[0]?.outcome)">{{item.options[0]?.directions[0]?.outcome}}</button>
+                                        @click="navigateToDetail(item,item.options[0]?.directions[1]?.outcome )">{{ getDisplayOutcome(item.options[0]?.directions[1]?.outcome) }}</button>
+                                    <button class="action-btn no-btn" @click="navigateToDetail(item, item.options[0]?.directions[0]?.outcome)">{{ getDisplayOutcome(item.options[0]?.directions[0]?.outcome) }}</button>
                                 </div>
                                 <div class="item-amount">
                                     <div class="amount-left">
@@ -318,9 +318,9 @@
                                         </div>
                                         <div class="option-buttons">
                                             <button class="option-btn yes-btn"
-                                                @click.stop="navigateToDetail(item, opt?.directions[1]?.outcome, opt.subEventGuid)">{{opt?.directions[1]?.outcome}}</button>
+                                                @click.stop="navigateToDetail(item, opt?.directions[1]?.outcome, opt.subEventGuid)">{{ getDisplayOutcome(opt?.directions[1]?.outcome) }}</button>
                                             <button class="option-btn no-btn"
-                                                @click.stop="navigateToDetail(item, opt?.directions[0]?.outcome, opt.subEventGuid)">{{ opt?.directions[0]?.outcome }}</button>
+                                                @click.stop="navigateToDetail(item, opt?.directions[0]?.outcome, opt.subEventGuid)">{{ getDisplayOutcome(opt?.directions[0]?.outcome) }}</button>
                                         </div>
                                     </div>
                                 </div>
@@ -412,6 +412,14 @@ watch(language, () => {
 });
 
 const showNotice = ref(false);
+
+const getDisplayOutcome = (outcome) => {
+    if (!outcome) return '';
+    const str = String(outcome).toLowerCase();
+    if (str === 'up') return t('bitcoinUpDown.up') || '涨';
+    if (str === 'down') return t('bitcoinUpDown.down') || '跌';
+    return outcome;
+};
 
 // 公告数据
 const announcement = ref();

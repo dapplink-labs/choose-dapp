@@ -396,6 +396,14 @@ const getStatusFilterParam = () => {
     return ''
 }
 
+const getDisplayOutcome = (outcome) => {
+    if (!outcome) return '';
+    const str = String(outcome).toLowerCase();
+    if (str === 'up') return t('bitcoinUpDown.up') || '涨';
+    if (str === 'down') return t('bitcoinUpDown.down') || '跌';
+    return outcome;
+}
+
 const mapPositionToRow = (p) => {
     const title = p?.event_name || ''
     const outcome = String(p?.outcome || '').toUpperCase() || 'YES'
@@ -427,7 +435,7 @@ const mapPositionToRow = (p) => {
         pnl: Number.isFinite(pnlPct) ? Number(pnlPct.toFixed(2)) : 0,
         oddsType,
         // 中间粉/绿标签：Buy/Sell + 价格（¢）
-        oddsLabel: `${outcome} ${formatPriceToCentText(price)}`,
+        oddsLabel: `${getDisplayOutcome(outcome)} ${formatPriceToCentText(price)}`,
         // 底部右上角状态和历史复用字段
         resultAmount: Number.isFinite(pnlAbs) ? Number(pnlAbs.toFixed(2)) : 0,
         status: (Number(pnlAbs) < 0) ? 'lost' : 'claimed',
@@ -464,7 +472,7 @@ const mapOpenOrderToRow = (o) => {
         iconBg: outcome === 'NO' ? '#E44096' : '#2FBC87',
         pnl: 0,
         oddsType: outcome === 'NO' ? 'no' : 'yes',
-        oddsLabel: `${outcome} ${formatPriceToCentText(priceNum)}`,
+        oddsLabel: `${getDisplayOutcome(outcome)} ${formatPriceToCentText(priceNum)}`,
         resultAmount: 0,
         status: String(o?.status || '').toLowerCase(),
         value: valueText,
@@ -498,7 +506,7 @@ const mapOrderHistoryToRow = (o) => {
         iconBg: outcome === 'NO' ? '#E44096' : '#2FBC87',
         pnl: Number.isFinite(pnlPct) ? Number(pnlPct.toFixed(2)) : 0,
         oddsType: outcome === 'NO' ? 'no' : 'yes',
-        oddsLabel: `${o?.sub_event_title || outcome} · ${formatPriceToCentText(priceNum)}`,
+        oddsLabel: `${o?.sub_event_title || getDisplayOutcome(outcome)} · ${formatPriceToCentText(priceNum)}`,
         resultAmount: Number.isFinite(pnlAbs) ? Number(pnlAbs.toFixed(2)) : 0,
         status: (Number.isFinite(pnlAbs) && pnlAbs < 0) ? 'lost' : 'claimed',
         value: Number.isFinite(principalNum) ? principalNum.toFixed(2) : (o?.dealed_cost || '0.00'),

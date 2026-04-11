@@ -20,6 +20,7 @@ import {
   getOrderHistory,
   getSubEventDetail,
   getUserPositions,
+  toggleFavoriteEvent,
 } from "@/api/APIEvent";
 
 export default {
@@ -36,11 +37,48 @@ export default {
     const { t } = useI18n();
     const router = useRouter();
     const route = useRoute();
+
+    const getDisplayOutcome = (outcome) => {
+      if (!outcome) return '';
+      const str = String(outcome).toLowerCase();
+      if (str === 'up') return t('bitcoinUpDown.up') || '涨';
+      if (str === 'down') return t('bitcoinUpDown.down') || '跌';
+      return outcome;
+    };
     const themeStore = useThemeStore();
     const { address } = useAccount();
 
     const handleBack = () => router.back();
     const goWithdraw = () => router.push({ name: "withdraw" });
+
+    const handleBookmark = async () => {
+      if (!address.value) {
+        ElMessage.warning(t("pleaseConnectWallet") || "Please connect wallet");
+        return;
+      }
+      if (!currentEventGuid.value) return;
+      try {
+        const res = await toggleFavoriteEvent({
+          user_address: address.value,
+          event_guid: currentEventGuid.value,
+        });
+        const payload = res?.data ?? res;
+        const code = payload?.code;
+        if (code === 200 || code === 2000 || code === 0) {
+          detailData.value.isFavorite = !detailData.value.isFavorite;
+          ElMessage.success(
+            detailData.value.isFavorite
+              ? t("favoriteSuccess") || "Favorite success"
+              : t("unfavoriteSuccess") || "Unfavorite success"
+          );
+        } else {
+          ElMessage.error(payload?.msg || "Operation failed");
+        }
+      } catch (err) {
+        console.error("Toggle favorite failed", err);
+      }
+    };
+
     const currentEventGuid = computed(
       () => route.query.id || route.query.event_guid || "",
     );
@@ -286,6 +324,7 @@ export default {
       yesOutcome: "",
       noOutcome: "",
       logo: "",
+      isFavorite: false,
     });
 
     // 已解析的子事件 GUID
@@ -415,7 +454,7 @@ export default {
       return {
         id: item?.guid,
         title: item?.sub_event_name || t("crypto.yesOrNo"),
-        tagLabel: `${outcome === "up" ? detailData.value.yesOutcome || "YES" : detailData.value.noOutcome || "NO"} | ${shares.toFixed(2) || 0} ${t("sports.shares")}`,
+        tagLabel: `${outcome === "up" ? getDisplayOutcome(detailData.value.yesOutcome || "YES") : getDisplayOutcome(detailData.value.noOutcome || "NO")} | ${shares.toFixed(2) || 0} ${t("sports.shares")}`,
         avgPrice: formatCentText(item?.avg_price || 0),
         cost: formatMoney(costNum),
         positionValue: formatMoney(currentNum),
@@ -1667,6 +1706,7 @@ export default {
           eventStatus: rawStatus,
           yesOutcome: yesDirection?.outcome || "YES",
           noOutcome: noDirection?.outcome || "NO",
+          isFavorite: !!eventItem?.is_favorited,
         };
 
         if (Number.isFinite(currentPrice)) {
@@ -2093,10 +2133,12 @@ export default {
       chartInstance?.dispose();
     });
     return {
+      getDisplayOutcome,
       router,
       route,
       themeStore,
       handleBack,
+      handleBookmark,
       goWithdraw,
       currentEventGuid,
       requestedSubEventGuid,

@@ -201,7 +201,7 @@
                 :key="pIdx"
                 :class="(['YES','UP','Up'].includes(pos.outcome || '')?'yes':'no').toLowerCase()"
               >
-                {{ pos.outcome}}
+                {{ getDisplayOutcome(pos.outcome) }}
                 {{ Number(pos.shares) }} ·
                 {{ Number(pos.avg_price * 100).toFixed(1) }} ¢
               </span>
@@ -213,14 +213,14 @@
                 :class="{ active: outcome.selected === 'yes' }"
                 @click="selectOutcome(index, 'yes')"
               >
-                {{ outcome.yesOutcome }} {{ outcome.yesPrice }} ¢
+                {{ getDisplayOutcome(outcome.yesOutcome) }} {{ outcome.yesPrice }} ¢
               </button>
               <button
                 class="outcome-btn no-btn"
                 :class="{ active: outcome.selected === 'no' }"
                 @click="selectOutcome(index, 'no')"
               >
-                {{ outcome.noOutcome }} {{ outcome.noPrice }} ¢
+                {{ getDisplayOutcome(outcome.noOutcome) }} {{ outcome.noPrice }} ¢
               </button>
             </div>
             <div v-else class="outcome-actions-ended">
@@ -565,6 +565,14 @@ const COMMENT_PAGE_SIZE = 20;
 
 const yesHolders = ref([]);
 const noHolders = ref([]);
+
+const getDisplayOutcome = (outcome) => {
+  if (!outcome) return '';
+  const str = String(outcome).toLowerCase();
+  if (str === 'up') return t('bitcoinUpDown.up') || '涨';
+  if (str === 'down') return t('bitcoinUpDown.down') || '跌';
+  return outcome;
+};
 
 // 事件活动记录（从 /api/v1/event/activity 获取）
 const activityData = ref([]);

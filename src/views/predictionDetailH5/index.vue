@@ -45,7 +45,7 @@
 
                 <div class="event-chance-row">
                     <div class="event-chance-left">
-                        <div class="event-yes-label">{{ detailData.yesOutcome || 'YES' }}</div>
+                        <div class="event-yes-label">{{ getDisplayOutcome(detailData.yesOutcome) || 'YES' }}</div>
                         <div class="event-chance-block">
                             <div class="event-chance-main">{{ detailData.yesChance }}</div>
                             <div class="event-change-row">
@@ -80,7 +80,7 @@
                             <div class="cdt-time">{{ chartDragState.tooltipTime }}</div>
                             <div class="cdt-row">
                                 <span class="cdt-dot" :style="{ background: chartColors.primary }"></span>
-                                <span class="cdt-name">{{ detailData.yesOutcome || 'YES' }}</span>
+                                <span class="cdt-name">{{ getDisplayOutcome(detailData.yesOutcome) || 'YES' }}</span>
                                 <span class="cdt-price">{{ chartDragState.tooltipPrice }}</span>
                             </div>
                         </div>
@@ -97,11 +97,11 @@
                 <div class="orderbook-tabs">
                     <button type="button" class="orderbook-tab" :class="{ active: activeOrderbookSide === 'yes' }"
                         @click="activeOrderbookSide = 'yes'">
-                        {{ detailData.yesOutcome || 'YES' }}
+                        {{ getDisplayOutcome(detailData.yesOutcome) || 'YES' }}
                     </button>
                     <button type="button" class="orderbook-tab" :class="{ active: activeOrderbookSide === 'no' }"
                         @click="activeOrderbookSide = 'no'">
-                        {{ detailData.noOutcome || 'NO' }}
+                        {{ getDisplayOutcome(detailData.noOutcome) || 'NO' }}
                     </button>
                 </div>
 
@@ -112,9 +112,9 @@
         </div>
         <!-- 底部预测操作栏 -->
         <div class="bottom-dock-actions">
-            <button class="trade-btn up" @click="openPayment('yes')">{{ $t('common.buy') }} {{ detailData.yesOutcome || 'YES' }} {{
+            <button class="trade-btn up" @click="openPayment('yes')">{{ $t('common.buy') }} {{ getDisplayOutcome(detailData.yesOutcome) || 'YES' }} {{
                 detailData.yesBidPrice }}</button>
-            <button class="trade-btn down" @click="openPayment('no')">{{ $t('common.buy') }} {{ detailData.noOutcome || 'NO' }} {{ detailData.noBidPrice
+            <button class="trade-btn down" @click="openPayment('no')">{{ $t('common.buy') }} {{ getDisplayOutcome(detailData.noOutcome) || 'NO' }} {{ detailData.noBidPrice
                 }}</button>
         </div>
 
@@ -202,6 +202,14 @@ const priceToPercent = (p) => {
     const pct = n <= 1 ? n * 100 : n
     return `${pct.toFixed(1)}%`
 }
+
+const getDisplayOutcome = (outcome) => {
+    if (!outcome) return '';
+    const str = String(outcome).toLowerCase();
+    if (str === 'up') return t('bitcoinUpDown.up') || '涨';
+    if (str === 'down') return t('bitcoinUpDown.down') || '跌';
+    return outcome;
+};
 
 // ===================== 事件结束状态 =====================
 const eventEnded = ref(false)

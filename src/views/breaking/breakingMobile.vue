@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { TopRight, BottomRight } from '@element-plus/icons-vue'
 import lp1Png from '@/assets/icon/LP1.png'
@@ -90,6 +90,14 @@ const updateDate = () => {
     })
   }
 }
+
+const getDisplayOutcome = (outcome) => {
+  if (!outcome) return '';
+  const str = String(outcome).toLowerCase();
+  if (str === 'up') return t('bitcoinUpDown.up') || '涨';
+  if (str === 'down') return t('bitcoinUpDown.down') || '跌';
+  return outcome;
+};
 
 // 图片加载失败兜底（避免外链失效导致裂图）
 const handleImgError = (e) => {

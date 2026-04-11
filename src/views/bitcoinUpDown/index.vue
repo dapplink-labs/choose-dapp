@@ -14,10 +14,15 @@
           </el-icon>
           <span class="top-volume">{{ topVolumeText }}</span>
         </div>
-        <button class="top-btn bookmark-btn" type="button">
+        <button
+          class="top-btn bookmark-btn"
+          :class="{ active: detailData.isFavorite }"
+          type="button"
+          @click="handleBookmark"
+        >
           <svg
             viewBox="0 0 24 24"
-            fill="none"
+            :fill="detailData.isFavorite ? 'currentColor' : 'none'"
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
@@ -470,8 +475,8 @@
                   }}
                   <span class="side-text">{{
                     ["yes", "up"].includes(order.outcome?.toLowerCase())
-                      ? detailData.yesOutcome
-                      : detailData.noOutcome
+                      ? getDisplayOutcome(detailData.yesOutcome)
+                      : getDisplayOutcome(detailData.noOutcome)
                   }}</span>
                 </div>
                 <div :class="['order-chip', outcomeToTrend(order.outcome)]">
@@ -551,8 +556,8 @@
                     {{ item.shares }}
                     {{
                       ["yes", "up"].includes(item.outcome?.toLowerCase() || "")
-                        ? detailData.yesOutcome
-                        : detailData.noOutcome
+                        ? getDisplayOutcome(detailData.yesOutcome)
+                        : getDisplayOutcome(detailData.noOutcome)
                     }}
                   </span>
                   at {{ item.price }}¢
@@ -585,14 +590,14 @@
             :class="{ active: orderBookTab === 'yes' }"
             @click="orderBookTab = 'yes'"
           >
-            {{ detailData.yesOutcome || "" }}
+            {{ getDisplayOutcome(detailData.yesOutcome) || "" }}
           </button>
           <button
             class="orderbook-tab"
             :class="{ active: orderBookTab === 'no' }"
             @click="orderBookTab = 'no'"
           >
-            {{ detailData.noOutcome || "" }}
+            {{ getDisplayOutcome(detailData.noOutcome) || "" }}
           </button>
         </div>
         <OrderBookMobile
@@ -616,7 +621,7 @@
       <!-- 事件未结束时显示购买按钮 -->
       <template v-if="!isEventEnded">
         <button class="trade-btn up" type="button" @click="openPayment('up')">
-          {{ $t("common.buy") }} {{ detailData.yesOutcome || "" }}
+          {{ $t("common.buy") }} {{ getDisplayOutcome(detailData.yesOutcome) || "" }}
           {{ upTradePriceText }}
         </button>
         <button
@@ -624,7 +629,7 @@
           type="button"
           @click="openPayment('down')"
         >
-          {{ $t("common.buy") }} {{ detailData.noOutcome || "" }}
+          {{ $t("common.buy") }} {{ getDisplayOutcome(detailData.noOutcome) || "" }}
           {{ downTradePriceText }}
         </button>
       </template>
@@ -688,6 +693,7 @@ $primary-blue: #5073e5;
 }
 
 .top-btn {
+  width: 28px;
   background: transparent;
   border: none;
   padding: 4px;
@@ -696,6 +702,11 @@ $primary-blue: #5073e5;
   justify-content: center;
   color: inherit;
   cursor: pointer;
+  transition: color 0.3s;
+}
+
+.bookmark-btn.active {
+  color: var(--text-color-y);
 }
 
 .top-right {

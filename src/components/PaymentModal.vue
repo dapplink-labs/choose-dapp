@@ -57,7 +57,7 @@
                   ),
                 }"
               >
-                {{ outcomeBadge }}
+                {{ getDisplayOutcome(outcomeBadge) }}
                 <span
                   class="icon"
                   aria-hidden="true"
@@ -303,6 +303,14 @@ const props = defineProps({
 });
 const emit = defineEmits(["update:modelValue", "order-success"]);
 
+const getDisplayOutcome = (outcome: string) => {
+  if (!outcome) return '';
+  const str = String(outcome).toLowerCase();
+  if (str === 'up') return t('bitcoinUpDown.up') || '涨';
+  if (str === 'down') return t('bitcoinUpDown.down') || '跌';
+  return outcome;
+};
+
 // ===================== 基础状态 =====================
 const activeSide = ref("buy");
 const orderType = ref("market");
@@ -422,7 +430,7 @@ const executeLabel = computed(() => {
     activeSide.value === "buy"
       ? t("payment.buy") || "Buy"
       : t("payment.sell") || "Sell";
-  const ynText = outcomeBadge.value;
+  const ynText = getDisplayOutcome(outcomeBadge.value);
   return `${sideText} ${ynText}`;
 });
 
