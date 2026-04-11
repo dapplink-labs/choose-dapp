@@ -398,10 +398,18 @@ import { isTradeBlockedForEvent } from '@/utils/blockedTradeEventGuids';
 const { address } = useAccount();
 // 获取当前语言环境
 const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en';
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
-const language = currentLocale.split('-')[0];
+const language = computed(() => (locale.value || currentLocale).split('-')[0]);
+
+watch(language, () => {
+    getCategoryListData();
+    getEcosystemListData(route.query.category_guid);
+    getHomeBannerList();
+    fetchPeriodList(route.query.category_guid);
+    fetchEventList();
+});
 
 const showNotice = ref(false);
 
@@ -410,7 +418,7 @@ const announcement = ref();
 
 // 获取公告数据
 async function getNotice() {
-    const response = await getNoticeData({ address: address.value, language: currentLocale });
+    const response = await getNoticeData({ address: address.value, language: locale.value || currentLocale });
     if (response?.data?.announcement) {
         announcement.value = response.data.announcement;
         showNotice.value = true;
@@ -419,7 +427,7 @@ async function getNotice() {
 // 获取分类列表数据
 const categoryList = ref([]);
 async function getCategoryListData() {
-    const response = await getCategoryList({ language_label: language });
+    const response = await getCategoryList({ language_label: language.value });
     const data = response?.data?.data?.categories || [];
     console.log("分类列表数据：", data);
     categoryList.value = [...data]
@@ -431,7 +439,7 @@ async function getEcosystemListData(categoryId) {
         ecosystemList.value = [];
         return;
     }
-    const response = await getEcosystemList({ language_label: language, category_guid: categoryId });
+    const response = await getEcosystemList({ language_label: language.value, category_guid: categoryId });
     const data = response?.data?.data?.ecosystems || [];
     console.log("生态列表数据：", data);
     ecosystemList.value = data.map(item => ({
@@ -453,7 +461,7 @@ watch(
 // 获取首页轮播图
 async function getHomeBannerList() {
     try {
-        const response = await getHomeBanner({ language: language, limit: 10 });
+        const response = await getHomeBanner({ language: language.value, limit: 10 });
         const list = response?.data?.data?.banners || [];
         bannerList.value = list
             .map((item) => ({
@@ -502,7 +510,7 @@ const frequencyOptions = ref([
 // 拉取时间段列表
 const fetchPeriodList = async (categoryGuid) => {
     try {
-        const params = { language_label: language };
+        const params = { language_label: language.value };
         if (categoryGuid) params.category_guid = categoryGuid;
         const res = await getPeriodList(params);
         const periods = res?.data?.data?.event_periods || [];
@@ -709,7 +717,7 @@ const fetchEventList = async (append = false) => {
     try {
         const query = route.query || {};
         const params = {
-            language_label: language,
+            language_label: language.value,
             include_sub_events: true,
             page: eventPage.value,
             page_size: PAGE_SIZE,

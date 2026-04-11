@@ -41,15 +41,20 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, watch, onMounted, nextTick, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { getCategoryList } from '@/api/APIEvent'
 
-const language = (localStorage.getItem('app-locale') || navigator.language).split('-')[0];
+const { t, locale } = useI18n()
 const router = useRouter()
 const route = useRoute()
-const { t } = useI18n()
+const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en';
+const language = computed(() => (locale.value || currentLocale).split('-')[0]);
+
+watch(language, () => {
+    getCategoryListData();
+});
 
 const activeNav = ref('')
 const navItemRefs = ref({})
@@ -64,7 +69,7 @@ const navItems = ref([
 async function getCategoryListData() {
 
   try {
-    const response = await getCategoryList({ language_label: language });
+    const response = await getCategoryList({ language_label: language.value });
     const categories = response?.data?.data?.categories || [];
     const dynamicItems = categories.map(c => ({
       key: c.code || `category_guid=${c.guid}`,

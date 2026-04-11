@@ -241,7 +241,7 @@ import { isTradeBlockedForEvent } from "@/utils/blockedTradeEventGuids";
 import { useAccount } from "@wagmi/vue";
 import { getCategoryList, getEventList, getFavoriteList, toggleFavoriteEvent } from "@/api/APIEvent";
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
 
@@ -249,7 +249,12 @@ const { address } = useAccount();
 
 // 语言环境（给接口的 language_label 用）
 const currentLocale = localStorage.getItem("app-locale") || navigator.language || "en";
-const language = String(currentLocale).split("-")[0];
+const language = computed(() => (locale.value || currentLocale).split("-")[0]);
+
+watch(language, () => {
+    fetchCategoryListData();
+    fetchEventList();
+});
 
 // 搜索相关（PC 顶部栏）
 const searchQuery = ref("");
@@ -379,7 +384,7 @@ const mapEventToCard = (e) => {
 
 const fetchCategoryListData = async () => {
     try {
-        const response = await getCategoryList({ language_label: language });
+        const response = await getCategoryList({ language_label: language.value });
         const cats = response?.data?.data?.categories || [];
         categoryList.value = [...cats];
     } catch (err) {
@@ -392,7 +397,7 @@ const fetchEventList = async () => {
     try {
         const query = route.query || {};
         const params = {
-            language_label: language,
+            language_label: language.value,
             include_sub_events: true,
             page: 1,
             page_size: PAGE_SIZE,

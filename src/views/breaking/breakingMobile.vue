@@ -65,19 +65,25 @@ import { isTradeBlockedForEvent } from "@/utils/blockedTradeEventGuids"
 
 const router = useRouter()
 const { address } = useAccount()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
-const language = currentLocale.split('-')[0]
+const language = computed(() => (locale.value || currentLocale).split('-')[0])
+
+watch(language, () => {
+    updateDate();
+    getCategoryListData();
+    fetchEventList();
+})
 
 const currentDate = ref('')
 
 const updateDate = () => {
   const d = new Date()
-  if (language === 'zh') {
+  if (language.value === 'zh') {
     currentDate.value = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
   } else {
-    currentDate.value = d.toLocaleDateString(currentLocale, {
+    currentDate.value = d.toLocaleDateString(locale.value || currentLocale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -109,7 +115,7 @@ const handleCategoryClick = (key) => {
 // 获取分类列表数据
 async function getCategoryListData() {
   try {
-    const response = await getCategoryList({ language_label: language });
+    const response = await getCategoryList({ language_label: language.value });
     const data = response?.data?.data?.categories || [];
     categoryList.value = data;
     categories.value = [
@@ -132,7 +138,7 @@ const fetchEventList = async () => {
   loading.value = true;
   try {
     const params = {
-      language_label: language,
+      language_label: language.value,
       event_type: 1, // 1 for breaking events
       page: 1,
       page_size: 50,

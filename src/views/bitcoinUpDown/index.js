@@ -97,7 +97,7 @@ export default {
       const start = parseDateSafe(detailData.value.startTime);
       const end = parseDateSafe(detailData.value.closeTime);
       if (!start && !end) return "";
-      const tz = getUtcOffsetText(end || start || new Date());
+      const tz = ""
       if (start && end) {
         const sameDay =
           start.getFullYear() === end.getFullYear() &&
