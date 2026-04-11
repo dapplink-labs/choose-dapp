@@ -777,7 +777,7 @@ const navigateToDetail = (item, choice, subEventGuid) => {
     const finalSubEventGuid = subEventGuid || fallbackSubEventGuid;
 
     // 部分列表可能你配置的 GUID 实际落在 sub_event_guid 上
-    if (isTradeBlockedForEvent(item?.id) || isTradeBlockedForEvent(finalSubEventGuid)) {
+    if (!item?.title.includes("BTCUSDT")) {
         ElMessage.warning(t('home.tradeNotOpen') || '暂未开启');
         return;
     }
