@@ -49,10 +49,10 @@ import { getCategoryList } from '@/api/APIEvent'
 const { t, locale } = useI18n()
 const router = useRouter()
 const route = useRoute()
-const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en';
-const language = computed(() => (locale.value || currentLocale).split('-')[0]);
+const language = computed(() => (locale.value ).split('-')[0]);
 
 watch(language, () => {
+ 
     getCategoryListData();
 });
 
@@ -67,7 +67,7 @@ const navItems = ref([
 ])
 
 async function getCategoryListData() {
-
+ console.log('language.value', language.value)
   try {
     const response = await getCategoryList({ language_label: language.value });
     const categories = response?.data?.data?.categories || [];
@@ -78,9 +78,10 @@ async function getCategoryListData() {
       query: { nav: c.code, category_guid: c.guid }
     }));
 
-    const existingKeys = new Set(navItems.value.map(i => i.key));
-    const toAdd = dynamicItems.filter(i => !existingKeys.has(i.key));
-    if (toAdd.length) navItems.value.splice(3, 0, ...toAdd);
+    navItems.value = [
+      ...navItems.value.slice(0, 3),
+      ...dynamicItems
+    ];
     updateActiveNavFromRoute();
   } catch (err) {
     console.error('Fetch categories failed', err);

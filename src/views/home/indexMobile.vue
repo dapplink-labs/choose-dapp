@@ -50,7 +50,7 @@
                                         <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2"
                                             stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
-                                    <input class="esports-search-input" type="text" placeholder="Search"
+                                    <input class="esports-search-input" type="text" :placeholder="$t('home.searchPlaceholder') || '搜索'"
                                         v-model="searchQuery" @input="handleSearchInput" />
                                 </div>
                                 <template v-else>
@@ -397,11 +397,10 @@ import { isTradeBlockedForEvent } from '@/utils/blockedTradeEventGuids';
 // 获取用户地址
 const { address } = useAccount();
 // 获取当前语言环境
-const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en';
 const { t, locale } = useI18n();
 const route = useRoute();
 const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
-const language = computed(() => (locale.value || currentLocale).split('-')[0]);
+const language = computed(() => (locale.value ).split('-')[0]);
 
 watch(language, () => {
     getCategoryListData();
@@ -426,7 +425,7 @@ const announcement = ref();
 
 // 获取公告数据
 async function getNotice() {
-    const response = await getNoticeData({ address: address.value, language: locale.value || currentLocale });
+    const response = await getNoticeData({ address: address.value, language: locale.value  });
     if (response?.data?.announcement) {
         announcement.value = response.data.announcement;
         showNotice.value = true;
