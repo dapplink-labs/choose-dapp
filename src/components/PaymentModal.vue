@@ -144,7 +144,7 @@
                 class="quick-share-btn"
                 @click="adjustInput(val)"
               >
-                {{ val > 0 ? "+" + val : val }}
+                {{ val === 'Max' ? $t('payment.max') : (val > 0 ? "+" + val : val) }}
               </button>
             </div>
           </div>
@@ -375,9 +375,12 @@ const isMarketBuy = computed(
 );
 
 // 快捷加减值：市价买入用金额步进，其余用份数步进
-const quickAdjustValues = computed(() =>
-  isMarketBuy.value ? [-100, -10, 10, 100] : [-100, -10, 10, 100],
-);
+const quickAdjustValues = computed(() => {
+  if (orderType.value === "market") {
+    return isMarketBuy.value ? [-100, -10, 10, 100, "Max"] : [-100, -10, 10, 100, "Max"];
+  }
+  return isMarketBuy.value ? [-100, -10, 10, 100] : [-100, -10, 10, 100];
+});
 
 // 汇总展示
 const displayTotal = computed(() => {
@@ -478,9 +481,17 @@ function clampPrice() {
   else price.value = Math.floor(v);
 }
 
-function adjustInput(val: number) {
+function adjustInput(val: number | string) {
+  if (val === 'Max') {
+    if (activeSide.value === 'buy') {
+      inputValue.value = String(userBalance.value);
+    } else if (activeSide.value === 'sell') {
+      inputValue.value = String(currentHoldingShares.value);
+    }
+    return;
+  }
   const current = Number(inputValue.value) || 0;
-  inputValue.value = String(Math.max(0, current + val));
+  inputValue.value = String(Math.max(0, current + Number(val)));
 }
 
 function onInputChange() {

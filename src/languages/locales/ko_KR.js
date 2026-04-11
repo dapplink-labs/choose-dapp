@@ -379,6 +379,7 @@ export default {
   footerNav: {
     home: "홈",
     breaking: "속보",
+    account: "계정",
   },
   userInfo: {
     ecosystem: "생태계",
@@ -551,6 +552,7 @@ export default {
     },
   },
   payment: {
+    max: "최대",
     systemTip: "시스템 알림",
     cancel: "취소",
     iKnow: "확인했습니다",

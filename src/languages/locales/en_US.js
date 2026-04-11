@@ -372,6 +372,7 @@ export default {
   footerNav: {
     home: "Home",
     breaking: "Breaking",
+    account: "Account",
   },
   userInfo: {
     ecosystem: "Ecosystem",
@@ -547,6 +548,7 @@ export default {
     },
   },
   payment: {
+    max: "Max",
     systemTip: "System Tip",
     cancel: "Cancel",
     iKnow: "I Know",

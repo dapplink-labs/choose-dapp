@@ -371,6 +371,7 @@ export default {
   footerNav: {
     home: "首页",
     breaking: "突发",
+    account: "账户",
   },
   userInfo: {
     ecosystem: "生态系统",
@@ -545,6 +546,7 @@ export default {
     },
   },
   payment: {
+    max: "最大",
     systemTip: "系统提示",
     cancel: "取消",
     iKnow: "我已知晓",

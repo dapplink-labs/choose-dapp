@@ -372,6 +372,7 @@ export default {
   footerNav: {
     home: "ホーム",
     breaking: "速報",
+    account: "アカウント",
   },
   userInfo: {
     ecosystem: "エコシステム",
@@ -544,6 +545,7 @@ export default {
     },
   },
   payment: {
+    max: "最大",
     systemTip: "システムヒント",
     cancel: "キャンセル",
     iKnow: "確認しました",
