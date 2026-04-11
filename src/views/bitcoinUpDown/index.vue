@@ -693,7 +693,7 @@ $primary-blue: #5073e5;
 }
 
 .top-btn {
-  width: 28px;
+  width: 24px;
   background: transparent;
   border: none;
   padding: 4px;
