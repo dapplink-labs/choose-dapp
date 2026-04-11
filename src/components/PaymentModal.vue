@@ -507,7 +507,7 @@ async function fetchOrderBookData() {
     console.log(res);
 
     if (code === 2000) {
-      orderBookData.value = res?.data?.data || null;
+      orderBookData.value = res?.data?.data?.order_book_data_list || null;
     }
   } catch (err) {
     console.error("Fetch order book failed in modal", err);
@@ -666,15 +666,26 @@ async function handleConfirm() {
     }
   }
 
-  // 市价单购买流动性警告校验
-  if (activeSide.value === "buy" && orderType.value === "market") {
+  // 市价单购买/卖出流动性警告校验
+  if (orderType.value === "market") {
     const sideStr = outcomeBadge.value || "";
-    // 判断订单薄是否有反方向(卖单/asks)挂单
-    const asks = orderBookData.value?.[sideStr]?.asks || [];
-    console.log(orderBookData.value)
-    if (asks.length === 0) {
-      showMarketWarning.value = true;
-      return;
+    
+    if (activeSide.value === "buy") {
+      // 购买时判断订单薄是否有反方向(卖单/asks)挂单
+      const asks = orderBookData.value?.[sideStr]?.asks || [];
+      console.log(orderBookData.value, asks);
+      if (asks.length === 0) {
+        showMarketWarning.value = true;
+        return;
+      }
+    } else if (activeSide.value === "sell") {
+      // 卖出时判断订单薄是否有同方向(买单/bids)挂单
+      const bids = orderBookData.value?.[sideStr]?.bids || [];
+      console.log(orderBookData.value, bids);
+      if (bids.length === 0) {
+        showMarketWarning.value = true;
+        return;
+      }
     }
   }
 

@@ -1438,7 +1438,6 @@ export default {
         });
         if (!isRespSuccess(res))
           throw new Error(res?.data?.message || "Fetch order book failed");
-        console.log(res);
         const data = res?.data?.data?.order_book_data_list || {};
         applyOrderBookPayload(data);
 

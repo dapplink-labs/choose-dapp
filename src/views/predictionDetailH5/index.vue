@@ -365,6 +365,19 @@ const normalizeOrderBookSide = (book = {}) => ({
 // 将 MQTT 或 REST 推送的订单簿数据应用到响应式状态
 const applyOrderBookPayload = (payload, outcome = '') => {
     if (!payload || typeof payload !== 'object') return
+
+    if (Array.isArray(payload.order_book_data_list)) {
+        const list = payload.order_book_data_list
+        const yesOutcome = detailData.value?.yesOutcome || 'YES'
+        const noOutcome = detailData.value?.noOutcome || 'NO'
+        const yesItem = list.find(item => item.direction?.toUpperCase() === yesOutcome.toUpperCase()) || list[0]
+        const noItem = list.find(item => item.direction?.toUpperCase() === noOutcome.toUpperCase()) || list[1]
+        
+        if (yesItem) orderBookYes.value = normalizeOrderBookSide(yesItem)
+        if (noItem) orderBookNo.value = normalizeOrderBookSide(noItem)
+        return
+    }
+
     const yesKey = payload.yes || payload.YES
     const noKey = payload.no || payload.NO
     if (yesKey || noKey) {
@@ -390,10 +403,21 @@ const fetchOrderBook = async () => {
             outcome: '',
         })
         const data = res?.data?.data || {}
-        if (!isRespSuccess(res) && !data.yes && !data.no && !data.asks) throw new Error(res?.data?.message || 'Fetch order book failed')
+        if (!isRespSuccess(res) && !data.yes && !data.no && !data.asks && !data.order_book_data_list) throw new Error(res?.data?.message || 'Fetch order book failed')
         applyOrderBookPayload(data)
+        
+        let yesData = data?.yes || data?.YES
+        let noData = data?.no || data?.NO
+        if (Array.isArray(data.order_book_data_list)) {
+            const list = data.order_book_data_list
+            const yesOutcome = detailData.value?.yesOutcome || 'YES'
+            const noOutcome = detailData.value?.noOutcome || 'NO'
+            yesData = list.find(item => item.direction?.toUpperCase() === yesOutcome.toUpperCase()) || list[0]
+            noData = list.find(item => item.direction?.toUpperCase() === noOutcome.toUpperCase()) || list[1]
+        }
+
         // 从订单簿获取成交量
-        const vol = firstFinite(data?.trade_volume, data?.total_volume, data?.yes?.trade_volume, data?.no?.trade_volume)
+        const vol = firstFinite(data?.trade_volume, data?.total_volume, yesData?.trade_volume, noData?.trade_volume)
         if (Number.isFinite(vol) && vol > 0) {
             detailData.value.tradeVolume = vol
             detailData.value.volume = formatVolume(vol)
@@ -407,10 +431,10 @@ const fetchOrderBook = async () => {
             const prices = (Array.isArray(bids) ? bids : []).map(l => firstFinite(l?.price)).filter(v => Number.isFinite(v))
             return prices.length ? Math.max(...prices) : null
         }
-        const yesBestAsk = pickBestAsk(data?.yes?.asks || data?.YES?.asks)
-        const noBestAsk = pickBestAsk(data?.no?.asks || data?.NO?.asks)
-        const yesBestBid = pickBestBid(data?.yes?.bids || data?.YES?.bids)
-        const noBestBid = pickBestBid(data?.no?.bids || data?.NO?.bids)
+        const yesBestAsk = pickBestAsk(yesData?.asks)
+        const noBestAsk = pickBestAsk(noData?.asks)
+        const yesBestBid = pickBestBid(yesData?.bids)
+        const noBestBid = pickBestBid(noData?.bids)
         if (Number.isFinite(yesBestAsk)) detailData.value.yesAskPrice = formatCentText(yesBestAsk)
         if (Number.isFinite(noBestAsk)) detailData.value.noAskPrice = formatCentText(noBestAsk)
         if (Number.isFinite(yesBestBid)) {
