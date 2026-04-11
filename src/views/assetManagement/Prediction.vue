@@ -43,7 +43,7 @@
           {{ profitAmount > 0 ? '+' : (profitAmount < 0 ? '-' : '') }} {{ formatCurrency(Math.abs(profitAmount)) }}
         </span>
       </div>
-      <div class="history-label">历史累计</div>
+      <div class="history-label">{{ $t('assetManagement.historyCumulative') || '历史累计' }}</div>
     </div>
 
     <!-- 图表部分 -->
@@ -124,10 +124,10 @@ const todayProfitRate = ref(0)
 
 // 时间周期选择
 const timePeriods = computed(() => [
-  { label: '1天', value: '1d' },
-  { label: '1周', value: '1w' },
-  { label: '1月', value: '1m' },
-  { label: '全部', value: 'all' }
+  { label: t('assetManagement.timePeriod1d'), value: '1d' },
+  { label: t('assetManagement.timePeriod1w'), value: '1w' },
+  { label: t('assetManagement.timePeriod1m'), value: '1m' },
+  { label: t('assetManagement.timePeriodAll'), value: 'all' }
 ])
 const selectedPeriod = ref('all')
 
@@ -201,7 +201,7 @@ const fetchPnlAndRender = async () => {
     })
     const code = res?.data?.code
     if (!(code === 0 || code === 200 || code === 2000)) {
-      throw new Error(res?.data?.message || 'fetch pnl failed')
+      throw new Error(res?.data?.message || t('assetManagement.fetchPnlFailed'))
     }
 
     const data = res?.data?.data || {}
@@ -220,7 +220,7 @@ const fetchPnlAndRender = async () => {
     pnlPoints.value = []
     profitAmount.value = 0
     updateChart()
-    ElMessage.error(e?.message || 'fetch pnl failed')
+    ElMessage.error(e?.message || t('assetManagement.fetchPnlFailed'))
   } finally {
     pnlLoading.value = false
   }
@@ -237,12 +237,12 @@ const fetchUserStat = async () => {
     })
     const code = res?.data?.code
     if (!(code === 0 || code === 200 || code === 2000)) {
-      throw new Error(res?.data?.message || 'fetch stat failed')
+      throw new Error(res?.data?.message || t('assetManagement.fetchStatFailed'))
     }
     statSummary.value = res?.data?.data || null
   } catch (e) {
     statSummary.value = null
-    ElMessage.error(e?.message || 'fetch stat failed')
+    ElMessage.error(e?.message || t('assetManagement.fetchStatFailed'))
   } finally {
     statLoading.value = false
   }

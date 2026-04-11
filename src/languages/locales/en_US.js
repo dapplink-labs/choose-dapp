@@ -48,7 +48,10 @@ export default {
     noOpenOrdersToCancel: 'No open orders to cancel',
     cancelAllSuccess: 'Canceled {n} orders',
     cancelAllFailed: '{n} orders failed to cancel',
-    predictionAmount: 'Prediction Amount'
+    predictionAmount: 'Prediction Amount',
+    historyCumulative: 'Historical Cumulative',
+    fetchPnlFailed: 'Fetch PnL failed',
+    fetchStatFailed: 'Fetch stat failed'
   },
   withdraw: {
     title: 'Withdraw',

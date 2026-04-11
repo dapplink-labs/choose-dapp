@@ -641,7 +641,7 @@ async function handleConfirm() {
   if (submitting.value || !canSubmit.value) return;
 
   if (!props.eventGuid || !props.subEventGuid) {
-    ElMessage.error(t("payment.missingIds") || "Missing event or sub-event id");
+    ElMessage.warning(t("payment.missingIds") || "Missing event or sub-event id");
     return;
   }
 
@@ -667,7 +667,7 @@ async function handleConfirm() {
 
     const currentBalance = Number(userBalance.value) || 0;
     if (requiredAmount > currentBalance) {
-      ElMessage.error(
+      ElMessage.warning(
         t("payment.insufficientBalance") || "Insufficient balance",
       );
       return;
@@ -680,7 +680,7 @@ async function handleConfirm() {
     const holdingShares = currentHoldingShares.value;
 
     if (sellShares > holdingShares) {
-      ElMessage.error(t("payment.insufficientShares") || "Insufficient shares");
+      ElMessage.warning(t("payment.insufficientShares") || "Insufficient shares");
       return;
     }
   }

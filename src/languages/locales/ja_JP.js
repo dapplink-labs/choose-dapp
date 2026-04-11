@@ -48,7 +48,10 @@ export default {
     noOpenOrdersToCancel: 'キャンセルできる未約定注文がありません',
     cancelAllSuccess: '{n}件の注文をキャンセルしました',
     cancelAllFailed: '{n}件の注文のキャンセルに失敗しました',
-    predictionAmount: '予測金額'
+    predictionAmount: '予測金額',
+    historyCumulative: '歴史的累積',
+    fetchPnlFailed: '収益データの取得に失敗しました',
+    fetchStatFailed: '統計データの取得に失敗しました'
   },
   withdraw: {
     title: '出金',

@@ -49,6 +49,9 @@ export default {
     cancelAllSuccess: "已取消 {n} 个挂单",
     cancelAllFailed: "{n} 个挂单取消失败",
     predictionAmount: "预测金额",
+    historyCumulative: "历史累计",
+    fetchPnlFailed: "获取收益数据失败",
+    fetchStatFailed: "获取统计数据失败"
   },
   withdraw: {
     title: "提币",
