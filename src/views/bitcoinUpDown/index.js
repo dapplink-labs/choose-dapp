@@ -57,7 +57,7 @@ export default {
       );
     });
 
-    const assetLogoSrc = computed(() => detailData.value.log || defaultLogo);
+    const assetLogoSrc = computed(() => detailData.value.logo);
 
     const parseDateSafe = (value) => {
       if (!value) return null;
@@ -285,6 +285,7 @@ export default {
       eventStatus: "", // 事件状态（settled/ended/closed 等表示已结束）
       yesOutcome: "",
       noOutcome: "",
+      logo: "",
     });
 
     // 已解析的子事件 GUID
@@ -1642,17 +1643,12 @@ export default {
         }
 
         detailData.value = {
-          log: eventItem?.log || subEvent?.log || "",
+          logo: eventItem?.logo || subEvent?.logo || defaultLogo,
           eventTitle: eventItem?.title || "",
           title: subEvent?.title || "",
           tradeVolume:
             firstFinite(
               subEvent?.trade_volume,
-              subEvent?.total_volume,
-              subEvent?.bet_volume,
-              subEvent?.total_bet_amount,
-              eventItem?.trade_volume,
-              eventItem?.total_volume,
             ) || 0,
           rulesDescription: (eventItem?.rules ?? subEvent?.rules ?? "") || "",
           closeTime,

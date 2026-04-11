@@ -776,13 +776,13 @@ $primary-blue: #5073e5;
   .asset-logo {
     width: 44px;
     height: 44px;
-    background: $primary-blue;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
+    // background: $primary-blue;
+    // border-radius: 12px;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+    // flex-shrink: 0;
+    // transition: all 0.3s ease;
   }
 
   .asset-text {

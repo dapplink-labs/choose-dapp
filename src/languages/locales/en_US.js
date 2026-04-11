@@ -74,7 +74,7 @@ export default {
     selectToken: "Select Token",
     selectNetwork: "Select Network",
     amountLabel: "Deposit Amount",
-    confirmBtn: "Confirm Deposit"
+    confirmBtn: "Confirm Deposit",
   },
   transactionSuccess: {
     title: "Transaction Successful",
@@ -131,7 +131,7 @@ export default {
     secs: "SECS",
     volume: "Vol.",
     questionTitle: "Will Ethereum go up or down on Feb 27?",
-    baopei: "Compensation"
+    baopei: "Compensation",
   },
   link: {
     titel: "Connect Wallet",
@@ -191,8 +191,7 @@ export default {
     insufficientBalance: "Insufficient balance",
     switchToCorrectNetwork: "Please switch to the correct network",
     minimumBridgeAmount: "Minimum bridge amount is",
-    networkSwitchFailed:
-      "Network switch failed, current network does not match target network",
+    networkSwitchFailed: "Network switch failed, current network does not match target network",
     invalidAmountFormat: "Invalid amount format",
     record: {
       title: "Cross-chain records",
@@ -216,8 +215,7 @@ export default {
   },
   notice: {
     title: "Feature Under Development",
-    subtitle:
-      "We are working hard to build new features and bring you an even better experience",
+    subtitle: "We are working hard to build new features and bring you an even better experience",
     soon: "Stay tuned · Exciting things coming soon",
     btn: "Got it",
   },
@@ -322,7 +320,7 @@ export default {
     copied: "Copied",
     copyFailed: "Copy failed",
     max: "MAX",
-    enterValidAmount: "Please enter valid amount"
+    enterValidAmount: "Please enter valid amount",
   },
   header: {
     searchPlaceholder: "Search ChooseMe",
@@ -332,9 +330,6 @@ export default {
     profile: "Profile",
     settingsTitle: "Settings",
     logout: "Logout",
-  },
-  messages: {
-    title: "Messages",
   },
   home: {
     comingSoon: "Prediction market coming soon.",
@@ -421,7 +416,6 @@ export default {
     inviteShare: "Invite & Share",
     underDevelopment: "Coming Soon",
     bindInviterFirst: "Please bind inviter first",
-
     profileTitle: "Profile",
     email: "Email",
     emailPlaceholder: "Enter your email address",
@@ -464,13 +458,11 @@ export default {
     disclaimer:
       "ChooseMe AI support is powered by AI. Replies may be inaccurate, incomplete or outdated. Do not treat them as investment advice.",
     inputPlaceholder: "Please enter content",
-    replySelectType:
-      "Xiao C found deposit/withdraw guides for you. Please select:",
+    replySelectType: "Xiao C found deposit/withdraw guides for you. Please select:",
     optionDeposit: "Deposit tutorial",
     optionWithdraw: "Withdraw tutorial",
     replyDepositGuides: "Here are the deposit tutorials found for you:",
-    replyDefault:
-      "Xiao C is looking up relevant help. Please wait or try another question.",
+    replyDefault: "Xiao C is looking up relevant help. Please wait or try another question.",
   },
   breaking: {
     ad: "Advertisement",
@@ -483,8 +475,7 @@ export default {
     },
     subscription: {
       title: "Get Daily Updates",
-      description:
-        "We'll send you an email every day with the latest updates from ChooseMe.",
+      description: "We'll send you an email every day with the latest updates from ChooseMe.",
       emailPlaceholder: "Please enter your email address",
       submit: "Get Updates",
     },
@@ -493,7 +484,7 @@ export default {
       followBtn: "follow on X",
       breakingNews: "Breaking News",
     },
-    title:"Breaking News"
+    title: "Breaking News",
   },
   detail: {
     viewResults: "View Results",
@@ -556,6 +547,11 @@ export default {
     },
   },
   payment: {
+    systemTip: "System Tip",
+    cancel: "Cancel",
+    iKnow: "I Know",
+    marketWarning:
+      "The current market liquidity is low, and the market order may not be matched. If the order is not filled, it will be automatically canceled and the funds will be returned to your account.",
     cashUsed: "Cash Used",
     maxTradeSize: "Max trade size:",
     usableBonusAmount: "Usable Bonus Amount:",
@@ -567,6 +563,48 @@ export default {
     projectedPnl: "Projected PnL(ROI)",
     tradedProbability: "Your traded probability",
     marketImpact: "Market Impact",
+    buy: "Buy",
+    sell: "Sell",
+    redeem: "Redeem",
+    sellSuccess: "Sell successfully",
+    tradeSuccess: "Trade successful",
+    tradeFailed: "Trade failed",
+    marketOrder: "Market",
+    limitOrder: "Limit",
+    balance: "Balance",
+    limitPrice: "Limit Price",
+    amount: "Amount",
+    calculating: "Calculating...",
+    shares: "Shares",
+    avgPrice: "Average Price",
+    estimatedShares: "Est. Shares",
+    estimatedProfit: "Est. Profit",
+    maxLeverageTip: "Max leverage: 10X (Not available yet)",
+    expiration: "Set expiration",
+    expiry5m: "5m",
+    expiry1h: "1h",
+    expiry12h: "12h",
+    expiry24h: "24h",
+    expiryEod: "EOD",
+    expiryCustom: "Custom",
+    expiryMinutes: "min",
+    total: "Total",
+    potentialGain: "Potential Gain",
+    submitting: "Submitting...",
+    orderSuccess: "Order created successfully",
+    orderFailed: "Order failed",
+    orderSubmitted: "Order submitted successfully",
+    orderSubmittedFailed: "Order submitted failed",
+    buyNo: "Buy No",
+    buyYes: "Buy Yes",
+    missingIds: "Missing event or sub-event id",
+    insufficientBalance: "Insufficient balance",
+    insufficientShares: "Insufficient shares",
+    receive: "Receive",
+    sellingShares: "Selling {shares} shares {'@'} {avgPrice}",
+    editOrder: "Edit order",
+    cashing: "Cashing...",
+    cashout: "Cashing",
   },
   earnings: {
     totalWinnings: "Total Winnings",
@@ -697,9 +735,6 @@ export default {
     maxLabel: "MAX",
     confirmClaimBtn: "Confirm Claim",
     inputExceed: "Entered amount exceeds claimable amount",
-    enterClaimAmount: "Please enter claim amount",
-    confirmClaimBtn: "Confirm Claim",
-    inputExceed: "Entered amount exceeds claimable amount",
     nodeTypes: {
       distributed: "Distributed Node",
       cluster: "Cluster Node",
@@ -722,8 +757,8 @@ export default {
     claimSuccess: "Claim successful",
     claimFailed: "Claim failed",
     claimCancelled: "You cancelled the claim",
-      priceTooLow: "Current token price is too low; must reach 1.1× base price to claim",
-      insufficientBnb: "Wallet BNB balance insufficient to cover transaction fee",
+    priceTooLow: "Current token price is too low; must reach 1.1× base price to claim",
+    insufficientBnb: "Wallet BNB balance insufficient to cover transaction fee",
     connectWalletFirst: "Please connect wallet first",
     missingContractAddress: "Missing NodeManager contract address",
     directAddressCount: "Direct Address Count",
@@ -769,8 +804,7 @@ export default {
     purchaseTime: "Activation Time",
     upline: "Upline",
     noStakingNode: "Notice",
-    noStakingNodeMessage:
-      "You don't have any staked nodes yet. Please stake a node first before viewing earnings",
+    noStakingNodeMessage: "You don't have any staked nodes yet. Please stake a node first before viewing earnings",
     nodeNames: {
       infoNode: "Info Node",
       dataNode: "Data Node",
@@ -829,7 +863,7 @@ export default {
       FAILED: "Failed",
       REJECTED: "Rejected",
       CONFIRMED: "Completed",
-    }
+    },
   },
   dashboard: {
     title: "Dashboard",
@@ -936,7 +970,7 @@ export default {
     exceedOnChain: "Claim amount exceeds on-chain claimable balance",
   },
   searchPage: {
-    searchPlaceholder: "Search",
+    searchPlaceholder: "Search events",
     browse: "Browse",
     themes: "Themes",
     browseItems: {
@@ -952,6 +986,14 @@ export default {
       sports: "Sports",
       esports: "Esports",
     },
+    trending: "Trending",
+    popular: "Popular",
+    liquidity: "Liquidity",
+    endingSoon: "Ending Soon",
+    crypto: "Crypto",
+    sports: "Sports",
+    politics: "Politics",
+    science: "Science",
   },
   sports: {
     volume: "Volume",
@@ -1031,50 +1073,6 @@ export default {
     votedToday: "Voted today",
     currentVotes: "Current votes: ",
   },
-  payment: {
-    buy: "Buy",
-    sell: "Sell",
-    redeem: "Redeem",
-    sellSuccess: "Sell successfully",
-    tradeSuccess: "Trade successful",
-    tradeFailed: "Trade failed",
-    marketOrder: "Market",
-    limitOrder: "Limit",
-    balance: "Balance",
-    limitPrice: "Limit Price",
-    amount: "Amount",
-    calculating: "Calculating...",
-    shares: "Shares",
-    avgPrice: "Average Price",
-    estimatedShares: "Est. Shares",
-    estimatedProfit: "Est. Profit",
-    leverage: "Leverage",
-    maxLeverageTip: "Max leverage: 10X (Not available yet)",
-    expiration: "Set expiration",
-    expiry5m: "5m",
-    expiry1h: "1h",
-    expiry12h: "12h",
-    expiry24h: "24h",
-    expiryEod: "EOD",
-    expiryCustom: "Custom",
-    expiryMinutes: "min",
-    total: "Total",
-    potentialGain: "Potential Gain",
-    submitting: "Submitting...",
-    orderSuccess: "Order created successfully",
-    orderFailed: "Order failed",
-    buyNo: "Buy No",
-    buyYes: "Buy Yes",
-    missingIds: "Missing event or sub-event id",
-    insufficientBalance: "Insufficient balance",
-    insufficientShares: "Insufficient shares",
-    receive: "Receive",
-    sellingShares: "Selling {shares} shares {'@'} {avgPrice}",
-    editOrder: "Edit order",
-    cancel: "Cancel",
-    cashing: "Cashing...",
-    cashout: "Cashing"
-  },
   datePicker: {
     title: "Filter by Date Range",
     desc: "You can view order records from the past {days} days",
@@ -1090,7 +1088,7 @@ export default {
     questionTitle: "ETH price on Dec 28?",
     betWin: "Bet {bet} to win",
     claim: "Claim",
-    done: "Done"
+    done: "Done",
   },
   myEarnings: {
     title: "My Earnings",
@@ -1104,8 +1102,7 @@ export default {
     subCoinEarnings: "Sub-coin Earnings",
     subCoinEarningsDesc: "Event oracle earnings",
     fomoPoolEarnings: "FOMO Pool Earnings",
-    fomoPoolEarningsDesc:
-      "10% of predicted platform profit is distributed to FOMO pool stakers",
+    fomoPoolEarningsDesc: "10% of predicted platform profit is distributed to FOMO pool stakers",
     myPerformance: "My Performance Overview",
     performanceDesc: "Actual performance is subject to final settlement",
     teamPerformance: "Team Total Performance",
@@ -1152,20 +1149,7 @@ export default {
     msgSubmitSuccess: "Submitted successfully",
     msgSubmitFail: "Submission failed, please try again later",
   },
-  "searchPage": {
-    "searchPlaceholder": "Search events",
-    "browse": "Browse",
-    "themes": "Themes",
-    "trending": "Trending",
-    "popular": "Popular",
-    "liquidity": "Liquidity",
-    "endingSoon": "Ending Soon",
-    "crypto": "Crypto",
-    "sports": "Sports",
-    "politics": "Politics",
-    "science": "Science"
-  },
-  "favoriteSuccess": "Added to favorites",
-  "unfavoriteSuccess": "Removed from favorites",
-  "operateFailed": "Operation failed"
+  favoriteSuccess: "Added to favorites",
+  unfavoriteSuccess: "Removed from favorites",
+  operateFailed: "Operation failed",
 };

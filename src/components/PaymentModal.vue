@@ -245,6 +245,23 @@
       </div>
     </div>
   </transition>
+
+  <!-- 市价单流动性警告弹窗 -->
+  <transition name="slide-up">
+    <div v-if="showMarketWarning" class="trade-overlay" style="z-index: 2002;" @click.self="showMarketWarning = false">
+      <div class="trade-modal warning-modal">
+        <div class="grabber" />
+        <h3 class="warning-title">{{ $t("payment.systemTip") || "系统提示" }}</h3>
+        <p class="warning-desc">
+          {{ $t("payment.marketWarning") || "当前市场流动性较低，市价委托可能无法完成撮合。若订单未成交，将自动撤单，资金原路返还至您的资金账户。" }}
+        </p>
+        <div class="warning-actions">
+          <button class="warning-cancel" @click="showMarketWarning = false">{{ $t("payment.cancel") || "取消" }}</button>
+          <button class="warning-confirm" @click="proceedWithMarketOrder">{{ $t("payment.iKnow") || "我已知晓" }}</button>
+        </div>
+      </div>
+    </div>
+  </transition>
 </template>
 
 <script setup lang="ts">
@@ -296,6 +313,8 @@ const outcomeBadge = ref(""); // 'yes' | 'no'
 const enableExpiry = ref(false);
 const expiryPreset = ref("5m"); // '5m' | '1h' | '12h' | '24h' | 'eod' | 'custom'
 const customExpiryMinutes = ref(5);
+
+const showMarketWarning = ref(false);
 
 const orderBookData = ref<OrderBookData | null>(null);
 
@@ -647,6 +666,26 @@ async function handleConfirm() {
     }
   }
 
+  // 市价单购买流动性警告校验
+  if (activeSide.value === "buy" && orderType.value === "market") {
+    const sideStr = outcomeBadge.value?.toLowerCase() || "";
+    // 判断订单薄是否有反方向(卖单/asks)挂单
+    const asks = orderBookData.value?.[sideStr]?.asks || [];
+    if (asks.length === 0) {
+      showMarketWarning.value = true;
+      return;
+    }
+  }
+
+  await executeOrder();
+}
+
+async function proceedWithMarketOrder() {
+  showMarketWarning.value = false;
+  await executeOrder();
+}
+
+async function executeOrder() {
   submitting.value = true;
   try {
     const orderParams: any = {
@@ -682,7 +721,7 @@ async function handleConfirm() {
     if (!res || !res.data) {
       ElMessage.error(
         orderType.value === "market"
-          ? t("payment.orderFailed")
+          ? t("payment.orderSubmittedFailed")
           : t("payment.tradeFailed"),
       );
       return;
@@ -691,21 +730,21 @@ async function handleConfirm() {
     if (isOrderSuccess(res)) {
       emit("order-success", res.data.data);
       ElMessage.success(
-        orderType.value === "market" ? "" : t("payment.tradeSuccess"),
+        orderType.value === "market" ? t("payment.orderSubmitted") : t("payment.tradeSuccess"),
       );
       fetchBalance(); // 交易成功后刷新用户余额
     } else {
       ElMessage.error(
         res.data.message ||
           t("payment.tradeFailed") ||
-          t("payment.orderFailed") ||
+          t("payment.orderSubmittedFailed") ||
           "Trade failed",
       );
     }
   } catch (err) {
     console.error("Make order failed", err);
     ElMessage.error(
-      t("payment.tradeFailed") || t("payment.orderFailed") || "Trade failed",
+      t("payment.tradeFailed") || t("payment.orderSubmittedFailed") || "Trade failed",
     );
   } finally {
     submitting.value = false;
@@ -713,6 +752,7 @@ async function handleConfirm() {
 }
 
 function handleClose() {
+  showMarketWarning.value = false;
   emit("update:modelValue", false);
 }
 
@@ -782,6 +822,57 @@ watch(
     background: var(--text-dark-gray);
     border-radius: 2px;
     margin: 0 auto 16px;
+  }
+}
+
+/* 流动性警告弹窗样式 */
+.warning-modal {
+  padding-bottom: 30px;
+
+  .warning-title {
+    font-family: PingFang SC, PingFang SC;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--bg-opposite);
+    margin: 10px 0 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 16px;
+  }
+
+  .warning-desc {
+    font-size: 14px;
+    color: var(--text-dark-gray);
+    line-height: 1.5;
+    margin-bottom: 30px;
+  }
+
+  .warning-actions {
+    display: flex;
+    gap: 12px;
+
+    .warning-cancel {
+      flex: 1;
+      background: #333333;
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      height: 48px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .warning-confirm {
+      flex: 1;
+      background: #ccff00;
+      color: #000000;
+      border: none;
+      border-radius: 12px;
+      height: 48px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
   }
 }
 
