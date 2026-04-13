@@ -396,6 +396,7 @@ export default {
     home: "首页",
     breaking: "突发",
     account: "账户",
+    wallet: "钱包",
   },
   userInfo: {
     ecosystem: "生态系统",

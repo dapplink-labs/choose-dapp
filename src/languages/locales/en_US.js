@@ -362,7 +362,7 @@ export default {
       }
     }
   },
-  footerNav: { home: 'Home', breaking: 'Breaking', account: 'Account' },
+  footerNav: { home: 'Home', breaking: 'Breaking', account: 'Account', wallet: 'Wallet' },
   userInfo: {
     ecosystem: 'Ecosystem',
     others: 'Others',

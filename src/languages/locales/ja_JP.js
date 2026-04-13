@@ -351,7 +351,7 @@ export default {
       }
     }
   },
-  footerNav: { home: 'ホーム', breaking: '速報', account: 'アカウント' },
+  footerNav: { home: 'ホーム', breaking: '速報', account: 'アカウント', wallet: 'ウォレット' },
   userInfo: {
     ecosystem: 'エコシステム',
     others: 'その他',

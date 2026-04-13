@@ -60,7 +60,7 @@ const navItems = computed(() => [
   { key: 'home', label: t('footerNav.home') || '首页', path: '/home' },
   { key: 'search', label: t('common.search') || '搜索', path: '/searchPage' },
   { key: 'breaking', label: t('footerNav.breaking') || '突发', path: '/breaking' },
-  { key: 'more', label: t('footerNav.account') || '账户', path: '/asset-management' }
+  { key: 'more', label: t('footerNav.wallet')  || '钱包', path: '/asset-management' }
 ])
 
 // 当前激活的导航项

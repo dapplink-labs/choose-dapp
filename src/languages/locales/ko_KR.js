@@ -351,7 +351,7 @@ export default {
       }
     }
   },
-  footerNav: { home: '홈', breaking: '속보', account: '계정' },
+  footerNav: { home: '홈', breaking: '속보', account: '계정', wallet: '지갑' },
   userInfo: {
     ecosystem: '생태계',
     others: '기타',
