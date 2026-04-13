@@ -303,6 +303,7 @@ export default {
     sell: 'Sell',
     close: 'Close',
     share: 'Share',
+    copyLink: 'Copy Link',
     noData: 'No data...',
     noMoreData: 'No more data',
     address: 'Address',

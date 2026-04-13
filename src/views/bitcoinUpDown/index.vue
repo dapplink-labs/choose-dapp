@@ -14,6 +14,28 @@
           </el-icon>
           <span class="top-volume">{{ topVolumeText }}</span>
         </div>
+        <button class="top-btn share-btn" type="button" @click="handleShare">
+          <svg
+            t="1776045210542"
+            class="icon"
+            viewBox="0 0 1024 1024"
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+            p-id="15980"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+          >
+            <path
+              d="M350.523077 393.846154c7.876923 0 15.753846-3.938462 19.692308-7.876923l118.153846-118.153846v393.846153c0 15.753846 11.815385 31.507692 31.507692 31.507693s31.507692-11.815385 31.507692-31.507693v-393.846153l118.153847 118.153846c11.815385 11.815385 31.507692 11.815385 43.323076 0s11.815385-31.507692 0-43.323077l-169.353846-169.353846c-3.938462-3.938462-3.938462-3.938462-7.876923-3.938462H523.815385 512c-3.938462 0-7.876923 3.938462-7.876923 3.938462L326.892308 342.646154c-11.815385 11.815385-11.815385 27.569231 0 39.384615 7.876923 7.876923 15.753846 11.815385 23.630769 11.815385z"
+              fill="currentColor"
+              p-id="15981"
+            ></path>
+            <path
+              d="M854.646154 445.046154c-15.753846 0-31.507692 11.815385-31.507692 31.507692v216.615385c0 43.323077-35.446154 82.707692-82.707693 82.707692H295.384615c-43.323077 0-82.707692-35.446154-82.707692-82.707692V472.615385c0-15.753846-11.815385-31.507692-31.507692-31.507693s-23.630769 15.753846-23.630769 31.507693v216.615384c0 78.769231 63.015385 141.784615 141.784615 141.784616h445.046154c78.769231 0 141.784615-63.015385 141.784615-141.784616V472.615385c0-15.753846-15.753846-27.569231-31.507692-27.569231z"
+              fill="currentColor"
+              p-id="15982"
+            ></path>
+          </svg>
+        </button>
         <button
           class="top-btn bookmark-btn"
           :class="{ active: detailData.isFavorite }"
@@ -52,9 +74,7 @@
           </div>
           <div class="asset-text">
             <h2>
-              <span>{{
-                detailData.eventTitle 
-              }}</span>
+              <span>{{ detailData.eventTitle }}</span>
               <span v-if="showBaopeiTag" class="baopei-tag">{{
                 $t("bitcoinUpDown.baopei")
               }}</span>
@@ -371,19 +391,42 @@
         <!-- Positions -->
         <div v-if="activeTab === 'Positions'" class="position-content">
           <div v-if="positions.length">
-            <div v-for="(pos, index) in positions" :key="pos.id" class="pos-card">
-              <h3 v-if="index === 0" class="pos-title">
-                {{ detailData.title || pos.title }}
-              </h3>
-              <span
-                class="pos-tag"
-                :class="
-                  ['yes', 'up'].includes(pos.outcome?.toLowerCase())
-                    ? 'up'
-                    : 'down'
-                "
-                >{{ pos.tagLabel }}</span
-              >
+            <div
+              v-for="(pos, index) in positions"
+              :key="pos.id"
+              class="pos-card"
+            >
+              <div class="pos-header">
+                <img
+                  :src="assetLogoSrc"
+                  class="pos-token-icon"
+                  alt="token"
+                  v-if="assetLogoSrc"
+                />
+                <div v-else class="pos-token-icon-fallback">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M15.4 10.8c.8-0.2 1.3-0.8 1.3-1.6 0-1.3-1.1-2.1-3.2-2.1H10V4.5H8v2.6H6.5V9h1.5v7H6.5v2h1.5v2.6h2v-2.6h1.7c2.3 0 3.6-1 3.6-2.5 0-1.1-0.7-1.9-1.8-2.2zM10 9h3c.8 0 1.2.3 1.2.8 0 .6-.5.9-1.3.9h-3V9zm3.3 5.3H10v-2.2h3.3c1 0 1.5.3 1.5.9 0 .7-.5 1.1-1.5 1.1z"
+                      fill="#fff"
+                    />
+                  </svg>
+                </div>
+                <span
+                  class="pos-tag"
+                  :class="
+                    ['yes', 'up'].includes(pos.outcome?.toLowerCase())
+                      ? 'up'
+                      : 'down'
+                  "
+                  >{{ pos.tagLabel }}</span
+                >
+              </div>
               <div class="pos-grid">
                 <div class="grid-item">
                   <div class="g-label">{{ $t("crypto.avgPrice") }}</div>
@@ -398,7 +441,21 @@
                   <div class="g-val">{{ pos.positionValue }}</div>
                 </div>
                 <div class="grid-item">
-                  <div class="g-label">{{ $t("crypto.profit") }}</div>
+                  <div class="g-label">
+                    {{ $t("crypto.profit") }}
+                    <img
+                      :src="shareIconSrc"
+                      class="share-icon"
+                      @click="handleShare(pos)"
+                      style="
+                        vertical-align: middle;
+                        margin-left: 4px;
+                        cursor: pointer;
+                        width: 14px;
+                        height: 14px;
+                      "
+                    />
+                  </div>
                   <div
                     class="g-val"
                     :class="{
@@ -413,8 +470,11 @@
               <button
                 class="withdraw-hero-btn"
                 :class="[
-                  ['yes', 'up'].includes(pos.outcome?.toLowerCase()) ? 'up' : 'down',
-                  { disabled: Number(pos?.raw?.shares) === 0 || !canWithdraw(pos) }
+                  'up',
+                  {
+                    disabled:
+                      Number(pos?.raw?.shares) === 0 || !canWithdraw(pos),
+                  },
                 ]"
                 type="button"
                 :disabled="Number(pos?.raw?.shares) === 0 || !canWithdraw(pos)"
@@ -441,7 +501,12 @@
               @click="handleCancelAllOrders"
             >
               <span v-if="cancelAllLoading" class="loading-icon">
-                <svg viewBox="0 0 24 24" width="1em" height="1em" class="spinner">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="1em"
+                  height="1em"
+                  class="spinner"
+                >
                   <circle
                     cx="12"
                     cy="12"
@@ -545,10 +610,16 @@
         <div v-else-if="activeTab === 'History'" class="history-content">
           <div class="history-header">{{ $t("crypto.history") }}</div>
           <div v-if="orderHistory.length" class="history-list">
-            <div v-for="item in orderHistory" :key="item.id" class="history-row">
+            <div
+              v-for="item in orderHistory"
+              :key="item.id"
+              class="history-row"
+            >
               <div class="history-main">
                 <div class="history-text">
-                  {{ item.side === "BUY" ? $t("common.buy") : $t("common.sell") }}
+                  {{
+                    item.side === "BUY" ? $t("common.buy") : $t("common.sell")
+                  }}
                   <span
                     class="history-side"
                     :class="outcomeToTrend(item.outcome)"
@@ -621,7 +692,8 @@
       <!-- 事件未结束时显示购买按钮 -->
       <template v-if="!isEventEnded">
         <button class="trade-btn up" type="button" @click="openPayment('up')">
-          {{ $t("common.buy") }} {{ getDisplayOutcome(detailData.yesOutcome) || "" }}
+          {{ $t("common.buy") }}
+          {{ getDisplayOutcome(detailData.yesOutcome) || "" }}
           {{ upTradePriceText }}
         </button>
         <button
@@ -629,7 +701,8 @@
           type="button"
           @click="openPayment('down')"
         >
-          {{ $t("common.buy") }} {{ getDisplayOutcome(detailData.noOutcome) || "" }}
+          {{ $t("common.buy") }}
+          {{ getDisplayOutcome(detailData.noOutcome) || "" }}
           {{ downTradePriceText }}
         </button>
       </template>
@@ -663,26 +736,96 @@
 
     <!-- 自定义底部取消挂单弹窗 -->
     <transition name="slide-up-modal">
-      <div v-if="cancelDialogVisible" class="custom-bottom-modal-overlay" @click.self="onCancelClose">
+      <div
+        v-if="cancelDialogVisible"
+        class="custom-bottom-modal-overlay"
+        @click.self="onCancelClose"
+      >
         <div class="custom-bottom-modal">
           <div class="modal-handle"></div>
           <div class="modal-icon">
-            <svg width="56" height="56" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="24" cy="24" r="22" stroke="#f3a228" stroke-width="4" fill="none" />
-              <path d="M24 14V26" stroke="#f3a228" stroke-width="4" stroke-linecap="square"/>
-              <circle cx="24" cy="34" r="2.5" fill="#f3a228"/>
+            <svg
+              width="56"
+              height="56"
+              viewBox="0 0 48 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="24"
+                cy="24"
+                r="22"
+                stroke="#f3a228"
+                stroke-width="4"
+                fill="none"
+              />
+              <path
+                d="M24 14V26"
+                stroke="#f3a228"
+                stroke-width="4"
+                stroke-linecap="square"
+              />
+              <circle cx="24" cy="34" r="2.5" fill="#f3a228" />
             </svg>
           </div>
           <div class="modal-title">
-            {{ cancelDialogType === 'all' ? ($t('assetManagement.cancelAllOrdersConfirm') || '是否取消所有挂单？') : ($t('assetManagement.cancelOrderConfirm') || '是否取消该挂单？') }}
+            {{
+              cancelDialogType === "all"
+                ? $t("assetManagement.cancelAllOrdersConfirm") ||
+                  "是否取消所有挂单？"
+                : $t("assetManagement.cancelOrderConfirm") || "是否取消该挂单？"
+            }}
           </div>
           <div class="modal-subtitle">
-            {{ $t('assetManagement.cancelOrderSubTitle') || '挂单取消后，金额将返还到资金账户' }}
+            {{
+              $t("assetManagement.cancelOrderSubTitle") ||
+              "挂单取消后，金额将返还到资金账户"
+            }}
           </div>
           <div class="modal-actions">
-            <button class="btn-cancel" @click="onCancelClose">{{ $t('common.cancel') || '取消' }}</button>
-            <button class="btn-confirm" @click="onCancelConfirm">{{ $t('common.confirm') || '确认' }}</button>
+            <button class="btn-cancel" @click="onCancelClose">
+              {{ $t("common.cancel") || "取消" }}
+            </button>
+            <button class="btn-confirm" @click="onCancelConfirm">
+              {{ $t("common.confirm") || "确认" }}
+            </button>
           </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- 自定义底部分享弹窗 -->
+    <transition name="slide-up-modal">
+      <div
+        v-if="shareDialogVisible"
+        class="custom-bottom-modal-overlay"
+        @click.self="closeShareDialog"
+      >
+        <div class="custom-bottom-modal share-modal">
+          <div class="modal-handle"></div>
+          <div class="share-header">
+            <h3>{{ $t("common.share") || "分享" }}</h3>
+          </div>
+          <div class="share-card">
+            <div class="share-card-icon">
+              <img
+                v-if="assetLogoSrc"
+                :src="assetLogoSrc"
+                alt="logo"
+                referrerpolicy="no-referrer"
+              />
+            </div>
+            <div class="share-card-info">
+              <div class="share-card-title">
+                {{ detailData.eventTitle || detailData.title }}
+                <span v-if="titleTimeRangeText"> {{ titleTimeRangeText }}</span>
+              </div>
+              <div class="share-card-subtitle">Chooseme.vip</div>
+            </div>
+          </div>
+          <button class="share-copy-btn" @click="copyShareLink">
+            {{ $t("common.copyLink") || "拷贝链接" }}
+          </button>
         </div>
       </div>
     </transition>
@@ -739,7 +882,7 @@ $primary-blue: #5073e5;
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 8px;
+  // gap: 8px;
 }
 
 .back-btn .el-icon {
@@ -1200,7 +1343,7 @@ $primary-blue: #5073e5;
 
 .business-tabs {
   display: flex;
-  gap: 50px;
+  gap: 24px;
   border-bottom: 1px solid var(--border-color);
   margin-bottom: 24px;
   padding-bottom: 0;
@@ -1422,18 +1565,35 @@ $primary-blue: #5073e5;
 }
 
 .pos-card {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  // background: var(--bg-color, #1e1e1e);
+  border: 1px solid var(--border-color, #333);
+  border-radius: 12px;
+  padding: 16px;
 
-  &:first-child {
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--border-color);
+  .pos-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
   }
 
-  .pos-title {
-    font-size: 20px;
-    font-weight: 600;
-    margin: 0 0 16px 0;
-    color: var(--bg-opposite);
+  .pos-token-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #f7931a;
+  }
+
+  .pos-token-icon-fallback {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #f7931a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .pos-tag {
@@ -1444,15 +1604,14 @@ $primary-blue: #5073e5;
     border-radius: 6px;
     font-size: 13px;
     font-weight: 600;
-    margin-bottom: 24px;
 
     &.up {
-      background: var(--button-bg-y);
+      background: rgba(187, 255, 46, 0.15);
       color: var(--text-color-y);
     }
 
     &.down {
-      background: var(--button-bg-n);
+      background: rgba(255, 60, 115, 0.15);
       color: var(--text-color-n);
     }
   }
@@ -1460,20 +1619,27 @@ $primary-blue: #5073e5;
   .pos-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    margin-bottom: 28px;
+    margin-bottom: 24px;
     gap: 12px;
 
     .grid-item {
+      &:last-child {
+       .g-label{
+        text-align: right;
+       }
+      }
       .g-label {
-        font-size: 14px;
-        color: #666;
+        font-size: 12px;
+        color: #888;
         margin-bottom: 8px;
+        white-space: nowrap;
       }
 
       .g-val {
-        font-size: 18px;
+        font-size: 13px;
         font-weight: 600;
-        color: var(--bg-opposite);
+        color: var(--bg-opposite, #fff);
+        white-space: nowrap;
 
         &.neon {
           color: var(--text-color-y);
@@ -1488,12 +1654,12 @@ $primary-blue: #5073e5;
 
   .withdraw-hero-btn {
     width: 100%;
-    height: 56px;
+    height: 48px;
     background: var(--text-color-y);
     color: #000;
     border: none;
     border-radius: 14px;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
 
@@ -1727,6 +1893,92 @@ $primary-blue: #5073e5;
   opacity: 0;
   .custom-bottom-modal {
     transform: translateY(100%);
+  }
+}
+
+.share-modal {
+  padding: 0 16px 24px;
+}
+
+.share-header {
+  margin-bottom: 20px;
+  width: 100%;
+  text-align: left;
+  margin-top: 10px;
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--bg-opposite);
+    margin: 0;
+  }
+}
+
+.share-card {
+  width: 100%;
+  background: var(--bg-page);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+  box-sizing: border-box;
+
+  .share-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #f3a228;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .share-card-info {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+
+    .share-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--bg-opposite);
+      margin-bottom: 4px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .share-card-subtitle {
+      font-size: 12px;
+      color: var(--text-dark-gray);
+    }
+  }
+}
+
+.share-copy-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 24px;
+  background: var(--text-color-y, #c3ff00);
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+
+  &:active {
+    opacity: 0.8;
   }
 }
 </style>

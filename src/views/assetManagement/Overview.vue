@@ -507,8 +507,8 @@ watch(
     }
 
     .value-unit {
-      font-size: 16px;
-      font-weight: 500;
+      font-size: 12px;
+      font-weight: 400;
       color: var(--text-gray, rgba(255, 255, 255, 0.7));
     }
 
@@ -528,10 +528,10 @@ watch(
 
   .action-btn {
     flex: 1;
-    height: 48px;
+    height: 40px;
     border-radius: 999px;
     border: none;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -541,8 +541,8 @@ watch(
     transition: all 0.2s;
 
     .icon {
-      width: 20px;
-      height: 20px;
+      width: 14px;
+      height: 14px;
     }
 
     &.deposit-btn {

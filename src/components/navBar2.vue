@@ -180,10 +180,12 @@ onMounted(async () => {
       &:hover .nav-text,
       &.active .nav-text {
         color: var(--bg-opposite);
+        font-weight: 600;
       }
 
       &.active .nav-icon {
         color: var(--bg-opposite);
+        
       }
 
       // --- 核心优化：新用户包赔样式 ---

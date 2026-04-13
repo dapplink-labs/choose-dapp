@@ -6,6 +6,8 @@ import * as echarts from "echarts";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { createIotMqttClient, hasWebCrypto } from "@/utils/mqttClient";
 import defaultLogo from "@/assets/icon/LP1.png";
+import shareDarkIcon from "@/assets/icon/share_dark.svg";
+import shareLightIcon from "@/assets/icon/share_light.svg";
 import OrderBookMobile from "@/components/OrderBookMobile.vue";
 import PaymentModal from "@/components/PaymentModal.vue";
 import CashoutModal from "@/components/CashoutModal.vue";
@@ -46,10 +48,56 @@ export default {
       return outcome;
     };
     const themeStore = useThemeStore();
+    const shareIconSrc = computed(() => !themeStore.isDark ? shareDarkIcon : shareLightIcon);
     const { address } = useAccount();
 
     const handleBack = () => router.back();
     const goWithdraw = () => router.push({ name: "withdraw" });
+
+    const handleShare = () => {
+      shareDialogVisible.value = true;
+    };
+
+    const closeShareDialog = () => {
+      shareDialogVisible.value = false;
+    };
+
+    const copyShareLink = async () => {
+      const shareUrl = window.location.href;
+      let success = false;
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          success = true;
+        } catch (err) {
+          console.warn('Clipboard API failed, fallback to execCommand', err);
+        }
+      }
+      
+      if (!success) {
+        const textArea = document.createElement('textarea');
+        textArea.value = shareUrl;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+          success = document.execCommand('copy');
+        } catch (err) {
+          console.warn('execCommand failed', err);
+        }
+        textArea.remove();
+      }
+
+      if (success) {
+        ElMessage.success(t('common.copied') || 'Copied successfully');
+        closeShareDialog();
+      } else {
+        ElMessage.error(t('common.copyFailed') || 'Copy failed');
+      }
+    };
 
     const handleBookmark = async () => {
       if (!address.value) {
@@ -399,6 +447,9 @@ export default {
     const paymentInitialSide = ref("buy");
     // 支付弹窗显示状态
     const showPayment = ref(false);
+
+    // 分享弹窗显示状态
+    const shareDialogVisible = ref(false);
 
     // 提现（二次确认）弹窗显示状态
     const showCashoutModal = ref(false);
@@ -2142,7 +2193,9 @@ export default {
       router,
       route,
       themeStore,
+      shareIconSrc,
       handleBack,
+      handleShare,
       handleBookmark,
       goWithdraw,
       currentEventGuid,
@@ -2196,6 +2249,9 @@ export default {
       currentOrderBook,
       orderBookVolumeText,
       paymentOutcomeTitle,
+      shareDialogVisible,
+      closeShareDialog,
+      copyShareLink,
       paymentInitialOutcome,
       paymentInitialSide,
       showPayment,

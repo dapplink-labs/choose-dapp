@@ -292,6 +292,7 @@ export default {
     sell: '売り',
     close: '閉じる',
     share: '共有',
+    copyLink: 'リンクをコピー',
     noData: 'データがありません...',
     noMoreData: 'これ以上データはありません',
     address: 'アドレス',

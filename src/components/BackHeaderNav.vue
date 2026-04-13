@@ -338,7 +338,7 @@ const handleOpenClick = async () => {
   .page-title {
     font-family: PingFang SC, PingFang SC;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--text-color, #FFFFFF);
     text-align: center;
     margin: 0;

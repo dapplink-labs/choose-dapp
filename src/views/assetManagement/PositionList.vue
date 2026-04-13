@@ -937,7 +937,7 @@ onBeforeUnmount(() => {
   margin-bottom: 16px;
 
   .position-tab-item {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text-gray, #666);
     cursor: pointer;
     position: relative;

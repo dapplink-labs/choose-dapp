@@ -330,6 +330,7 @@ export default {
     sell: "出售",
     close: "关闭",
     share: "分享",
+    copyLink: "拷贝链接",
     noData: "暂无数据...",
     noMoreData: "没有更多数据了",
     address: "地址",

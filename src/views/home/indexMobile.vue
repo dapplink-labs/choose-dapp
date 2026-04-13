@@ -1528,7 +1528,7 @@ $gradient-mask-right: linear-gradient(
                 outline: none;
                 background: transparent;
                 color: var(--bg-opposite);
-                font-size: 16px;
+                font-size: 14px;
                 line-height: 1.2;
                 padding: 0;
 
