@@ -293,6 +293,7 @@ export default {
     close: '닫기',
     share: '공유',
     copyLink: '링크 복사',
+    shareImage: '이미지 공유',
     noData: '데이터 없음...',
     noMoreData: '더 이상 데이터가 없습니다',
     address: '주소',
@@ -311,7 +312,8 @@ export default {
     copied: '복사됨',
     copyFailed: '복사 실패',
     max: 'MAX',
-    enterValidAmount: '유효한 금액을 입력하세요'
+    enterValidAmount: '유효한 금액을 입력하세요',
+    holding:'보유 중'
   },
   header: {
     searchPlaceholder: 'ChooseMe 검색',

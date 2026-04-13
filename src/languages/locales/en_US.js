@@ -304,6 +304,7 @@ export default {
     close: 'Close',
     share: 'Share',
     copyLink: 'Copy Link',
+    shareImage: 'Share Image',
     noData: 'No data...',
     noMoreData: 'No more data',
     address: 'Address',
@@ -322,7 +323,8 @@ export default {
     copied: 'Copied',
     copyFailed: 'Copy failed',
     max: 'MAX',
-    enterValidAmount: 'Please enter valid amount'
+    enterValidAmount: 'Please enter valid amount',
+    holding:'Holding',
   },
   header: {
     searchPlaceholder: 'Search ChooseMe',

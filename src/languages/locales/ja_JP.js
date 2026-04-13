@@ -293,6 +293,7 @@ export default {
     close: '閉じる',
     share: '共有',
     copyLink: 'リンクをコピー',
+    shareImage: '画像を共有',
     noData: 'データがありません...',
     noMoreData: 'これ以上データはありません',
     address: 'アドレス',
@@ -311,7 +312,8 @@ export default {
     copied: 'コピーしました',
     copyFailed: 'コピーに失敗しました',
     max: 'MAX',
-    enterValidAmount: '有効な金額を入力してください'
+    enterValidAmount: '有効な金額を入力してください',
+    holding:'保有中'
   },
   header: {
     searchPlaceholder: 'ChooseMeを検索',

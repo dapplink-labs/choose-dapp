@@ -331,6 +331,7 @@ export default {
     close: "关闭",
     share: "分享",
     copyLink: "拷贝链接",
+    shareImage: "分享图片",
     noData: "暂无数据...",
     noMoreData: "没有更多数据了",
     address: "地址",
@@ -350,6 +351,7 @@ export default {
     copyFailed: "复制失败",
     max: "MAX",
     enterValidAmount: "请输入有效金额",
+    holding: "持股中",
   },
   header: {
     searchPlaceholder: "搜索ChooseMe",

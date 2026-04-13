@@ -54,12 +54,86 @@ export default {
     const handleBack = () => router.back();
     const goWithdraw = () => router.push({ name: "withdraw" });
 
+    const sharePositionData = ref(null);
+    const shareCardRef = ref(null);
+    const positionShareDialogVisible = ref(false);
+
+    const formatAddress = (addr) => {
+      if (!addr) return "";
+      return addr.slice(0, 6) + "...." + addr.slice(-4);
+    };
+
     const handleShare = () => {
       shareDialogVisible.value = true;
     };
 
+    const handlePositionShare = (pos) => {
+      sharePositionData.value = pos;
+      positionShareDialogVisible.value = true;
+    };
+
     const closeShareDialog = () => {
       shareDialogVisible.value = false;
+    };
+
+    const closePositionShareDialog = () => {
+      sharePositionData.value = null;
+      positionShareDialogVisible.value = false;
+    };
+
+    const shareImage = async () => {
+      if (!shareCardRef.value) return;
+      try {
+        const { default: html2canvas } = await import("html2canvas");
+        const canvas = await html2canvas(shareCardRef.value, {
+          backgroundColor: null,
+          useCORS: true,
+          scale: 2, // High resolution
+        });
+        
+        canvas.toBlob(async (blob) => {
+          if (!blob) {
+            ElMessage.error(t("common.generateFailed") || "生成图片失败");
+            return;
+          }
+          
+          try {
+            if (navigator.canShare && navigator.canShare({ files: [new File([blob], 'share.png', { type: 'image/png' })] })) {
+              const file = new File([blob], 'share.png', { type: 'image/png' });
+              await navigator.share({
+                files: [file],
+                title: t("common.shareVictory") || "分享胜利",
+              });
+            } else {
+              // Fallback to download
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = "chooseme-share.png";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+            }
+          } catch (error) {
+            console.error("Share API error:", error);
+            // Fallback to download if share is cancelled or failed
+            if (error.name !== "AbortError") {
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement("a");
+              link.href = url;
+              link.download = "chooseme-share.png";
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+            }
+          }
+        }, "image/png");
+      } catch (err) {
+        console.error("html2canvas error:", err);
+        ElMessage.error(t("common.generateFailed") || "生成图片失败");
+      }
     };
 
     const copyShareLink = async () => {
@@ -504,12 +578,15 @@ export default {
         ) || 0;
       return {
         id: item?.guid,
-        title: item?.sub_event_name || t("crypto.yesOrNo"),
+        title: item?.sub_event_name || detailData.value.title || t("crypto.yesOrNo"),
         tagLabel: `${outcome === "up" ? getDisplayOutcome(detailData.value.yesOutcome || "YES") : getDisplayOutcome(detailData.value.noOutcome || "NO")} | ${shares.toFixed(2) || 0} ${t("sports.shares")}`,
         avgPrice: formatCentText(item?.avg_price || 0),
+        currentPriceText: formatCentText(item?.current_price || 0),
         cost: formatMoney(costNum),
         positionValue: formatMoney(currentNum),
         profit: `${profitNum >= 0 ? "+" : "-"}${formatMoney(Math.abs(profitNum))}${costNum ? `(${profitPct >= 0 ? "+" : ""}${profitPct.toFixed(2)}%)` : ""}`,
+        profitNum: formatMoney(Math.abs(profitNum)),
+        profitPct: profitPct.toFixed(2),
         profitPositive: profitNum >= 0,
         raw: item,
         outcome: item?.outcome,
@@ -2250,7 +2327,14 @@ export default {
       orderBookVolumeText,
       paymentOutcomeTitle,
       shareDialogVisible,
+      sharePositionData,
+      shareCardRef,
+      positionShareDialogVisible,
       closeShareDialog,
+      handlePositionShare,
+      closePositionShareDialog,
+      shareImage,
+      formatAddress,
       copyShareLink,
       paymentInitialOutcome,
       paymentInitialSide,

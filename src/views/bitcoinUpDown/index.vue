@@ -446,7 +446,7 @@
                     <img
                       :src="shareIconSrc"
                       class="share-icon"
-                      @click="handleShare(pos)"
+                      @click="handlePositionShare(pos)"
                       style="
                         vertical-align: middle;
                         margin-left: 4px;
@@ -826,6 +826,78 @@
           <button class="share-copy-btn" @click="copyShareLink">
             {{ $t("common.copyLink") || "拷贝链接" }}
           </button>
+        </div>
+      </div>
+    </transition>
+
+    <!-- 持仓分享弹窗 -->
+    <transition name="slide-up-modal">
+      <div
+        v-if="positionShareDialogVisible"
+        class="custom-bottom-modal-overlay"
+        @click.self="closePositionShareDialog"
+      >
+        <div class="custom-bottom-modal position-share-modal">
+          <div class="modal-handle"></div>
+          <div class="share-header">
+            <h3>{{ $t("common.share") || "分享" }}</h3>
+          </div>
+          
+          <!-- Share Card Content -->
+          <div class="position-share-card-container" ref="shareCardRef">
+            <div class="share-card-top">
+              <div class="share-logo-box">
+                <img src="@/assets/logo-Dark.png" alt="CHOOSEME" class="share-logo-img" />
+              </div>
+              <div class="share-user-box">
+                <img src="@/assets/icon/avatarImg1.png" alt="avatar" class="share-avatar" />
+                <span class="share-address">{{ formatAddress(address) }}</span>
+              </div>
+            </div>
+
+            <div class="share-card-middle">
+              <div class="share-profit-info">
+                <div class="share-roi" :class="sharePositionData?.profitPositive ? 'neon' : 'hot-pink'">
+                  {{ sharePositionData?.profitPositive ? '+' : '' }}{{ sharePositionData?.profitPct || '0.00' }}%
+                </div>
+                <div class="share-profit-val" :class="sharePositionData?.profitPositive ? 'neon' : 'hot-pink'">
+                  {{ sharePositionData?.profitNum || '0.00' }}  
+                  <span class="share-profit-val-unit">USDT</span>
+                </div>
+
+                <div class="share-event-info">
+                  <img v-if="assetLogoSrc" :src="assetLogoSrc" class="share-asset-logo" />
+                  <div class="share-event-text">
+                    <div class="share-event-title">{{ sharePositionData?.title || (detailData.eventTitle || detailData.title) }}</div>
+                    <div class="share-event-subtitle">{{ sharePositionData?.tagLabel }} | {{ $t("common.holding") || "持股中" }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="share-coin-img-box">
+                <img src="@/assets/images/shareCoin.png" alt="coin" class="share-coin-img" />
+              </div>
+            </div>
+
+            <div class="share-card-bottom">
+              <div class="share-price-row">
+                <span class="share-price-label">{{ $t("crypto.avgPrice") || "下单均价" }}</span>
+                <span class="share-price-val">{{ sharePositionData?.avgPrice }}</span>
+              </div>
+              <div class="share-price-row">
+                <span class="share-price-label">{{ $t("crypto.currentPrice") || "当前价格" }}</span>
+                <span class="share-price-val">{{ sharePositionData?.currentPriceText || sharePositionData?.avgPrice }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="share-actions">
+            <button class="share-copy-btn-new" @click="copyShareLink">
+              {{ $t("common.copyLink") || "拷贝链接" }}
+            </button>
+            <button class="share-image-btn" @click="shareImage">
+              {{ $t("common.shareImage") || "分享图片" }}
+            </button>
+          </div>
         </div>
       </div>
     </transition>
@@ -1979,6 +2051,184 @@ $primary-blue: #5073e5;
 
   &:active {
     opacity: 0.8;
+  }
+}
+
+/* --------------------------
+   持仓分享弹窗专用样式
+-------------------------- */
+.position-share-modal {
+  padding: 0 16px 24px;
+  background: var(--el-bg-color, #111);
+}
+
+.position-share-card-container {
+  width: 100%;
+  background: #000;
+  border-radius: 12px;
+  padding: 19px 8px 18px 17px;
+  box-sizing: border-box;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--bg-color);
+
+  .share-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    .share-logo-box {
+      .share-logo-img {
+        height: 16px;
+        object-fit: contain;
+      }
+    }
+
+    .share-user-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right:9px;
+      .share-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .share-address {
+        font-size: 12px;
+        color: #888;
+      }
+    }
+  }
+
+  .share-card-middle {
+    display: flex;
+    justify-content: space-between;
+
+    .share-profit-info {
+      flex: 1;
+
+      .share-roi {
+        font-size: 32px;
+        font-weight: bold;
+        line-height: 1.1;
+        margin-bottom: 8px;
+        &.neon { color: var(--text-color-y, #b8ff22); }
+        &.hot-pink { color: var(--text-color-n, #ff3366); }
+      }
+
+      .share-profit-val {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 22px;
+        &.neon { color: var(--text-color-y, #b8ff22); }
+        &.hot-pink { color: var(--text-color-n, #ff3366); }
+        .share-profit-val-unit{
+          color:var(--bg-opposite)
+        }
+      }
+
+      .share-event-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .share-asset-logo {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          background: #f3a228;
+          object-fit: cover;
+        }
+
+        .share-event-text {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          .share-event-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+          }
+
+          .share-event-subtitle {
+            font-size: 12px;
+            color: #888;
+          }
+        }
+      }
+    }
+
+    .share-coin-img-box {
+      width: 120px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      .share-coin-img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+      }
+    }
+  }
+
+  .share-card-bottom {
+    // border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-right:7px;
+    .share-price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+
+      .share-price-label {
+        color: #888;
+      }
+
+      .share-price-val {
+        color: #fff;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.share-actions {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+
+  button {
+    flex: 1;
+    height: 48px;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .share-copy-btn-new {
+    background: #fff;
+    color: #000;
+  }
+
+  .share-image-btn {
+    background: var(--text-color-y, #b8ff22);
+    color: #000;
   }
 }
 </style>
