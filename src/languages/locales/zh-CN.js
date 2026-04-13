@@ -95,6 +95,15 @@ export default {
     depositing: "充币中...",
     depositSuccess: "充币成功！"
   },
+  orderStatus: {
+    PENDING: "待处理",
+    TRADING: "交易中",
+    PARTIALLY_FILLED: "部分成交",
+    FULLY_FILLED: "完全成交",
+    FINISHED: "已结算",
+    CANCELLED: "已取消",
+    FAILED: "失败"
+  },
   commonManagement: {
     processing: "处理中",
     confirmed: "已完成",

@@ -95,6 +95,15 @@ export default {
     depositing: 'Depositing...',
     depositSuccess: 'Deposit successful!'
   },
+  orderStatus: {
+    PENDING: 'Pending',
+    TRADING: 'Trading',
+    PARTIALLY_FILLED: 'Partially Filled',
+    FULLY_FILLED: 'Fully Filled',
+    FINISHED: 'Finished',
+    CANCELLED: 'Cancelled',
+    FAILED: 'Failed'
+  },
   commonManagement: {
     processing: "Processing",
     confirmed: "Completed",

@@ -95,6 +95,15 @@ export default {
     depositing: '入金中...',
     depositSuccess: '入金成功！'
   },
+  orderStatus: {
+    PENDING: '保留中',
+    TRADING: '取引中',
+    PARTIALLY_FILLED: '一部約定',
+    FULLY_FILLED: '完全約定',
+    FINISHED: '決済完了',
+    CANCELLED: 'キャンセル済み',
+    FAILED: '失敗'
+  },
   commonManagement: {
     processing: "処理中",
     confirmed: "完了",

@@ -95,6 +95,15 @@ export default {
     depositing: '입금 중...',
     depositSuccess: '입금 성공!'
   },
+  orderStatus: {
+    PENDING: '대기 중',
+    TRADING: '거래 중',
+    PARTIALLY_FILLED: '부분 체결',
+    FULLY_FILLED: '완전 체결',
+    FINISHED: '정산 완료',
+    CANCELLED: '취소됨',
+    FAILED: '실패'
+  },
   commonManagement: {
     processing: "처리 중",
     confirmed: "완료",

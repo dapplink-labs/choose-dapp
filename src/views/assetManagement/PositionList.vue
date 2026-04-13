@@ -149,11 +149,18 @@
                 <span
                   class="status-pill status-right"
                   :class="
-                    item.status === 'lost' ? 'status-lost' : 'status-claimed'
+                    ['LOST', 'CANCELLED', 'CANCELED', 'FAILED'].includes(
+                      String(item.rawStatus || item.status).toUpperCase(),
+                    )
+                      ? 'status-lost'
+                      : 'status-claimed'
                   "
                 >
-                  <el-icon class="status-icon">
-                    <CloseBold v-if="item.status === 'lost'" />
+                  <el-icon
+                    class="status-icon"
+                    v-if="['WIN', 'LOST', 'claimed', 'COMPLETED', 'FINISHED', 'FULLY_FILLED', 'CANCELLED', 'CANCELED', 'FAILED'].includes(String(item.rawStatus || item.status).toUpperCase())"
+                  >
+                    <CloseBold v-if="['LOST', 'FAILED', 'CANCELLED', 'CANCELED'].includes(String(item.rawStatus || item.status).toUpperCase())" />
                     <Select v-else />
                   </el-icon>
                   <span class="status-text">{{ item.status }}</span>
@@ -301,14 +308,13 @@ const typeOptions = computed(() => {
     // 历史仓位：按订单状态筛选
     return [
       { value: "all", label: t("assetManagement.all") },
-      {
-        value: "COMPLETED",
-        label: t("assetManagement.completed") || "COMPLETED",
-      },
-      {
-        value: "CANCELLED",
-        label: t("assetManagement.cancelled") || "CANCELLED",
-      },
+      { value: "PENDING", label: t("orderStatus.PENDING") || "PENDING" },
+      { value: "TRADING", label: t("orderStatus.TRADING") || "TRADING" },
+      { value: "PARTIALLY_FILLED", label: t("orderStatus.PARTIALLY_FILLED") || "PARTIALLY_FILLED" },
+      { value: "FULLY_FILLED", label: t("orderStatus.FULLY_FILLED") || "FULLY_FILLED" },
+      { value: "FINISHED", label: t("orderStatus.FINISHED") || "FINISHED" },
+      { value: "CANCELLED", label: t("orderStatus.CANCELLED") || "CANCELLED" },
+      { value: "FAILED", label: t("orderStatus.FAILED") || "FAILED" },
     ];
   }
   // 仓位事件：目前只有 Buy 持仓
@@ -572,7 +578,7 @@ const getSideFilterParam = () => {
 
 const getStatusFilterParam = () => {
   if (activeTab.value !== "history") return "";
-  if (filterType.value === "COMPLETED" || filterType.value === "CANCELLED")
+  if (filterType.value && filterType.value !== "all")
     return filterType.value;
   return "";
 };
@@ -589,7 +595,6 @@ const mapPositionToRow = (p) => {
   const title = p?.event_name || "";
   const outcome = String(p?.outcome || "").toUpperCase() || "YES";
   const chancePct = parsePct(p?.chance);
-  const oddsType = outcome === "NO" ? "no" : "yes";
   const price = Number(p?.current_price ?? p?.avg_price);
   const priceText = Number.isFinite(price) ? formatNum(price, 2) : "--";
 
@@ -614,10 +619,10 @@ const mapPositionToRow = (p) => {
     // 左侧标签显示 Buy（目前接口无 side 字段，统一视为买入持仓）
     side: "BUY",
     outcome,
-    iconBg: outcome === "NO" ? "#E44096" : "#2FBC87",
+    iconBg: ["NO", "DOWN"].includes(outcome) ? "#E44096" : "#2FBC87",
     // 中间行右侧显示盈亏百分比
     pnl: Number.isFinite(pnlPct) ? Number(pnlPct.toFixed(2)) : 0,
-    oddsType,
+    oddsType: ["NO", "DOWN"].includes(outcome) ? "no" : "yes",
     // 中间粉/绿标签：Buy/Sell + 价格（¢）
     oddsLabel: `${getDisplayOutcome(outcome)} ${formatPriceToCentText(price)}`,
     // 底部右上角状态和历史复用字段
@@ -660,9 +665,9 @@ const mapOpenOrderToRow = (o) => {
     price: Number.isFinite(priceNum) ? formatNum(priceNum, 2) : "--",
     side: tradeSide, // BUY/SELL（pending tab 左侧标签）
     outcome,
-    iconBg: outcome === "NO" ? "#E44096" : "#2FBC87",
+    iconBg: ["NO", "DOWN"].includes(outcome) ? "#E44096" : "#2FBC87",
     pnl: 0,
-    oddsType: outcome === "NO" ? "no" : "yes",
+    oddsType: ["NO", "DOWN"].includes(outcome) ? "no" : "yes",
     oddsLabel: `${getDisplayOutcome(outcome)} ${formatPriceToCentText(priceNum)}`,
     resultAmount: 0,
     status: String(o?.status || "").toLowerCase(),
@@ -688,6 +693,15 @@ const mapOrderHistoryToRow = (o) => {
       ? (pnlAbs / principalNum) * 100
       : 0;
 
+  let rawStatus = o?.status || "";
+  let displayStatus = rawStatus;
+  if (displayStatus === "FINISHED") {
+    displayStatus = Number.isFinite(pnlAbs) && pnlAbs < 0 ? "lost" : "win";
+    rawStatus = displayStatus;
+  } else {
+    displayStatus = t(`orderStatus.${displayStatus}`) || displayStatus;
+  }
+
   const time = (o?.dealed_at || o?.created_at || "")
     .replace("T", " ")
     .replace("Z", "");
@@ -699,12 +713,13 @@ const mapOrderHistoryToRow = (o) => {
     price: Number.isFinite(priceNum) ? formatNum(priceNum, 2) : "--",
     side: tradeSide, // BUY/SELL（history tab）
     outcome,
-    iconBg: outcome === "NO" ? "#E44096" : "#2FBC87",
+    iconBg: ["NO", "DOWN"].includes(outcome) ? "#E44096" : "#2FBC87",
     pnl: Number.isFinite(pnlPct) ? Number(pnlPct.toFixed(2)) : 0,
-    oddsType: outcome === "NO" ? "no" : "yes",
+    oddsType: ["NO", "DOWN"].includes(outcome) ? "no" : "yes",
     oddsLabel: `${o?.sub_event_title || getDisplayOutcome(outcome)} · ${formatPriceToCentText(priceNum)}`,
     resultAmount: Number.isFinite(pnlAbs) ? Number(pnlAbs.toFixed(2)) : 0,
-    status: Number.isFinite(pnlAbs) && pnlAbs < 0 ? "lost" : "claimed",
+    status: displayStatus,
+    rawStatus: rawStatus,
     value: Number.isFinite(principalNum)
       ? principalNum.toFixed(2)
       : o?.dealed_cost || "0.00",
