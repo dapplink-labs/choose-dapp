@@ -2,10 +2,13 @@
   <div class="breaking-mobile-page">
     <!-- 突发事件横幅 -->
     <div class="hero-banner">
-      <div class="hero-bg" :style="{ backgroundImage: `url(${breakingBanner})` }">
+      <div
+        class="hero-bg"
+        :style="{ backgroundImage: `url(${breakingBanner})` }"
+      >
         <div class="hero-content">
           <div class="hero-date">{{ currentDate }}</div>
-          <div class="hero-title">{{ $t('breaking.title') || '突发事件' }}</div>
+          <div class="hero-title">{{ $t("breaking.title") || "突发事件" }}</div>
           <!-- <div class="hero-subtitle">{{ $t('breaking.subtitle') || '检视过去24小时内变动最大的市场' }}</div> -->
         </div>
       </div>
@@ -14,8 +17,13 @@
     <!-- 类别筛选器 -->
     <div class="category-filter">
       <div class="filter-scroll-container">
-        <button v-for="category in categories" :key="category.key" class="filter-btn"
-          :class="{ active: activeCategory === category.key }" @click="handleCategoryClick(category.key)">
+        <button
+          v-for="category in categories"
+          :key="category.key"
+          class="filter-btn"
+          :class="{ active: activeCategory === category.key }"
+          @click="handleCategoryClick(category.key)"
+        >
           {{ category.label }}
         </button>
       </div>
@@ -23,19 +31,38 @@
 
     <!-- 事件列表 -->
     <div class="events-list">
-      <div v-for="(item, index) in eventsList" :key="item.id" class="event-item" @click="handleEventClick(item)">
+      <div
+        v-for="(item, index) in eventsList"
+        :key="item.id"
+        class="event-item"
+        @click="handleEventClick(item)"
+      >
         <div class="event-number">{{ index + 1 }}</div>
-        <img :src="item.avatar" :alt="item.title" class="event-avatar" @error="handleImgError" />
+        <img
+          :src="item.avatar"
+          :alt="item.title"
+          class="event-avatar"
+          @error="handleImgError"
+        />
         <div class="event-content">
           <div class="event-title-row">
             <div class="event-title">{{ item.title }}</div>
             <div class="event-stats">
               <div class="stat-percent">{{ item.mainPercent }}%</div>
-              <div class="stat-change" :class="item.changeClass"
-                v-if="item.changePercent !== undefined && item.changePercent !== null">
+              <div
+                class="stat-change"
+                :class="item.changeClass"
+                v-if="
+                  item.changePercent !== undefined &&
+                  item.changePercent !== null
+                "
+              >
                 <el-icon class="change-icon">
-                  <TopRight style="color: #4CAF50;" v-if="item.changeClass === 'positive'" />
-                  <BottomRight style="color: #F44336;" v-else />
+                  <TopRight
+                    style="color: #4caf50"
+                    v-if="item.changeClass === 'positive'"
+                  />
+                  <BottomRight style="color: #f44336" v-else />
                 </el-icon>
                 <span class="change-value">{{ item.changePercent }}%</span>
               </div>
@@ -45,80 +72,81 @@
       </div>
       <!-- 列表为空 -->
       <div v-if="!eventsList.length && !loading" class="list-empty">
-        <p class="list-empty-text">{{ $t('home.listEmpty') || '暂无事件' }}</p>
+        <p class="list-empty-text">{{ $t("home.listEmpty") || "暂无事件" }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { TopRight, BottomRight } from '@element-plus/icons-vue'
-import lp1Png from '@/assets/icon/LP1.png'
-import breakingBanner from '@/assets/images/sudden.png'
-import { getCategoryList, getEventList } from "@/api/APIEvent"
-import { useAccount } from "@wagmi/vue"
-import { useI18n } from "vue-i18n"
-import { ElMessage } from "element-plus"
-import { isTradeBlockedForEvent } from "@/utils/blockedTradeEventGuids"
+import { ref, onMounted, watch, computed } from "vue";
+import { useRouter } from "vue-router";
+import { TopRight, BottomRight } from "@element-plus/icons-vue";
+import lp1Png from "@/assets/icon/LP1.png";
+import breakingBanner from "@/assets/images/sudden.png";
+import { getCategoryList, getEventList } from "@/api/APIEvent";
+import { useAccount } from "@wagmi/vue";
+import { useI18n } from "vue-i18n";
+import { ElMessage } from "element-plus";
+import { isTradeBlockedForEvent } from "@/utils/blockedTradeEventGuids";
 
-const router = useRouter()
-const { address } = useAccount()
-const { t, locale } = useI18n()
+const router = useRouter();
+const { address } = useAccount();
+const { t, locale } = useI18n();
 
-const currentLocale = localStorage.getItem('app-locale') || navigator.language || 'en'
-const language = computed(() => (locale.value || currentLocale).split('-')[0])
+const currentLocale =
+  localStorage.getItem("app-locale") || navigator.language || "en";
+const language = computed(() => (locale.value || currentLocale).split("-")[0]);
 
 watch(language, () => {
-    updateDate();
-    getCategoryListData();
-    fetchEventList();
-})
+  updateDate();
+  getCategoryListData();
+  fetchEventList();
+});
 
-const currentDate = ref('')
+const currentDate = ref("");
 
 const updateDate = () => {
-  const d = new Date()
-  if (language.value === 'zh') {
-    currentDate.value = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`
+  const d = new Date();
+  if (language.value === "zh") {
+    currentDate.value = `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
   } else {
     currentDate.value = d.toLocaleDateString(locale.value || currentLocale, {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   }
-}
+};
 
 const getDisplayOutcome = (outcome) => {
-  if (!outcome) return '';
+  if (!outcome) return "";
   const str = String(outcome).toLowerCase();
-  if (str === 'up') return t('bitcoinUpDown.up') || '涨';
-  if (str === 'down') return t('bitcoinUpDown.down') || '跌';
+  if (str === "up") return t("bitcoinUpDown.up") || "涨";
+  if (str === "down") return t("bitcoinUpDown.down") || "跌";
   return outcome;
 };
 
 // 图片加载失败兜底（避免外链失效导致裂图）
 const handleImgError = (e) => {
-  const img = e?.target
-  if (!img) return
+  const img = e?.target;
+  if (!img) return;
   // 防止死循环：如果已经替换过就不再处理
-  if (img.dataset?.fallbackApplied === '1') return
-  if (img.src && String(img.src).includes('LP1.png')) return
-  if (img.dataset) img.dataset.fallbackApplied = '1'
-  img.src = lp1Png
-}
+  if (img.dataset?.fallbackApplied === "1") return;
+  if (img.src && String(img.src).includes("LP1.png")) return;
+  if (img.dataset) img.dataset.fallbackApplied = "1";
+  img.src = lp1Png;
+};
 
 // 类别筛选器
-const categoryList = ref([])
-const categories = ref([{ key: 'all', label: t('home.all') || '全部' }])
-const activeCategory = ref('all')
+const categoryList = ref([]);
+const categories = ref([{ key: "all", label: t("home.all") || "全部" }]);
+const activeCategory = ref("all");
 
 const handleCategoryClick = (key) => {
-  activeCategory.value = key
-  fetchEventList()
-}
+  activeCategory.value = key;
+  fetchEventList();
+};
 
 // 获取分类列表数据
 async function getCategoryListData() {
@@ -127,20 +155,20 @@ async function getCategoryListData() {
     const data = response?.data?.data?.categories || [];
     categoryList.value = data;
     categories.value = [
-      { key: 'all', label: t('home.all') || '全部' },
-      ...data.map(item => ({
+      { key: "all", label: t("home.all") || "全部" },
+      ...data.map((item) => ({
         key: item.guid,
-        label: item.name
-      }))
+        label: item.name,
+      })),
     ];
   } catch (err) {
-    console.error('Fetch category list failed', err);
+    console.error("Fetch category list failed", err);
   }
 }
 
 // 事件列表数据
-const eventsList = ref([])
-const loading = ref(false)
+const eventsList = ref([]);
+const loading = ref(false);
 
 const fetchEventList = async () => {
   loading.value = true;
@@ -150,66 +178,76 @@ const fetchEventList = async () => {
       event_type: 1, // 1 for breaking events
       page: 1,
       page_size: 50,
-      user_address: address.value || '',
-      include_sub_events: true
+      user_address: address.value || "",
+      include_sub_events: true,
     };
 
-    if (activeCategory.value !== 'all') {
+    if (activeCategory.value !== "all") {
       params.category_guid = activeCategory.value;
     }
 
     const res = await getEventList(params);
     const list = res?.data?.data?.events || [];
 
-    eventsList.value = list.map(e => {
+    eventsList.value = list.map((e) => {
       const subEvents = Array.isArray(e.sub_events) ? e.sub_events : [];
-      const changePercent = e.change_percent !== undefined ? e.change_percent : 0;
+      const mainPercent =
+        subEvents[0]?.directions?.filter((x) =>
+          ["YES", "Up", "UP"].includes(x.outcome),
+        )[0].chance || 0;
+      const changePercent = Number(mainPercent) - Number(50);
       return {
         id: e.event_guid,
-        code: e.code || '',
-        category_guid: e.category_guid || '',
-        avatar: e.logo || '',
-        title: e.title || '',
-        mainPercent: `${subEvents[0]?.directions?.filter((x) => [ 'YES','Up','UP'].includes(x.outcome))[0].chance}`,
+        code: e.code || "",
+        category_guid: e.category_guid || "",
+        avatar: e.logo || "",
+        title: e.title || "",
+        mainPercent: `${subEvents[0]?.directions?.filter((x) => ["YES", "Up", "UP"].includes(x.outcome))[0].chance}`,
         changePercent: changePercent,
-        changeClass: changePercent >= 0 ? 'positive' : 'negative',
+        changeClass: changePercent >= 0 ? "positive" : "negative",
         options: subEvents.map((sub) => ({
-          text: sub.title || '',
-          subEventGuid: sub.sub_event_guid || '',
+          text: sub.title || "",
+          subEventGuid: sub.sub_event_guid || "",
           directions: sub?.directions,
-          percentage: `${sub?.directions?.filter((x) => [ 'YES','Up','UP'].includes(x.outcome))[0]?.chance || '--'}%`,
+          percentage: `${sub?.directions?.filter((x) => ["YES", "Up", "UP"].includes(x.outcome))[0]?.chance || "--"}%`,
         })),
       };
     });
   } catch (err) {
-    console.error('Fetch event list failed', err);
+    console.error("Fetch event list failed", err);
     eventsList.value = [];
   } finally {
     loading.value = false;
   }
-}
+};
 
 // 事件点击处理
 const handleEventClick = (item) => {
-  const fallbackSubEventGuid = item?.options?.[0]?.subEventGuid || '';
+  const fallbackSubEventGuid = item?.options?.[0]?.subEventGuid || "";
 
   // 部分列表可能你配置的 GUID 实际落在 sub_event_guid 上
-  if (isTradeBlockedForEvent(item?.id) || isTradeBlockedForEvent(fallbackSubEventGuid)) {
-    ElMessage.warning(t('home.tradeNotOpen') || '暂未开启')
-    return
+  if (
+    isTradeBlockedForEvent(item?.id) ||
+    isTradeBlockedForEvent(fallbackSubEventGuid)
+  ) {
+    ElMessage.warning(t("home.tradeNotOpen") || "暂未开启");
+    return;
   }
 
   // 优先按事件 code 分流，兜底再用 category code
-  const eventCode = String(item.code || '').toUpperCase();
+  const eventCode = String(item.code || "").toUpperCase();
   const categoryCode = String(
-    categoryList.value.find(c => c.guid === item.category_guid || c.category_guid === item.category_guid)?.code || ''
+    categoryList.value.find(
+      (c) =>
+        c.guid === item.category_guid || c.category_guid === item.category_guid,
+    )?.code || "",
   ).toUpperCase();
   const targetCode = eventCode || categoryCode;
 
   // 1. 体育事件：进入体育详情页
-  if (targetCode === 'SPORTS') {
+  if (targetCode === "SPORTS") {
     router.push({
-      path: '/sports-detail-h5',
+      path: "/sports-detail-h5",
       query: {
         id: item.id,
       },
@@ -221,10 +259,10 @@ const handleEventClick = (item) => {
   if (item?.options?.length === 1) {
     const cryptoQuery = {
       event_guid: item.id,
-      ...(fallbackSubEventGuid ? { sub_event_guid: fallbackSubEventGuid } : {})
+      ...(fallbackSubEventGuid ? { sub_event_guid: fallbackSubEventGuid } : {}),
     };
     router.push({
-      path: '/bitcoin-up-down',
+      path: "/bitcoin-up-down",
       query: cryptoQuery,
     });
     return;
@@ -238,13 +276,13 @@ const handleEventClick = (item) => {
       ...(fallbackSubEventGuid ? { sub_event_guid: fallbackSubEventGuid } : {}),
     },
   });
-}
+};
 
 onMounted(() => {
   updateDate();
   getCategoryListData();
   fetchEventList();
-})
+});
 </script>
 
 <style scoped lang="scss">
@@ -330,7 +368,7 @@ onMounted(() => {
         cursor: pointer;
         transition: all 0.2s;
         white-space: nowrap;
-        border: 1px solid var(--border-color, #E0E0E0);
+        border: 1px solid var(--border-color, #e0e0e0);
         background-color: transparent;
         color: var(--text-color, #1a1a1a);
 
@@ -431,12 +469,11 @@ onMounted(() => {
               white-space: nowrap;
 
               &.positive {
-                color: #4CAF50;
-
+                color: #4caf50;
               }
 
               &.negative {
-                color: #F44336;
+                color: #f44336;
               }
 
               .change-icon {
