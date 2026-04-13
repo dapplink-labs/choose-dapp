@@ -820,7 +820,7 @@
                 {{ detailData.eventTitle || detailData.title }}
                 <span v-if="titleTimeRangeText"> {{ titleTimeRangeText }}</span>
               </div>
-              <div class="share-card-subtitle">Chooseme.vip</div>
+              <div class="share-card-subtitle">{{ shareSubTitle }}</div> 
             </div>
           </div>
           <button class="share-copy-btn" @click="copyShareLink">

@@ -39,8 +39,11 @@ export default {
     const { t } = useI18n();
     const router = useRouter();
     const route = useRoute();
+    const shareSubTitle = computed(()=>{
+       return window.location.host;
+    })
 
-    const getDisplayOutcome = (outcome) => {
+       const getDisplayOutcome = (outcome) => {
       if (!outcome) return '';
       const str = String(outcome).toLowerCase();
       if (str === 'up') return t('bitcoinUpDown.up') || '涨';
@@ -137,7 +140,14 @@ export default {
     };
 
     const copyShareLink = async () => {
-      const shareUrl = window.location.href;
+      let shareUrl = window.location.href;
+      if (address.value) {
+        if (shareUrl.includes('inviteCode=')) {
+          shareUrl = shareUrl.replace(/inviteCode=[^&]*/, `inviteCode=${address.value}`);
+        } else {
+          shareUrl += shareUrl.includes('?') ? `&inviteCode=${address.value}` : `?inviteCode=${address.value}`;
+        }
+      }
       let success = false;
       if (navigator.clipboard && window.isSecureContext) {
         try {
@@ -2418,6 +2428,7 @@ export default {
       resizeHandler,
       t,
       address,
+      shareSubTitle
     };
   },
 };
