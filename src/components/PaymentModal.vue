@@ -144,7 +144,7 @@
                 class="quick-share-btn"
                 @click="adjustInput(val)"
               >
-                {{ val === 'Max' ? $t('payment.max') : (val > 0 ? "+" + val : val) }}
+                {{ val === 'Max' ? $t('payment.max') : (Number(val) > 0 ? "+" + val : val) }}
               </button>
             </div>
           </div>

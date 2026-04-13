@@ -1641,7 +1641,7 @@ $primary-blue: #5073e5;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 9999;
   display: flex;
   align-items: flex-end;
@@ -1650,7 +1650,7 @@ $primary-blue: #5073e5;
 
 .custom-bottom-modal {
   width: 100%;
-  background: var(--bg-page-h5, #1e1e1e);
+  background: var(--el-bg-color, #1e1e1e);
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   padding: 24px 20px 32px;
