@@ -69,14 +69,6 @@
           </svg>
         </button>
 
-        <!-- 关灯按钮 -->
-        <button class="theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
-          <el-icon class="theme-icon">
-            <Sunny v-if="isDark" />
-            <Moon v-else />
-          </el-icon>
-        </button>
-
         <div class="finance-info">
           <span class="finance-label">{{ $t('header.portfolio') || '投资组合' }}: </span>
           <span class="finance-amount">${{ portfolioAmount }}</span>
@@ -159,14 +151,6 @@
           </template>
         </el-dropdown>
 
-        <!-- 主题切换按钮 -->
-        <div class="h5-theme-toggle-btn" @click="toggleTheme" :title="isDark ? '开灯' : '关灯'">
-          <el-icon class="theme-icon" :class="{ 'icon-light': !isDark, 'icon-dark': isDark }">
-            <Sunny v-if="!isDark" />
-            <Moon v-else />
-          </el-icon>
-        </div>
-
         <!-- 未连接钱包时显示"连接钱包"按钮（跳转到 LinkWallet 页面） -->
         <button v-if="statusReady && !isConnected" class="h5-connect-wallet-btn" @click="goLinkWallet">
           {{ $t('link.titel') || '链接钱包' }}
@@ -218,7 +202,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, inject, watch } from 'vue'
-import { Search, ArrowDown, Sunny, Moon, CloseBold } from '@element-plus/icons-vue'
+import { Search, ArrowDown, CloseBold } from '@element-plus/icons-vue'
 import { injected, useAccount, useChainId, useConnect, useDisconnect } from '@wagmi/vue'
 import { copyText } from 'vue3-clipboard'
 import { useThemeStore } from '@/stores/theme'
@@ -369,10 +353,6 @@ const wallets = [
   },
 
 ]
-
-const toggleTheme = () => {
-  themeStore.toggleTheme()
-}
 
 // 语言切换处理
 const handleLanguageChange = (command) => {

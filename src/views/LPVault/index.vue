@@ -1,528 +1,382 @@
 <template>
-    <div class="LPVault">
+  <div class="lpvault-page">
+    <BackHeaderNav
+      class="lpvault-header"
+      :show-record-btn="true"
+      :show-open-btn="true"
+      :type="2"
+      action-mode="icon"
+      :action-icon-size="32"
+      :record-icon-src="recordIcon"
+      :open-icon-src="shareIcon"
+    />
 
-        <!-- 通用返回头部导航 -->
-        <BackHeaderNav :show-record-btn="true" :show-open-btn="true" :type="2" />
+    <section class="hero-section">
+      <div class="hero-copy">
+        <h1 class="hero-title">{{ $t('lpVault.title') }}</h1>
+        <p class="hero-desc">
+          {{ $t('lpVault.desc') }}
+          <button type="button" class="hero-link" @click="handleOpenMore">{{ $t('lpVault.learnMore') }}</button>
+        </p>
+      </div>
+    </section>
 
-        <div class="banner1">
+    <StakingSuccessModal
+      v-model:visible="showSuccessModal"
+      :nodeLevel="activatedNodeType"
+      :nodeName="activatedNodeName"
+    />
 
-            <div class="intro">
-                <h1>{{ $t('lpVault.title') }}</h1>
-                <p>{{ $t('lpVault.desc') }},
-                    <a href="javascript:void(0)" @click="handleOpenMore">{{ $t('lpVault.learnMore') }}</a>。
-                </p>
-            </div>
-        </div>
-
-        <!-- 激活提示模块：使用通用跑马灯组件（type 1 对应质押节点激活消息） -->
-        <!-- <ActivationMarquee :type="1" /> -->
-
-        <StakingSuccessModal 
-            v-model:visible="showSuccessModal" 
-            :nodeLevel="activatedNodeType"
-            :nodeName="activatedNodeName"
-        />
-
-        <h3>
-            <span>{{ $t('lpVault.nodeStaking') }}</span>
-            <b @click="handleOpenMyIncome">{{ $t('lpVault.myLPIncome') }}
-                <el-icon class="arrow-icon">
-                    <ArrowRightBold />
-                </el-icon>
-            </b>
-        </h3>
-
-        <!-- 节点卡片列表 -->
-        <div class="node-card-list">
-            <div v-for="node in nodeList" :key="node.type" class="node-card-item">
-                <div class="node-item-header">
-                    <div class="node-item-icon">
-                        <img :src="node.icon" :alt="node.name" />
-                    </div>
-                    <div class="node-item-main">
-                        <div class="node-item-title-wrapper">
-                            <span class="node-item-name">{{ node.name }}</span>
-                            <span class="node-item-type-badge">{{ node.nodeLevel }}</span>
-                        </div>
-                        <div class="node-item-price">
-                            <span class="label">{{ $t('lpVault.activationPrice') }}</span>
-                            <span class="value">
-                                <img class="coin" :src="TIcon" alt="T" />{{ node.price }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="node-item-metrics">
-                    <div class="metric-item">
-                        <span class="metric-label">{{ $t('lpVault.dailyEarnings') }}</span>
-                        <span class="metric-value daily-earnings">{{ node?.node_min_income }}% ~ {{
-                            node?.node_max_income }}%</span>
-                    </div>
-                    <div class="metric-item">
-                        <span class="metric-label">{{ $t('lpVault.cycleDays') }}</span>
-                        <span class="metric-value">{{ node.cycleDays }}</span>
-                    </div>
-                    <div class="metric-item">
-                        <span class="metric-label">{{ $t('lpVault.totalEarnings') }}</span>
-                        <span class="metric-value total-earnings">
-                            <img class="total-icon" src="@/assets/icon/LP1.png" alt="" />
-                            {{ node.totalEarnings }} USDT
-                        </span>
-                    </div>
-                </div>
-
-                <button
-                    class="node-item-btn"
-                    :disabled="String(node.nodeLevel) === 'T6'"
-                    @click="String(node.nodeLevel) !== 'T6' && handleActivate(node.type)"
-                >
-                    {{ $t('lpVault.activateStaking') }}
-                </button>
-            </div>
-        </div>
+    <div class="section-heading">
+      <span class="section-title">{{ $t('lpVault.nodeStakingSection') }}</span>
+      <button type="button" class="income-entry" @click="handleOpenMyIncome">
+        <span>{{ $t('lpVault.myLPIncome') }}</span>
+        <img :src="arrowRightIcon" :alt="$t('lpVault.myLPIncome')" class="income-arrow" />
+      </button>
     </div>
+
+    <div class="staking-card-list">
+      <article v-for="node in nodeList" :key="node.type" class="staking-card">
+        <div class="card-header">
+          <div class="card-illustration-wrap">
+            <img :src="nodeIllustration" :alt="node.name" class="card-illustration" />
+          </div>
+
+          <div class="card-headline">
+            <h2 class="card-title">{{ node.name }}</h2>
+            <div class="card-badges">
+              <span class="info-badge price-badge">{{ node.price }} U</span>
+              <span class="info-badge level-badge">{{ node.nodeLevel }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-metrics">
+          <div class="metric-block">
+            <div class="metric-label">{{ $t('lpVault.dailyEarnings') }}</div>
+            <div class="metric-value metric-green">{{ node.node_min_income }}%-{{ node.node_max_income }}%</div>
+          </div>
+          <div class="metric-block metric-center">
+            <div class="metric-label">{{ $t('lpVault.cycleDays') }}</div>
+            <div class="metric-value">{{ node.cycleDays }}</div>
+          </div>
+          <div class="metric-block metric-right">
+            <div class="metric-label">{{ $t('lpVault.totalEarnings') }}</div>
+            <div class="metric-value total-value">
+              <img class="total-icon" :src="tIcon" alt="T" />
+              <span>{{ node.totalEarnings }}</span>
+            </div>
+          </div>
+        </div>
+
+        <button
+          class="stake-button"
+          :disabled="String(node.nodeLevel) === 'T6'"
+          @click="String(node.nodeLevel) !== 'T6' && handleActivate(node.type)"
+        >
+          {{ $t('lpVault.activateStakingShort') }}
+        </button>
+      </article>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ArrowRightBold } from '@element-plus/icons-vue'
-import TIcon from '@/assets/icon/TIcon.png'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
-import ActivationMarquee from '@/components/ActivationMarquee.vue'
 import StakingSuccessModal from '@/components/StakingSuccessModal.vue'
+import tIcon from '@/assets/icon/TIcon.png'
 import { useLPVault } from './useLPVault.js'
 
+const iconModules = import.meta.glob('@/assets/new_icon/LPVault/*.{png,svg}', { eager: true })
+const iconMap = Object.fromEntries(
+  Object.entries(iconModules).map(([path, mod]) => {
+    const fileName = path.split('/').pop() || path
+    const name = fileName.replace(/\.(png|svg)$/i, '')
+    return [name, mod.default]
+  }),
+)
+const getIcon = (name) => iconMap[name]
+
+const arrowRightIcon = getIcon('lpvault-arrow-right')
+const nodeIllustration = getIcon('lpvault-node-illustration')
+const recordIcon = getIcon('lpvault-records')
+const shareIcon = getIcon('lpvault-share')
+
 const {
-    handleOpenMore,
-    handleOpenMyIncome,
-    nodeList,
-    handleActivate,
-    showSuccessModal,
-    activatedNodeType,
-    activatedNodeName,
+  handleOpenMore,
+  handleOpenMyIncome,
+  nodeList,
+  handleActivate,
+  showSuccessModal,
+  activatedNodeType,
+  activatedNodeName,
 } = useLPVault()
 </script>
 
 <style scoped lang="scss">
-.theme-dark {
-    .activation-banner {
-        background: #2F2F2F !important;
-    }
-
-    .node-card-item {
-        background: #1D1D1D !important;
-    }
-
-    .node-item-name {
-        color: #FFFFFF !important;
-    }
-
-
-    .node-item-btn {
-        background: var(--text-color-y, #BBFF2E) !important;
-        color: #000000 !important;
-    }
+.lpvault-page {
+  min-height: 100vh;
+  padding: 84px 20px 36px;
+  background: #232933;
+  color: #ffffff;
 }
 
-.LPVault {
-    min-height: 100vh;
-    padding: 80px 10px 60px 10px;
-    background-color: var(--bg-page-h5, #FCFCFC);
-    color: var(--text-color, #1a1a1a);
-    transition: background-color 0.3s ease, color 0.3s ease;
+.lpvault-header:deep(.cps-card-header) {
+  padding: 16px 20px 12px;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
 
-    &::after {
-        background: url("../../assets/images/banner3.png");
-        background-size: cover;
-        background-repeat: no-repeat;
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 230px;
-    }
+.lpvault-header:deep(.back-btn) {
+  width: 20px;
+  height: 20px;
+}
 
-    .banner1 {
-        flex-direction: column;
-        display: flex;
-        height: 100%;
-        justify-content: space-between;
-        margin-bottom: 20px;
+.lpvault-header:deep(.header-right) {
+  gap: 14px;
+}
 
-        h3 {
-            padding: 0 10px;
-            margin-bottom: 20px;
-        }
-    }
+.lpvault-header:deep(.action-btn) {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
 
-    .hide-scroll {
-        overflow: auto;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
+.lpvault-header:deep(.action-btn .action-text) {
+  display: none !important;
+}
 
-    .hide-scroll::-webkit-scrollbar {
-        display: none;
-    }
+.lpvault-header:deep(.action-btn .icon) {
+  width: 32px !important;
+  height: 32px !important;
+}
 
-    .tab {
-        display: flex;
-        gap: 20px;
-        border-bottom: 1px solid var(--border-color, #F3F3F3);
-        margin-bottom: 20px;
-        overflow-x: auto;
-        white-space: nowrap;
-        transition: border-color 0.3s ease;
+.hero-section {
+  margin-bottom: 48px;
+}
 
-        .item {
-            font-weight: 400;
-            font-size: 16px;
-            width: 90px;
-            flex-shrink: 0;
-            color: var(--text-gray, #909090);
-            padding-bottom: 15px;
-            border-bottom: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.3s ease;
+.hero-title {
+  margin: 0 0 16px;
+  font-size: 30px;
+  line-height: 1.18;
+  font-weight: 700;
+  color: #ffffff;
+}
 
-            &:hover {
-                color: var(--text-color, #000000);
-            }
-        }
+.hero-desc {
+  margin: 0;
+  color: #8d94a1;
+  font-size: 14px;
+  line-height: 1.58;
+  letter-spacing: 0.01em;
+}
 
-        .active {
-            flex-shrink: 0;
-            font-weight: 400;
-            font-size: 16px;
-            color: var(--text-color, #000);
-            width: 90px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--text-color, #000);
-            transition: all 0.3s ease;
-        }
-    }
+.hero-link {
+  border: none;
+  padding: 0;
+  margin-left: 4px;
+  background: transparent;
+  color: #8d94a1;
+  font-size: 14px;
+  line-height: 1.72;
+  text-decoration: underline;
+  cursor: pointer;
+}
 
-    .back-btn .icon,
-    .open-btn .icon {
-        width: 100%;
-        height: 100%;
-    }
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
 
-    .intro {
+.section-title {
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #ffffff;
+}
 
-        h1 {
-            font-family: Noto Sans SC, Noto Sans SC;
-            font-weight: bold;
-            font-size: 28px;
-            color: var(--text-color, #000000);
-            transition: color 0.3s ease;
-            margin-bottom: 10px;
-        }
+.income-entry {
+  border: none;
+  padding: 0;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
 
-        p {
-            display: block;
-            width: 100%;
-            padding-right: 25%;
-            box-sizing: border-box;
-        }
+.income-arrow {
+  width: 11px;
+  height: 11px;
+  object-fit: contain;
+}
 
-        p,
-        a {
-            font-family: PingFang SC, PingFang SC;
-            font-weight: 400;
-            font-size: 14px;
-            color: #383838;
-            line-height: 20px;
-            text-align: left;
-            color: var(--text-gray, #909090);
-            transition: color 0.3s ease;
-        }
+.staking-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
 
-        a {
-            cursor: pointer;
-            text-decoration: underline;
+.staking-card {
+  background: #2f3743;
+  border-radius: 16px;
+  padding: 18px 16px 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
 
-            &:hover {
-                color: var(--text-color, #000000);
-            }
-        }
-    }
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
 
-    .activation-banner {
-        width: 100%;
-        box-sizing: border-box;
-        margin: 32px 0 16px;
-        padding: 10px 14px;
-        /* 开灯（亮色主题）默认背景色 */
-        background: #F4F4F4;
-        border-radius: 999px;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        color: #111111;
-        transition: background-color 0.3s ease, color 0.3s ease;
-    }
+.card-illustration-wrap {
+  width: 88px;
+  flex-shrink: 0;
+}
 
-    .activation-avatar {
-        width: 36px;
-        height: 36px;
-        aspect-ratio: 1 / 1;
-        flex-shrink: 0;
-        border-radius: 50%;
-        background: #2F2F2F;
-        overflow: hidden;
+.card-illustration {
+  width: 88px;
+  height: 66px;
+  object-fit: contain;
+}
 
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-    }
+.card-headline {
+  min-width: 0;
+  padding-top: 2px;
+}
 
-    .activation-text {
-        font-size: 13px;
-        line-height: 18px;
-        color: var(--text-color, #000000);
-    }
+.card-title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  line-height: 1.16;
+  font-weight: 700;
+  color: #ffffff;
+}
 
-    /* 节点卡片列表样式 */
-    .node-card-list {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        margin-bottom: 24px;
-    }
+.card-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-    .node-card-item {
-        background: #F6F6F6;
-        border-radius: 16px;
-        padding: 16px;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        transition: all 0.3s ease;
-    }
+.info-badge {
+  min-width: 0;
+  height: 28px;
+  padding: 0 11px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  line-height: 1;
+  color: #f3d04d;
+  background: rgba(86, 88, 55, 0.9);
+}
 
-    .node-item-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
+.card-metrics {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
 
-    .node-item-icon {
-        position: relative;
-        width: 72px;
-        height: 72px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: visible;
-        flex-shrink: 0;
+.metric-block {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-        img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-    }
+.metric-center {
+  align-items: center;
+  text-align: center;
+}
 
-    .node-item-main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
+.metric-right {
+  align-items: flex-end;
+  text-align: right;
+}
 
-    .node-item-title-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 4px;
-    }
+.metric-label {
+  position: relative;
+  display: inline-block;
+  color: #8d94a1;
+  font-size: 13px;
+  line-height: 1.35;
+  padding-bottom: 6px;
+}
 
-    .node-item-name {
-        font-family: PingFang SC, PingFang SC;
-        font-weight: 400;
-        font-size: 18px;
-        line-height: 1.5;
-        color: #666666;
-        transition: color 0.3s ease;
-    }
+.metric-label::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-bottom: 1px dashed rgba(156, 164, 177, 0.9);
+}
 
-    .node-item-type-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 1px 10px;
-        border-radius: 6px;
-        font-family: DingTalk JinBuTi, DingTalk JinBuTi;
-        font-weight: 500;
-        font-size: 13px;
-        background: rgba(234, 171, 74, 0.1);
-        color: #EAAB4A;
-        font-style: italic;
-    }
+.metric-value {
+  margin-top: 12px;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #ffffff;
+}
 
-    /* 暗色主题下的标签样式 */
-    :deep(.theme-dark) .node-item-type-badge {
-        background: #2F2F2F;
-        color: #FFFFFF;
-    }
+.metric-green {
+  color: #2bd39a;
+}
 
-    .node-item-price {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 14px;
-        color: #9ca3af;
+.total-value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  line-height: 1;
+}
 
-        .label {
-            color: #9ca3af;
-        }
+.total-value span {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
 
-        .value {
-            font-family: PingFang SC, PingFang SC;
-            font-weight: 600;
-            font-size: 16px;
-            color: var(--text-color, #000000);
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
+.total-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
 
-        .coin {
-            width: 18px;
-            height: 18px;
-            display: inline-block;
-            object-fit: contain;
-        }
-    }
+.stake-button {
+  margin-top: 20px;
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 13px;
+  background: linear-gradient(180deg, #ffd94b 0%, #ffcc1f 100%);
+  color: #121212;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
 
-    .node-item-metrics {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        padding: 12px 0;
-        margin: 8px 0;
-    }
-
-    .metric-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 14px;
-        line-height: 1.5;
-    }
-
-    .metric-label {
-        font-family: PingFang SC, PingFang SC;
-        font-weight: 400;
-        font-size: 14px;
-        color: #909090;
-        line-height: 20px;
-        text-align: left;
-        font-style: normal;
-        text-transform: none;
-        border-bottom: 1px dashed #909090;
-    }
-
-    .metric-value {
-        font-family: PingFang SC, PingFang SC;
-        font-weight: 600;
-        color: var(--text-color, #000000);
-        transition: color 0.3s ease;
-
-        &.daily-earnings {
-            color: #2EBE69;
-        }
-
-        &.total-earnings {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--text-color, #000000);
-        }
-    }
-
-    .total-icon {
-        width: 16px;
-        height: 16px;
-        object-fit: contain;
-    }
-
-    .node-item-btn {
-        margin-top: 8px;
-        height: 44px;
-        border-radius: 22px;
-        border: none;
-        background: #2B6C18;
-        color: #ffffff;
-        font-family: PingFang SC, PingFang SC;
-        font-weight: 700;
-        font-size: 15px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 8px 16px rgba(46, 190, 105, 0.3);
-        }
-
-        &:active {
-            transform: translateY(0);
-        }
-
-        &:disabled {
-            background: #c5c5c5!important;
-            color: #999!important;
-            cursor: not-allowed!important;
-            box-shadow: none!important;
-            transform: none!important;
-        }
-    }
-
-    h3 {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin: 25px 0 24px 0;
-
-        span {
-            font-weight: bold;
-            font-size: 20px;
-            color: var(--text-color, #000000);
-            transition: color 0.3s ease;
-        }
-
-        b {
-            font-weight: 400;
-            font-size: 14px;
-            color: var(--text-color, #000000);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-
-            &:hover {
-                transform: translateX(4px);
-            }
-
-            .arrow-icon {
-                color: var(--text-color, #000000);
-                font-size: 14px;
-                transition: all 0.3s ease;
-            }
-
-            &:hover .arrow-icon {
-                transform: translateX(2px);
-            }
-        }
-    }
-
+.stake-button:disabled {
+  background: #565d68;
+  color: #9aa3b2;
+  cursor: not-allowed;
 }
 </style>

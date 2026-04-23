@@ -1,747 +1,669 @@
 <template>
-  <div class="user-info-page">
-    <!-- 用户信息卡片 -->
-    <div class="user-card">
-      <div class="user-info">
-        <img :src="userAvatar" :alt="$t('common.userAvatar')" class="avatar" />
-        <div class="user-details">
-          <div class="username">{{ username }}</div>
-          <div class="wallet-address" @click="copyWalletAddress">
-            {{ walletAddress }}
+  <div class="personal-center-page">
+    <div class="personal-center-header">
+      <div class="profile-row">
+        <img :src="userAvatar" :alt="$t('common.userAvatar')" class="profile-avatar" />
+        <div class="profile-copy">
+          <div class="profile-name-row">
+            <div class="profile-name">{{ username }}</div>
+            <img
+              v-if="verificationBadge"
+              :src="verificationBadge"
+              :alt="$t('userInfo.officialVerification')"
+              class="verification-badge"
+            />
           </div>
+          <button type="button" class="profile-address" @click="copyWalletAddress">
+            {{ walletAddress }}
+          </button>
         </div>
       </div>
-      <div class="action-icons">
-        <!-- <img :src="isDark ? getIcon('29Dark') : getIcon('29')" :alt="$t('common.share')" class="icon-img"
-          @click="handleShare" /> -->
-        <img v-if="!isComingSoon" :src="isDark ? getIcon('settingDark') : getIcon('setting')"
-          :alt="$t('common.settings')" class="icon-img" @click="handleSettings" />
-        <img :src="isDark ? getIcon('closeDark') : getIcon('close')" :alt="$t('common.close')" class="icon-img"
-          @click="handleClose" />
+
+      <div class="header-actions">
+        <button
+          v-if="!isComingSoon"
+          type="button"
+          class="icon-button"
+          :aria-label="$t('common.settings')"
+          @click="handleSettings"
+        >
+          <img :src="settingsIcon" :alt="$t('common.settings')" class="action-icon" />
+        </button>
+        <button
+          type="button"
+          class="icon-button"
+          :aria-label="$t('common.close')"
+          @click="handleClose"
+        >
+          <img :src="closeIcon" :alt="$t('common.close')" class="action-icon" />
+        </button>
       </div>
     </div>
 
-    <!-- Ecosystem 标题 -->
-    <div class="section-title">{{ $t("userInfo.ecosystem") }}</div>
-
-    <!-- Ecosystem 网格布局 -->
-    <div class="section-grid">
-      <div v-for="item in ecosystemItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
-        <div class="section-icon-wrapper">
-          <img :src="item.icon" :alt="item.label" class="section-icon" />
-        </div>
-        <div class="section-label">{{ item.label }}</div>
+    <section v-for="section in sections" :key="section.title" class="menu-section">
+      <h2 class="section-title">{{ section.title }}</h2>
+      <div class="menu-grid">
+        <button
+          v-for="item in section.items"
+          :key="item.key"
+          type="button"
+          class="menu-card"
+          @click="handleMenuClick(item)"
+        >
+          <span class="menu-icon-shell">
+            <img :src="item.icon" :alt="item.label" class="menu-icon" />
+          </span>
+          <span class="menu-label">{{ item.label }}</span>
+        </button>
       </div>
-    </div>
+    </section>
 
-    <!-- Support 标题 -->
-    <div class="section-title section-title-with-margin">
-      {{ $t("userInfo.support") }}
-    </div>
-
-    <!-- Support 网格布局 -->
-    <div class="section-grid">
-      <div v-for="item in supportItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
-        <div class="section-icon-wrapper">
-          <img :src="item.icon" :alt="item.label" class="section-icon" />
-        </div>
-        <div class="section-label">{{ item.label }}</div>
-      </div>
-    </div>
-
-    <!-- Others 标题 -->
-    <div class="section-title">{{ $t("userInfo.others") }}</div>
-
-    <!-- Others 网格布局 -->
-    <div class="section-grid">
-      <div v-for="item in othersItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
-        <div class="section-icon-wrapper">
-          <img :src="item.icon" :alt="item.label" class="section-icon" />
-        </div>
-        <div class="section-label">{{ item.label }}</div>
-      </div>
-    </div>
-
-    <!-- Choose Me 标题 -->
-    <div class="section-title">{{ $t("userInfo.chooseMe") }}</div>
-
-    <!-- Choose Me 网格布局 -->
-    <div class="section-grid">
-      <div v-for="item in chooseMeItems" :key="item.key" class="section-item" @click="handleMenuClick(item)">
-        <div class="section-icon-wrapper">
-          <img :src="item.icon" :alt="item.label" class="section-icon" />
-        </div>
-        <div class="section-label">{{ item.label }}</div>
-      </div>
-    </div>
-
-    <!-- Social links -->
-    <div class="social-links">
-      <a v-for="(link, idx) in friendLinks" :key="idx" href="javascript:void(0)" class="social-link"
-        :aria-label="link.label" @click="goHref(link)">
-        <img :src="link.icon" :alt="link.label" />
-      </a>
-    </div>
-
-    <!-- Disconnect button -->
-    <div class="disconnect-section">
-      <button class="disconnect-btn" @click="handleDisconnect">
-        {{ $t("userInfo.disconnectWallet") }}
+    <div class="social-row">
+      <button
+        v-for="link in socialLinks"
+        :key="link.label"
+        type="button"
+        class="social-button"
+        :aria-label="link.label"
+        @click="goHref(link)"
+      >
+        <img :src="link.icon" :alt="link.label" class="social-icon" />
       </button>
     </div>
 
-    <!-- 分享邀请码弹窗 -->
+    <div class="disconnect-wrap">
+      <button class="disconnect-btn" @click="handleDisconnect">
+        {{ $t('link.exit') }}
+      </button>
+    </div>
+
     <ShareInvitationCode v-model="showShareModal" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { useAccount, useDisconnect } from "@wagmi/vue";
-import { useThemeStore } from "@/stores/theme";
-import { useI18n } from "vue-i18n";
-import Message from "@/utils/message";
-import ShareInvitationCode from "@/components/ShareInvitationCode.vue";
-import { readContract } from "@wagmi/core";
-import { config } from "@/wagmi.ts";
-import nodeManagerABI from "@/assets/abi/nodeManagerABI.json";
-import networks from "@/assets/json/networks.js";
-const BSC_CHAIN_ID = 56;
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAccount, useDisconnect } from '@wagmi/vue'
+import { useI18n } from 'vue-i18n'
+import Message from '@/utils/message'
+import ShareInvitationCode from '@/components/ShareInvitationCode.vue'
+import { readContract } from '@wagmi/core'
+import { config } from '@/wagmi.ts'
+import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
+import networks from '@/assets/json/networks.js'
 
-const { locale, t } = useI18n();
-const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === "true");
+const BSC_CHAIN_ID = 56
+const { t } = useI18n()
+const router = useRouter()
+const { address } = useAccount()
+const { disconnect } = useDisconnect()
+const isComingSoon = computed(() => import.meta.env.VITE_IS_COMING_SOON === 'true')
 
-// 批量导入 icon 资源，减少单独 import
-const iconModules = import.meta.glob("@/assets/icon/*.{png,svg}", {
-  eager: true,
-});
+const iconModules = import.meta.glob('@/assets/new_icon/*.{png,svg}', { eager: true })
 const iconMap = Object.fromEntries(
   Object.entries(iconModules).map(([path, mod]) => {
-    const fileName = path.split("/").pop() || path;
-    const name = fileName.replace(/\.(png|svg)$/i, "");
-    return [name, mod.default];
+    const fileName = path.split('/').pop() || path
+    const name = fileName.replace(/\.(png|svg)$/i, '')
+    return [name, mod.default]
   }),
-);
-const getIcon = (name) => iconMap[name];
+)
+const getIcon = (name) => iconMap[name]
 
-const router = useRouter();
-const { address, status } = useAccount();
-const { disconnect } = useDisconnect();
-const themeStore = useThemeStore();
-const isDark = computed(() => themeStore.isDark);
+const randomNumber = ref(Math.floor(Math.random() * 10000))
+const username = ref(`Choose Me ${randomNumber.value}`)
+const showShareModal = ref(false)
 
-// 生成一个随机数
-const randomNumber = ref(Math.floor(Math.random() * 10000));
-// 用户信息
-const username = ref("Choose Me " + randomNumber.value);
 const walletAddress = computed(() => {
-  if (address.value) {
-    return `${address.value.slice(0, 6)}....${address.value.slice(-4)}`;
-  }
-  return "";
-});
-
-// 分享邀请码弹窗状态
-const showShareModal = ref(false);
+  if (!address.value) return '0x000...0000'
+  return `${address.value.slice(0, 6)}....${address.value.slice(-4)}`
+})
 
 const userAvatar = computed(() => {
   return address.value
     ? `https://effigy.im/a/${address.value}.svg`
-    : "/src/assets/icon/noperson.png";
-});
+    : '/src/assets/icon/noperson.png'
+})
 
-// 点击钱包地址复制
-const copyWalletAddress = async () => {
-  if (!address.value) return;
-  const fullAddress = address.value;
+const settingsIcon = computed(() => getIcon('personal-center-settings'))
+const closeIcon = computed(() => getIcon('personal-center-close'))
+const verificationBadge = computed(() => getIcon('personal-center-verified-badge'))
 
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    await navigator.clipboard.writeText(fullAddress);
-    Message.success(t("userInfo.walletAddressCopied"));
-  }
-};
+const ecosystemItems = computed(() => [
+  {
+    key: 'my-earnings',
+    label: t('userInfo.myEarnings'),
+    icon: getIcon('personal-center-my-earnings'),
+    path: '/my-earnings',
+  },
+  {
+    key: 'lp-vault',
+    label: t('userInfo.lpVault'),
+    icon: getIcon('personal-center-my-staking'),
+    path: '/LPVault',
+  },
+  {
+    key: 'dashboard',
+    label: t('userInfo.onChainData'),
+    icon: getIcon('personal-center-on-chain-data'),
+    path: '/dashboard',
+  },
+  {
+    key: 'prediction-market',
+    label: t('userInfo.predictionMarket'),
+    icon: getIcon('personal-center-prediction-market'),
+    path: '/create',
+  },
+  {
+    key: 'assets',
+    label: t('userInfo.assets'),
+    icon: getIcon('personal-center-on-chain-assets'),
+    path: '/asset-management',
+  },
+  {
+    key: 'event-pool',
+    label: t('userInfo.eventPool'),
+    icon: getIcon('personal-center-event-pool'),
+    path: '/event-pool',
+  },
+  {
+    key: 'launchpad',
+    label: t('userInfo.launchpad'),
+    icon: getIcon('personal-center-task-platform'),
+    path: '/',
+  },
+  {
+    key: 'smart-money',
+    label: t('userInfo.smartMoney'),
+    icon: getIcon('personal-center-smart-money'),
+    path: '/',
+  },
+  {
+    key: 'borrow',
+    label: t('userInfo.borrow'),
+    icon: getIcon('personal-center-borrow'),
+    path: '/',
+  },
+  {
+    key: 'earn',
+    label: t('userInfo.earn'),
+    icon: getIcon('personal-center-earn'),
+    path: '/',
+  },
+  {
+    key: 'strategyTrading',
+    label: t('userInfo.strategyTrading'),
+    icon: getIcon('personal-center-strategy-trading'),
+    path: '/',
+  },
+  {
+    key: 'copyTrading',
+    label: t('userInfo.copyTrading'),
+    icon: getIcon('personal-center-copy-trading'),
+    path: '/',
+  },
+  {
+    key: 'airdrop',
+    label: t('userInfo.airdrop'),
+    icon: getIcon('personal-center-airdrop'),
+    path: '/',
+  },
+  {
+    key: 'academy',
+    label: t('userInfo.academy'),
+    icon: getIcon('personal-center-academy'),
+    path: '/',
+  },
+  {
+    key: 'nft',
+    label: t('userInfo.nft'),
+    icon: getIcon('personal-center-nft'),
+    path: '/',
+  },
+  {
+    key: 'inviteShare',
+    label: t('userInfo.inviteShare'),
+    icon: getIcon('personal-center-invite-share'),
+    path: '/',
+  },
+  {
+    key: 'launch-events',
+    label: t('userInfo.launchEvents'),
+    icon: getIcon('personal-center-launch-events'),
+    path: '/',
+  },
+])
 
-// 生态系统菜单配置
-const baseEcosystemItems = computed(() => [
+const supportItems = computed(() => [
   {
-    key: "my-earnings",
-    label: t("userInfo.myEarnings"),
-    icon: getIcon("1"),
-    iconDark: getIcon("1Dark"),
-    path: "/my-earnings",
+    key: 'official-verification',
+    label: t('userInfo.officialVerification'),
+    icon: getIcon('personal-center-official-verification'),
+    path: '/',
   },
   {
-    key: "LPVault",
-    label: t("userInfo.lpVault"),
-    icon: getIcon("2"),
-    iconDark: getIcon("2Dark"),
-    path: "/LPVault",
+    key: 'product-feedback',
+    label: t('userInfo.productFeedback'),
+    icon: getIcon('personal-center-product-feedback'),
+    path: '/feedback',
   },
   {
-    key: "dashboard",
-    label: t("userInfo.onChainData"),
-    icon: getIcon("3"),
-    iconDark: getIcon("3Dark"),
-    path: "/dashboard",
+    key: 'api-management',
+    label: t('userInfo.apiManagement'),
+    icon: getIcon('personal-center-api-management'),
+    path: '/',
   },
   {
-    key: "create",
-    label: t("userInfo.predictionMarket"),
-    icon: getIcon("4"),
-    iconDark: getIcon("4Dark"),
-    path: "/create",
+    key: 'help-center',
+    label: t('userInfo.helpCenter'),
+    icon: getIcon('personal-center-help-center'),
+    path: '/help-center',
   },
   {
-    key: "fund",
-    label: t("userInfo.assets"),
-    icon: getIcon("5"),
-    iconDark: getIcon("5Dark"),
-    path: "/asset-management",
+    key: 'customer-support',
+    label: t('userInfo.customerSupport'),
+    icon: getIcon('personal-center-online-support'),
+    path: '/help-center',
   },
   {
-    key: "event-pool",
-    label: t("userInfo.eventPool"),
-    icon: getIcon("6"),
-    iconDark: getIcon("6Dark"),
-    path: "/event-pool",
+    key: 'developer-docs',
+    label: t('userInfo.developerDocs'),
+    icon: getIcon('personal-center-changelog'),
+    path: '/',
   },
-  {
-    key: "launchpad",
-    label: t("userInfo.launchpad"),
-    icon: getIcon("14"),
-    iconDark: getIcon("14Dark"),
-    path: "/",
-  },
-  {
-    key: "smart-money",
-    label: t("userInfo.smartMoney"),
-    icon: getIcon("15"),
-    iconDark: getIcon("15Dark"),
-    path: "/",
-  },
-  {
-    key: "borrow",
-    label: t("userInfo.borrow"),
-    icon: getIcon("30"),
-    iconDark: getIcon("30Dark"),
-    path: "/",
-  },
-  {
-    key: "earn",
-    label: t("userInfo.earn"),
-    icon: getIcon("31"),
-    iconDark: getIcon("31Dark"),
-    path: "/",
-  },
-  {
-    key: "strategyTrading",
-    label: t("userInfo.strategyTrading"),
-    icon: getIcon("32"),
-    iconDark: getIcon("32Dark"),
-    path: "/",
-  },
-  {
-    key: "copyTrading",
-    label: t("userInfo.copyTrading"),
-    icon: getIcon("33"),
-    iconDark: getIcon("33Dark"),
-    path: "/",
-  },
-  {
-    key: "airdrop",
-    label: t("userInfo.airdrop"),
-    icon: getIcon("34"),
-    iconDark: getIcon("34Dark"),
-    path: "/",
-  },
-  {
-    key: "academy",
-    label: t("userInfo.academy"),
-    icon: getIcon("35"),
-    iconDark: getIcon("35Dark"),
-    path: "/",
-  },
-  {
-    key: "nft",
-    label: t("userInfo.nft"),
-    icon: getIcon("36"),
-    iconDark: getIcon("36Dark"),
-    path: "/",
-  },
-  {
-    key: "inviteShare",
-    label: t("userInfo.inviteShare"),
-    icon: getIcon("25"),
-    iconDark: getIcon("25Dark"),
-    path: "/",
-  },
-]);
+])
 
-const ecosystemItems = computed(() =>
-  baseEcosystemItems.value.map((item) => ({
-    ...item,
-    icon: isDark.value ? item.iconDark : item.icon,
-  })),
-);
+const othersItems = computed(() => [
+  {
+    key: 'audit',
+    label: t('userInfo.audit'),
+    icon: getIcon('personal-center-audit'),
+    path: '/',
+  },
+  {
+    key: 'github',
+    label: t('userInfo.github'),
+    icon: getIcon('personal-center-github'),
+    href: 'https://github.com/Prediction333/event-contracts',
+  },
+  {
+    key: 'technical-support',
+    label: t('userInfo.technicalSupport'),
+    icon: getIcon('personal-center-technical-support'),
+    path: '/',
+  },
+  {
+    key: 'developer-contributions',
+    label: t('userInfo.developerContributions'),
+    icon: getIcon('personal-center-developer-contributions'),
+    path: '/',
+  },
+  {
+    key: 'tokenomics',
+    label: t('userInfo.tokenomics'),
+    icon: getIcon('personal-center-tokenomics'),
+    path: '/',
+  },
+  {
+    key: 'bug-bounty',
+    label: t('userInfo.bugBounty'),
+    icon: getIcon('personal-center-bug-bounty'),
+    path: '/',
+  },
+  {
+    key: 'language',
+    label: t('userInfo.languageEntry'),
+    icon: getIcon('personal-center-language'),
+    path: '/',
+  },
+])
 
-// 其他菜单配置
-const baseOthersItems = computed(() => [
+const trustMeItems = computed(() => [
   {
-    key: "audit",
-    label: t("userInfo.audit"),
-    icon: getIcon("7"),
-    iconDark: getIcon("7Dark"),
-    path: "/",
+    key: 'leaderboardH5',
+    label: t('userInfo.leaderboard'),
+    icon: getIcon('personal-center-leaderboard'),
+    path: '/leaderboardH5',
   },
   {
-    key: "github",
-    label: t("userInfo.github"),
-    icon: getIcon("17"),
-    iconDark: getIcon("17Dark"),
-    href: "https://github.com/Prediction333/event-contracts",
+    key: 'reward',
+    label: t('userInfo.reward'),
+    icon: getIcon('personal-center-reward'),
+    path: '/reward',
   },
   {
-    key: "technical-support",
-    label: t("userInfo.technicalSupport"),
-    icon: getIcon("18"),
-    iconDark: getIcon("18Dark"),
-    path: "/",
+    key: 'accuracy',
+    label: t('userInfo.accuracy'),
+    icon: getIcon('personal-center-accuracy'),
+    path: '/accuracy',
   },
   {
-    key: "developer-contributions",
-    label: t("userInfo.developerContributions"),
-    icon: getIcon("12"),
-    iconDark: getIcon("12Dark"),
-    path: "/",
+    key: 'terms',
+    label: t('userInfo.terms'),
+    icon: getIcon('personal-center-terms'),
+    path: '/terms',
   },
-  {
-    key: "tokenomics",
-    label: t("userInfo.tokenomics"),
-    icon: getIcon("13"),
-    iconDark: getIcon("13Dark"),
-    path: "/",
-  },
-  {
-    key: "bug-bounty",
-    label: t("userInfo.bugBounty"),
-    icon: getIcon("16"),
-    iconDark: getIcon("16Dark"),
-    path: "/",
-  },
-]);
+])
 
-const othersItems = computed(() =>
-  baseOthersItems.value.map((item) => ({
-    ...item,
-    icon: isDark.value ? item.iconDark : item.icon,
-  })),
-);
+const sections = computed(() => [
+  { title: t('userInfo.ecosystem'), items: ecosystemItems.value },
+  { title: t('userInfo.support'), items: supportItems.value },
+  { title: t('userInfo.others'), items: othersItems.value },
+  { title: t('userInfo.trustMe'), items: trustMeItems.value },
+])
 
-// 支持菜单配置
-const baseSupportItems = computed(() => [
+const socialLinks = computed(() => [
   {
-    key: "official-verification",
-    label: t("userInfo.officialVerification"),
-    icon: getIcon("19"),
-    iconDark: getIcon("19Dark"),
-    path: "/",
+    label: 'Facebook',
+    icon: getIcon('social-facebook'),
+    href: 'https://facebook.com',
   },
   {
-    key: "product-feedback",
-    label: t("userInfo.productFeedback"),
-    icon: getIcon("20"),
-    iconDark: getIcon("20Dark"),
-    path: "/feedback",
+    label: 'Instagram',
+    icon: getIcon('social-instagram'),
+    href: 'https://instagram.com',
   },
   {
-    key: "api-management",
-    label: t("userInfo.apiManagement"),
-    icon: getIcon("21"),
-    iconDark: getIcon("21Dark"),
-    path: "/",
+    label: 'LinkedIn',
+    icon: getIcon('social-linkedin'),
+    href: 'https://linkedin.com',
   },
   {
-    key: "help-center",
-    label: t("userInfo.helpCenter"),
-    icon: getIcon("22"),
-    iconDark: getIcon("22Dark"),
-    path: "/help-center",
+    label: 'Telegram',
+    icon: getIcon('social-telegram'),
+    href: 'https://t.me/Choosme_Global',
   },
   {
-    key: "customer-support",
-    label: t("userInfo.customerSupport"),
-    icon: getIcon("23"),
-    iconDark: getIcon("23Dark"),
-    path: "/help-center",
+    label: 'X',
+    icon: getIcon('social-x'),
+    href: 'https://x.com/chooseme_global?s=21',
   },
   {
-    key: "developer-docs",
-    label: t("userInfo.developerDocs"),
-    icon: getIcon("8"),
-    iconDark: getIcon("8Dark"),
-    path: "/doc",
+    label: 'Medium',
+    icon: getIcon('social-medium'),
+    href: 'https://medium.com/@ChooseMeGlobal',
   },
-]);
+])
 
-const supportItems = computed(() =>
-  baseSupportItems.value.map((item) => ({
-    ...item,
-    icon: isDark.value ? item.iconDark : item.icon,
-  })),
-);
-
-// choose me菜单配置
-const baseChooseMeItems = computed(() => [
-  {
-    key: "leaderboardH5",
-    label: t("userInfo.leaderboard"),
-    icon: getIcon("38"),
-    iconDark: getIcon("38Dark"),
-    path: "/leaderboardH5",
-  },
-  {
-    key: "reward",
-    label: t("userInfo.reward"),
-    icon: getIcon("25"),
-    iconDark: getIcon("25Dark"),
-    path: "/reward",
-  },
-  {
-    key: "accuracy",
-    label: t("userInfo.accuracy"),
-    icon: getIcon("26"),
-    iconDark: getIcon("26Dark"),
-    path: "/accuracy",
-  },
-  {
-    key: "terms",
-    label: t("userInfo.terms"),
-    icon: getIcon("27"),
-    iconDark: getIcon("27Dark"),
-    path: "/terms",
-  },
-]);
-function goHref(link) {
-  window.open(link.href, "_blank");
-}
-const chooseMeItems = computed(() =>
-  baseChooseMeItems.value.map((item) => ({
-    ...item,
-    icon: isDark.value ? item.iconDark : item.icon,
-  })),
-);
-
-// 友链图标（使用 assets/icon 中的图片，随主题切换）
-const baseFriendLinks = [
-  {
-    label: "Twitter",
-    icon: getIcon("Twitter"),
-    iconDark: getIcon("TwitterDark"),
-    href: "https://x.com/chooseme_global?s=21",
-  },
-  {
-    label: "Telegram",
-    icon: getIcon("tgDark"),
-    iconDark: getIcon("tg"),
-    href: "https://t.me/Choosme_Global",
-  },
-  // { label: 'Instagram', icon: getIcon('ins'), iconDark: getIcon('insDark') ,href:""},
-  // { label: 'LinkedIn', icon: getIcon('in'), iconDark: getIcon('inDark') },
-  // { label: 'TikTok', icon: getIcon('dy'), iconDark: getIcon('dyDark') },
-  // { label: 'Twitter', icon: getIcon('Twitter'), iconDark: getIcon('TwitterDark') },
-  {
-    label: "YouTube",
-    icon: getIcon("YouTube"),
-    iconDark: getIcon("YouTubeDark"),
-    href: "https://www.youtube.com/@ChooseMeGlobal",
-  },
-  {
-    label: "media",
-    icon: getIcon("mediaDark"),
-    iconDark: getIcon("media"),
-    href: "https://medium.com/@ChooseMeGlobal",
-  },
-];
-
-const friendLinks = computed(() =>
-  baseFriendLinks.map((link) => ({
-    ...link,
-    icon: isDark.value ? link.iconDark : link.icon,
-    href: link.href,
-  })),
-);
-
-// 处理分享点击
-const handleShare = async () => {
-  // 合约读取是否绑定邀请人
-  const inviter = await readContract(config, {
-    address: networks.find((n) => Number(n.chainId) === BSC_CHAIN_ID)
-      .proxyNodeManager,
-    abi: nodeManagerABI,
-    functionName: "inviters",
-    args: [address.value],
-  });
-  if (inviter == "0x0000000000000000000000000000000000000000") {
-    Message.warning(t("userInfo.bindInviterFirst"));
-    return;
-  }
-  // 打开分享邀请码弹窗
-  showShareModal.value = true;
-};
-
-// 处理设置点击
-const handleSettings = () => {
-  router.push("/userInfo");
-};
-
-// 处理关闭点击
-const handleClose = () => {
-  router.push("/home");
-};
-
-// 允许访问的路径列表（除了这些路径外，其他都显示"待开放"）
 const allowedPaths = [
-  "/my-earnings", // 我的收益
-  "/LPVault", // LPVault
-  // "/computing-power-services", // 在线客服
-  // '/dashboard', // 链上数据
-  // '/asset-management', // 链上资产
-  // '/leaderboardH5', // 排行榜
-  // '/event-pool', // 事件池
-  // '/help-center', // 帮助中心
-  '/feedback', // 反馈
-];
+  '/my-earnings',
+  '/LPVault',
+  '/dashboard',
+  '/asset-management',
+  '/event-pool',
+  '/feedback',
+  '/help-center',
+  '/leaderboardH5',
+  '/accuracy',
+]
 
-// 处理菜单项点击
+const copyWalletAddress = async () => {
+  if (!address.value) return
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    await navigator.clipboard.writeText(address.value)
+    Message.success(t('userInfo.walletAddressCopied'))
+  }
+}
+
+function goHref(link) {
+  if (!link?.href) {
+    Message.info(t('userInfo.underDevelopment'))
+    return
+  }
+  window.open(link.href, '_blank')
+}
+
+const handleShare = async () => {
+  if (!address.value) {
+    Message.info(t('userInfo.underDevelopment'))
+    return
+  }
+
+  const inviter = await readContract(config, {
+    address: networks.find((n) => Number(n.chainId) === BSC_CHAIN_ID).proxyNodeManager,
+    abi: nodeManagerABI,
+    functionName: 'inviters',
+    args: [address.value],
+  })
+
+  if (inviter === '0x0000000000000000000000000000000000000000') {
+    Message.warning(t('userInfo.bindInviterFirst'))
+    return
+  }
+
+  showShareModal.value = true
+}
+
+const handleSettings = () => {
+  router.push('/userInfo')
+}
+
+const handleClose = () => {
+  router.push('/home')
+}
+
 const handleMenuClick = (item) => {
-  if (item.key === "inviteShare") {
-    showShareModal.value = true;
-    return;
+  if (item.key === 'inviteShare') {
+    handleShare()
+    return
   }
-  if (item.key === "github") {
-    goHref(item);
-    return;
-  }
-  // 菜单项的路由跳转
-  if (item.path) {
-    // 检查路径是否在允许列表中
-    if (allowedPaths.includes(item.path)) {
-      router.push(item.path);
-    } else {
-      // 不在允许列表中的路径，显示"待开放"提示
-      Message.info(t("userInfo.underDevelopment"));
-    }
-  }
-};
 
-// 处理断开链接
+  if (item.href) {
+    goHref(item)
+    return
+  }
+
+  if (item.path && allowedPaths.includes(item.path)) {
+    router.push(item.path)
+    return
+  }
+
+  Message.info(t('userInfo.underDevelopment'))
+}
+
 const handleDisconnect = async () => {
-  localStorage.removeItem("inviteCode");
-  window.sessionStorage.clear();
+  localStorage.removeItem('inviteCode')
+  window.sessionStorage.clear()
   try {
-    console.log("开始断开钱包连接...");
-    // 调用 wagmi 断开钱包连接（异步操作）
-    await disconnect();
-
-    // 立即跳转到首页，不等待状态更新
-    router.replace("/");
+    await disconnect()
+    router.replace('/')
   } catch (error) {
-    console.error("断开连接失败:", error);
-
-    // 即使断开失败，也立即返回首页
-    router.replace("/");
+    console.error('断开连接失败:', error)
+    router.replace('/')
   }
-};
+}
 
-// 初始化主题
 onMounted(() => {
-  themeStore.applyTheme();
-});
+  document.documentElement.classList.add('theme-dark')
+  document.documentElement.classList.remove('theme-light')
+})
 </script>
 
 <style scoped lang="scss">
-.user-info-page {
+.personal-center-page {
   min-height: 100vh;
-  background-color: var(--bg-page-h5, #ffffff);
-  padding: 16px;
-  padding-top: 16px;
-  padding-bottom: 16px;
+  padding: 28px 24px 128px;
   box-sizing: border-box;
-  transition: background-color 0.3s ease;
+  background: #232933;
+  color: #ffffff;
+}
 
-  .user-card {
-    background: transparent;
-    padding: 17px 0;
-    box-sizing: border-box;
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.personal-center-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 40px;
+}
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      flex: 1;
-      gap: 12px;
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
 
-      .avatar {
-        width: 56px;
-        height: 56px;
-        border-radius: 50%;
-        object-fit: cover;
-        flex-shrink: 0;
-      }
+.profile-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #313844;
+}
 
-      .user-details {
-        flex: 1;
-        min-width: 0;
+.profile-copy {
+  min-width: 0;
+}
 
-        .username {
-          font-size: 16px;
-          font-weight: 600;
-          color: var(--text-color, #1a1a1a);
-          margin-bottom: 4px;
-          line-height: 1.4;
-          transition: color 0.3s ease;
-        }
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-        .wallet-address {
-          font-size: 12px;
-          color: var(--text-gray, #666);
-          line-height: 1.4;
-          word-break: break-all;
-          cursor: pointer;
-          transition: color 0.3s ease;
-        }
-      }
-    }
+.profile-name {
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-    .action-icons {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+.verification-badge {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
 
-      .icon-img {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-        transition: opacity 0.2s;
+.profile-address {
+  margin-top: 8px;
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: #9aa3b2;
+  font-size: 14px;
+  line-height: 1.2;
+  text-align: left;
+}
 
-        &:active {
-          opacity: 0.6;
-        }
-      }
-    }
-  }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-top: 32px;
+}
 
-  // 统一的标题样式
-  .section-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-color, #1a1a1a);
-    margin-bottom: 24px;
-    transition: color 0.3s ease;
+.icon-button {
+  width: 20px;
+  height: 20px;
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
 
-    &.section-title-with-margin {
-      margin-top: 32px;
-    }
-  }
+.action-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
 
-  // 统一的网格布局样式
-  .section-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 40px 0px;
-    padding-bottom: 36px;
-    border-bottom: 1px solid var(--border-color, #f3f3f3);
-    margin-bottom: 32px;
+.menu-section {
+  margin-bottom: 44px;
+}
 
-    // 统一的网格项样式
-    .section-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      transition: transform 0.2s;
+.section-title {
+  margin: 0 0 24px;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #ffffff;
+}
 
-      &:active {
-        transform: scale(0.95);
-      }
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px 20px;
+}
 
-      // 统一的图标包装器样式
-      .section-icon-wrapper {
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 8px;
+.menu-card {
+  border: none;
+  padding: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
 
-        // 统一的图标样式
-        .section-icon {
-          width: 100%;
-          height: 100%;
-          object-fit: contain;
-        }
-      }
+.menu-icon-shell {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: rgba(47, 55, 67, 0.98);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
 
-      // 统一的标签样式
-      .section-label {
-        font-size: 11px;
-        color: var(--text-color, #1a1a1a);
-        text-align: center;
-        line-height: 1.4;
-        transition: color 0.3s ease;
-      }
-    }
-  }
+.menu-icon {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
 
-  .social-links {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    margin: 26px 0 38px;
-    padding: 0 8px;
+.menu-label {
+  font-size: 12px;
+  line-height: 1.35;
+  color: #f3f4f6;
+  text-align: center;
+  word-break: break-word;
+}
 
-    .social-link {
-      width: 42px;
-      height: 42px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background-color 0.3s ease;
+.social-row {
+  margin-top: 6px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
 
-      img {
-        max-width: 24px;
-        filter: grayscale(100%) brightness(1.1);
-      }
-    }
-  }
+.social-button {
+  border: none;
+  padding: 0;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+}
 
-  .disconnect-section {
-    padding: 0 4px 12px;
+.social-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
 
-    .disconnect-btn {
-      width: 100%;
-      height: 48px;
-      border-radius: 10px;
-      border: none;
-      background: #ffffff;
-      color: #1a1a1a;
-      border: 1px solid var(--border-color, #e0e0e0);
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
+.disconnect-wrap {
+  margin-top: 28px;
+}
 
-      &:active {
-        opacity: 0.85;
-        transform: scale(0.99);
-      }
-    }
-  }
+.disconnect-btn {
+  width: 100%;
+  height: 64px;
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffd94b 0%, #ffcc1f 100%);
+  color: #141414;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
 }
 </style>

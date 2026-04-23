@@ -1,0 +1,8 @@
+ignoredBuiltDependencies:
+  - '@parcel/watcher'
+  - bufferutil
+  - core-js
+  - esbuild
+  - keccak
+  - utf-8-validate
+  - vue-demi

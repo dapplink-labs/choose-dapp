@@ -8,7 +8,8 @@ export default defineConfig({
   server: {
     host: '0.0.0.0', // 允许外部访问，通常用于 Docker 或云环境
     port: 3001, // 配置服务器监听端口
-    open: true, // 自动打开浏览器
+    strictPort: true, // 固定端口，便于 DevTools MCP 连接和调试
+    open: false, // 调试时不自动拉起系统浏览器
     cors: true, // 允许跨域请求
     proxy: {
       "/api": {

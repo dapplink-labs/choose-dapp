@@ -13,8 +13,16 @@
       <slot name="right"></slot>
 
       <!-- 记录按钮 -->
-      <button v-if="showRecordBtn" class="action-btn" type="button" @click="handleRecordClick">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 19.308" class="icon">
+      <button
+        v-if="showRecordBtn"
+        :class="['action-btn', { 'action-btn--icon-only': actionMode === 'icon' }]"
+        :style="actionMode === 'icon' ? iconOnlyStyle : undefined"
+        type="button"
+        :title="type == 1 ? $t('purchaseNodeRecord.title') : $t('purchaseNodeRecord.title2')"
+        @click="handleRecordClick"
+      >
+        <img v-if="recordIconSrc" :src="recordIconSrc" class="icon custom-icon" :style="actionMode === 'icon' ? iconImageStyle : undefined" alt="" />
+        <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 19.308" class="icon">
           <g transform="translate(-314.296 -57)">
             <path
               d="M12.694,19.308H0V0H17.417V9.9a5.352,5.352,0,0,0-1.611-.247,1.519,1.519,0,0,0-.324.053V1.93H1.935V17.377h9.1a5.355,5.355,0,0,0,1.653,1.928Zm.854-8.689H3.874V8.689h9.674v1.929ZM7.743,6.758H3.874V4.828H7.743V6.757Z"
@@ -24,20 +32,29 @@
               transform="translate(326.296 68)" fill="currentColor" />
           </g>
         </svg>
-        <span class="action-text">{{ type == 1 ? $t('purchaseNodeRecord.title') : $t('purchaseNodeRecord.title2')
+        <span v-if="actionMode !== 'icon'" class="action-text">{{
+          type == 1 ? $t('purchaseNodeRecord.title') : $t('purchaseNodeRecord.title2')
         }}</span>
       </button>
 
       <!-- 分享按钮 -->
-      <button v-if="showOpenBtn" class="action-btn" type="button" @click="handleOpenClick">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 14 14" class="icon"
+      <button
+        v-if="showOpenBtn"
+        :class="['action-btn', { 'action-btn--icon-only': actionMode === 'icon' }]"
+        :style="actionMode === 'icon' ? iconOnlyStyle : undefined"
+        type="button"
+        :title="$t('common.share') || '分享'"
+        @click="handleOpenClick"
+      >
+        <img v-if="openIconSrc" :src="openIconSrc" class="icon custom-icon" :style="actionMode === 'icon' ? iconImageStyle : undefined" alt="" />
+        <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 14 14" class="icon"
           fill="currentColor">
           <path
             d="M440.193,148.479a.683.683,0,1,0,1.362,0c0-2.541.63-3.356,2.6-3.356h.49a.683.683,0,0,0,.973.955l1.008-1.012a.882.882,0,0,0,0-1.249l-1.012-1.012a.681.681,0,1,0-.969.956h-.49C441.415,143.761,440.193,145.2,440.193,148.479Z"
             transform="translate(-434.173 -140.653)" />
           <path d="M13.3,6.3a.7.7,0,0,0-.7.7A5.618,5.618,0,1,1,7,1.4.7.7,0,1,0,7,0a7,7,0,1,0,7,7,.7.7,0,0,0-.7-.7Z" />
         </svg>
-        <span class="action-text">{{ $t('common.share') || '分享' }}</span>
+        <span v-if="actionMode !== 'icon'" class="action-text">{{ $t('common.share') || '分享' }}</span>
       </button>
     </div>
   </div>
@@ -101,6 +118,22 @@ const props = defineProps({
   scrollContainer: {
     type: String,
     default: ''
+  },
+  actionMode: {
+    type: String,
+    default: 'pill'
+  },
+  recordIconSrc: {
+    type: String,
+    default: ''
+  },
+  openIconSrc: {
+    type: String,
+    default: ''
+  },
+  actionIconSize: {
+    type: [String, Number],
+    default: 20
   }
 })
 
@@ -110,6 +143,19 @@ const themeStore = useThemeStore()
 
 const scrollY = ref(0)
 const isDark = computed(() => themeStore.isDark)
+const normalizedActionIconSize = computed(() => {
+  const value = Number(props.actionIconSize)
+  return Number.isFinite(value) && value > 0 ? value : 20
+})
+const iconOnlyStyle = computed(() => ({
+  width: `${normalizedActionIconSize.value}px`,
+  height: `${normalizedActionIconSize.value}px`,
+  minWidth: `${normalizedActionIconSize.value}px`,
+}))
+const iconImageStyle = computed(() => ({
+  width: `${normalizedActionIconSize.value}px`,
+  height: `${normalizedActionIconSize.value}px`,
+}))
 // 分享弹窗显示状态
 const showShareModal = ref(false)
 
@@ -381,6 +427,25 @@ const handleOpenClick = async () => {
     .action-text {
       line-height: 1;
       white-space: nowrap;
+    }
+
+    .custom-icon {
+      object-fit: contain;
+    }
+  }
+
+  .action-btn--icon-only {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none !important;
+    border-radius: 0;
+    background: transparent !important;
+    box-shadow: none !important;
+
+    .icon {
+      width: 20px;
+      height: 20px;
     }
   }
 }
