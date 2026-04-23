@@ -1,5 +1,4 @@
-import { http, createConfig, createStorage } from '@wagmi/vue'
-import { walletConnect, injected } from '@wagmi/vue/connectors'
+import { http, createConfig } from '@wagmi/vue'
 import { defineChain, fallback } from 'viem'
 
 const bsc = defineChain({

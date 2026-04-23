@@ -226,7 +226,8 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, inject, watch } from 'vue'
 import { Search, ArrowDown, Sunny, Moon, CloseBold } from '@element-plus/icons-vue'
-import { injected, useAccount, useChainId, useConnect, useDisconnect } from '@wagmi/vue'
+import { useAccount, useChainId, useConnect, useDisconnect } from '@wagmi/vue'
+import { injected } from '@wagmi/core'
 import { copyText } from 'vue3-clipboard'
 import { useThemeStore } from '@/stores/theme'
 import { useCounterStore } from '@/stores/counter'
