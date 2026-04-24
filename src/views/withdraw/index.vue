@@ -14,9 +14,9 @@
 
       <!-- 选择币种 -->
       <div class="form-group">
-        <label class="form-label">{{ $t('withdraw.selectCurrency') }}</label>
+        <label class="form-label">{{ $t('withdraw.selectToken') }}</label>
         <div class="input-wrap select-wrap" @click="showCurrencyPicker = true">
-          <span class="input-value">{{ selectedCurrency }}</span>
+          <span class="input-value">{{ selectedCurrency?.asset_symbol || $t('withdraw.selectCurrency') }}</span>
           <svg class="arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round" />
@@ -38,42 +38,53 @@
         <div class="amount-input-wrap">
           <input v-model="withdrawAmount" type="number" class="form-input amount-input"
             :placeholder="$t('withdraw.withdrawAmountPlaceholder')" step="any" min="0" @input="handleAmountInput" />
-          <span class="amount-unit">{{ selectedCurrency }}</span>
+          <span class="amount-unit">{{ selectedCurrency?.asset_symbol }}</span>
           <button class="max-btn" @click="handleMaxClick">{{ $t('withdraw.max') }}</button>
         </div>
-        <div class="balance-tip">{{ $t('withdraw.balance') }}: {{ balance }} {{ selectedCurrency }}</div>
+        <div class="balance-tip">{{ $t('withdraw.balance') }}: {{ balance }} {{ selectedCurrency?.asset_symbol }}</div>
       </div>
 
     </div>
 
     <!-- 底部固定：交易摘要 + 确定提币 -->
     <div class="fixed-bottom">
-      <div class="summary-section" v-if="canSubmit">
+      <!-- <div class="summary-section" v-if="canSubmit">
         <div class="summary-row">
           <span class="summary-label">{{ $t('withdraw.youWillReceive') }}</span>
-          <span class="summary-value receive">{{ displayReceiveAmount }} {{ selectedCurrency }}</span>
+          <span class="summary-value receive">{{ displayReceiveAmount }} {{ selectedCurrency?.asset_symbol }}</span>
         </div>
         <div class="summary-row">
           <span class="summary-label">{{ $t('withdraw.feePercent', { percent: feeRate }) }}</span>
-          <span class="summary-value">{{ feeAmount }} {{ selectedCurrency }}</span>
+          <span class="summary-value">{{ feeAmount }} {{ selectedCurrency?.asset_symbol }}</span>
         </div>
-      </div>
-      <button class="confirm-btn" :disabled="!canSubmit" @click="handleConfirm">
+      </div> -->
+      <PrimaryActionButton
+        class="confirm-btn"
+        :disabled="!canSubmit"
+        height="48px"
+        radius="12px"
+        font-size="16px"
+        font-weight="500"
+        disabled-bg="var(--button-disabled-bg, #565d68)"
+        disabled-text-color="var(--button-disabled-text-color, #9aa3b2)"
+        @click="handleConfirm"
+      >
         {{ $t('withdraw.confirmWithdraw') }}
-      </button>
+      </PrimaryActionButton>
     </div>
 
     <!-- 币种选择弹窗 -->
     <div v-if="showCurrencyPicker" class="picker-overlay" @click.self="showCurrencyPicker = false">
       <div class="picker-panel">
         <div class="picker-header">
-          <span class="picker-title">{{ $t('withdraw.selectCurrency') }}</span>
+          <span class="picker-title">{{ $t('withdraw.selectToken') }}</span>
           <span class="picker-close" @click="showCurrencyPicker = false">×</span>
         </div>
         <div class="picker-list">
-          <div v-for="currency in currencyList" :key="currency" class="picker-item"
-            :class="{ active: selectedCurrency === currency }" @click="selectCurrency(currency)">
-            {{ currency }}
+          <div v-for="currency in currencyList" :key="currency.asset_address" class="picker-item"
+            :class="{ active: selectedCurrency?.asset_address === currency.asset_address }"
+            @click="selectCurrency(currency)">
+            {{ currency.asset_symbol }}
           </div>
         </div>
       </div>
@@ -82,21 +93,37 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
+import { getAssetList, getUserBalances, userWithdraw } from '@/api/APIEvent'
+import { ElLoading } from 'element-plus'
+import Message from '@/utils/message'
+import { useAccount } from '@wagmi/vue'
+import networks from '@/assets/json/networks.js'
 
 const router = useRouter()
+const { t } = useI18n()
 
-const receiveAddress = ref('0x0d766a37A0E60f75A9bDFEfA3EDFd12D372a5b85')
-const withdrawAmount = ref('200.87')
-const selectedCurrency = ref('USDT')
-const selectedNetwork = ref('BNB Smart Chain(BEP20)')
-const balance = ref('200.87')
-const feeRate = ref(3)
+const { address } = useAccount()
+
+const receiveAddress = ref('')
+const withdrawAmount = ref('')
+const selectedCurrency = ref(null)
+const balance = ref('0.00')
+const feeRate = ref(0)
 const showCurrencyPicker = ref(false)
 
-const currencyList = ['USDT', 'CHO']
+const currencyList = ref([])
+
+const selectedNetwork = computed(() => {
+  if (!selectedCurrency.value) return t('withdraw.defaultNetwork')
+  const targetChainId = Number(selectedCurrency.value.chain_id)
+  const net = networks.find(n => Number(n.chainId) === targetChainId)
+  return net ? net.name : t('withdraw.unknownNetwork')
+})
 
 // 处理键盘弹出时的滚动问题
 const pageRef = ref(null)
@@ -106,7 +133,7 @@ const preventOverscroll = (e) => {
   const scrollTop = el.scrollTop
   const scrollHeight = el.scrollHeight
   const clientHeight = el.clientHeight
-  
+
   if (scrollTop <= 0 && e.deltaY < 0) {
     e.preventDefault()
   }
@@ -118,21 +145,75 @@ const preventOverscroll = (e) => {
 const handleTouchMove = (e) => {
   const el = document.querySelector('.withdraw-page')
   if (!el) return
-  
+
   const scrollTop = el.scrollTop
   const scrollHeight = el.scrollHeight
   const clientHeight = el.clientHeight
-  
+
   // 如果内容不需要滚动，阻止默认行为
   if (scrollHeight <= clientHeight) {
     e.preventDefault()
   }
 }
 
+const fetchAssets = async () => {
+  try {
+    const res = await getAssetList({})
+    const { data } = res
+    if (data.code === 2000) {
+      currencyList.value = data?.data?.filter(item => item.is_active) || []
+      if (currencyList.value.length > 0) {
+        selectedCurrency.value = currencyList.value[0]
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch asset list:', error)
+  }
+}
+
+const fetchBalance = async () => {
+  if (!selectedCurrency.value || !address.value) {
+    balance.value = '0.00'
+    return
+  }
+  try {
+    const res = await getUserBalances({
+      user_address: address.value,
+      asset_guid: selectedCurrency.value.asset_guid,
+      currency: selectedCurrency.value.asset_symbol
+    })
+    if (res.data?.code === 2000) {
+      // The API returns balance according to the selected currency.
+      // We will try to extract the cash from the response.
+      let cash = '0.00'
+      if (Array.isArray(res.data.data?.balances)) {
+        const item = res.data.data.balances.find(i => i.asset_guid === selectedCurrency.value.guid)
+        if (item) cash = item.available_balance
+        feeRate.value = item.exchange_rate || 0
+      }
+      balance.value = cash
+    } else {
+      balance.value = '0.00'
+    }
+  } catch (e) {
+    console.error(e)
+    balance.value = '0.00'
+  }
+}
+
+watch([selectedCurrency, address], () => {
+  fetchBalance()
+})
+
 onMounted(() => {
   // 禁止 iOS 橡皮筋效果
   document.body.style.overscrollBehavior = 'none'
   document.documentElement.style.overscrollBehavior = 'none'
+  fetchAssets()
+
+  if (address.value) {
+    receiveAddress.value = address.value
+  }
 })
 
 onUnmounted(() => {
@@ -142,13 +223,16 @@ onUnmounted(() => {
 
 const handleAmountInput = () => {
   const val = parseFloat(withdrawAmount.value)
-  if (val > parseFloat(balance.value)) {
-    withdrawAmount.value = balance.value
-  }
+  // Disable balance check for now if we don't know the real withdrawable balance
+  // if (val > parseFloat(balance.value)) {
+  //   withdrawAmount.value = balance.value
+  // }
 }
 
 const handleMaxClick = () => {
-  withdrawAmount.value = balance.value
+  if (parseFloat(balance.value) > 0) {
+    withdrawAmount.value = balance.value
+  }
 }
 
 const selectCurrency = (currency) => {
@@ -174,35 +258,79 @@ const canSubmit = computed(() => {
     receiveAddress.value.trim() &&
     selectedCurrency.value &&
     withdrawAmount.value &&
-    parseFloat(withdrawAmount.value) > 0 &&
-    parseFloat(withdrawAmount.value) <= parseFloat(balance.value)
+    parseFloat(withdrawAmount.value) > 0
   )
 })
 
-const handleConfirm = () => {
+const handleConfirm = async () => {
   if (!canSubmit.value) return
-  // TODO: 实现实际提币逻辑，成功后跳转
-    router.push({
-    path: '/transaction-success',
-    query: {
-      type: 'withdraw',
-      amount: withdrawAmount.value,
-      currency: selectedCurrency.value,
-      address: receiveAddress.value.trim(),
-      network: selectedNetwork.value,
-      networkFee: '0.05',
-      txId: '8jkj90...798h56',
-      submitTime: new Date().toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      }),
-      referenceNo: String(Math.floor(10000000 + Math.random() * 90000000))
-    }
+
+  const loading = ElLoading.service({
+    lock: true,
+    text: t('commonManagement.processing'),
+    background: 'rgba(0, 0, 0, 0.7)',
   })
+
+  try {
+    if (!address.value) {
+      Message.error(t('lpVault.connectWalletFirst') || 'Please connect wallet first')
+      return
+    }
+
+    const withdrawAmt = parseFloat(withdrawAmount.value) || 0
+    if (withdrawAmt <= 0) {
+      Message.error(t('withdraw.pleaseEnterValidAmount'))
+      return
+    }
+
+    const tokenAddress = selectedCurrency.value.asset_address
+
+    loading.text = t('withdraw.withdrawing')
+
+    // 调用后端提现接口
+    const res = await userWithdraw({
+      address: address.value,
+      amount: String(withdrawAmt),
+      asset_guid: selectedCurrency.value.guid,
+      to_address: receiveAddress.value.trim(),
+      token_address: tokenAddress,
+    })
+
+    if (res.data?.code === 2000) {
+      withdrawAmount.value = ''
+      Message.success(t('withdraw.withdrawSuccess'))
+      router.push({
+        path: '/transaction-success',
+        query: {
+          type: 'withdraw',
+          amount: withdrawAmt,
+          currency: selectedCurrency.value.asset_symbol,
+          address: receiveAddress.value.trim(),
+          network: selectedNetwork.value,
+          networkFee: '0.00',
+          txId: res.data.data?.guid || t('commonManagement.processing'),
+          status: res.data.data?.status || '',
+          submitTime: new Date().toLocaleString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          }),
+          referenceNo: String(Math.floor(10000000 + Math.random() * 90000000))
+        }
+      })
+    } else {
+      Message.error(res.data?.message || t('withdraw.withdrawFailed'))
+    }
+
+  } catch (error) {
+    console.error('Withdraw error:', error)
+    Message.error(t('withdraw.withdrawError'))
+  } finally {
+    loading.close()
+  }
 }
 </script>
 
@@ -342,7 +470,7 @@ const handleConfirm = () => {
 
 /* 底部固定区域 */
 .fixed-bottom {
-  padding: 0 16px ;
+  padding: 0 16px;
   box-sizing: border-box;
 }
 
@@ -384,32 +512,7 @@ const handleConfirm = () => {
 }
 
 .fixed-bottom .confirm-btn {
-  width: 100%;
-  height: 48px;
-  background: var(--text-color-y);
-  border: none;
-  border-radius: 12px;
-  font-family: PingFang SC, PingFang SC;
-  font-weight: 500;
-  font-size: 16px;
   margin-top: 30px;
-  color: #000;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-
-  &:hover:not(:disabled) {
-    opacity: 0.9;
-  }
-
-  &:active:not(:disabled) {
-    opacity: 0.85;
-  }
-
-  &:disabled {
-    background: var(--border-color, #23262f);
-    color: var(--text-dark-gray, #909090);
-    cursor: not-allowed;
-  }
 }
 
 /* 币种选择弹窗 */

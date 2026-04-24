@@ -1,5 +1,8 @@
 <template>
     <div class="obm">
+        <!-- 加载中 -->
+        <div v-if="loading" class="obm-loading">{{ $t('common.loading') || 'Loading...' }}</div>
+        <template v-else>
         <!-- 表头 -->
         <div class="obm-header">
             <div class="obm-header-cell obm-header-volume">{{ t('detail.volume') || '交易量' }}</div>
@@ -17,13 +20,13 @@
                             :style="{ width: `${(order.shares / maxSellShares) * 100}%` }" />
                     </div>
                     <div class="obm-cell obm-price-cell obm-price-sell">
-                        ${{ order.price }}
+                        {{ formatCentText(order.price) }}
                     </div>
                     <div class="obm-cell obm-shares-cell">
                         {{ formatNumber(order.shares) }}
                     </div>
                     <div class="obm-cell obm-total-cell">
-                        ${{ formatNumber(order.total) }}
+                        {{ formatDollarText(order.total) }}
                     </div>
                 </div>
             </div>
@@ -32,10 +35,10 @@
         <!-- 中间：最后价格与价差 -->
         <div class="obm-last-row">
             <div class="obm-last-label">
-                {{ t('detail.last') || '最后' }}:${{ lastPrice }}
+                {{ t('detail.last') || '最后' }}: {{ formatCentText(lastPrice) }}
             </div>
             <div class="obm-spread-label">
-                {{ t('detail.spread') || '价差' }}: ${{ spread }}
+                {{ t('detail.spread') || '价差' }}: {{ formatCentText(spread) }}
             </div>
         </div>
 
@@ -48,60 +51,83 @@
                             :style="{ width: `${(order.shares / maxBuyShares) * 100}%` }" />
                     </div>
                     <div class="obm-cell obm-price-cell obm-price-buy">
-                        ${{ order.price }}
+                        {{ formatCentText(order.price) }}
                     </div>
                     <div class="obm-cell obm-shares-cell">
                         {{ formatNumber(order.shares) }}
                     </div>
                     <div class="obm-cell obm-total-cell">
-                        ${{ formatNumber(order.total) }}
+                        {{ formatDollarText(order.total) }}
                     </div>
                 </div>
             </div>
         </div>
+        </template>
     </div>
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-defineProps({
-    // 预留：以后可以根据 yes/no 决定数据或配色
-    activeSide: {
-        type: String,
-        default: 'yes'
-    }
+const props = defineProps({
+    activeSide: { type: String, default: 'yes' },
+    // 卖单列表 [{price, quantity}]
+    asks: { type: Array, default: () => [] },
+    // 买单列表 [{price, quantity}]
+    bids: { type: Array, default: () => [] },
+    // 最近成交价
+    lastTradePrice: { type: String, default: '' },
+    // 是否加载中
+    loading: { type: Boolean, default: false },
+    // 是否允许在无数据时回退到 mock
+    useMockFallback: { type: Boolean, default: true },
 })
 
 const { t } = useI18n()
 
-// shares 由大到小，形成左侧阶梯形状（紫色）
-const sellOrders = ref([
-    { price: 88, shares: 10000, total: 71200.0 },
-    { price: 88, shares: 8000, total: 56960.0 },
-    { price: 88, shares: 6000, total: 42720.0 },
-    { price: 88, shares: 4000, total: 28480.0 },
-    { price: 88, shares: 2000, total: 14240.0 }
-])
+// 卖单（asks）从大到小排序（保留全部，超出 10 条用滚动）
+const sellOrders = computed(() => {
+    const list = props.asks.length ? props.asks : (props.useMockFallback ? MOCK_SELL : [])
+    return [...list]
+        .sort((a, b) => Number(b.price) - Number(a.price))
+        .map(o => ({
+            price: Number(o.price),
+            shares: Number(o.quantity),
+            total: Number(o.price) * Number(o.quantity)
+        }))
+})
 
-// shares 由小到大，形成反向阶梯形状（绿色）
-const buyOrders = ref([
-    { price: 88, shares: 2000, total: 14240.0 },
-    { price: 88, shares: 4000, total: 28480.0 },
-    { price: 88, shares: 6000, total: 42720.0 },
-    { price: 88, shares: 8000, total: 56960.0 },
-    { price: 88, shares: 10000, total: 71200.0 }
-])
+// 买单（bids）从大到小排序（保留全部，超出 10 条用滚动）
+const buyOrders = computed(() => {
+    const list = props.bids.length ? props.bids : (props.useMockFallback ? MOCK_BUY : [])
+    return [...list]
+        .sort((a, b) => Number(b.price) - Number(a.price))
+        .map(o => ({
+            price: Number(o.price),
+            shares: Number(o.quantity),
+            total: Number(o.price) * Number(o.quantity)
+        }))
+})
 
-const lastPrice = ref(84)
-const spread = ref(1)
+const lastPrice = computed(() => {
+    if (props.lastTradePrice) return Number(props.lastTradePrice)
+    // 取买一价作为兜底
+    return buyOrders.value[0]?.price || '--'
+})
+
+const spread = computed(() => {
+    const best_ask = Number(sellOrders.value[sellOrders.value.length - 1]?.price || 0)
+    const best_bid = Number(buyOrders.value[0]?.price || 0)
+    if (!best_ask || !best_bid) return '--'
+    return Math.abs(best_ask - best_bid)
+})
 
 const maxSellShares = computed(() =>
-    Math.max(...sellOrders.value.map(o => o.shares))
+    Math.max(1, ...sellOrders.value.map(o => o.shares))
 )
 const maxBuyShares = computed(() =>
-    Math.max(...buyOrders.value.map(o => o.shares))
+    Math.max(1, ...buyOrders.value.map(o => o.shares))
 )
 
 const formatNumber = (num) => {
@@ -110,6 +136,34 @@ const formatNumber = (num) => {
         maximumFractionDigits: 2
     })
 }
+
+const formatCentText = (value) => {
+    const num = Number(value)
+    if (!Number.isFinite(num)) return '--'
+    return `${Math.round(num * 100)}¢`
+}
+
+const formatDollarText = (value) => {
+    const num = Number(value)
+    if (!Number.isFinite(num)) return '--'
+    return `$${formatNumber(num)}`
+}
+
+// 占位 mock 数据（无真实数据时展示）
+const MOCK_SELL = [
+    { price: '0.9200', quantity: '10000' },
+    { price: '0.9000', quantity: '8000' },
+    { price: '0.8800', quantity: '6000' },
+    { price: '0.8600', quantity: '4000' },
+    { price: '0.8400', quantity: '2000' },
+]
+const MOCK_BUY = [
+    { price: '0.8000', quantity: '2000' },
+    { price: '0.7800', quantity: '4000' },
+    { price: '0.7600', quantity: '6000' },
+    { price: '0.7400', quantity: '8000' },
+    { price: '0.7200', quantity: '10000' },
+]
 </script>
 
 <style scoped lang="scss">
@@ -117,6 +171,13 @@ const formatNumber = (num) => {
     margin-top: 12px;
     color: var(--bg-opposite);
     font-size: 12px;
+}
+
+.obm-loading {
+    text-align: center;
+    padding: 24px 0;
+    color: var(--text-dark-gray);
+    font-size: 13px;
 }
 
 .obm-header {
@@ -140,6 +201,8 @@ const formatNumber = (num) => {
 
 .obm-rows {
     border-top: 1px solid var(--border-color);
+    max-height: 300px; /* 30px * 10 行 */
+    overflow-y: auto;
 }
 
 .obm-row {
@@ -200,8 +263,8 @@ const formatNumber = (num) => {
     display: flex;
     justify-content: space-between;
     padding: 8px 0;
-    color: rgba(255, 255, 255, 0.7);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-dark-gray);
+    border-top: 1px solid var(--border-color);
 }
 
 .obm-spread-label {

@@ -53,14 +53,14 @@ import { useI18n } from 'vue-i18n'
 const router = useRouter()
 const route = useRoute()
 const { t } = useI18n()
-const isProd = import.meta.env.VITE_IS_COMING_SOON === 'true'
+
 
 // 导航项配置
 const navItems = computed(() => [
   { key: 'home', label: t('footerNav.home') || '首页', path: '/home' },
   { key: 'search', label: t('common.search') || '搜索', path: '/searchPage' },
   { key: 'breaking', label: t('footerNav.breaking') || '突发', path: '/breaking' },
-  { key: 'more', label: t('common.more') || '更多', path: '/asset-management' }
+  { key: 'more', label: t('footerNav.wallet')  || '钱包', path: '/asset-management' }
 ])
 
 // 当前激活的导航项
@@ -99,11 +99,7 @@ onMounted(() => {
 
 // 处理导航点击
 const handleNavClick = (item) => {
-  // 生产环境下禁用路由跳转，仅更新本地激活状态
-  if (isProd) {
-    activeNav.value = item.key || 'home'
-    return
-  }
+
   if (item.isSearch) {
     // 搜索功能：跳转到首页并滚动到搜索框（如果存在）
     router.push('/').then(() => {

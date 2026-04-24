@@ -49,12 +49,36 @@
                 </div>
               </div>
 
-              <button class="main-btn" @click="handleClaim">{{ $t('claimSuccess.claim') }}</button>
+              <PrimaryActionButton
+                class="main-btn"
+                height="56px"
+                radius="8px"
+                font-size="18px"
+                font-weight="700"
+                text-color="var(--bg-page)"
+                gradient-from="var(--bg-opposite)"
+                gradient-to="var(--bg-opposite)"
+                @click="handleClaim"
+              >
+                {{ $t('claimSuccess.claim') }}
+              </PrimaryActionButton>
             </div>
 
             <!-- 领取后的状态 -->
             <div v-else class="done-view">
-              <button class="main-btn is-white" @click="handleDone">{{ $t('claimSuccess.done') }}</button>
+              <PrimaryActionButton
+                class="main-btn is-white"
+                height="56px"
+                radius="8px"
+                font-size="18px"
+                font-weight="700"
+                text-color="var(--bg-card)"
+                gradient-from="#ffffff"
+                gradient-to="#ffffff"
+                @click="handleDone"
+              >
+                {{ $t('claimSuccess.done') }}
+              </PrimaryActionButton>
             </div>
           </div>
         </div>
@@ -67,6 +91,7 @@
 import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SuccessfullyClaimedIcon from '@/assets/icon/SuccessfullyClaimedIcon.png'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
 
 const { t } = useI18n()
 
@@ -304,15 +329,6 @@ const handleClose = () => {
 
 .main-btn {
   width: 100%;
-  height: 56px;
-  border-radius: 8px;
-  border: none;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  background: var(--bg-opposite);
-  color: var(--bg-page);
-  transition: all 0.2s ease;
   margin: 26px 0;
 }
 

@@ -80,9 +80,22 @@
         </div>
 
         <div class="feedback-footer">
-            <button class="submit-btn" @click="handleSubmit" :disabled="!isFormValid || submitting">
+            <PrimaryActionButton
+                class="submit-btn"
+                @click="handleSubmit"
+                :disabled="!isFormValid || submitting"
+                height="50px"
+                radius="8px"
+                font-size="16px"
+                font-weight="600"
+                text-color="var(--bg-color-010101, #010101)"
+                gradient-from="var(--el-menu-text-color, #010101)"
+                gradient-to="var(--el-menu-text-color, #010101)"
+                disabled-bg="#2F2F2F"
+                disabled-text-color="#888888"
+            >
                 {{ submitting ? t("feedback.submitting") : t("feedback.submit") }}
-            </button>
+            </PrimaryActionButton>
             <p class="footer-tip">{{ t("feedback.footerTip") }}</p>
         </div>
 
@@ -124,6 +137,7 @@ import { useI18n } from "vue-i18n"
 import { submitFeedbackV2, uploadFile, getFeedbackTypesV2 } from "@/api/feedback"
 import { ElMessage } from "element-plus"
 import { useAccount } from '@wagmi/vue'
+import PrimaryActionButton from "@/components/PrimaryActionButton.vue"
 
 const router = useRouter()
 const { t, locale } = useI18n()
@@ -547,23 +561,7 @@ const handleSubmit = async () => {
 
 .submit-btn {
     width: 100%;
-    height: 50px;
-    background: var(--el-menu-text-color, #010101);
-    border: none;
-    border-radius: 8px;
-    color: var(--bg-color-010101, #010101);
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
     margin-bottom: 16px;
-    transition: all 0.3s ease;
-
-    &:disabled {
-        background: #2F2F2F;
-        color: #888;
-        cursor: not-allowed;
-        opacity: 1;
-    }
 }
 
 .footer-tip {

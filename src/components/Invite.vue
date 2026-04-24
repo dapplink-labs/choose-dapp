@@ -4,6 +4,7 @@
       <div v-if="visible" class="invite-overlay" @click="handleClose">
       <div class="invite-card" @click.stop>
         <div class="card-handle"></div>
+        <div class="skip-btn" @click="handleClose">{{ $t('common.skip') || '跳过' }}</div>
 
         <h2 class="card-title">{{ $t('invite.title') }}</h2>
 
@@ -13,10 +14,23 @@
         <p class="tip-text">{{ $t('invite.tip') }}</p>
 
         <div class="action-row">
-          <button class="btn primary-btn" type="button" :disabled="loading" @click="handleConfirm">
+          <PrimaryActionButton
+            class="btn primary-btn"
+            :disabled="loading"
+            height="48px"
+            radius="12px"
+            font-size="16px"
+            font-weight="600"
+            text-color="#0a0a0a"
+            gradient-from="var(--text-color-y)"
+            gradient-to="var(--text-color-y)"
+            disabled-bg="#2f2f2f"
+            disabled-text-color="#7b7b7b"
+            @click="handleConfirm"
+          >
             <span v-if="loading">{{ $t('common.loading') || '...' }}</span>
             <span v-else>{{ $t('common.confirm') }}</span>
-          </button>
+          </PrimaryActionButton>
         </div>
       </div>
     </div>
@@ -37,6 +51,7 @@ import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
 import networks from '@/assets/json/networks.js'
 import { writeContractOptimized } from '@/utils/requestWEB3.js'
 import { config } from '@/wagmi.ts'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
 
 const { t } = useI18n()
 const { address } = useAccount()
@@ -265,6 +280,22 @@ const handleConfirm = async () => {
   box-sizing: border-box;
   box-shadow: var(--invite-card-shadow);
   border: 1px solid var(--invite-card-border);
+  position: relative;
+}
+
+.skip-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-size: 14px;
+  color: var(--invite-tip);
+  cursor: pointer;
+  padding: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.skip-btn:hover {
+  opacity: 0.8;
 }
 
 .card-handle {
@@ -323,29 +354,14 @@ const handleConfirm = async () => {
 
 .btn {
   width: 100%;
-  height: 48px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
   letter-spacing: 0.2px;
 }
 
 .primary-btn {
-  background: var(--text-color-y);
-  color: #0a0a0a;
   box-shadow: 0 12px 30px rgba(180, 255, 40, 0.28);
 }
 
-.primary-btn:active {
-  transform: scale(0.98);
-}
-
 .primary-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
   box-shadow: none;
 }
 

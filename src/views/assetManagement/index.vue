@@ -1,29 +1,33 @@
 <template>
-    <div class="asset-management">
-        <BackHeaderNav :title="$t('userInfo.fundManagement')" />
+  <div class="asset-management">
+    <BackHeaderNav class="asset-header" :title="$t('userInfo.fundManagement')" />
 
-        <div class="main-content">
-            <div class="tab-nav">
-                <div :class="['tab-item', { active: activeTab === 0 }]" @click="handleTabClick(0)">
-                    {{ $t('assetManagement.overview') || '资产总览' }}
-                </div>
-                <div :class="['tab-item', { active: activeTab === 1 }]" @click="handleTabClick(1)">
-                    {{ $t('assetManagement.prediction') || '预测' }}
-                </div>
-            </div>
-
-            <!-- 内容区域 -->
-            <div class="tab-content">
-                <Overview v-if="activeTab === 0" />
-                <Prediction v-else />
-            </div>
+    <div class="main-content">
+      <div class="tab-nav">
+        <div :class="['tab-item', { active: activeTab === 0 }]" @click="handleTabClick(0)">
+          {{ $t('assetManagement.overview') || '资产总览' }}
         </div>
+        <div :class="['tab-item', { active: activeTab === 1 }]" @click="handleTabClick(1)">
+          {{ $t('assetManagement.funds') || '资金' }}
+        </div>
+        <div :class="['tab-item', { active: activeTab === 2 }]" @click="handleTabClick(2)">
+          {{ $t('assetManagement.staking') || '质押' }}
+        </div>
+      </div>
+
+      <div class="tab-content">
+        <Overview v-if="activeTab === 0" />
+        <Funds v-else-if="activeTab === 1" />
+        <Staking v-else-if="activeTab === 2" />
+      </div>
     </div>
+  </div>
 </template>
 <script setup>
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import Overview from './Overview.vue'
-import Prediction from './Prediction.vue'
+import Funds from './Funds.vue'
+import Staking from './Staking.vue'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
@@ -37,44 +41,65 @@ const handleTabClick = (index) => {
 </script>
 <style scoped lang="scss">
 .asset-management {
-    width: 100%;
-    min-height: 100vh;
-    background-color: var(--bg-page-h5);
-    color: var(--text-color);
-    transition: background-color 0.3s ease, color 0.3s ease;
-    padding-top: 60px;
+  width: 100%;
+  min-height: 100vh;
+  background: #232932;
+  color: #ffffff;
+  padding-top: 60px;
+}
+
+.asset-header:deep(.cps-card-header) {
+  padding: 14px 20px 10px;
+  background: #232932 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.asset-header:deep(.back-btn) {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+}
+
+.asset-header:deep(.page-title) {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.main-content {
+  min-height: calc(100vh - 60px);
 }
 
 .tab-nav {
-    display: flex;
-    gap: 20px;
-    border-bottom: 1px solid var(--border-color, #E0E0E0);
-    padding: 0 16px 10px;
+  display: flex;
+  gap: 22px;
+  padding: 7px 20px 11px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  overflow-x: auto;
+  scrollbar-width: none;
 
-    .tab-item {
-        font-family: PingFang SC, PingFang SC;
-        font-weight: 600;
-        font-size: 16px;
-        color: #909090;
-        cursor: pointer;
-        padding-bottom: 8px;
-        position: relative;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
-        &.active {
-            color: var(--text-color, #000000);
-            font-weight: 600;
-        }
+  .tab-item {
+    flex-shrink: 0;
+    position: relative;
+    padding-bottom: 2px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #8d94a1;
+    line-height: 1.2;
+    cursor: pointer;
+
+    &.active {
+      color: #ffffff;
     }
+  }
 }
 
 .tab-content {
-    flex: 1;
-}
-
-.prediction-placeholder {
-    padding: 40px 16px;
-    text-align: center;
-    color: var(--text-gray, rgba(255, 255, 255, 0.5));
-    font-size: 14px;
+  flex: 1;
 }
 </style>

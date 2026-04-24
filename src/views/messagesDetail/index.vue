@@ -24,7 +24,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
-import { getNoticeData } from '@/api/API'
+import { getAnnouncementDetail, markAnnouncementRead } from '@/api/APIEvent'
 import { useAccount } from '@wagmi/vue'
 
 const route = useRoute()
@@ -34,19 +34,33 @@ const time = ref('')
 const description = ref('')
 const loading = ref(true)
 const error = ref('')
-const language = ref(localStorage.getItem('app-locale'))
+const language = ref(localStorage.getItem('app-locale') || 'en')
 
 async function fetchDetail() {
-  const id = route.query.id ?? route.state?.id ?? ''
+  const guid = route.query.id ?? route.state?.id ?? ''
+  if (!guid) return
+
   loading.value = true
   error.value = ''
   try {
-    const res = await getNoticeData({ address: address.value, language: language.value })
-    const ann = res?.data?.announcement
+    const res = await getAnnouncementDetail({ 
+      guid, 
+      language: language.value,
+      user_address: address.value || '' 
+    })
+    const ann = res?.data?.data
     if (ann) {
       title.value = ann.title ?? ''
-      time.value = ann.time ?? ''
+      time.value = ann.created_at ?? ''
       description.value = ann.content ?? ''
+
+      // 标记已读
+      if (address.value && !ann.is_read) {
+        markAnnouncementRead({
+          guid,
+          user_address: address.value
+        }).catch(err => console.error('Mark read failed:', err))
+      }
     } else {
       title.value = route.state?.title ?? route.query.title ?? ''
       time.value = route.state?.time ?? route.query.time ?? ''
@@ -64,6 +78,7 @@ async function fetchDetail() {
 
 onMounted(fetchDetail)
 watch(() => route.query.id, fetchDetail)
+watch(address, fetchDetail)
 </script>
 
 <style scoped lang="scss">

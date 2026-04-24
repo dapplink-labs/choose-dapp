@@ -36,22 +36,23 @@
 import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref, watch, onBeforeUnmount } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { reconnect, signMessage } from '@wagmi/core'
+import { injected, reconnect, signMessage } from '@wagmi/core'
 import { useConnect, useChainId, useAccount, useDisconnect, } from '@wagmi/vue'
-import { injected } from '@wagmi/vue/connectors'
 import { useThemeStore } from '../../stores/theme'
 import { useCounterStore } from '@/stores/counter'
 import { ElLoading } from 'element-plus'
 import Message from '@/utils/message'
 import { register } from '@/api/API'
 import { eventBus } from '@/utils/eventBus'
-import { readContract } from '@wagmi/core'
+import { readContract, switchChain } from '@wagmi/core'
 import { config } from '@/wagmi.ts'
 import networks from '@/assets/json/networks.js'
 import nodeManagerABI from '@/assets/abi/nodeManagerABI.json'
+import { userLogin } from '@/api/APIEvent'
 import logoLight from '@/assets/icon/logo.png'
 import logoDark from '@/assets/icon/logoDark.png'
 import { UserRejectedRequestError } from 'viem'
+
 // 基础配置
 const { t } = useI18n()
 const BSC_CHAIN_ID = 56
@@ -62,7 +63,7 @@ const router = useRouter()
 const route = useRoute()
 const { connect, connectors, connectAsync } = useConnect()
 const chainId = useChainId()
-console.log(chainId)
+// console.log(chainId)
 const { status, address } = useAccount()
 const { disconnect } = useDisconnect()
 const themeStore = useThemeStore()
@@ -101,6 +102,17 @@ const checkUserStatus = async () => {
     const currentNetwork = networks.find(n => Number(n.chainId) === BSC_CHAIN_ID)
     if (!currentNetwork || !currentNetwork.proxyNodeManager) {
       throw new Error('未找到 BSC 网络合约配置')
+    }
+    // 1. Check network
+    if (Number(chainId.value) !== BSC_CHAIN_ID) {
+      try {
+        await switchChain(config, { chainId: BSC_CHAIN_ID })
+        await new Promise((r) => setTimeout(r, 1000))
+      } catch (switchError) {
+        console.error('Failed to switch chain:', switchError)
+        loading.close()
+        return
+      }
     }
     console.log("------------------------")
     // 3. 读取合约检查邀请人
@@ -165,7 +177,18 @@ async function wallconnects(id, chainId) {
 
       if (!signature) return
 
-      // 3️⃣ 签名成功 → 进首页 ✅
+      // 3️⃣ 签名成功 → 钱包登录接口 ✅
+      try {
+       const res = await userLogin({ user_address: addr })
+        console.log(res)
+        localStorage.setItem('user_guid', res.data.data.user_guid)
+      } catch (err) {
+        console.error('Wallet login failed:', err)
+        Message.error(t('linkWallet.userVerificationFailed') || 'Wallet login failed')
+        return
+      }
+
+      // 4️⃣ 登录成功 → 进首页 ✅
       router.push('/home')
       await checkUserStatus()
 
@@ -188,10 +211,8 @@ onMounted(async () => {
   setTimeout(async () => {
     disconnect()
     window.sessionStorage.clear()
-    console.log("--------------------------------------------------")
+
   }, 500)
-
-
 
 })
 </script>

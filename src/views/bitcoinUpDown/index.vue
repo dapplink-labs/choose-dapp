@@ -12,13 +12,48 @@
           <el-icon class="trophy-icon">
             <Trophy />
           </el-icon>
-          <span class="top-volume">$153,642,644 {{ $t('bitcoinUpDown.volume') }}</span>
+          <span class="top-volume">{{ topVolumeText }}</span>
         </div>
-        <button class="top-btn bookmark-btn" type="button">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <button class="top-btn share-btn" type="button" @click="handleShare">
+          <svg
+            t="1776045210542"
+            class="icon"
+            viewBox="0 0 1024 1024"
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+            p-id="15980"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+          >
+            <path
+              d="M350.523077 393.846154c7.876923 0 15.753846-3.938462 19.692308-7.876923l118.153846-118.153846v393.846153c0 15.753846 11.815385 31.507692 31.507692 31.507693s31.507692-11.815385 31.507692-31.507693v-393.846153l118.153847 118.153846c11.815385 11.815385 31.507692 11.815385 43.323076 0s11.815385-31.507692 0-43.323077l-169.353846-169.353846c-3.938462-3.938462-3.938462-3.938462-7.876923-3.938462H523.815385 512c-3.938462 0-7.876923 3.938462-7.876923 3.938462L326.892308 342.646154c-11.815385 11.815385-11.815385 27.569231 0 39.384615 7.876923 7.876923 15.753846 11.815385 23.630769 11.815385z"
+              fill="currentColor"
+              p-id="15981"
+            ></path>
+            <path
+              d="M854.646154 445.046154c-15.753846 0-31.507692 11.815385-31.507692 31.507692v216.615385c0 43.323077-35.446154 82.707692-82.707693 82.707692H295.384615c-43.323077 0-82.707692-35.446154-82.707692-82.707692V472.615385c0-15.753846-11.815385-31.507692-31.507692-31.507693s-23.630769 15.753846-23.630769 31.507693v216.615384c0 78.769231 63.015385 141.784615 141.784615 141.784616h445.046154c78.769231 0 141.784615-63.015385 141.784615-141.784616V472.615385c0-15.753846-15.753846-27.569231-31.507692-27.569231z"
+              fill="currentColor"
+              p-id="15982"
+            ></path>
+          </svg>
+        </button>
+        <button
+          class="top-btn bookmark-btn"
+          :class="{ active: detailData.isFavorite }"
+          type="button"
+          @click="handleBookmark"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            :fill="detailData.isFavorite ? 'currentColor' : 'none'"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </button>
       </div>
@@ -26,44 +61,80 @@
 
     <!-- 滚动容器 -->
     <div class="content-scroller" @scroll="handleScroll">
-
       <!-- 2. 吸顶标题区与倒计时 -->
       <div class="asset-profile-wrapper" :class="{ 'is-sticky': isSticky }">
         <div class="asset-profile">
           <div class="asset-logo">
-            <svg viewBox="0 0 32 32" width="100%" height="100%">
-              <path fill="#fff"
-                d="M21.7 14.3c.3-2-1.2-3.1-3.3-3.8l.7-2.7-1.6-.4-.7 2.6c-.4-.1-.9-.2-1.3-.3l.7-2.6-1.6-.4-.7 2.7c-.3-.1-.7-.2-1-.2v-.1l-2.2-.6-.4 1.7s1.2.3 1.2.3c.7.2.8.6.8 1l-.8 3.1c0 0 .1 0 .2.1h-.2l-1.1 4.4c-.1.2-.3.5-.8.4 0 0-1.2-.3-1.2-.3l-.8 1.8 2.1.5c.4.1.8.2 1.2.3l-.7 2.8 1.6.4.7-2.7c.4.1.9.2 1.3.3l-.7 2.7 1.6.4.7-2.8c2.9.5 5.1.3 6-2.3.8-2.1 0-3.3-1.5-4.1 1.1-.2 1.9-1 2.1-2.5zm-3.8 5.3c-.5 2.2-4.2 1-5.4.7l1-3.9c1.2.3 5 .9 4.4 3.2zm.6-5.3c-.5 2-3.5.9-4.5.7l.9-3.5c1 .2 4.1.7 3.6 2.8z" />
-            </svg>
+            <img
+              class="asset-logo-img"
+              :src="assetLogoSrc"
+              alt=""
+              referrerpolicy="no-referrer"
+            />
           </div>
           <div class="asset-text">
-            <h2>{{ $t('bitcoinUpDown.questionTitle') }}</h2>
+            <h2>
+              <span>{{ detailData.eventTitle }}</span>
+              <span v-if="showBaopeiTag" class="baopei-tag">{{
+                $t("bitcoinUpDown.baopei")
+              }}</span>
+            </h2>
+            <p v-if="titleTimeRangeText" class="asset-time-range">
+              {{ titleTimeRangeText }}
+            </p>
           </div>
-          <!-- 选中历史记录时隐藏倒计时 -->
-          <div class="timer" v-show="activeSegmentMode !== 'past'">
+          <!-- 倒计时规则：进入历史视图隐藏；剩余时间超过 24h 隐藏 -->
+          <div
+            class="timer"
+            v-show="activeSegmentMode !== 'past' && shouldShowCountDown"
+          >
             <div class="time-block">
               <div class="time-value">
-                <span class="digit-wrapper" v-for="(char, i) in countDown.hours.split('')" :key="'h' + i">
-                  <transition name="fast-roll"><span class="digit unit" :key="char">{{ char }}</span></transition>
+                <span
+                  class="digit-wrapper"
+                  v-for="(char, i) in countDown.hours.split('')"
+                  :key="'h' + i"
+                >
+                  <transition name="fast-roll"
+                    ><span class="digit unit" :key="char">{{
+                      char
+                    }}</span></transition
+                  >
                 </span>
               </div>
-              <span class="label">{{ $t('bitcoinUpDown.hrs') }}</span>
+              <span class="label">{{ $t("bitcoinUpDown.hrs") }}</span>
             </div>
             <div class="time-block">
               <div class="time-value">
-                <span class="digit-wrapper" v-for="(char, i) in countDown.minutes.split('')" :key="'m' + i">
-                  <transition name="fast-roll"><span class="digit unit" :key="char">{{ char }}</span></transition>
+                <span
+                  class="digit-wrapper"
+                  v-for="(char, i) in countDown.minutes.split('')"
+                  :key="'m' + i"
+                >
+                  <transition name="fast-roll"
+                    ><span class="digit unit" :key="char">{{
+                      char
+                    }}</span></transition
+                  >
                 </span>
               </div>
-              <span class="label">{{ $t('bitcoinUpDown.mins') }}</span>
+              <span class="label">{{ $t("bitcoinUpDown.mins") }}</span>
             </div>
             <div class="time-block">
               <div class="time-value">
-                <span class="digit-wrapper" v-for="(char, i) in countDown.seconds.split('')" :key="'s' + i">
-                  <transition name="fast-roll"><span class="digit unit" :key="char">{{ char }}</span></transition>
+                <span
+                  class="digit-wrapper"
+                  v-for="(char, i) in countDown.seconds.split('')"
+                  :key="'s' + i"
+                >
+                  <transition name="fast-roll"
+                    ><span class="digit unit" :key="char">{{
+                      char
+                    }}</span></transition
+                  >
                 </span>
               </div>
-              <span class="label">{{ $t('bitcoinUpDown.secs') }}</span>
+              <span class="label">{{ $t("bitcoinUpDown.secs") }}</span>
             </div>
           </div>
         </div>
@@ -72,22 +143,39 @@
       <!-- 3. 价格看板 -->
       <div class="price-dashboard">
         <div class="price-item">
-          <div class="label">{{ $t('bitcoinUpDown.priceToBeat') }}</div>
-          <div class="value">{{ activeSegmentMode === 'future' ? '--' : formatPrice(displayTargetPrice) }}</div>
+          <div class="label">{{ $t("bitcoinUpDown.openPrice") }}</div>
+          <div class="value">
+            {{
+              activeSegmentMode === "future"
+                ? "--"
+                : formatPrice(displayTargetPrice)
+            }}
+          </div>
         </div>
 
         <div class="price-item current">
           <div class="label">
-            {{ activeSegmentMode === 'past' ? $t('bitcoinUpDown.finalPrice') : $t('bitcoinUpDown.currentPrice') }}
-            <span v-if="activeSegmentMode !== 'future'" :class="['diff', diffData.status]">
+            {{
+              activeSegmentMode === "past"
+                ? $t("bitcoinUpDown.finalPrice")
+                : $t("bitcoinUpDown.currentPrice")
+            }}
+            <span
+              v-if="activeSegmentMode !== 'future'"
+              :class="['diff', diffData.status]"
+            >
               <span class="svg-icon-wrapper diff-icon" :class="diffData.status">
                 <svg v-if="diffData.status === 'up'" viewBox="0 0 12 12">
-                  <path d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
-                    fill="currentColor" />
+                  <path
+                    d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
+                    fill="currentColor"
+                  />
                 </svg>
                 <svg v-else viewBox="0 0 12 12">
-                  <path d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
-                    fill="currentColor" />
+                  <path
+                    d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
+                    fill="currentColor"
+                  />
                 </svg>
               </span>
               ${{ diffData.value }}
@@ -96,13 +184,17 @@
           <div class="value price-value">
             <span class="symbol">$</span>
             <template v-if="activeSegmentMode === 'past'">
-              <span class="digit-static">{{ selectedPastRecord?.finalPrice.toLocaleString('en-US', {
-                minimumFractionDigits: 2
-              }) }}</span>
+              <span class="digit-static">{{
+                selectedPastRecord?.finalPrice.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                })
+              }}</span>
             </template>
             <template v-else>
-              <template v-for="(char, i) in currentPriceChars" :key="'p'+i">
-                <span v-if="['.', ','].includes(char)" class="symbol">{{ char }}</span>
+              <template v-for="(char, i) in currentPriceChars" :key="'p' + i">
+                <span v-if="['.', ','].includes(char)" class="symbol">{{
+                  char
+                }}</span>
                 <span v-else class="digit-wrapper">
                   <transition name="fast-roll">
                     <span class="digit" :key="char">{{ char }}</span>
@@ -117,44 +209,114 @@
       <!-- 4. 图表与工具栏 -->
       <div class="chart-section">
         <div class="chart-container">
-          <div ref="chartRef" class="main-chart" style="touch-action: none;"></div>
+          <div
+            ref="chartRef"
+            class="main-chart"
+            style="touch-action: none"
+          ></div>
+          <!-- 拖拽价格浮窗 -->
+          <transition name="cdt">
+            <div
+              v-if="chartDragState.tooltipVisible"
+              class="chart-drag-tooltip"
+              :style="{
+                left: chartDragState.tooltipLeft + 'px',
+                top: chartDragState.tooltipTop + 'px',
+              }"
+            >
+              <div class="cdt-time">{{ chartDragState.tooltipTime }}</div>
+              <div
+                v-for="item in chartDragState.tooltipItems"
+                :key="item.name"
+                class="cdt-row"
+              >
+                <span
+                  class="cdt-dot"
+                  :style="{ background: item.color }"
+                ></span>
+                <span class="cdt-name">{{ item.name }}</span>
+                <span class="cdt-price">${{ item.price }}</span>
+              </div>
+            </div>
+          </transition>
         </div>
 
         <div class="chart-toolbar">
           <!-- 下拉菜单：选择历史记录 -->
-          <el-dropdown trigger="click" placement="bottom-start" @command="selectPastRecord"
-            popper-class="custom-history-dropdown">
+          <el-dropdown
+            trigger="click"
+            placement="bottom-start"
+            @command="selectPastRecord"
+            popper-class="custom-history-dropdown"
+          >
             <div class="record-capsule">
               <div class="record-selector">
-                {{ $t('bitcoinUpDown.past') }} <el-icon>
+                {{ $t("bitcoinUpDown.past") }}
+                <el-icon>
                   <ArrowDown />
                 </el-icon>
               </div>
               <div class="trend-markers">
-                <span v-for="res in lastThreeResults" :key="res.id" class="svg-icon-wrapper" :class="res.result">
-                  <svg v-if="res.result === 'up'" style="width:12px;height:12px" viewBox="0 0 12 12">
-                    <path d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
-                      fill="currentColor" />
+                <span
+                  v-for="res in lastThreeResults"
+                  :key="res.id"
+                  class="svg-icon-wrapper"
+                  :class="res.result"
+                >
+                  <svg
+                    v-if="res.result === 'up'"
+                    style="width: 12px; height: 12px"
+                    viewBox="0 0 12 12"
+                  >
+                    <path
+                      d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
+                      fill="currentColor"
+                    />
                   </svg>
-                  <svg v-else style="width:12px;height:12px" viewBox="0 0 12 12">
-                    <path d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
-                      fill="currentColor" />
+                  <svg
+                    v-else
+                    style="width: 12px; height: 12px"
+                    viewBox="0 0 12 12"
+                  >
+                    <path
+                      d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
+                      fill="currentColor"
+                    />
                   </svg>
                 </span>
               </div>
             </div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item v-for="record in pastRecords" :key="record.id" :command="record">
+                <el-dropdown-item
+                  v-for="record in pastRecords"
+                  :key="record.id"
+                  :command="record"
+                >
                   <div class="drop-item-content">
-                    <span class="svg-icon-wrapper dropdown-icon" :class="record.result">
-                      <svg v-if="record.result === 'up'" style="width:14px;height:14px" viewBox="0 0 12 12">
-                        <path d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
-                          fill="currentColor" />
+                    <span
+                      class="svg-icon-wrapper dropdown-icon"
+                      :class="record.result"
+                    >
+                      <svg
+                        v-if="record.result === 'up'"
+                        style="width: 14px; height: 14px"
+                        viewBox="0 0 12 12"
+                      >
+                        <path
+                          d="M5.14 2.22a1 1 0 011.72 0l4.28 7.4A1 1 0 0110.28 11H1.72a1 1 0 01-.86-1.5z"
+                          fill="currentColor"
+                        />
                       </svg>
-                      <svg v-else style="width:14px;height:14px" viewBox="0 0 12 12">
-                        <path d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
-                          fill="currentColor" />
+                      <svg
+                        v-else
+                        style="width: 14px; height: 14px"
+                        viewBox="0 0 12 12"
+                      >
+                        <path
+                          d="M10.86 1H1.72a1 1 0 00-.86 1.5l4.28 7.4a1 1 0 001.72 0l4.28-7.4A1 1 0 0010.86 1z"
+                          fill="currentColor"
+                        />
                       </svg>
                     </span>
                     {{ record.label }}
@@ -167,123 +329,325 @@
           <!-- 🔥 动态时间轴按钮逻辑 🔥 -->
           <div class="time-segments">
             <!-- 1. 最左侧：临时生成的历史记录游标 (仅在选择历史且存在时显示) -->
-            <span v-if="activeSegmentMode === 'past' && selectedPastRecord" class="time-pill active past-active">
-              {{ $t('bitcoinUpDown.ended') }}: {{ selectedPastRecord.date }}
+            <span
+              v-if="activeSegmentMode === 'past' && selectedPastRecord"
+              class="time-pill active past-active"
+            >
+              {{ $t("bitcoinUpDown.ended") }}: {{ selectedPastRecord.date }}
             </span>
 
             <!-- 2. 中间：常驻实时按钮 (点击清除历史游标) -->
-            <span class="time-pill" :class="{ active: activeSegmentMode === 'live' }" @click="selectLiveSegment">
+            <span
+              class="time-pill"
+              :class="{ active: activeSegmentMode === 'live' }"
+              @click="selectLiveSegment"
+            >
               <i class="dot breathing-dot"></i> {{ liveSegment.label }}
             </span>
 
             <!-- 3. 右侧：当天未来按钮 (只有一个) -->
-            <span v-for="ft in futureSegments" :key="ft.id" class="time-pill "
-              :class="{ active: activeSegmentMode === 'future' && selectedFutureId === ft.id }"
-              @click="selectFutureSegment(ft)">
+            <span
+              v-for="ft in futureSegments"
+              :key="ft.id"
+              class="time-pill"
+              :class="{
+                active:
+                  activeSegmentMode === 'future' && selectedFutureId === ft.id,
+              }"
+              @click="selectFutureSegment(ft)"
+            >
               {{ ft.label }}
             </span>
           </div>
         </div>
       </div>
 
-      <!-- 5. 底部业务逻辑 -->
-      <div class="business-tabs">
-        <div class="tab-item" :class="{ active: activeTab === 'Positions' }" @click="activeTab = 'Positions'">{{
-          $t('crypto.positions') }}</div>
-        <div class="tab-item" :class="{ active: activeTab === 'Orders' }" @click="activeTab = 'Orders'">{{
-          $t('crypto.orders')
-        }}</div>
-        <div class="tab-item" :class="{ active: activeTab === 'History' }" @click="activeTab = 'History'">{{
-          $t('crypto.history') }}</div>
-      </div>
-
-      <!-- Positions -->
-      <div v-if="activeTab === 'Positions'" class="position-content">
-        <div class="pos-card">
-          <h3 class="pos-title">{{ $t('crypto.upOrDown') }}</h3>
-          <span class="pos-tag">{{ $t('crypto.up') }} | 100 {{ $t('sports.shares') }}</span>
-          <div class="pos-grid">
-            <div class="grid-item">
-              <div class="g-label">{{ $t('crypto.avgPrice') }}</div>
-              <div class="g-val">40 ¢</div>
-            </div>
-            <div class="grid-item">
-              <div class="g-label">{{ $t('crypto.cost') }}</div>
-              <div class="g-val">$40</div>
-            </div>
-            <div class="grid-item">
-              <div class="g-label">{{ $t('crypto.current') }}</div>
-              <div class="g-val">$80</div>
-            </div>
-            <div class="grid-item">
-              <div class="g-label">{{ $t('crypto.profit') }}</div>
-              <div class="g-val neon">+$40(+100%)</div>
-            </div>
+      <template v-if="hasBusinessData">
+        <!-- 5. 底部业务逻辑 -->
+        <div class="business-tabs">
+          <div
+            class="tab-item"
+            :class="{ active: activeTab === 'Positions' }"
+            @click="activeTab = 'Positions'"
+          >
+            {{ $t("crypto.positions") }}
           </div>
-          <button class="withdraw-hero-btn">{{ $t('crypto.withdraw') }}</button>
+          <div
+            class="tab-item"
+            :class="{ active: activeTab === 'Orders' }"
+            @click="activeTab = 'Orders'"
+          >
+            {{ $t("crypto.orders") }}
+          </div>
+          <div
+            class="tab-item"
+            :class="{ active: activeTab === 'History' }"
+            @click="activeTab = 'History'"
+          >
+            {{ $t("crypto.history") }}
+          </div>
         </div>
-      </div>
 
-      <!-- Orders -->
-      <div v-else-if="activeTab === 'Orders'" class="orders-content">
-        <div class="orders-header-row">
-          <div class="orders-title">{{ $t('crypto.openOrders') }}</div>
-          <button class="cancel-all-btn" type="button" v-if="openOrders.length" @click="handleCancelAllOrders">
-            {{ $t('crypto.cancelAll') }}
-          </button>
-        </div>
-
-        <div v-if="openOrders.length">
-          <div v-for="order in openOrders" :key="order.id" class="order-row">
-            <div class="order-left">
-              <div class="order-side" :class="order.side">
-                {{ $t('common.buy') }}
-                <span class="side-text">{{ order.side === 'up' ? $t('crypto.up') : $t('crypto.down') }}</span>
+        <!-- Positions -->
+        <div v-if="activeTab === 'Positions'" class="position-content">
+          <div v-if="positions.length">
+            <div
+              v-for="(pos, index) in positions"
+              :key="pos.id"
+              class="pos-card"
+            >
+              <div class="pos-header">
+                <img
+                  :src="assetLogoSrc"
+                  class="pos-token-icon"
+                  alt="token"
+                  v-if="assetLogoSrc"
+                />
+                <div v-else class="pos-token-icon-fallback">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M15.4 10.8c.8-0.2 1.3-0.8 1.3-1.6 0-1.3-1.1-2.1-3.2-2.1H10V4.5H8v2.6H6.5V9h1.5v7H6.5v2h1.5v2.6h2v-2.6h1.7c2.3 0 3.6-1 3.6-2.5 0-1.1-0.7-1.9-1.8-2.2zM10 9h3c.8 0 1.2.3 1.2.8 0 .6-.5.9-1.3.9h-3V9zm3.3 5.3H10v-2.2h3.3c1 0 1.5.3 1.5.9 0 .7-.5 1.1-1.5 1.1z"
+                      fill="#fff"
+                    />
+                  </svg>
+                </div>
+                <span
+                  class="pos-tag"
+                  :class="
+                    ['yes', 'up'].includes(pos.outcome?.toLowerCase())
+                      ? 'up'
+                      : 'down'
+                  "
+                  >{{ pos.tagLabel }}</span
+                >
               </div>
-              <div :class="['order-chip', order.side === 'up' ? 'up' : 'down']">
-                <span class="chip-price">{{ order.price }} ¢</span>
-                <span class="chip-sep">|</span>
-                <span class="chip-cost">${{ order.cost }}</span>
+              <div class="pos-grid">
+                <div class="grid-item">
+                  <div class="g-label">{{ $t("crypto.avgPrice") }}</div>
+                  <div class="g-val">{{ pos.avgPrice }}</div>
+                </div>
+                <div class="grid-item">
+                  <div class="g-label">{{ $t("crypto.cost") }}</div>
+                  <div class="g-val">{{ pos.cost }}</div>
+                </div>
+                <div class="grid-item">
+                  <div class="g-label">{{ $t("crypto.current") }}</div>
+                  <div class="g-val">{{ pos.positionValue }}</div>
+                </div>
+                <div class="grid-item">
+                  <div class="g-label">
+                    {{ $t("crypto.profit") }}
+                    <img
+                      :src="shareIconSrc"
+                      class="share-icon"
+                      @click="handlePositionShare(pos)"
+                      style="
+                        vertical-align: middle;
+                        margin-left: 4px;
+                        cursor: pointer;
+                        width: 14px;
+                        height: 14px;
+                      "
+                    />
+                  </div>
+                  <div
+                    class="g-val"
+                    :class="{
+                      neon: pos.profitPositive,
+                      'hot-pink': !pos.profitPositive,
+                    }"
+                  >
+                    {{ pos.profit }}
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="order-right">
-              <div>
-                <div class="order-progress">{{ order.filled }}/{{ order.total }}</div>
-                <div class="order-until" v-if="order.untilCancel">{{ $t('crypto.untilCancel') }}</div>
-              </div>
-              <button class="order-cancel-btn" type="button" @click="handleCancelOrder(order.id)" aria-label="cancel">
-                ✕
+              <button
+                class="withdraw-hero-btn"
+                :class="[
+                  'up',
+                  {
+                    disabled:
+                      Number(pos?.raw?.shares) === 0 || !canWithdraw(pos),
+                  },
+                ]"
+                type="button"
+                :disabled="Number(pos?.raw?.shares) === 0 || !canWithdraw(pos)"
+                @click="handlePositionWithdraw(pos)"
+              >
+                {{ $t("crypto.withdraw") }}
               </button>
             </div>
           </div>
-        </div>
-        <div v-else class="orders-empty">{{ $t('common.noData') || '暂无数据...' }}</div>
-      </div>
-
-      <!-- History -->
-      <div v-else-if="activeTab === 'History'" class="history-content">
-        <div class="history-header">{{ $t('crypto.history') }}</div>
-        <div v-if="orderHistory.length">
-          <div v-for="item in orderHistory" :key="item.id" class="history-row">
-            <div class="history-main">
-              <div class="history-text">
-                {{ $t('common.buy') }}
-                <span class="history-side" :class="item.side">
-                  {{ item.shares }} {{ item.side === 'up' ? $t('crypto.up') : $t('crypto.down') }}
-                </span>
-                at {{ item.price }}¢ <span class="muted">(${{ item.notional }})</span>
-              </div>
-            </div>
-            <div class="history-time">{{ item.timeAgo }}</div>
+          <div v-else class="orders-empty">
+            {{ $t("common.noData") || "暂无数据..." }}
           </div>
         </div>
-        <div v-else class="orders-empty">{{ $t('common.noData') || '暂无数据...' }}</div>
-      </div>
+
+        <!-- Orders -->
+        <div v-else-if="activeTab === 'Orders'" class="orders-content">
+          <div class="orders-header-row">
+            <div class="orders-title">{{ $t("crypto.openOrders") }}</div>
+            <button
+              class="cancel-all-btn"
+              type="button"
+              v-if="openOrders.length"
+              :disabled="cancelAllLoading"
+              @click="handleCancelAllOrders"
+            >
+              <span v-if="cancelAllLoading" class="loading-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  width="1em"
+                  height="1em"
+                  class="spinner"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="3"
+                    stroke-dasharray="31.4 31.4"
+                    stroke-linecap="round"
+                  >
+                    <animateTransform
+                      attributeName="transform"
+                      type="rotate"
+                      repeatCount="indefinite"
+                      dur="1s"
+                      values="0 12 12;360 12 12"
+                    />
+                  </circle>
+                </svg>
+              </span>
+              {{ $t("crypto.cancelAll") }}
+            </button>
+          </div>
+
+          <div v-if="openOrders.length" class="orders-list">
+            <div v-for="order in openOrders" :key="order.id" class="order-row">
+              <div class="order-left">
+                <div class="order-side" :class="outcomeToTrend(order.outcome)">
+                  {{
+                    order.side === "BUY" ? $t("common.buy") : $t("common.sell")
+                  }}
+                  <span class="side-text">{{
+                    ["yes", "up"].includes(order.outcome?.toLowerCase())
+                      ? getDisplayOutcome(detailData.yesOutcome)
+                      : getDisplayOutcome(detailData.noOutcome)
+                  }}</span>
+                </div>
+                <div :class="['order-chip', outcomeToTrend(order.outcome)]">
+                  <span class="chip-price">{{ order.price }} ¢</span>
+                  <span class="chip-sep">|</span>
+                  <span class="chip-cost">${{ order.cost }}</span>
+                </div>
+              </div>
+              <div class="order-right">
+                <div>
+                  <div class="order-progress">
+                    {{ order.filled }}/{{ order.total }}
+                  </div>
+                  <div class="order-until" v-if="order.untilCancel">
+                    {{ $t("crypto.untilCancel") }}
+                  </div>
+                </div>
+                <button
+                  class="order-cancel-btn"
+                  type="button"
+                  :disabled="cancelingId === order.orderGuid"
+                  @click="handleCancelOrder(order.id)"
+                  aria-label="cancel"
+                >
+                  <span
+                    v-if="cancelingId === order.orderGuid"
+                    class="loading-icon"
+                  >
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="1em"
+                      height="1em"
+                      class="spinner"
+                    >
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        stroke-dasharray="31.4 31.4"
+                        stroke-linecap="round"
+                      >
+                        <animateTransform
+                          attributeName="transform"
+                          type="rotate"
+                          repeatCount="indefinite"
+                          dur="1s"
+                          values="0 12 12;360 12 12"
+                        />
+                      </circle>
+                    </svg>
+                  </span>
+                  <span v-else>✕</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div v-else class="orders-empty">
+            {{ $t("common.noData") || "暂无数据..." }}
+          </div>
+        </div>
+
+        <!-- History -->
+        <div v-else-if="activeTab === 'History'" class="history-content">
+          <div class="history-header">{{ $t("crypto.history") }}</div>
+          <div v-if="orderHistory.length" class="history-list">
+            <div
+              v-for="item in orderHistory"
+              :key="item.id"
+              class="history-row"
+            >
+              <div class="history-main">
+                <div class="history-text">
+                  {{
+                    item.side === "BUY" ? $t("common.buy") : $t("common.sell")
+                  }}
+                  <span
+                    class="history-side"
+                    :class="outcomeToTrend(item.outcome)"
+                  >
+                    {{ item.shares }}
+                    {{
+                      ["yes", "up"].includes(item.outcome?.toLowerCase() || "")
+                        ? getDisplayOutcome(detailData.yesOutcome)
+                        : getDisplayOutcome(detailData.noOutcome)
+                    }}
+                  </span>
+                  at {{ item.price }}¢
+                  <span class="muted">(${{ item.notional }})</span>
+                </div>
+              </div>
+              <div class="history-time">{{ item.timeAgo }}</div>
+            </div>
+          </div>
+          <div v-else class="orders-empty">
+            {{ $t("common.noData") || "暂无数据..." }}
+          </div>
+        </div>
+      </template>
 
       <div class="orderbook-header" @click="isBookOpen = !isBookOpen">
-        <span>{{ $t('sports.orderBook') }}</span>
+        <span>{{ $t("sports.orderBook") }}</span>
         <div class="header-right">
-          <span class="vol">$35.4K</span>
+          <span class="vol">{{ orderBookVolumeText }}</span>
           <el-icon :class="{ rotate: isBookOpen }">
             <ArrowDown />
           </el-icon>
@@ -292,304 +656,255 @@
 
       <div v-if="isBookOpen" class="book-body">
         <div class="orderbook-tabs">
-          <button class="orderbook-tab" :class="{ active: orderBookTab === 'yes' }" @click="orderBookTab = 'yes'">{{
-            $t('detail.tradeYes') }}</button>
-          <button class="orderbook-tab" :class="{ active: orderBookTab === 'no' }" @click="orderBookTab = 'no'">{{
-            $t('detail.tradeNo') }}</button>
+          <button
+            class="orderbook-tab"
+            :class="{ active: orderBookTab === 'yes' }"
+            @click="orderBookTab = 'yes'"
+          >
+            {{ getDisplayOutcome(detailData.yesOutcome) || "" }}
+          </button>
+          <button
+            class="orderbook-tab"
+            :class="{ active: orderBookTab === 'no' }"
+            @click="orderBookTab = 'no'"
+          >
+            {{ getDisplayOutcome(detailData.noOutcome) || "" }}
+          </button>
         </div>
-        <OrderBookMobile :active-side="orderBookTab" />
+        <OrderBookMobile
+          :active-side="orderBookTab"
+          :asks="currentOrderBook.asks"
+          :bids="currentOrderBook.bids"
+          :last-trade-price="currentOrderBook.last_trade_price"
+          :loading="orderBookLoading"
+          :use-mock-fallback="false"
+        />
       </div>
 
-      <div class="rules-footer">
-        <h4>{{ $t('detail.rules') }}</h4>
-        <p>{{ $t('bitcoinUpDown.rulesDescription') }}</p>
+      <div v-if="detailData.rulesDescription" class="rules-footer">
+        <h4>{{ $t("detail.rules") }}</h4>
+        <p>{{ detailData.rulesDescription }}</p>
       </div>
     </div>
 
     <!-- 吸底操作栏 -->
     <div class="bottom-dock-actions">
-      <button class="trade-btn up" type="button" @click="openPayment('up')">
-        {{ $t('common.buy') }} {{ $t('crypto.up') }} 96 ¢
-      </button>
-      <button class="trade-btn down" type="button" @click="openPayment('down')">
-        {{ $t('common.buy') }} {{ $t('crypto.down') }} 4 ¢
-      </button>
+      <!-- 事件未结束时显示购买按钮 -->
+      <template v-if="!isEventEnded">
+        <button class="trade-btn up" type="button" @click="openPayment('up')">
+          {{ $t("common.buy") }}
+          {{ getDisplayOutcome(detailData.yesOutcome) || "" }}
+          {{ upTradePriceText }}
+        </button>
+        <button
+          class="trade-btn down"
+          type="button"
+          @click="openPayment('down')"
+        >
+          {{ $t("common.buy") }}
+          {{ getDisplayOutcome(detailData.noOutcome) || "" }}
+          {{ downTradePriceText }}
+        </button>
+      </template>
+      <!-- 事件已结束时显示提示 -->
+      <div v-else class="event-ended-tip">
+        {{ $t("bitcoinUpDown.eventEnded") }}
+      </div>
     </div>
 
-    <PaymentModal v-model="showPayment" />
+    <PaymentModal
+      v-model="showPayment"
+      :event-title="detailData.title"
+      :outcome-title="paymentOutcomeTitle"
+      :event-guid="currentEventGuid"
+      :sub-event-guid="resolvedSubEventGuid"
+      :initial-outcome="paymentInitialOutcome"
+      :initial-side="paymentInitialSide"
+      :yes-outcome="detailData.yesOutcome"
+      :no-outcome="detailData.noOutcome"
+      @order-success="onOrderSuccess"
+    />
+
+    <CashoutModal
+      v-model="showCashoutModal"
+      :position="cashoutPosition"
+      :event-title="detailData.title"
+      :event-guid="currentEventGuid"
+      :sub-event-guid="resolvedSubEventGuid"
+      @order-success="onOrderSuccess"
+    />
+
+    <!-- 自定义底部取消挂单弹窗 -->
+    <transition name="slide-up-modal">
+      <div
+        v-if="cancelDialogVisible"
+        class="custom-bottom-modal-overlay"
+        @click.self="onCancelClose"
+      >
+        <div class="custom-bottom-modal">
+          <div class="modal-handle"></div>
+          <div class="modal-icon">
+            <svg
+              width="56"
+              height="56"
+              viewBox="0 0 48 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="24"
+                cy="24"
+                r="22"
+                stroke="#f3a228"
+                stroke-width="4"
+                fill="none"
+              />
+              <path
+                d="M24 14V26"
+                stroke="#f3a228"
+                stroke-width="4"
+                stroke-linecap="square"
+              />
+              <circle cx="24" cy="34" r="2.5" fill="#f3a228" />
+            </svg>
+          </div>
+          <div class="modal-title">
+            {{
+              cancelDialogType === "all"
+                ? $t("assetManagement.cancelAllOrdersConfirm") ||
+                  "是否取消所有挂单？"
+                : $t("assetManagement.cancelOrderConfirm") || "是否取消该挂单？"
+            }}
+          </div>
+          <div class="modal-subtitle">
+            {{
+              $t("assetManagement.cancelOrderSubTitle") ||
+              "挂单取消后，金额将返还到资金账户"
+            }}
+          </div>
+          <div class="modal-actions">
+            <button class="btn-cancel" @click="onCancelClose">
+              {{ $t("common.cancel") || "取消" }}
+            </button>
+            <button class="btn-confirm" @click="onCancelConfirm">
+              {{ $t("common.confirm") || "确认" }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- 自定义底部分享弹窗 -->
+    <transition name="slide-up-modal">
+      <div
+        v-if="shareDialogVisible"
+        class="custom-bottom-modal-overlay"
+        @click.self="closeShareDialog"
+      >
+        <div class="custom-bottom-modal share-modal">
+          <div class="modal-handle"></div>
+          <div class="share-header">
+            <h3>{{ $t("common.share") || "分享" }}</h3>
+          </div>
+          <div class="share-card">
+            <div class="share-card-icon">
+              <img
+                v-if="assetLogoSrc"
+                :src="assetLogoSrc"
+                alt="logo"
+                referrerpolicy="no-referrer"
+              />
+            </div>
+            <div class="share-card-info">
+              <div class="share-card-title">
+                {{ detailData.eventTitle || detailData.title }}
+                <span v-if="titleTimeRangeText"> {{ titleTimeRangeText }}</span>
+              </div>
+              <div class="share-card-subtitle">{{ shareSubTitle }}</div> 
+            </div>
+          </div>
+          <button class="share-copy-btn" @click="copyShareLink">
+            {{ $t("common.copyLink") || "拷贝链接" }}
+          </button>
+        </div>
+      </div>
+    </transition>
+
+    <!-- 持仓分享弹窗 -->
+    <transition name="slide-up-modal">
+      <div
+        v-if="positionShareDialogVisible"
+        class="custom-bottom-modal-overlay"
+        @click.self="closePositionShareDialog"
+      >
+        <div class="custom-bottom-modal position-share-modal">
+          <div class="modal-handle"></div>
+          <div class="share-header">
+            <h3>{{ $t("common.share") || "分享" }}</h3>
+          </div>
+          
+          <!-- Share Card Content -->
+          <div class="position-share-card-container" ref="shareCardRef">
+            <div class="share-card-top">
+              <div class="share-logo-box">
+                <img src="@/assets/logo-Dark.png" alt="CHOOSEME" class="share-logo-img" />
+              </div>
+              <div class="share-user-box">
+                <img src="@/assets/icon/avatarImg1.png" alt="avatar" class="share-avatar" />
+                <span class="share-address">{{ formatAddress(address) }}</span>
+              </div>
+            </div>
+
+            <div class="share-card-middle">
+              <div class="share-profit-info">
+                <div class="share-roi" :class="sharePositionData?.profitPositive ? 'neon' : 'hot-pink'">
+                  {{ sharePositionData?.profitPositive ? '+' : '' }}{{ sharePositionData?.profitPct || '0.00' }}%
+                </div>
+                <div class="share-profit-val" :class="sharePositionData?.profitPositive ? 'neon' : 'hot-pink'">
+                  {{ sharePositionData?.profitNum || '0.00' }}  
+                  <span class="share-profit-val-unit">USDT</span>
+                </div>
+
+                <div class="share-event-info">
+                  <img v-if="assetLogoSrc" :src="assetLogoSrc" class="share-asset-logo" />
+                  <div class="share-event-text">
+                    <div class="share-event-title">{{ sharePositionData?.title || (detailData.eventTitle || detailData.title) }}</div>
+                    <div class="share-event-subtitle">{{ sharePositionData?.tagLabel }} | {{ $t("common.holding") || "持股中" }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="share-coin-img-box">
+                <img src="@/assets/images/shareCoin.png" alt="coin" class="share-coin-img" />
+              </div>
+            </div>
+
+            <div class="share-card-bottom">
+              <div class="share-price-row">
+                <span class="share-price-label">{{ $t("crypto.avgPrice") || "下单均价" }}</span>
+                <span class="share-price-val">{{ sharePositionData?.avgPrice }}</span>
+              </div>
+              <div class="share-price-row">
+                <span class="share-price-label">{{ $t("crypto.currentPrice") || "当前价格" }}</span>
+                <span class="share-price-val">{{ sharePositionData?.currentPriceText || sharePositionData?.avgPrice }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="share-actions">
+            <button class="share-copy-btn-new" @click="copyShareLink">
+              {{ $t("common.copyLink") || "拷贝链接" }}
+            </button>
+            <button class="share-image-btn" @click="shareImage">
+              {{ $t("common.shareImage") || "分享图片" }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
-import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import { ArrowLeft, ArrowDown, Trophy } from '@element-plus/icons-vue'
-import * as echarts from 'echarts'
-import OrderBookMobile from '@/components/OrderBookMobile.vue'
-import PaymentModal from '@/components/PaymentModal.vue'
-import { useThemeStore } from '@/stores/theme'
-
-const { t } = useI18n()
-const router = useRouter()
-const themeStore = useThemeStore()
-
-const handleBack = () => router.back()
-const activeTab = ref('Positions')
-const isBookOpen = ref(false)
-const orderBookTab = ref('yes')
-
-const openOrders = ref([
-  { id: 1, side: 'down', price: 80, cost: 40, filled: 0, total: 50, untilCancel: true },
-  { id: 2, side: 'down', price: 80, cost: 40, filled: 0, total: 50, untilCancel: true }
-])
-
-const orderHistory = ref([
-  { id: 1, side: 'up', shares: 40, price: 80, notional: 32, timeAgo: '4分钟前' },
-  { id: 2, side: 'down', shares: 40, price: 80, notional: 32, timeAgo: '4分钟前' }
-])
-
-const handleCancelAllOrders = () => {
-  openOrders.value = []
-}
-
-const handleCancelOrder = (id) => {
-  openOrders.value = openOrders.value.filter(o => o.id !== id)
-}
-
-const showPayment = ref(false)
-const selectedTradeSide = ref(null) // 'up' | 'down'
-const openPayment = (side) => {
-  selectedTradeSide.value = side
-  showPayment.value = true
-}
-
-// --- 吸顶逻辑 ---
-const isSticky = ref(false)
-const handleScroll = (e) => {
-  isSticky.value = e.target.scrollTop > 20
-}
-
-// --- 倒计时 ---
-const countDown = ref({ hours: '01', minutes: '10', seconds: '18' })
-let timerInterval = null
-const startCountDown = () => {
-  let totalSeconds = 1 * 3600 + 10 * 60 + 18
-  timerInterval = setInterval(() => {
-    if (totalSeconds <= 0) return clearInterval(timerInterval)
-    totalSeconds--
-    const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0')
-    const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0')
-    const s = (totalSeconds % 60).toString().padStart(2, '0')
-    countDown.value = { hours: h, minutes: m, seconds: s }
-  }, 1000)
-}
-
-// --- 状态机 ---
-const activeSegmentMode = ref('live')
-
-// 模拟历史数据
-const pastRecords = [
-  { id: 1, label: '12 PM ET · Feb 25', date: 'Feb 25', result: 'up', targetPrice: 2047.32, finalPrice: 2062.59 },
-  { id: 2, label: '12 PM ET · Feb 24', date: 'Feb 24', result: 'down', targetPrice: 3168.00, finalPrice: 3136.32 },
-  { id: 3, label: '12 PM ET · Feb 23', date: 'Feb 23', result: 'down', targetPrice: 2100.00, finalPrice: 2080.00 },
-]
-const lastThreeResults = pastRecords.slice(0, 3)
-const selectedPastRecord = ref(null)
-
-// 模拟 Live 数据
-const liveSegment = { label: '12 PM', targetPrice: 2047.32 }
-const livePrice = ref(2062.59)
-
-// 模拟当天未来截点 (仅留一个)
-const futureSegments = [
-  { id: 'today', label: '12 PM Feb 27' }
-]
-const selectedFutureId = ref(null)
-
-// --- 数据衍生 ---
-const displayTargetPrice = computed(() => {
-  if (activeSegmentMode.value === 'past') return selectedPastRecord.value?.targetPrice
-  if (activeSegmentMode.value === 'live') return liveSegment.targetPrice
-  return null
-})
-
-const currentPriceChars = computed(() => {
-  return livePrice.value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).split('')
-})
-
-const diffData = computed(() => {
-  let current, target;
-  if (activeSegmentMode.value === 'past') {
-    current = selectedPastRecord.value.finalPrice
-    target = selectedPastRecord.value.targetPrice
-  } else if (activeSegmentMode.value === 'live') {
-    current = livePrice.value
-    target = liveSegment.targetPrice
-  } else {
-    return { status: '', value: '' }
-  }
-  const diff = current - target
-  return { status: diff >= 0 ? 'up' : 'down', value: Math.abs(diff).toFixed(2) }
-})
-
-const formatPrice = (val) => val ? `$${val.toLocaleString('en-US', { minimumFractionDigits: 2 })}` : ''
-
-// --- Echarts 滑动图表 ---
-const chartRef = ref(null)
-let chartInstance = null
-let chartDataX = []
-let chartDataY = []
-let lastGenTime = 0
-
-const generateMockData = () => {
-  chartDataX = []
-  chartDataY = []
-  if (activeSegmentMode.value === 'past') {
-    let base = selectedPastRecord.value.targetPrice
-    const final = selectedPastRecord.value.finalPrice
-    for (let i = 0; i < 49; i++) {
-      chartDataX.push(`12:${(i + 10).toString().padStart(2, '0')}`)
-      base += (final - base) * 0.1 + (Math.random() - 0.5) * 5
-      chartDataY.push(base)
-    }
-    chartDataX.push(`End`)
-    chartDataY.push(final)
-  } else {
-    let base = 2060.00
-    lastGenTime = new Date().getTime() - 50 * 2000
-    for (let i = 0; i < 50; i++) {
-      const d = new Date(lastGenTime)
-      chartDataX.push(`${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`)
-      base += (Math.random() - 0.45) * 0.5
-      chartDataY.push(base)
-      lastGenTime += 2000
-    }
-    livePrice.value = chartDataY[chartDataY.length - 1]
-  }
-}
-
-const chartColors = computed(() => ({
-  axisLabel: themeStore.isDark ? '#666' : '#888',
-  splitLine: themeStore.isDark ? '#2a2f34' : '#e0e0e0',
-  primary: '#5073e5',
-}))
-
-const updateChart = () => {
-  if (!chartInstance) return
-  const colors = chartColors.value
-  let markLineData = []
-  if (activeSegmentMode.value !== 'future') {
-    markLineData = [{ yAxis: displayTargetPrice.value }]
-  }
-
-  const option = {
-    backgroundColor: 'transparent',
-    animation: true,
-    animationDuration: 300,
-    animationDurationUpdate: 2000,
-    animationEasingUpdate: 'linear',
-    grid: { left: '2%', right: '15%', top: '15%', bottom: '12%', containLabel: false },
-    xAxis: {
-      type: 'category', data: chartDataX,
-      axisLine: { show: false }, axisTick: { show: false },
-      axisLabel: { show: true, interval: Math.floor(chartDataX.length / 2), color: colors.axisLabel, fontSize: 10 }
-    },
-    yAxis: {
-      type: 'value', position: 'right', scale: true,
-      axisLine: { show: false }, axisTick: { show: false },
-      axisLabel: { formatter: (v) => '$' + v.toFixed(2), color: colors.axisLabel, fontSize: 10 },
-      splitLine: { lineStyle: { color: colors.splitLine } }
-    },
-    series: [
-      {
-        name: 'PriceLine', type: 'line', data: chartDataY,
-        smooth: 0.3, symbol: 'none',
-        lineStyle: { width: 3, color: colors.primary },
-        markLine: {
-          symbol: ['none', 'none'], label: { show: false },
-          data: markLineData,
-          lineStyle: { type: 'dashed', color: '#888', width: 1, opacity: 0.6 }
-        }
-      }
-    ]
-  }
-
-  if (activeSegmentMode.value !== 'past') {
-    option.series.push({
-      name: 'PulseDot', type: 'effectScatter', coordinateSystem: 'cartesian2d',
-      data: [[chartDataX[chartDataX.length - 1], chartDataY[chartDataY.length - 1]]],
-      symbolSize: 8, showEffectOn: 'render',
-      rippleEffect: { period: 2, scale: 3, brushType: 'fill' },
-      itemStyle: { color: colors.primary, shadowBlur: 10, shadowColor: colors.primary },
-      zlevel: 1
-    })
-  }
-  chartInstance.setOption(option, false)
-}
-
-let wsInterval = null
-const startWebSocketMock = () => {
-  wsInterval = setInterval(() => {
-    if (activeSegmentMode.value !== 'past') {
-      const newPrice = livePrice.value + (Math.random() - 0.48) * 0.3
-      livePrice.value = newPrice
-      const d = new Date(lastGenTime)
-      const newTimeStr = `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`
-      chartDataX.push(newTimeStr)
-      chartDataY.push(newPrice)
-      if (chartDataX.length > 50) {
-        chartDataX.shift()
-        chartDataY.shift()
-      }
-      lastGenTime += 2000
-      updateChart()
-    }
-  }, 2000)
-}
-
-// --- 🔥 事件交互：管理左侧历史标签的挂载与销毁 🔥 ---
-const selectPastRecord = (record) => {
-  activeSegmentMode.value = 'past'
-  selectedPastRecord.value = record // 记录存在，模板 v-if 满足，在最左侧挂载该标签
-  generateMockData()
-  updateChart()
-}
-
-const selectLiveSegment = () => {
-  activeSegmentMode.value = 'live'
-  selectedPastRecord.value = null // 清除记录，模板 v-if 不满足，历史标签销毁！
-  selectedFutureId.value = null
-  generateMockData()
-  updateChart()
-}
-
-const selectFutureSegment = (ft) => {
-  activeSegmentMode.value = 'future'
-  selectedFutureId.value = ft.id
-  selectedPastRecord.value = null // 同理销毁
-  generateMockData()
-  updateChart()
-}
-
-watch(() => themeStore.isDark, () => updateChart())
-
-onMounted(() => {
-  startCountDown()
-  generateMockData()
-  nextTick(() => {
-    chartInstance = echarts.init(chartRef.value)
-    updateChart()
-    startWebSocketMock()
-  })
-  window.addEventListener('resize', () => chartInstance?.resize())
-})
-onUnmounted(() => {
-  clearInterval(timerInterval)
-  clearInterval(wsInterval)
-  chartInstance?.dispose()
-})
-</script>
+<script src="./index.js"></script>
 
 <style scoped lang="scss">
 $hot-pink: var(--text-color-n);
@@ -619,6 +934,7 @@ $primary-blue: #5073e5;
 }
 
 .top-btn {
+  width: 24px;
   background: transparent;
   border: none;
   padding: 4px;
@@ -627,13 +943,18 @@ $primary-blue: #5073e5;
   justify-content: center;
   color: inherit;
   cursor: pointer;
+  transition: color 0.3s;
+}
+
+.bookmark-btn.active {
+  color: var(--text-color-y);
 }
 
 .top-right {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 8px;
+  // gap: 8px;
 }
 
 .back-btn .el-icon {
@@ -707,18 +1028,26 @@ $primary-blue: #5073e5;
   .asset-logo {
     width: 44px;
     height: 44px;
-    background: $primary-blue;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
+    // background: $primary-blue;
+    // border-radius: 12px;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+    // flex-shrink: 0;
+    // transition: all 0.3s ease;
   }
 
   .asset-text {
     flex: 1;
     min-width: 0;
+  }
+
+  .asset-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+    display: block;
   }
 
   .asset-text h2 {
@@ -727,7 +1056,35 @@ $primary-blue: #5073e5;
     margin: 0;
     line-height: 1.3;
     color: var(--bg-opposite);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     transition: font-size 0.3s ease;
+  }
+
+  .asset-time-range {
+    margin: 6px 0 0;
+    color: var(--text-dark-gray);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .baopei-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 600;
+    color: #000;
+    background: linear-gradient(
+      90deg,
+      rgb(62, 195, 197) 0%,
+      rgb(153, 89, 189) 100%
+    );
+    white-space: nowrap;
   }
 
   .timer {
@@ -745,7 +1102,7 @@ $primary-blue: #5073e5;
     .unit {
       font-size: 20px;
       font-weight: 700;
-      color: #888;
+      color: #f6465d;
       line-height: 1;
       transition: font-size 0.3s ease;
     }
@@ -789,7 +1146,9 @@ $primary-blue: #5073e5;
 
 .fast-roll-enter-active,
 .fast-roll-leave-active {
-  transition: transform 0.25s cubic-bezier(0.33, 1, 0.68, 1), opacity 0.2s linear;
+  transition:
+    transform 0.25s cubic-bezier(0.33, 1, 0.68, 1),
+    opacity 0.2s linear;
 }
 
 .fast-roll-enter-from {
@@ -848,7 +1207,7 @@ $primary-blue: #5073e5;
 
     &.current .label,
     &.current .value {
-      color: $primary-blue;
+      color: var(--text-color-y);
     }
   }
 }
@@ -861,13 +1220,73 @@ $primary-blue: #5073e5;
   position: relative;
   height: 220px;
   background: transparent;
-  border-bottom: 1px solid var(--border-color);
 
   .main-chart {
     width: 100%;
     height: 100%;
     -webkit-tap-highlight-color: transparent;
   }
+}
+
+/* ── 图表拖拽探索浮窗 ── */
+.chart-drag-tooltip {
+  position: absolute;
+  z-index: 10;
+  background: var(--bg-page, rgba(20, 24, 30, 0.92));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+  border-radius: 10px;
+  padding: 10px 14px;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  min-width: 120px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+
+  .cdt-time {
+    font-size: 11px;
+    color: var(--text-dark-gray, #888);
+    margin-bottom: 6px;
+    white-space: nowrap;
+  }
+
+  .cdt-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .cdt-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .cdt-name {
+    font-size: 12px;
+    color: var(--text-dark-gray, #888);
+    min-width: 30px;
+  }
+
+  .cdt-price {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bg-opposite, #fff);
+    margin-left: auto;
+  }
+}
+
+.cdt-enter-active,
+.cdt-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.cdt-enter-from,
+.cdt-leave-to {
+  opacity: 0;
+  transform: translateY(-4px) scale(0.97);
 }
 
 .svg-icon-wrapper {
@@ -972,7 +1391,6 @@ $primary-blue: #5073e5;
         background: var(--bg-page);
         color: var(--bg-opposite);
       }
-
     }
   }
 }
@@ -997,7 +1415,7 @@ $primary-blue: #5073e5;
 
 .business-tabs {
   display: flex;
-  gap: 50px;
+  gap: 24px;
   border-bottom: 1px solid var(--border-color);
   margin-bottom: 24px;
   padding-bottom: 0;
@@ -1014,7 +1432,7 @@ $primary-blue: #5073e5;
       color: var(--bg-opposite);
 
       &::after {
-        content: '';
+        content: "";
         position: absolute;
         bottom: -1px;
         left: 0;
@@ -1053,6 +1471,12 @@ $primary-blue: #5073e5;
   }
 }
 
+/* 订单列表：超过 10 条时出现滚动条 */
+.orders-list {
+  max-height: 520px;
+  overflow-y: auto;
+}
+
 .order-row {
   display: flex;
   align-items: center;
@@ -1075,7 +1499,7 @@ $primary-blue: #5073e5;
   .order-chip {
     display: inline-block;
     padding: 4px 10px;
-    border-radius: 999px;
+    border-radius: 4px;
     background: var(--button-bg-n);
     color: var(--text-color-n);
     font-size: 12px;
@@ -1109,7 +1533,7 @@ $primary-blue: #5073e5;
   }
 
   /* stacked progress block on right */
-  .order-right>div {
+  .order-right > div {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
@@ -1117,14 +1541,20 @@ $primary-blue: #5073e5;
     margin-right: 6px;
   }
 
+  .loading-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .order-chip.up {
-    background: $neon-green;
-    color: #000;
+    background: var(--button-bg-y);
+    color: var(--text-color-y);
   }
 
   .order-chip.down {
-    background: $hot-pink;
-    color: #fff;
+    background: var(--button-bg-n);
+    color: var(--text-color-n);
   }
 
   .order-chip .chip-price,
@@ -1138,7 +1568,7 @@ $primary-blue: #5073e5;
     opacity: 0.9;
   }
 
-  // History 方向高亮颜色（只给 Up/Down 文案上色）
+  // History 方向高亮颜色（只给 Yes/No 文案上色）
   .history-side.up {
     color: $neon-green;
   }
@@ -1146,7 +1576,6 @@ $primary-blue: #5073e5;
   .history-side.down {
     color: $hot-pink;
   }
-
 }
 
 .orders-empty {
@@ -1154,6 +1583,12 @@ $primary-blue: #5073e5;
   font-size: 13px;
   color: var(--text-dark-gray);
   padding: 24px 0;
+}
+
+/* 历史列表：超过 10 条时出现滚动条 */
+.history-list {
+  max-height: 560px;
+  overflow-y: auto;
 }
 
 .history-header {
@@ -1202,11 +1637,35 @@ $primary-blue: #5073e5;
 }
 
 .pos-card {
-  .pos-title {
-    font-size: 20px;
-    font-weight: 600;
-    margin: 0 0 16px 0;
-    color: var(--bg-opposite);
+  margin-bottom: 16px;
+  // background: var(--bg-color, #1e1e1e);
+  border: 1px solid var(--border-color, #333);
+  border-radius: 12px;
+  padding: 16px;
+
+  .pos-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .pos-token-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #f7931a;
+  }
+
+  .pos-token-icon-fallback {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: #f7931a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .pos-tag {
@@ -1217,29 +1676,49 @@ $primary-blue: #5073e5;
     border-radius: 6px;
     font-size: 13px;
     font-weight: 600;
-    margin-bottom: 24px;
+
+    &.up {
+      background: rgba(187, 255, 46, 0.15);
+      color: var(--text-color-y);
+    }
+
+    &.down {
+      background: rgba(255, 60, 115, 0.15);
+      color: var(--text-color-n);
+    }
   }
 
   .pos-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    margin-bottom: 28px;
+    margin-bottom: 24px;
     gap: 12px;
 
     .grid-item {
+      &:last-child {
+       .g-label{
+        text-align: right;
+       }
+      }
       .g-label {
-        font-size: 14px;
-        color: #666;
+        font-size: 12px;
+        color: #888;
         margin-bottom: 8px;
+        white-space: nowrap;
       }
 
       .g-val {
-        font-size: 18px;
+        font-size: 13px;
         font-weight: 600;
-        color: var(--bg-opposite);
+        color: var(--bg-opposite, #fff);
+        white-space: nowrap;
 
         &.neon {
           color: var(--text-color-y);
+        }
+
+        &.hot-pink {
+          color: var(--text-color-n);
         }
       }
     }
@@ -1247,14 +1726,30 @@ $primary-blue: #5073e5;
 
   .withdraw-hero-btn {
     width: 100%;
-    height: 56px;
+    height: 48px;
     background: var(--text-color-y);
     color: #000;
     border: none;
     border-radius: 14px;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
+
+    &.up {
+      background: var(--text-color-y);
+    }
+
+    &.down {
+      background: var(--text-color-n);
+    }
+
+    &:disabled,
+    &.disabled {
+      background: var(--border-color) !important;
+      color: var(--text-dark-gray) !important;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
   }
 }
 
@@ -1344,6 +1839,16 @@ $primary-blue: #5073e5;
   background: var(--bg-page-h5);
   z-index: 40;
 
+  .event-ended-tip {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-dark-gray);
+    padding: 12px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+  }
+
   .trade-btn {
     flex: 1;
     height: 48px;
@@ -1364,6 +1869,366 @@ $primary-blue: #5073e5;
       border: 1.5px solid var(--text-color-n);
       background: var(--button-bg-n);
     }
+  }
+}
+
+/* 自定义底部弹窗样式 */
+.custom-bottom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.custom-bottom-modal {
+  width: 100%;
+  background: var(--el-bg-color, #1e1e1e);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 24px 20px 32px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+
+  .modal-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--border-color, #444);
+    border-radius: 2px;
+    margin-bottom: 24px;
+    position: absolute;
+    top: 12px;
+  }
+
+  .modal-icon {
+    margin-bottom: 20px;
+    margin-top: 10px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--bg-opposite, #fff);
+    margin-bottom: 12px;
+  }
+
+  .modal-subtitle {
+    font-size: 14px;
+    color: var(--text-dark-gray, #888);
+    margin-bottom: 32px;
+  }
+
+  .modal-actions {
+    width: 100%;
+    display: flex;
+    gap: 16px;
+
+    button {
+      flex: 1;
+      height: 48px;
+      border-radius: 24px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-cancel {
+      background: var(--bg-pn, #2a2a2a);
+      color: var(--bg-opposite, #fff);
+    }
+
+    .btn-confirm {
+      background: var(--text-color-y, #ffd94b);
+      color: #000;
+    }
+  }
+}
+
+.slide-up-modal-enter-active,
+.slide-up-modal-leave-active {
+  transition: opacity 0.3s;
+  .custom-bottom-modal {
+    transition: transform 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+}
+.slide-up-modal-enter-from,
+.slide-up-modal-leave-to {
+  opacity: 0;
+  .custom-bottom-modal {
+    transform: translateY(100%);
+  }
+}
+
+.share-modal {
+  padding: 0 16px 24px;
+}
+
+.share-header {
+  margin-bottom: 20px;
+  width: 100%;
+  text-align: left;
+  margin-top: 10px;
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--bg-opposite);
+    margin: 0;
+  }
+}
+
+.share-card {
+  width: 100%;
+  background: var(--bg-page);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+  box-sizing: border-box;
+
+  .share-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #f3a228;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .share-card-info {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+
+    .share-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--bg-opposite);
+      margin-bottom: 4px;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+
+    .share-card-subtitle {
+      font-size: 12px;
+      color: var(--text-dark-gray);
+    }
+  }
+}
+
+.share-copy-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: 24px;
+  background: var(--text-color-y, #ffd94b);
+  color: #000;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+/* --------------------------
+   持仓分享弹窗专用样式
+-------------------------- */
+.position-share-modal {
+  padding: 0 16px 24px;
+  background: var(--el-bg-color, #111);
+}
+
+.position-share-card-container {
+  width: 100%;
+  background: #000;
+  border-radius: 12px;
+  padding: 19px 8px 18px 17px;
+  box-sizing: border-box;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--bg-color);
+
+  .share-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    .share-logo-box {
+      .share-logo-img {
+        height: 16px;
+        object-fit: contain;
+      }
+    }
+
+    .share-user-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-right:9px;
+      .share-avatar {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .share-address {
+        font-size: 12px;
+        color: #888;
+      }
+    }
+  }
+
+  .share-card-middle {
+    display: flex;
+    justify-content: space-between;
+
+    .share-profit-info {
+      flex: 1;
+
+      .share-roi {
+        font-size: 32px;
+        font-weight: bold;
+        line-height: 1.1;
+        margin-bottom: 8px;
+        &.neon { color: var(--text-color-y, #ffd94b); }
+        &.hot-pink { color: var(--text-color-n, #ff3366); }
+      }
+
+      .share-profit-val {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 22px;
+        &.neon { color: var(--text-color-y, #ffd94b); }
+        &.hot-pink { color: var(--text-color-n, #ff3366); }
+        .share-profit-val-unit{
+          color:var(--bg-opposite)
+        }
+      }
+
+      .share-event-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .share-asset-logo {
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          background: #f3a228;
+          object-fit: cover;
+        }
+
+        .share-event-text {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+
+          .share-event-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+          }
+
+          .share-event-subtitle {
+            font-size: 12px;
+            color: #888;
+          }
+        }
+      }
+    }
+
+    .share-coin-img-box {
+      width: 120px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      .share-coin-img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+      }
+    }
+  }
+
+  .share-card-bottom {
+    // border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-right:7px;
+    .share-price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+
+      .share-price-label {
+        color: #888;
+      }
+
+      .share-price-val {
+        color: #fff;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.share-actions {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+
+  button {
+    flex: 1;
+    height: 48px;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .share-copy-btn-new {
+    background: #fff;
+    color: #000;
+  }
+
+  .share-image-btn {
+    background: var(--text-color-y, #ffd94b);
+    color: #000;
   }
 }
 </style>

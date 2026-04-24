@@ -10,14 +10,18 @@
                     <input v-model="searchQuery" type="text" class="search-input"
                         :placeholder="$t('searchPage.searchPlaceholder')" @keyup.enter="handleSearch"
                         @input="handleSearchInput" />
+                    <el-icon v-if="showClear" class="close-icon" @click="clearSearch">
+                        <Close />
+                    </el-icon>
                 </div>
             </div>
 
             <!-- 浏览部分 -->
-            <div class="browse-section">
+            <div v-if="!searchQuery.trim()" class="browse-section">
                 <h3 class="section-title">{{ $t('searchPage.browse') }}</h3>
                 <div class="browse-buttons">
-                    <button v-for="item in browseItems" :key="item.key" class="browse-btn">
+                    <button v-for="item in browseItems" :key="item.key" class="browse-btn"
+                        @click="handleBrowseClick(item)">
                         <el-icon class="browse-icon">
 
                             <!-- 渲染内联 SVG 图标 -->
@@ -70,10 +74,11 @@
             </div>
 
             <!-- 主题部分 -->
-            <div class="themes-section">
+            <div v-if="!searchQuery.trim()" class="themes-section">
                 <h3 class="section-title">{{ $t('searchPage.themes') }}</h3>
                 <div class="themes-grid">
-                    <button v-for="theme in themeItems" :key="theme.key" class="theme-btn">
+                    <button v-for="theme in themeItems" :key="theme.key" class="theme-btn"
+                        @click="handleThemeClick(theme)">
                         <div class="theme-thumbnail">
                             <img :src="theme.thumbnail" :alt="theme.label" />
                         </div>
@@ -81,110 +86,250 @@
                     </button>
                 </div>
             </div>
+
+            <!-- 搜索结果列表 -->
+            <div v-if="searchQuery.trim()" class="search-results">
+                <div v-if="loading" class="list-loading">{{ $t('common.loading') }}</div>
+                <div v-else-if="!results.length" class="list-empty">{{ $t('common.noData') }}</div>
+                <div v-else class="results-list">
+                    <div v-for="(item, index) in results" :key="index" class="result-item"
+                        @click="navigateToDetail(item)">
+                        <div class="result-left">
+                            <img :src="item.avatar" class="result-avatar"
+                                @error="(e) => (e.target.src = fallbackListImg)" />
+                            <div class="result-title">{{ item.title }}</div>
+                        </div>
+                        <div class="result-right">
+                            <span class="result-percentage">{{ item.percentage }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { Search } from '@element-plus/icons-vue'
+import { Search, Avatar } from '@element-plus/icons-vue'
 import si1 from '@/assets/images/searchIcon01.png'
 import si2 from '@/assets/images/searchIcon02.png'
 import si3 from '@/assets/images/searchIcon03.png'
 import si4 from '@/assets/images/searchIcon04.png'
+import { getEventList } from '@/api/APIEvent'
+import fallbackListImg from '@/assets/images/searchIcon01.png'
+import { useAccount } from '@wagmi/vue'
+import { ElMessage } from 'element-plus'
+import { isTradeBlockedForEvent } from '@/utils/blockedTradeEventGuids'
 
 const router = useRouter()
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const { address } = useAccount()
 
 // 搜索关键词
 const searchQuery = ref('')
+const loading = ref(false)
+const results = ref([])
+
+// 搜索框右侧图标（清除或搜索）
+const showClear = computed(() => searchQuery.value.length > 0)
+const clearSearch = () => {
+    searchQuery.value = ''
+    results.value = []
+}
 
 // 浏览部分数据
 const browseItems = computed(() => [
-    {
-        key: 'latest',
-        label: t('searchPage.browseItems.latest'),
-        icon: 'latest'
-    },
-    {
-        key: 'trends',
-        label: t('searchPage.browseItems.trends'),
-        icon: 'trends'
-    },
-    {
-        key: 'popular',
-        label: t('searchPage.browseItems.popular'),
-        icon: 'popular'
-    },
-    {
-        key: 'liquidity',
-        label: t('searchPage.browseItems.liquidity'),
-        icon: 'liquidity'
-    },
-    {
-        key: 'endingSoon',
-        label: t('searchPage.browseItems.endingSoon'),
-        icon: 'endingSoon'
-    }
+    { key: 'trends', label: t('searchPage.trending'), icon: 'trends' },
+    { key: 'popular', label: t('searchPage.popular'), icon: 'popular' },
+    { key: 'liquidity', label: t('searchPage.liquidity'), icon: 'liquidity' },
+    { key: 'endingSoon', label: t('searchPage.endingSoon'), icon: 'endingSoon' }
 ])
 
 // 主题部分数据
 const themeItems = computed(() => [
-    {
-        key: 'crypto',
-        label: t('searchPage.themeItems.crypto'),
-        thumbnail: si1
-    },
-    {
-        key: 'finance',
-        label: t('searchPage.themeItems.finance'),
-        thumbnail: si2
-    },
-    {
-        key: 'sports',
-        label: t('searchPage.themeItems.sports'),
-        thumbnail: si3
-    },
-    {
-        key: 'esports',
-        label: t('searchPage.themeItems.esports'),
-        thumbnail: si4
-    }
+    { key: 'crypto', label: t('searchPage.crypto'), thumbnail: si1, guid: 'CRYPTO' },
+    { key: 'sports', label: t('searchPage.sports'), thumbnail: si2, guid: 'SPORTS' },
+    { key: 'politics', label: t('searchPage.politics'), thumbnail: si3, guid: 'POLITICS' },
+    { key: 'science', label: t('searchPage.science'), thumbnail: si4, guid: 'TECHNOLOGY' }
 ])
 
 
+// 封装公共的请求和处理逻辑
+const fetchAndSetResults = async (customParams = {}, labelToSet = '') => {
+    loading.value = true
+    try {
+        const lang = locale.value === 'zh-cn' ? 'zh' :
+            locale.value === 'ko-kr' ? 'ko' :
+                locale.value === 'ja-jp' ? 'ja' : 'en'
+
+        const baseParams = {
+            language_label: lang,
+            user_address: address.value || '',
+            page: 1,
+            page_size: 50,
+            include_sub_events: true,
+            ...customParams
+        }
+
+        const res = await getEventList(baseParams)
+        const list = res?.data?.data?.events || res?.data?.events || []
+
+        if (labelToSet) {
+            searchQuery.value = labelToSet
+        }
+
+        results.value = list.map(e => {
+            const subEvents = Array.isArray(e.sub_events) ? e.sub_events : []
+            // 增加可选链判断，防止某些数据缺失导致报错
+            const yesDirection = subEvents[0]?.directions?.find((x) => x.outcome === 'YES')
+            const percentage = yesDirection ? `${yesDirection.chance}%` : '0%'
+
+            return {
+                guid: e.event_guid,
+                title: e.event_title || e.title,
+                avatar: e.logo || fallbackListImg,
+                percentage: percentage
+            }
+        })
+    } catch (error) {
+        console.error('Fetch events failed:', error)
+    } finally {
+        loading.value = false
+    }
+}
+
 // 处理搜索
-const handleSearch = () => {
-    if (!searchQuery.value.trim()) {
+const handleSearch = async () => {
+    const query = searchQuery.value.trim()
+    if (!query) {
+        results.value = []
         return
     }
-    // TODO: 实现搜索逻辑
-    console.log('搜索:', searchQuery.value)
+    await fetchAndSetResults({ search_key: query })
 }
 
 // 处理搜索输入
+let searchTimer = null
 const handleSearchInput = () => {
-    // 可以在这里实现实时搜索建议
+    if (searchTimer) clearTimeout(searchTimer)
+    searchTimer = setTimeout(() => {
+        handleSearch()
+    }, 500)
+}
+
+const handleBrowseClick = async (item) => {
+    const params = {}
+
+    // 根据不同的 key 设置排序
+    if (item.key === 'trends') {
+        params.sort_type = 'trade_volume' // 假设 trade_volume 是 trends/成交量
+    } else if (item.key === 'popular') {
+        params.sort_type = 'popularity' // 假设 popularity 是 popular/热门
+    } else if (item.key === 'liquidity') {
+        params.sort_type = 'liquidity' // 假设 liquidity 是流动性
+    } else if (item.key === 'endingSoon') {
+        params.sort_type = 'open_time' // 假设 open_time 是即将结束
+    }
+
+    await fetchAndSetResults(params, item.label)
+}
+
+const handleThemeClick = async (theme) => {
+    // 根据主题 key 映射 category_code (这里需要根据实际情况配置)
+    await fetchAndSetResults({ category_code: theme.guid }, theme.label)
+}
+
+const navigateToDetail = (item) => {
+    if (isTradeBlockedForEvent(item?.guid)) {
+        ElMessage.warning(t('home.tradeNotOpen') || '暂未开启')
+        return
+    }
+    router.push({
+        path: '/prediction-detail-h5',
+        query: { guid: item.guid }
+    })
 }
 </script>
 
 <style scoped lang="scss">
+/* ... existing code ... */
 .search-page {
-    min-height: calc(100vh - 57px);
-    overflow: hidden;
-    background-color: var(--bg-page-h5, #FCFCFC);
-    color: var(--text-color, #1a1a1a);
-    transition: background-color 0.3s ease, color 0.3s ease;
+    width: 100%;
+    background: var(--bg-page-h5);
+    min-height: 100vh;
     box-sizing: border-box;
+    /* ... existing code ... */
 }
 
 .search-content {
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 20px 10px 0 10px;
+    padding: 20px 0;
+
 }
+
+// 搜索结果
+.search-results {
+    padding: 0 10px;
+}
+
+.result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.05));
+    cursor: pointer;
+
+    &:active {
+        opacity: 0.7;
+    }
+
+    .result-left {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        margin-right: 16px;
+
+        .result-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .result-title {
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.4;
+            color: var(--bg-opposite);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    }
+
+    .result-right {
+        .result-percentage {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--bg-opposite);
+        }
+    }
+}
+
+.list-loading,
+.list-empty {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--text-dark-gray);
+    font-size: 14px;
+}
+
 
 // 搜索栏
 .search-bar-container {
@@ -202,8 +347,8 @@ const handleSearchInput = () => {
     transition: all 0.3s ease;
 
     &:focus-within {
-        border-color: var(--text-color-y, #2EBE69);
-        box-shadow: 0 0 0 3px rgba(46, 190, 105, 0.1);
+        border-color: var(--text-color-y, #ffd94b);
+        box-shadow: 0 0 0 3px var(--theme-accent-outline, rgba(255, 212, 74, 0.12));
     }
 
     .search-icon {

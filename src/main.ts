@@ -9,6 +9,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
 import 'element-plus/theme-chalk/display.css'
 import './styles/global.scss'
+
 import i18n from "./languages"
 // `@coinbase-wallet/sdk` uses `Buffer`
 globalThis.Buffer = Buffer

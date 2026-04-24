@@ -1,22 +1,17 @@
 import { useRouter } from "vue-router";
 import { ref, computed, onMounted } from "vue";
 import { useI18n } from "vue-i18n";
-import distributedNodeImg from "@/assets/icon/DistributedNode.png";
-import distributedNodeImgDark from "@/assets/icon/DistributedNodeDark.png";
-import clusterNodeImgDark from "@/assets/icon/ClusterNode.png";
-import clusterNodeImg from "@/assets/icon/11.png";
-import { useThemeStore } from "@/stores/theme";
 import { useAccount, useChainId } from "@wagmi/vue";
 import { readContract, switchChain } from "@wagmi/core";
 import { ElLoading } from "element-plus";
 import Message from "@/utils/message";
 import nodeManagerABI from "@/assets/abi/nodeManagerABI.json";
 import networks from "@/assets/json/networks.js";
+import nodeIllustration from "@/assets/new_icon/LPVault/lpvault-node-illustration.png";
 import {
   checkAllowance,
   approveToken,
   writeContractOptimized,
-  safeBigInt,
   getUserTokenBalance,
 } from "@/utils/requestWEB3.js";
 import { config } from "../../wagmi.ts";
@@ -26,7 +21,6 @@ import { eventBus } from "@/utils/eventBus";
 export function useComputingPowerServices() {
   const router = useRouter();
   const { t } = useI18n();
-  const { isDark } = useThemeStore();
   const { address } = useAccount();
   const chainId = useChainId();
   // BSC 主网chainId
@@ -74,6 +68,7 @@ export function useComputingPowerServices() {
   };
 
   const showPurchaseNode = ref(false);
+  const showPurchaseSuccess = ref(false);
 
   const purchaseTitle = computed(() =>
     activeNodeTab.value === 0
@@ -92,6 +87,10 @@ export function useComputingPowerServices() {
   const handleBuy = (type) => {
     activeNodeTab.value = type;
     showPurchaseNode.value = true;
+  };
+
+  const handleClosePurchaseSuccess = () => {
+    showPurchaseSuccess.value = false;
   };
 
   // 获取节点价格
@@ -227,6 +226,7 @@ export function useComputingPowerServices() {
       });
 
       showPurchaseNode.value = false;
+      showPurchaseSuccess.value = true;
       await fetchNodeProducts();
     } catch (error) {
       // 可选：根据错误类型提示
@@ -270,15 +270,7 @@ export function useComputingPowerServices() {
         return {
           id: item.id,
           type: rawNodeType, // 0: 分布节点, 1: 集群节点
-          icon:
-            item.icon ||
-            (isDistributed
-              ? isDark.value
-                ? distributedNodeImgDark
-                : distributedNodeImg
-              : isDark.value
-                ? clusterNodeImgDark
-                : clusterNodeImg),
+          icon: nodeIllustration,
           title:
             item.name ||
             (isDistributed
@@ -308,9 +300,7 @@ export function useComputingPowerServices() {
   });
 
   // 保留当前选中节点图（弹窗可能复用）
-  const currentNodeImg = computed(() =>
-    activeNodeTab.value === 0 ? distributedNodeImg : clusterNodeImg,
-  );
+  const currentNodeImg = computed(() => nodeIllustration);
 
   // 判断单个节点的按钮是否可点击
   // 规则：
@@ -345,12 +335,12 @@ export function useComputingPowerServices() {
   const getButtonText = (nodeType) => {
     const node = nodeProducts.value.find((n) => n.type === nodeType);
     if (!node) {
-      return t("computingPower.sellEnd");
+      return t("computingPower.buyButton");
     }
 
     const isActive = node.is_active;
     if (isActive === 1) {
-      return t("computingPower.sellEnd");
+      return t("computingPower.buyNow");
     } else if (isActive === 2) {
       return t("computingPower.activating");
     } else if (isActive === 3) {
@@ -366,6 +356,7 @@ export function useComputingPowerServices() {
     nodeProducts,
     displayNodes,
     showPurchaseNode,
+    showPurchaseSuccess,
     purchaseTitle,
     purchasePrice,
     currentNodeImg,
@@ -375,5 +366,6 @@ export function useComputingPowerServices() {
     handleMyNodes,
     handleBuy,
     handleConfirmBuy,
+    handleClosePurchaseSuccess,
   };
 }

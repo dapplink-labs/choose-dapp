@@ -36,9 +36,16 @@
                 <!-- 底部区域 -->
                 <div class="card-footer">
                     <!-- <p class="footer-note">* {{ $t('collectEarnings.claimNote') || '可领取全部节点收益，也可以选择领取单个节点收益' }}</p> -->
-                    <button class="confirm-btn" @click="handleConfirm">
+                    <PrimaryActionButton
+                        class="confirm-btn"
+                        height="50px"
+                        radius="25px"
+                        font-size="16px"
+                        font-weight="600"
+                        @click="handleConfirm"
+                    >
                         {{ $t('common.confirm') || '确认' }}
-                    </button>
+                    </PrimaryActionButton>
                 </div>
             </div>
         </div>
@@ -47,6 +54,7 @@
 
 <script setup>
 import { ref, watch, onUnmounted } from 'vue'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
 import { formatChoAmount } from '@/utils/format_amount.js'
 
 const props = defineProps({
@@ -277,19 +285,6 @@ onUnmounted(() => {
 
 .confirm-btn {
     width: 100%;
-    height: 50px;
-    background: #a4f128; // Lime green
-    color: #000;
-    border: none;
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s;
-
-    &:active {
-        opacity: 0.9;
-    }
 }
 
 // Animation

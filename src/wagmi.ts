@@ -1,5 +1,4 @@
-import { http, createConfig, createStorage } from '@wagmi/vue'
-import { walletConnect, injected } from '@wagmi/vue/connectors'
+import { http, createConfig } from '@wagmi/vue'
 import { defineChain, fallback } from 'viem'
 
 const bsc = defineChain({
@@ -21,11 +20,29 @@ const bsc = defineChain({
   },
   testnet: false,
 })
-
+const usdt = defineChain({
+  id: 97,
+  name: 'USDT',
+  nativeCurrency: { name: 'USDT', symbol: 'USDT', decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: [
+        'https://go.getblock.io/00384bdf2ed44f53956c987b6866009e'
+      ]
+    }
+  },
+  blockExplorers: {
+    default: {
+      name: 'USDT',
+      url: 'https://bnb-testnet.api.onfinality.io/public',
+    },
+  },
+  testnet: false,
+})
 // ✅ 2. 构建 wagmi config
 // createConfig 用于创建 wagmi 的配置对象
 export const config = createConfig({
-  chains: [bsc],// 配置支持的区块链网络
+  chains: [bsc, usdt],// 配置支持的区块链网络
   // connectors: [
   //   // injected(), // ✅ 添加 injected 连接器支持 MetaMask 等浏览器钱包
   //   walletConnect({// WalletConnect 连接器与injected 连接器类似，允许用户通过 WalletConnect 协议连接他们的移动钱包或其他支持 WalletConnect 的钱包。
@@ -37,7 +54,10 @@ export const config = createConfig({
   transports: {
     [bsc.id]: fallback([
       http('https://go.getblock.asia/8e87ac495a5941ae9dfb9ea6ed9ae7d2')
-    ])
+    ]),
+    [usdt.id]: fallback([
+      http('https://go.getblock.io/00384bdf2ed44f53956c987b6866009e')
+    ]),
   },
 })
 

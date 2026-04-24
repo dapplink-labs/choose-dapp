@@ -201,10 +201,23 @@
         </div>
       </div>
 
-      <button class="claim-all-btn" :class="{ 'claim-all-btn--disabled': isClaimDisabledByTime }"
-        :disabled="isClaimDisabledByTime" @click="openCollectEarnings">
+      <PrimaryActionButton
+        class="claim-all-btn"
+        :class="{ 'claim-all-btn--disabled': isClaimDisabledByTime }"
+        :disabled="isClaimDisabledByTime"
+        height="48px"
+        radius="12px"
+        font-size="16px"
+        font-weight="600"
+        text-color="#0a0a0a"
+        gradient-from="var(--text-color-y)"
+        gradient-to="var(--text-color-y)"
+        disabled-bg="#2f2f2f"
+        disabled-text-color="#7b7b7b"
+        @click="openCollectEarnings"
+      >
         {{ claimButtonText }}
-      </button>
+      </PrimaryActionButton>
     </div>
 
     <!-- 我的团队模块 -->
@@ -323,9 +336,19 @@
           <p class="card-message">
             {{ $t("myIncome.noStakingNodeMessage") }}
           </p>
-          <button class="confirm-btn" @click="handleCloseNoNodeModal">
+          <PrimaryActionButton
+            class="confirm-btn"
+            height="48px"
+            radius="12px"
+            font-size="16px"
+            font-weight="600"
+            text-color="#0a0a0a"
+            gradient-from="var(--text-color-y)"
+            gradient-to="var(--text-color-y)"
+            @click="handleCloseNoNodeModal"
+          >
             {{ $t("common.confirm") }}
-          </button>
+          </PrimaryActionButton>
         </div>
       </div>
     </transition>
@@ -348,6 +371,7 @@ import TabNode from "@/components/TabNode.vue";
 import TeamTree from "@/components/TeamTree.vue";
 import BackHeaderNav from "@/components/BackHeaderNav.vue";
 import ActivationMarquee from "@/components/ActivationMarquee.vue";
+import PrimaryActionButton from "@/components/PrimaryActionButton.vue";
 import {
   getNodeStakingInfo,
   getNodeStakingRecords,
@@ -669,7 +693,7 @@ watch(activeTab, () => {
 <style scoped lang="scss">
 .theme-light {
   .progress-fill {
-    background: linear-gradient(270deg, #BBFF2E 0%, #31D908 100%) !important;
+    background: linear-gradient(270deg, var(--button-gradient-from, #ffd94b) 0%, var(--button-gradient-to, #ffcc1f) 100%) !important;
     // background-color: #2b6c18 !important;
   }
 
@@ -902,7 +926,7 @@ watch(activeTab, () => {
         top: 0;
         left: 0;
         height: 100%;
-        background: linear-gradient(270deg, #BBFF2E 0%, #31D908 100%) !important;
+        background: linear-gradient(270deg, var(--button-gradient-from, #ffd94b) 0%, var(--button-gradient-to, #ffcc1f) 100%) !important;
         border-radius: 10px;
         transition: width 0.3s ease;
       }
@@ -929,7 +953,7 @@ watch(activeTab, () => {
           font-family: PingFang SC, PingFang SC;
           font-weight: 500;
           font-size: 10px;
-          color: #BBFF2E;
+          color: var(--text-color-y, #ffd94b);
           // line-height: 20px;
         }
       }
@@ -1463,26 +1487,7 @@ watch(activeTab, () => {
 
 .confirm-btn {
   width: 100%;
-  height: 48px;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  background: var(--text-color-y);
-  color: #0a0a0a;
   box-shadow: 0 12px 30px rgba(180, 255, 40, 0.28);
-  transition:
-    transform 0.15s ease,
-    opacity 0.2s ease;
-
-  &:active {
-    transform: scale(0.98);
-  }
-
-  &:hover {
-    opacity: 0.9;
-  }
 }
 
 // 弹窗过渡动画

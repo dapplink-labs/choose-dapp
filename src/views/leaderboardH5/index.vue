@@ -504,7 +504,7 @@ onMounted(() => {
     font-family: PingFang SC, PingFang SC;
     font-weight: 600;
     font-size: 16px;
-    color: var(--text-color-y, #BBFF2E);
+    color: var(--text-color-y, #ffd94b);
   }
 }
 </style>

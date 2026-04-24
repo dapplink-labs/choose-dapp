@@ -95,12 +95,22 @@
           <span v-if="!isInsufficient"> {{ $t('bridge.Insufficient') }} </span>
           <span v-else>{{ $t('bridge.Crosschain') }}</span>
         </button> -->
-        <button class="submit-btn" :disabled="address && (!amount || !isInsufficient)" @click="handleSubmitClick">
+        <PrimaryActionButton
+          class="submit-btn"
+          :disabled="address && (!amount || !isInsufficient)"
+          height="48px"
+          radius="999px"
+          font-size="16px"
+          font-weight="500"
+          disabled-bg="#2F2F2F"
+          disabled-text-color="#888888"
+          @click="handleSubmitClick"
+        >
           <span v-if="!address">{{ $t('bridge.connectWallet') }}</span>
           <span v-else-if="!amount">{{ $t('bridge.enterValidAmount') }}</span>
           <span v-else-if="!isInsufficient">{{ $t('bridge.Insufficient') }}</span>
           <span v-else>{{ $t('bridge.Crosschain') }}</span>
-        </button>
+        </PrimaryActionButton>
       </div>
     </div>
 
@@ -160,10 +170,20 @@
         </div>
       </div>
       <!-- 底部按钮 222-->
-      <button class="modal-btn" :disabled="isProcessing" @click="bridgeMethod">
+      <PrimaryActionButton
+        class="modal-btn"
+        :disabled="isProcessing"
+        height="48px"
+        radius="999px"
+        font-size="16px"
+        font-weight="500"
+        disabled-bg="#2F2F2F"
+        disabled-text-color="#888888"
+        @click="bridgeMethod"
+      >
         <img src="@/assets/images/bridge/loading.svg" v-if="isProcessing" alt="">
         <span v-else>{{ $t('bridge.continue') }}</span>
-      </button>
+      </PrimaryActionButton>
     </div>
 
 
@@ -415,6 +435,7 @@ import { config } from '../../wagmi.ts' // 确保路径正确
 
 // 在 script setup 的导入部分添加
 import { bridgeMethodOptimized } from './bridgeCore.js'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
 const pageNumber = ref(1)
 
 const pageSize = ref(5)
@@ -1138,7 +1159,7 @@ function select2(val) {
 
   :deep(.el-pager li.is-active) {
     border-radius: 8px;
-    background: #00CE7A;
+    background: var(--text-color-y, #ffd94b);
     color: #1A1E1D;
     text-align: center;
 
@@ -1231,7 +1252,7 @@ function select2(val) {
         }
 
         .arrow {
-          color: #00CE7A;
+          color: var(--text-color-y, #ffd94b);
           font-size: 14px;
           font-weight: 700;
           display: inline-block;
@@ -1565,7 +1586,7 @@ function select2(val) {
         height: 48px;
         border: none;
         outline: none;
-        background: #00CE7A;
+        background: var(--text-color-y, #ffd94b);
         border-radius: 999px;
         font-size: 16px;
         font-style: normal;
@@ -1637,7 +1658,7 @@ function select2(val) {
               font-weight: 500;
 
               &.success {
-                color: #00CE7A;
+                color: var(--text-color-y, #ffd94b);
               }
 
               &.fail {
@@ -1762,7 +1783,7 @@ function select2(val) {
               font-size: 12px;
 
               &.success {
-                color: #00CE7A;
+                color: var(--text-color-y, #ffd94b);
               }
 
               &.fail {
@@ -1805,8 +1826,8 @@ function select2(val) {
 
   $text-main: #fff;
   $text-secondary: #8E8E92;
-  $primary: #00CE7A;
-  $primary-hover: #00c864;
+  $primary: var(--text-color-y, #ffd94b);
+  $primary-hover: var(--theme-accent-strong, #ffcc1f);
 
   .confirm-modal {
     max-width: 420px;
@@ -1971,30 +1992,16 @@ function select2(val) {
     .modal-btn {
       margin-top: 24px;
       width: 100%;
-      height: 48px;
-      background: $primary;
-      border-radius: 999px;
-      border: none;
-      color: #1A1E1D;
-      font-size: 16px;
-      font-weight: 500;
       letter-spacing: 2px;
-      cursor: pointer;
-      transition: background .18s;
 
       img {
         width: 30px;
         animation: rotate 5s linear infinite;
       }
-
-      &:hover {
-        background: $primary-hover;
+      :deep(&.primary-action-button) {
+        transition: none;
       }
     }
-  }
-
-  .modal-btn:disabled {
-    cursor: not-allowed;
   }
 
 
@@ -2245,7 +2252,7 @@ function select2(val) {
           }
 
           .arrow {
-            color: #00CE7A;
+            color: var(--text-color-y, #ffd94b);
             font-size: 14px;
             font-weight: 700;
             display: inline-block;
@@ -2579,7 +2586,7 @@ function select2(val) {
           height: 48px;
           border: none;
           outline: none;
-          background: #00CE7A;
+          background: var(--text-color-y, #ffd94b);
           border-radius: 999px;
           font-size: 16px;
           font-style: normal;

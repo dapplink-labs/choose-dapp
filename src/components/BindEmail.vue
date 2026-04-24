@@ -23,12 +23,32 @@
 
         <!-- 底部按钮 -->
         <div class="action-row">
-          <button class="btn skip-btn" type="button" @click="handleSkip">
+          <PrimaryActionButton
+            class="btn skip-btn"
+            height="44px"
+            radius="999px"
+            font-size="14px"
+            font-weight="500"
+            text-color="var(--text-color, #000000)"
+            gradient-from="var(--bg-page-h5, #ffffff)"
+            gradient-to="var(--bg-page-h5, #ffffff)"
+            @click="handleSkip"
+          >
             {{ $t('common.skip') }}
-          </button>
-          <button class="btn primary-btn" type="button" @click="handleConfirm">
+          </PrimaryActionButton>
+          <PrimaryActionButton
+            class="btn primary-btn"
+            height="44px"
+            radius="999px"
+            font-size="14px"
+            font-weight="500"
+            text-color="var(--bg-page-h5, #ffffff)"
+            gradient-from="var(--bg-opposite, #000000)"
+            gradient-to="var(--bg-opposite, #000000)"
+            @click="handleConfirm"
+          >
             {{ $t('common.continue') }}
-          </button>
+          </PrimaryActionButton>
         </div>
       </div>
     </div>
@@ -38,6 +58,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
 
 const { t } = useI18n()
 
@@ -166,24 +187,14 @@ const handleConfirm = () => {
 
 .btn {
   flex: 1;
-  height: 44px;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  border: 1px solid transparent;
 }
 
 .skip-btn {
-  background-color: var(--bg-page-h5, #ffffff);
   border-color: var(--border-color, #E0E0E0);
-  color: var(--text-color, #000000);
+  box-shadow: inset 0 0 0 1px var(--border-color, #E0E0E0);
 }
 
-.primary-btn {
-  background-color: var(--bg-opposite, #ffffff);
-  color: var();
-}
+.primary-btn {}
 
 .fade-enter-active,
 .fade-leave-active {
@@ -195,4 +206,3 @@ const handleConfirm = () => {
   opacity: 0;
 }
 </style>
-

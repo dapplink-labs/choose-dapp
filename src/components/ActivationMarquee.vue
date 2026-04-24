@@ -319,7 +319,7 @@ onMounted(() => {
 
   .amount-text {
     margin-left: 8px;
-    color: #2EBE69;
+    color: var(--text-color-y, #ffd94b);
     font-weight: 700;
     font-size: 14px;
     white-space: nowrap;

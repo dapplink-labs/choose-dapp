@@ -14,13 +14,25 @@
             <span class="earnings-label">{{ $t('purchaseNode.nodeType') }}</span>
             <span class="earnings-value">{{ title }}</span>
           </div>
-          <div class="earnings-item">
+        <div class="earnings-item">
             <span class="earnings-label">{{ $t('purchaseNode.nodePrice') }}</span>
             <span class="earnings-value">{{ price }} U</span>
           </div>
         </div>
         <!-- 购买按钮 -->
-        <button class="buy-btn" @click="handleBuy">{{ $t('purchaseNode.buyBtn') }}</button>
+        <PrimaryActionButton
+          class="buy-btn"
+          height="48px"
+          radius="12px"
+          font-size="16px"
+          font-weight="600"
+          text-color="var(--bg-page-h5, #ffffff)"
+          gradient-from="var(--bg-opposite, #000000)"
+          gradient-to="var(--bg-opposite, #000000)"
+          @click="handleBuy"
+        >
+          {{ $t('purchaseNode.buyBtn') }}
+        </PrimaryActionButton>
       </div>
     </div>
   </transition>
@@ -30,6 +42,7 @@
 import { defineProps, defineEmits, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useThemeStore } from '@/stores/theme'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
 
 const { t } = useI18n()
 const themeStore = useThemeStore()
@@ -120,19 +133,6 @@ const handleBuy = () => {
 
 .buy-btn {
   width: 100%;
-  height: 48px;
-  border: none;
-  border-radius: 12px;
-  background-color: var(--bg-opposite, #000000);
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--bg-page-h5, #ffffff);
-  cursor: pointer;
-  transition: opacity 0.2s, background-color 0.3s ease, color 0.3s ease;
-
-  &:active {
-    opacity: 0.8;
-  }
 }
 
 // 底部弹窗动画

@@ -48,7 +48,7 @@
                 <span v-if="item.isUnread" class="unread-dot"></span>
               </div>
             </div>
-            <p class="message-desc">{{ item.description }}</p>
+            <p class="message-desc" v-html="item.description"></p>
           </div>
         </div>
       </template>
@@ -61,115 +61,66 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
+import { getAnnouncementList } from '@/api/APIEvent'
+import { useAccount } from '@wagmi/vue'
 
 const router = useRouter()
-const activeTab = ref('all')
+const { address } = useAccount()
+const activeTab = ref('announcement')
 
 const tabs = [
-  { key: 'all', label: '全部' },
+  // { key: 'all', label: '全部' },
   { key: 'announcement', label: '系统公告' },
-  { key: 'prediction', label: '预测' },
-  { key: 'staking', label: '质押' }
+  // { key: 'prediction', label: '预测' },
+  // { key: 'staking', label: '质押' }
 ]
 
-/** 消息跳转类型：deposit_success 充币成功页，withdraw_success 提币成功页，detail 消息详情页 */
-const messages = ref([
-  {
-    id: '1',
-    type: 'transaction',
-    messageAction: 'deposit_success',
-    title: '充币到账',
-    description: '您的 100 USDT充币已于 2026/02/06 上午11:23:09 (UTC+8) 到账。',
-    time: '12:12',
-    isUnread: true,
-    category: 'announcement',
-    amount: '100',
-    currency: 'USDT'
-  },
-  {
-    id: '2',
-    type: 'transaction',
-    messageAction: 'deposit_success',
-    title: '充币到账',
-    description: '您的 100 USDT充币已于 2026/02/06 上午11:23:09 (UTC+8) 到账。',
-    time: '12:10',
-    isUnread: true,
-    category: 'announcement',
-    amount: '100',
-    currency: 'USDT'
-  },
-  {
-    id: '3',
-    type: 'transaction',
-    messageAction: 'withdraw_success',
-    title: '提币成功',
-    description: '您的 50 USDT 提币已成功转出。',
-    time: '12:08',
-    isUnread: true,
-    category: 'announcement',
-    amount: '50',
-    currency: 'USDT'
-  },
-  {
-    id: '4',
-    type: 'system',
-    messageAction: 'detail',
-    title: '节点售卖即将下线',
-    description: '节点售卖功能将在2026/02/07 下午11:59:59 (UTC+8) 准时下线。',
-    time: '11:45',
-    isUnread: false,
-    category: 'announcement'
-  },
-  {
-    id: '5',
-    type: 'system',
-    messageAction: 'detail',
-    title: '质押功能即将开启',
-    description: '节点质押功能将在2026/02/05 下午04:00:00 (UTC+8) 准时上线。',
-    time: '10:12',
-    isUnread: false,
-    category: 'staking'
-  },
-  {
-    id: '6',
-    type: 'transaction',
-    messageAction: 'detail',
-    title: 'Bitcoin Up or Down',
-    description: 'Bitcoin Up or Down - February 5, 5:30AM - 5:45 AM UTC+8\n10.00 shares @ 18.0¢ (10.00/10)',
-    time: '09:19',
-    isUnread: false,
-    category: 'prediction'
-  },
-  {
-    isDateSeparator: true,
-    date: '2026年2月8日'
-  },
-  {
-    id: '7',
-    type: 'transaction',
-    messageAction: 'detail',
-    title: 'Bitcoin Up or Down',
-    description: 'Bitcoin Up or Down - February 5, 5:30AM - 5:45 AM UTC+8\n10.00 shares @ 18.0¢ (10.00/10)',
-    time: '09:19',
-    isUnread: false,
-    category: 'prediction'
-  },
-  {
-    id: '8',
-    type: 'system',
-    messageAction: 'detail',
-    title: '节点质押成功',
-    description: '您已成功参与 验证节点T3 质押。',
-    time: '11:45',
-    isUnread: false,
-    category: 'staking'
+const messages = ref([])
+const loading = ref(false)
+const language = ref(localStorage.getItem('app-locale') || 'en')
+
+const fetchMessages = async () => {
+  loading.value = true
+  try {
+    const res = await getAnnouncementList({
+      language: language.value,
+      page: 1,
+      page_size: 100,
+      user_address: address.value || ''
+    })
+    
+    if (res?.data?.code === 2000 && res.data.data?.list) {
+      messages.value = res.data.data.list.map(item => ({
+        id: item.guid,
+        type: 'system',
+        messageAction: 'detail',
+        title: item.title,
+        description: item.summary,
+        time: item.created_at,
+        isUnread: !item.is_read,
+        category: 'announcement'
+      }))
+    }
+  } catch (error) {
+    console.error('Failed to fetch messages:', error)
+  } finally {
+    loading.value = false
   }
-])
+}
+
+onMounted(() => {
+  fetchMessages()
+})
+
+watch(address, () => {
+  fetchMessages()
+})
 
 const filteredMessages = computed(() => {
+
   return messages.value.filter(msg => {
     if (msg.isDateSeparator) return true
     if (activeTab.value === 'all') return true

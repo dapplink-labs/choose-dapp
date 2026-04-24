@@ -72,9 +72,17 @@
     </div>
 
     <div class="disconnect-wrap">
-      <button class="disconnect-btn" @click="handleDisconnect">
+      <PrimaryActionButton
+        class="disconnect-btn"
+        height="64px"
+        radius="18px"
+        font-size="18px"
+        letter-spacing="0.02em"
+        text-color="#141414"
+        @click="handleDisconnect"
+      >
         {{ $t('link.exit') }}
-      </button>
+      </PrimaryActionButton>
     </div>
 
     <ShareInvitationCode v-model="showShareModal" />
@@ -87,6 +95,7 @@ import { useRouter } from 'vue-router'
 import { useAccount, useDisconnect } from '@wagmi/vue'
 import { useI18n } from 'vue-i18n'
 import Message from '@/utils/message'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
 import ShareInvitationCode from '@/components/ShareInvitationCode.vue'
 import { readContract } from '@wagmi/core'
 import { config } from '@/wagmi.ts'
@@ -131,6 +140,12 @@ const verificationBadge = computed(() => getIcon('personal-center-verified-badge
 
 const ecosystemItems = computed(() => [
   {
+    key: 'node-purchase',
+    label: t('userInfo.stakingPool'),
+    icon: getIcon('personal-center-my-staking'),
+    path: '/computing-power-services',
+  },
+  {
     key: 'my-earnings',
     label: t('userInfo.myEarnings'),
     icon: getIcon('personal-center-my-earnings'),
@@ -147,12 +162,6 @@ const ecosystemItems = computed(() => [
     label: t('userInfo.onChainData'),
     icon: getIcon('personal-center-on-chain-data'),
     path: '/dashboard',
-  },
-  {
-    key: 'prediction-market',
-    label: t('userInfo.predictionMarket'),
-    icon: getIcon('personal-center-prediction-market'),
-    path: '/create',
   },
   {
     key: 'assets',
@@ -386,6 +395,7 @@ const socialLinks = computed(() => [
 ])
 
 const allowedPaths = [
+  '/computing-power-services',
   '/my-earnings',
   '/LPVault',
   '/dashboard',
@@ -554,7 +564,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding-top: 32px;
+  padding-top: 16px;
 }
 
 .icon-button {
@@ -654,16 +664,5 @@ onMounted(() => {
   margin-top: 28px;
 }
 
-.disconnect-btn {
-  width: 100%;
-  height: 64px;
-  border: none;
-  border-radius: 18px;
-  background: linear-gradient(180deg, #ffd94b 0%, #ffcc1f 100%);
-  color: #141414;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-}
+.disconnect-btn {}
 </style>

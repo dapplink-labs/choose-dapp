@@ -177,7 +177,7 @@ import {
   computed,
 } from "vue";
 import { useChainId, useConnect, useDisconnect, useAccount } from "@wagmi/vue";
-import { injected } from '@wagmi/vue/connectors';
+import { injected } from '@wagmi/core';
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { JsonRpcProvider, formatEther } from 'ethers'

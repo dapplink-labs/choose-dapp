@@ -1,6 +1,17 @@
 /* 默认主题变量定义（亮色主题） */
 :root,
 .theme-light {
+  --theme-accent: #ffd94b;
+  --theme-accent-strong: #ffcc1f;
+  --theme-accent-soft: rgba(255, 212, 74, 0.18);
+  --theme-accent-border: rgba(255, 212, 74, 0.42);
+  --theme-accent-press: rgba(255, 212, 74, 0.3);
+  --theme-accent-outline: rgba(255, 212, 74, 0.12);
+  --button-gradient-from: var(--theme-accent);
+  --button-gradient-to: var(--theme-accent-strong);
+  --button-text-color: #121212;
+  --button-disabled-bg: #d9dde5;
+  --button-disabled-text-color: #8c96a8;
   --bg-color-010101: #ffffff;
   --bg-color   : #ffffff;
   --text-color : #1a1a1a;
@@ -20,21 +31,32 @@
   --el-menu-border-color:none;
   --el-menu-text-color:#000;
   --el-menu-bg-color:#151517;
-  --el-menu-active-color:#00CE7A;
+  --el-menu-active-color:var(--theme-accent);
   --el-border-color-light:none;
   --bg-pn:#FAFAFA;
-  --bg-current-user:#E8F5E9;
-  --bg-current-user-border:#C8E6C9;
+  --bg-current-user:rgba(255, 212, 74, 0.14);
+  --bg-current-user-border:rgba(255, 212, 74, 0.34);
   --bg-dashboard:#FFFFFF;
   --text-color-F4: #444444;
-  --text-color-y: #2EBE69;
+  --text-color-y: var(--theme-accent);
   --text-color-n: #E44096;
-  --button-bg-y: rgba(47, 188, 135, 0.2);
+  --button-bg-y: var(--theme-accent-soft);
   --button-bg-n: rgba(228, 64, 150, 0.2);
 }
 
 /* 暗黑主题 */
 .theme-dark {
+  --theme-accent: #ffd94b;
+  --theme-accent-strong: #ffcc1f;
+  --theme-accent-soft: rgba(255, 212, 74, 0.18);
+  --theme-accent-border: rgba(255, 212, 74, 0.42);
+  --theme-accent-press: rgba(255, 212, 74, 0.3);
+  --theme-accent-outline: rgba(255, 212, 74, 0.12);
+  --button-gradient-from: var(--theme-accent);
+  --button-gradient-to: var(--theme-accent-strong);
+  --button-text-color: #121212;
+  --button-disabled-bg: #565d68;
+  --button-disabled-text-color: #9aa3b2;
   --bg-color-010101: #010101;
   --bg-color   : #1e1e1e;
   --text-color : #f2f2f2;
@@ -54,16 +76,16 @@
   --el-menu-border-color:none;
   --el-menu-text-color:#fff;
   --el-menu-bg-color:#151517;
-  --el-menu-active-color:#00CE7A;
+  --el-menu-active-color:var(--theme-accent);
   --el-border-color-light:none;
   --bg-pn:#262626;
-  --bg-current-user:rgba(17, 95, 198, 0.3);
-  --bg-current-user-border:rgba(17, 95, 198, 0.6);
+  --bg-current-user:rgba(255, 212, 74, 0.14);
+  --bg-current-user-border:rgba(255, 212, 74, 0.3);
   --bg-dashboard:#000000;
   --text-color-F4: #F4F4F4;
-  --text-color-y: #BBFF2E;
+  --text-color-y: var(--theme-accent);
   --text-color-n: #E44096;
-  --button-bg-y: rgba(188, 255, 51, 0.2);
+  --button-bg-y: var(--theme-accent-soft);
   --button-bg-n: rgba(226, 56, 145, 0.2);
 }
 

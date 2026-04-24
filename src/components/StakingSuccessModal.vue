@@ -4,7 +4,7 @@
       <div class="modal-header">
         <img class="confetti-bg" src="@/assets/images/mask/model-bg.png" alt="background" />
         <div class="icon-wrapper">
-          <el-icon class="success-icon" :size="40" color="#BBFF2E"><Check /></el-icon>
+          <el-icon class="success-icon" :size="40" color="var(--text-color-y, #ffd94b)"><Check /></el-icon>
         </div>
       </div>
       
@@ -15,9 +15,19 @@
           <span class="badge-value">{{ nodeLevel }}</span>
         </div>
         
-        <button class="confirm-btn" @click="handleClose">
+        <PrimaryActionButton
+          class="confirm-btn"
+          height="48px"
+          radius="12px"
+          font-size="16px"
+          font-weight="600"
+          text-color="#000000"
+          gradient-from="#ffffff"
+          gradient-to="#ffffff"
+          @click="handleClose"
+        >
           {{ $t('lpVault.confirm') }}
-        </button>
+        </PrimaryActionButton>
         
         <p class="footer-note">
           * {{ $t('lpVault.rewardsDistributionNote') }}
@@ -29,7 +39,8 @@
 
 <script setup>
 import { defineProps, defineEmits } from 'vue'
-import { Select } from '@element-plus/icons-vue'
+import { Check } from '@element-plus/icons-vue'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
 
 const props = defineProps({
   visible: {
@@ -110,13 +121,13 @@ const handleClose = () => {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 3px solid #BBFF2E;
+    border: 3px solid var(--text-color-y, #ffd94b);
     background: transparent;
     margin-top: 20px;
   }
   
   .success-icon {
-    color: #BBFF2E;
+    color: var(--text-color-y, #ffd94b);
   }
 }
 
@@ -160,21 +171,7 @@ const handleClose = () => {
   }
   
   .confirm-btn {
-    width: 100%;
-    height: 48px;
-    background: #FFFFFF;
-    color: #000000;
-    border: none;
-    border-radius: 24px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
     margin-bottom: 16px;
-    transition: opacity 0.2s;
-    
-    &:active {
-      opacity: 0.9;
-    }
   }
   
   .footer-note {

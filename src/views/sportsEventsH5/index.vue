@@ -5,19 +5,20 @@
 
         <!-- 1. 体育子分类：使用您提供的原生 SVG -->
         <div class="sports-categories">
-            <div v-for="category in sportsCategories" :key="category.key" class="category-item"
-                :class="{ active: activeCategory === category.key }" @click="handleCategoryClick(category.key)">
+            <div v-for="category in sportsCategories" :key="category.guid || category.key" class="category-item"
+                :class="{ active: !['football', 'basketball'].includes(category.key) && (selectedCategoryGuid ? selectedCategoryGuid === category.guid : activeCategory === category.key) }"
+                @click="handleCategoryClick(category)">
                 <div class="category-icon-wrapper">
                     <div class="category-icon" :class="category.key">
                         <!-- 足球图标逻辑 (世界杯/足球) -->
-                        <svg v-if="category.key === 'worldcup' || category.key === 'football'"
+                        <svg v-if="category.key === 'WORLD_CUP' || category.key === 'football'"
                             xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 20 20.001">
                             <path
                                 d="M95.579,57.689l1.067-.667c-.4,0-.667-.133-1.067-.133H94.512Zm-7.863,6,2.8,1.067,4.531-3.067.133-3.067-2-1.467a10.317,10.317,0,0,0-6.262,4.267l.8,2.267Zm7.73-1.2-4.264,2.933,1.465,5.067,5.2.133,1.732-4.933-4.131-3.2Zm.533-3.867v3.067l4.261,3.2,2.932-.933.8-2.133a10.52,10.52,0,0,0-6-4.667l-2,1.467Zm-9.33,5.2-.4-1.2a7.71,7.71,0,0,0-.667,1.867Zm17.855.8-.133-.933-.267.667Zm-2.8,9.867h-1.333l-.4,1.2A5.074,5.074,0,0,0,101.707,74.489Zm1.732-9.467-2.8.8-1.865,5.2,1.733,2.533h2.264a9.436,9.436,0,0,0,2.532-6.4v-.667l-1.867-1.467ZM89.848,73.156l1.867-2.267-1.6-5.2-2.931-1.067-1.867,1.333v.8a10.387,10.387,0,0,0,2.133,6.534Zm-1.465.933a6.268,6.268,0,0,0,1.6,1.2l-.4-1.2Zm11.194-.133-1.6-2.267-5.6-.133-1.865,2.4.8,2.133a8.94,8.94,0,0,0,3.731.8,8.828,8.828,0,0,0,3.731-.667Z"
                                 transform="translate(-85.305 -56.889)" fill="currentColor" />
                         </svg>
                         <!-- 篮球图标逻辑 (NBA/篮球) -->
-                        <svg v-else-if="category.key === 'nba' || category.key === 'basketball'"
+                        <svg v-else-if="category.key === 'NBA' || category.key === 'basketball'"
                             xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 20 19.999">
                             <path
                                 d="M180.016,170.921a7.381,7.381,0,0,1-1.391,6.813l2.216,2.216,6.582-6.582A9.957,9.957,0,0,0,180.016,170.921ZM190.81,181.67a9.975,9.975,0,0,0-2.45-7.368l-6.583,6.583,2.155,2.155A7.383,7.383,0,0,1,190.81,181.67ZM184.891,184l3.47,3.469A9.934,9.934,0,0,0,190.614,183,6.075,6.075,0,0,0,184.891,184Zm-1.936,6.66a9.9,9.9,0,0,0,4.471-2.254l-3.47-3.47a6.071,6.071,0,0,0-1,5.724Zm-6.226-12.95-3.407-3.407a9.932,9.932,0,0,0-2.246,4.434A6.07,6.07,0,0,0,176.729,177.709ZM183,183.977l-2.155-2.156-6.584,6.584a9.958,9.958,0,0,0,7.369,2.448A7.369,7.369,0,0,1,183,183.977Zm-12.122-3.918a9.966,9.966,0,0,0,2.447,7.41l6.584-6.583-2.218-2.217A7.376,7.376,0,0,1,170.875,180.059Zm7.817-8.938a9.956,9.956,0,0,0-4.434,2.245l3.408,3.408A6.066,6.066,0,0,0,178.692,171.122Z"
@@ -35,7 +36,7 @@
             <div class="nba-title-row">
                 <div class="title-left">
                     <!-- 世界杯/足球图标 -->
-                    <div v-if="activeCategory === 'worldcup' || activeCategory === 'football'"
+                    <div v-if="activeCategory === 'WORLD_CUP' || activeCategory === 'football'"
                         class="icon-circle orange">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20.001">
                             <path
@@ -62,17 +63,21 @@
 
             <!-- 3. 类型切换 Tab -->
             <div class="type-tabs">
-                <button class="tab-btn" :class="{ active: activeTab === 'match' }"
-                    @click="activeTab = 'match'">{{ $t('sportsEvents.match') }}</button>
-                <button class="tab-btn" :class="{ active: activeTab === 'player' }" @click="activeTab = 'player'">{{
-                    activeCategory === 'worldcup' || activeCategory === 'football' ? $t('sportsEvents.playerMarket') : $t('sportsEvents.props') }}</button>
+                <button class="tab-btn" :class="{ active: activeTab === 'match' }" @click="handleTabClick('match')">{{
+                    $t('sportsEvents.match') }}</button>
+                <button class="tab-btn" :class="{ active: activeTab === 'player' }" @click="handleTabClick('player')">{{
+                    activeCategory === 'WORLD_CUP' || activeCategory === 'NBA' || activeCategory === 'football' ? $t('sportsEvents.playerMarket') :
+                        $t('sportsEvents.props') }}</button>
             </div>
 
             <!-- 4. 赛事列表 - NBA/篮球（只在“比赛” Tab 下渲染） -->
-            <div v-if="(activeCategory === 'nba' || activeCategory === 'basketball') && activeTab === 'match'"
+            <div v-if="(activeCategory === 'NBA' || activeCategory === 'basketball') && activeTab === 'match'"
                 class="event-list">
+                <div v-if="eventsLoading" class="list-loading">{{ $t('common.loading') || 'Loading...' }}</div>
+                <div v-else-if="!eventsList.length" class="list-empty">{{ $t('common.noData') || 'No data' }}</div>
                 <div v-for="(event, idx) in eventsList" :key="idx" class="event-wrapper">
-                    <div v-if="event.month" class="date-label">{{ formatDate(event.month, event.day, event.weekday) }}</div>
+                    <div v-if="event.month" class="date-label">{{ formatDate(event.month, event.day, event.weekday) }}
+                    </div>
 
                     <div class="event-card">
                         <div class="card-meta">
@@ -111,10 +116,14 @@
             </div>
 
             <!-- 4. 赛事列表 - 世界杯/足球 比赛 -->
-            <div v-if="(activeCategory === 'worldcup' || activeCategory === 'football') && activeTab === 'match'"
+            <div v-if="(activeCategory === 'WORLD_CUP' || activeCategory === 'football') && activeTab === 'match'"
                 class="event-list worldcup-list">
+                <div v-if="eventsLoading" class="list-loading">{{ $t('common.loading') || 'Loading...' }}</div>
+                <div v-else-if="!worldcupEventsList.length" class="list-empty">{{ $t('common.noData') || 'No data' }}
+                </div>
                 <div v-for="(event, idx) in worldcupEventsList" :key="idx" class="event-wrapper">
-                    <div v-if="event.month" class="date-label">{{ formatDate(event.month, event.day, event.weekday) }}</div>
+                    <div v-if="event.month" class="date-label">{{ formatDate(event.month, event.day, event.weekday) }}
+                    </div>
 
                     <div class="event-card worldcup-card">
                         <div class="card-meta">
@@ -158,9 +167,10 @@
             </div>
 
             <!-- 4. 球员盘列表 - 世界杯/足球 -->
-            <div v-if="(activeCategory === 'worldcup' || activeCategory === 'football') && activeTab === 'player'"
+            <div v-if="(activeCategory === 'WORLD_CUP' || activeCategory === 'football') && activeTab === 'player'"
                 class="player-panel-list">
-                <div v-for="(item, idx) in playerPanelList" :key="idx" class="player-card">
+                <div v-for="(item, idx) in playerPanelList" :key="idx" class="player-card"
+                    @click="handlePlayerMarketClick">
                     <div class="card-header">
                         <img :src="item.avatar" class="card-avatar" />
                         <div class="card-title">{{ item.title }}</div>
@@ -177,13 +187,11 @@
                     </div>
                     <div class="card-options">
                         <div v-for="(opt, optIdx) in item.options" :key="optIdx" class="option-row">
-                            <div class="option-info">
-                                <span class="option-name">{{ opt.name }}</span>
-                                <span class="option-percent">{{ opt.percent }}</span>
-                            </div>
+                            <span class="option-name">{{ opt.name }}</span>
+                            <span class="option-percent">{{ opt.percent }}</span>
                             <div class="option-btns">
-                                <button class="opt-btn yes" @click="openPayment(item, 'yes')">Yes</button>
-                                <button class="opt-btn no" @click="openPayment(item, 'no')">No</button>
+                                <button class="opt-btn yes" @click.stop="handlePlayerOptionClick">{{ opt.directions?.[1]?.outcome || $t('detail.resultYes') || 'Yes' }}</button>
+                                <button class="opt-btn no" @click.stop="handlePlayerOptionClick">{{ opt.directions?.[0]?.outcome || $t('detail.resultNo') || 'No' }}</button>
                             </div>
                         </div>
                     </div>
@@ -217,9 +225,10 @@
             </div>
 
             <!-- 4. 球员盘列表 - NBA/篮球（属性/Props Tab） -->
-            <div v-if="(activeCategory === 'nba' || activeCategory === 'basketball') && activeTab === 'player'"
+            <div v-if="(activeCategory === 'NBA' || activeCategory === 'basketball') && activeTab === 'player'"
                 class="player-panel-list">
-                <div v-for="(item, idx) in nbaPlayerPanelList" :key="idx" class="player-card">
+                <div v-for="(item, idx) in nbaPlayerPanelList" :key="idx" class="player-card"
+                    @click="handlePlayerMarketClick">
                     <div class="card-header">
                         <img :src="item.avatar" class="card-avatar" />
                         <div class="card-title">{{ item.title }}</div>
@@ -236,13 +245,11 @@
                     </div>
                     <div class="card-options">
                         <div v-for="(opt, optIdx) in item.options" :key="optIdx" class="option-row">
-                            <div class="option-info">
-                                <span class="option-name">{{ opt.name }}</span>
-                                <span class="option-percent">{{ opt.percent }}</span>
-                            </div>
+                            <span class="option-name">{{ opt.name }}</span>
+                            <span class="option-percent">{{ opt.percent }}</span>
                             <div class="option-btns">
-                                <button class="opt-btn yes" @click="openPayment(item, 'yes')">Yes</button>
-                                <button class="opt-btn no" @click="openPayment(item, 'no')">No</button>
+                                <button class="opt-btn yes" @click.stop="handlePlayerOptionClick">{{ opt.directions?.[1]?.outcome || $t('detail.resultYes') || 'Yes' }}</button>
+                                <button class="opt-btn no" @click.stop="handlePlayerOptionClick">{{ opt.directions?.[0]?.outcome || $t('detail.resultNo') || 'No' }}</button>
                             </div>
                         </div>
                     </div>
@@ -281,24 +288,30 @@
     <PaymentModal v-model="showPayment" />
 
     <!-- 联赛选择器 -->
-    <LeagueSelector v-model:visible="showLeagueSelector" :selected-league="selectedLeague"
-        @select="handleLeagueSelect" />
+        <LeagueSelector v-model:visible="showLeagueSelector" :selected-league="selectedLeague"
+            :sport-type="leagueSelectorSportType" @select="handleLeagueSelect" />
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ArrowDown, Avatar } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import tyIcon01 from '@/assets/icon/tyIcon01.png'
 import tyIcon02 from '@/assets/icon/tyIcon02.png'
 import NavBar2 from '@/components/navBar2.vue'
 import PaymentModal from '@/components/PaymentModal.vue'
 import LeagueSelector from './LeagueSelector.vue'
+import { getCategoryList, getEventList } from '@/api/APIEvent'
+import { useAccount } from '@wagmi/vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const { address } = useAccount()
 const router = useRouter()
-const activeCategory = ref('nba')
+const route = useRoute()
+const activeCategory = ref('NBA')
+const selectedCategoryGuid = ref('')
 const selectedMatchday = ref(9)
 const activeTab = ref('match')
 
@@ -309,31 +322,253 @@ const selectedSide = ref(null)
 // 联赛选择器状态
 const showLeagueSelector = ref(false)
 const selectedLeague = ref('')
+const leagueSelectorSportType = ref('football')
+
+// URL 传入的分类 ID
+const urlCategoryGuid = computed(() => route.query.category_guid || '')
+
+// 动态分类数据
+const dynamicCategories = ref([])
+
+// 获取分类列表
+const fetchCategories = async () => {
+    try {
+        const lang = locale.value === 'zh-cn' ? 'zh' :
+            locale.value === 'ko-kr' ? 'ko' :
+                locale.value === 'ja-jp' ? 'ja' : 'en'
+
+        const params = { language_label: lang }
+        // 有 URL 分类ID时，按父分类ID查询其二级分类
+        if (urlCategoryGuid.value) {
+            params.parent_category_guid = urlCategoryGuid.value
+        } else {
+            // 无父分类ID时兜底查询二级分类
+            params.level = 1
+        }
+
+        const res = await getCategoryList(params)
+
+        const categoryList = Array.isArray(res?.data?.categories)
+            ? res.data.categories
+            : Array.isArray(res?.data?.data?.categories)
+                ? res.data.data.categories
+                : []
+
+        if ((res?.data?.code === 200 || res?.data?.code === 2000) && categoryList.length > 0) {
+            // 将二级分类接口数据映射到页面分类结构
+            dynamicCategories.value = categoryList.map(item => {
+                const guid = item.category_guid || item.guid || ''
+                const label = item.category_name || item.name || ''
+                // 接口约定：code 为 NBA / WORLD_CUP 分别对应篮球 / 世界杯
+                const code = String(item.code || '').toUpperCase()
+                let key = guid
+                const name = label.toLowerCase()
+
+                // 严格按接口 code 映射：WORLD_CUP = 世界杯，NBA = 篮球
+                if (code === 'NBA') key = 'NBA'
+                else if (code === 'WORLD_CUP') key = 'WORLD_CUP'
+                // 其他分类仍按名称/code 兜底判定（避免接口未覆盖时分类为空）
+                else if (name.includes('soccer') || name.includes('football') || name.includes('足球') || code === 'FOOTBALL') key = 'football'
+                else if (name.includes('basketball') || name.includes('篮球') || code === 'BASKETBALL') key = 'basketball'
+
+                return {
+                    key: key,
+                    guid,
+                    label,
+                    badge: 0
+                }
+            }).filter(item => !!item.guid)
+
+            // 自动选中第一个有效分类
+            if (dynamicCategories.value.length > 0) {
+                const byGuid = dynamicCategories.value.find(c => c.guid === selectedCategoryGuid.value)
+                const byKey = dynamicCategories.value.find(c => c.key === activeCategory.value)
+                const target = byGuid || byKey || dynamicCategories.value[0]
+                activeCategory.value = target.key
+                selectedCategoryGuid.value = target.guid
+            }
+        } else {
+            dynamicCategories.value = []
+        }
+    } catch (error) {
+        console.error('Fetch categories failed:', error)
+        dynamicCategories.value = []
+    }
+    // 分类加载完毕后立即拉取赛事（无论成功与否，保证入口调用）
+    await fetchSportsEvents()
+}
+
+onMounted(async () => {
+    await fetchCategories()
+})
 
 // 计算当前分类标题
 const currentCategoryTitle = computed(() => {
+    const found = dynamicCategories.value.find(c => c.guid === selectedCategoryGuid.value)
+    if (found) return found.label
+
     const categoryMap = {
-        'worldcup': t('sportsEvents.worldCup'),
-        'nba': 'NBA',
+        'WORLD_CUP': t('sportsEvents.worldCup'),
+        'NBA': 'NBA',
         'football': t('sportsEvents.football'),
         'basketball': t('sportsEvents.basketball')
     }
     return categoryMap[activeCategory.value] || 'NBA'
 })
 
-const handleCategoryClick = (categoryKey) => {
-    // 足球和篮球不切换，只打开联赛选择器
-    if (categoryKey === 'football' || categoryKey === 'basketball') {
-        showLeagueSelector.value = true
+const handleTabClick = (tab) => {
+    activeTab.value = tab
+    // 足球/篮球目前走 mock 展示
+    if (activeCategory.value === 'football' || activeCategory.value === 'basketball') {
+        applyMockLeagueData(activeCategory.value)
         return
     }
-    activeCategory.value = categoryKey
-    activeTab.value = 'match' // 切换分类时重置tab
+    fetchSportsEvents()
+}
+
+const handleCategoryClick = (category) => {
+    activeCategory.value = category.key
+    selectedCategoryGuid.value = category.guid
+    activeTab.value = 'match' // 切换分类时重置 tab
+
+    // 足球/篮球切分类：先打开联赛选择器，并使用 mock 数据兜底展示
+    if (category.key === 'football' || category.key === 'basketball') {
+        showLeagueSelector.value = true
+        leagueSelectorSportType.value = category.key
+        if (!selectedLeague.value) selectedLeague.value = 'epl'
+        applyMockLeagueData(category.key)
+        return
+    }
+
+    fetchSportsEvents()
 }
 
 const handleLeagueSelect = (league) => {
     selectedLeague.value = league.id
     console.log('选择联赛:', league.name)
+
+    // 联赛选择后刷新 mock 数据（不依赖接口）
+    applyMockLeagueData(leagueSelectorSportType.value)
+}
+
+// mock：根据当前分类 + 联赛 id 生成列表数据
+function applyMockLeagueData(categoryKey) {
+    const leagueId = selectedLeague.value || 'epl'
+    const leagueNameMap = {
+        epl: '英超联赛',
+        laliga: '西甲联赛',
+        ucl: '欧洲冠军联赛',
+        bundesliga: '德甲联赛',
+        ligue1: '法甲联赛',
+        seriea: '意甲联赛',
+        mls: '美国职业足球大联盟联赛',
+        uel: '欧洲联赛',
+        uecl: '欧洲协会联赛',
+    }
+    const leagueName = leagueNameMap[leagueId] || '联赛'
+
+    if (categoryKey === 'football') {
+        worldcupEventsList.value = [
+            {
+                month: todayMonthKey,
+                day: todayDay,
+                weekday: todayWeekdayKey,
+                time: todayTime,
+                volume: '$2,500',
+                drawOdds: '33',
+                eventGuid: `mock_worldcup_${leagueId}`,
+                team1: {
+                    name: `${leagueName}队伍A`,
+                    shortName: 'A',
+                    record: '',
+                    logo: tyIcon01,
+                    odds: '55',
+                },
+                team2: {
+                    name: `${leagueName}队伍B`,
+                    shortName: 'B',
+                    record: '',
+                    logo: tyIcon02,
+                    odds: '45',
+                },
+            },
+        ]
+
+        playerPanelList.value = [
+            {
+                avatar: tyIcon01,
+                title: `${leagueName} 冠军队伍`,
+                maxLeverage: '10X',
+                maxReturn: '182%',
+                options: [
+                    { name: `${leagueName}队伍A`, percent: '82%' },
+                    { name: `${leagueName}队伍B`, percent: '32%' },
+                ],
+                timeRemaining: '04:30:57',
+                participantCount: 1280,
+                amount: '19.00',
+            },
+            {
+                avatar: tyIcon02,
+                title: `${leagueName} 最佳射手`,
+                maxLeverage: '10X',
+                maxReturn: '182%',
+                options: [
+                    { name: `${leagueName}队伍A`, percent: '82%' },
+                    { name: `${leagueName}队伍B`, percent: '18%' },
+                ],
+                timeRemaining: '04:30:57',
+                participantCount: 1280,
+                amount: '19.00',
+            },
+        ]
+
+        return
+    }
+
+    if (categoryKey === 'basketball') {
+        eventsList.value = [
+            {
+                month: todayMonthKey,
+                day: todayDay,
+                weekday: todayWeekdayKey,
+                time: todayTime,
+                volume: '$1,000',
+                drawOdds: '',
+                eventGuid: `mock_basket_${leagueId}`,
+                team1: {
+                    name: `${leagueName} Knights`,
+                    shortName: 'NYK',
+                    record: '',
+                    logo: tyIcon01,
+                    odds: '50',
+                },
+                team2: {
+                    name: `${leagueName} Lakers`,
+                    shortName: 'LAL',
+                    record: '',
+                    logo: tyIcon02,
+                    odds: '50',
+                },
+            },
+        ]
+
+        nbaPlayerPanelList.value = [
+            {
+                avatar: tyIcon01,
+                title: `LeBron James total points vs Knicks (${leagueName})`,
+                maxLeverage: '5x',
+                maxReturn: '120%',
+                timeRemaining: '4h 21m left',
+                participantCount: 3284,
+                amount: '1.2M',
+                options: [
+                    { name: 'Over 28.5 pts', percent: '62%' },
+                    { name: 'Under 28.5 pts', percent: '38%' },
+                ],
+            },
+        ]
+    }
 }
 
 // 日期格式化函数
@@ -345,78 +580,280 @@ const formatDate = (month, day, weekdayKey) => {
 }
 
 const handleGameView = (event) => {
-    router.push('/sports-detail-h5')
+    router.push({
+        path: '/sports-detail-h5',
+        query: {
+            event_guid: event?.eventGuid || event?.event_guid || ''
+        },
+    })
 }
 
 const openPayment = (event, side) => {
-    selectedEvent.value = event
-    selectedSide.value = side
-    showPayment.value = true
+    // 体育事件下注/购买功能当前尚未开放
+    ElMessage.warning('暂未开启')
 }
 
-const sportsCategories = computed(() => [
-    { key: 'worldcup', label: t('sportsEvents.worldCup'), badge: 14 },
-    { key: 'nba', label: 'NBA', badge: 32 },
-    { key: 'football', label: t('sportsEvents.football'), badge: 0 },
-    { key: 'basketball', label: t('sportsEvents.basketball'), badge: 0 }
-])
+// 球员盘目前尚未开放交易/下单，因此点击直接给出提示
+const handlePlayerMarketClick = () => {
+    ElMessage.warning('暂未开启')
+}
+
+const handlePlayerOptionClick = () => {
+    ElMessage.warning('暂未开启')
+}
+
+const sportsCategories = computed(() => {
+    // 优先使用动态获取的分类，如果还没有获取到，可以保留几个默认的兜底
+    if (dynamicCategories.value.length > 0) {
+        return dynamicCategories.value
+    }
+
+    return [
+        { key: 'WORLD_CUP', label: t('sportsEvents.worldCup'), badge: 14 },
+        { key: 'NBA', label: 'NBA', badge: 32 },
+        { key: 'football', label: t('sportsEvents.football'), badge: 0 },
+        { key: 'basketball', label: t('sportsEvents.basketball'), badge: 0 }
+    ]
+})
+
+// 加载状态
+const eventsLoading = ref(false)
+
+// 将接口返回的 event 对象映射为页面所需格式
+const mapApiEventToCard = (e, isFirstOfDay) => {
+    const subEvents = Array.isArray(e.sub_events) ? e.sub_events : []
+    const team1 = subEvents[0] || {}
+    const team2 = subEvents[1] || {}
+
+    // 解析 open_time: "2026-01-05 04:00:00"
+    let month = '', day = '', weekday = '', timeStr = ''
+    if (e.open_time) {
+        const dt = new Date(e.open_time.replace(' ', 'T'))
+        if (!isNaN(dt.getTime())) {
+            const monthKeys = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+            const weekdayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+            if (isFirstOfDay) {
+                month = monthKeys[dt.getMonth()]
+                day = dt.getDate()
+                weekday = weekdayKeys[dt.getDay()]
+            }
+            const h = dt.getHours()
+            const m = String(dt.getMinutes()).padStart(2, '0')
+            const ampm = h >= 12 ? 'PM' : 'AM'
+            const h12 = h % 12 || 12
+            timeStr = `${h12}:${m} ${ampm}`
+        }
+    }
+
+    const volumeNum = Number(e.trade_volume)
+    const volumeStr = Number.isFinite(volumeNum)
+        ? '$' + volumeNum.toLocaleString('en-US', { maximumFractionDigits: 0 })
+        : '--'
+
+    // 获取赔率（0-100 整数显示，若接口有 price 字段则用，否则均分）
+    const getOdds = (sub) => {
+        if (sub.price !== undefined && sub.price !== null) {
+            return String(Math.round(Number(sub.price) * 100))
+        }
+        return '50'
+    }
+
+    return {
+        // 日期分组标识（仅当日首条时有值）
+        month,
+        day,
+        weekday,
+        time: timeStr,
+        volume: volumeStr,
+        // 三选一赛事（足球/世界杯）置 drawOdds
+        drawOdds: subEvents[2] ? getOdds(subEvents[2]) : (subEvents.length === 3 ? '33' : ''),
+        // 原始 guid，供跳转使用
+        eventGuid: e.event_guid || '',
+        team1: {
+            name: team1.title || '',
+            shortName: (team1.title || '').slice(0, 3).toUpperCase(),
+            record: '',
+            logo: team1.logo || e.logo || '',
+            odds: getOdds(team1)
+        },
+        team2: {
+            name: team2.title || '',
+            shortName: (team2.title || '').slice(0, 3).toUpperCase(),
+            record: '',
+            logo: team2.logo || e.logo || '',
+            odds: getOdds(team2)
+        }
+    }
+}
+
+// 将事件列表按日期分组并注入 month/day/weekday 标识
+const groupEventsByDate = (events) => {
+    const seen = new Set()
+    return events.map((e) => {
+        const dateKey = e.open_time ? e.open_time.slice(0, 10) : ''
+        const isFirst = dateKey && !seen.has(dateKey)
+        if (isFirst) seen.add(dateKey)
+        return mapApiEventToCard(e, isFirst)
+    })
+}
+
+// NBA/篮球 赛事列表（mock fallback：接口返回空时仍展示一条）
+const monthKeys = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
+const weekdayKeys = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+const now = new Date()
+const todayMonthKey = monthKeys[now.getMonth()]
+const todayWeekdayKey = weekdayKeys[now.getDay()]
+const todayDay = now.getDate()
+const todayTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
 
 const eventsList = ref([
     {
-        month: 'jan', day: 5, weekday: 'mon', time: '4:00 AM', volume: '$37,755,917',
-        team1: { name: '尼克斯队', shortName: '尼克斯', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: '湖人队', shortName: '湖人', record: '8-6-5', logo: tyIcon02, odds: '69' }
-    },
-    {
-        month: '', day: '', weekday: '', time: '4:00 AM', volume: '$37,755,917',
-        team1: { name: '尼克斯队', shortName: 'DET', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: '湖人队', shortName: 'Cle', record: '8-6-5', logo: tyIcon02, odds: '69' }
-    },
-    {
-        month: 'jan', day: 5, weekday: 'mon', time: '4:00 AM', volume: '$37,755,917',
-        team1: { name: '尼克斯队', shortName: '尼克斯', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: '湖人队', shortName: '湖人', record: '8-6-5', logo: tyIcon02, odds: '69' }
-    },
-    {
-        month: '', day: '', weekday: '', time: '4:00 AM', volume: '$37,755,917',
-        team1: { name: '尼克斯队', shortName: 'DET', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: '湖人队', shortName: 'Cle', record: '8-6-5', logo: tyIcon02, odds: '69' }
-    },
-    {
-        month: 'jan', day: 5, weekday: 'mon', time: '4:00 AM', volume: '$37,755,917',
-        team1: { name: '尼克斯队', shortName: '尼克斯', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: '湖人队', shortName: '湖人', record: '8-6-5', logo: tyIcon02, odds: '69' }
-    },
-    {
-        month: '', day: '', weekday: '', time: '4:00 AM', volume: '$37,755,917',
-        team1: { name: '尼克斯队', shortName: 'DET', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: '湖人队', shortName: 'Cle', record: '8-6-5', logo: tyIcon02, odds: '69' }
+        month: todayMonthKey,
+        day: todayDay,
+        weekday: todayWeekdayKey,
+        time: todayTime,
+        volume: '$1,000',
+        drawOdds: '',
+        eventGuid: 'mock_nba_event_guid',
+        team1: {
+            name: 'Los Angeles Knicks',
+            shortName: 'NYK',
+            record: '',
+            logo: tyIcon01,
+            odds: '50'
+        },
+        team2: {
+            name: 'Los Angeles Lakers',
+            shortName: 'LAL',
+            record: '',
+            logo: tyIcon02,
+            odds: '50'
+        }
     }
 ])
 
-// 世界杯赛事列表
+// 世界杯/足球 赛事列表（mock fallback：接口返回空时仍展示一条）
 const worldcupEventsList = ref([
     {
-        month: 'jan', day: 5, weekday: 'mon', time: '4:00 AM', volume: '$37,755,917', drawOdds: '32',
-        team1: { name: 'Leeds United FC', shortName: 'lee', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: 'Man Utd', shortName: 'MUN', record: '8-6-5', logo: tyIcon02, odds: '32' }
-    },
-    {
-        month: '', day: '', weekday: '', time: '4:00 AM', volume: '$37,755,917', drawOdds: '32',
-        team1: { name: 'Leeds United FC', shortName: 'lee', record: '5-6-8', logo: tyIcon01, odds: '32' },
-        team2: { name: 'Man Utd', shortName: 'MUN', record: '8-6-5', logo: tyIcon02, odds: '32' }
-    },
-    {
-        month: 'jan', day: 6, weekday: 'mon', time: '6:00 AM', volume: '$25,500,000', drawOdds: '28',
-        team1: { name: 'Chelsea FC', shortName: 'CHE', record: '6-4-9', logo: tyIcon01, odds: '35' },
-        team2: { name: 'Arsenal', shortName: 'ARS', record: '7-5-7', logo: tyIcon02, odds: '37' }
-    },
-    {
-        month: '', day: '', weekday: '', time: '8:00 AM', volume: '$18,200,000', drawOdds: '30',
-        team1: { name: 'Liverpool FC', shortName: 'LIV', record: '8-3-8', logo: tyIcon01, odds: '40' },
-        team2: { name: 'Man City', shortName: 'MCI', record: '9-2-8', logo: tyIcon02, odds: '30' }
+        month: todayMonthKey,
+        day: todayDay,
+        weekday: todayWeekdayKey,
+        time: todayTime,
+        volume: '$2,500',
+        drawOdds: '33',
+        eventGuid: 'mock_worldcup_event_guid',
+        team1: {
+            name: 'Spain',
+            shortName: 'ESP',
+            record: '',
+            logo: tyIcon01,
+            odds: '55'
+        },
+        team2: {
+            name: 'Portugal',
+            shortName: 'POR',
+            record: '',
+            logo: tyIcon02,
+            odds: '45'
+        }
     }
 ])
+
+// 获取体育赛事列表（根据当前分类 + 当前 Tab）
+const fetchSportsEvents = async () => {
+    const categoryGuid = selectedCategoryGuid.value
+    console.log('Fetching sports events for categoryGuid:', categoryGuid, 'tab:', activeTab.value)
+    if (!categoryGuid) return
+
+    eventsLoading.value = true
+    try {
+        const lang = locale.value === 'zh-cn' ? 'zh'
+            : locale.value === 'ko-kr' ? 'ko'
+                : locale.value === 'ja-jp' ? 'ja' : 'en'
+
+        const isFootball = activeCategory.value === 'WORLD_CUP' || activeCategory.value === 'football'
+
+        const baseParams = {
+            language_label: lang,
+            include_sub_events: true,
+            user_address: address.value || '',
+            page: 1,
+            page_size: 20,
+            category_guid: categoryGuid
+        }
+
+        if (activeTab.value === 'match') {
+            // 比赛 Tab：拉取赛事列表
+            const res = await getEventList({ ...baseParams })
+            const list = res?.data?.data?.events || res?.data?.events || []
+            const mapped = groupEventsByDate(list)
+
+            if (isFootball) {
+                if (mapped.length) worldcupEventsList.value = mapped
+            } else {
+                if (mapped.length) eventsList.value = mapped
+            }
+        } else if (activeTab.value === 'player') {
+            const res = await getEventList({ ...baseParams })
+            const list = res?.data?.data?.events || res?.data?.events || []
+            const mapped = list.map(mapApiToPlayerItem)
+
+            if (isFootball) {
+                playerPanelList.value = mapped.length ? mapped : playerPanelList.value
+            } else {
+                nbaPlayerPanelList.value = mapped.length ? mapped : nbaPlayerPanelList.value
+            }
+        }
+    } catch (err) {
+        console.error('Fetch sports events failed:', err)
+    } finally {
+        eventsLoading.value = false
+    }
+}
+
+// 将接口球员盘事件映射为页面所需格式
+const mapApiToPlayerItem = (e) => {
+    const subEvents = Array.isArray(e.sub_events) ? e.sub_events : []
+    const totalPrice = subEvents.reduce((sum, s) => sum + Number(s.price || 0), 0)
+    const options = subEvents.map(s => ({
+        name: s.title || '',
+        directions: s?.directions || [{ outcome: 'NO' }, { outcome: 'YES' }],
+        percent: totalPrice > 0
+            ? Math.round((Number(s.price || 0) / totalPrice) * 100) + '%'
+            : '--'
+    }))
+
+    const volumeNum = Number(e.trade_volume)
+    const amountStr = Number.isFinite(volumeNum)
+        ? volumeNum >= 1_000_000
+            ? (volumeNum / 1_000_000).toFixed(1) + 'M'
+            : volumeNum >= 1_000
+                ? (volumeNum / 1_000).toFixed(0) + 'K'
+                : String(volumeNum)
+        : '--'
+
+    // 剩余时间（从 close_time 计算）
+    let timeRemaining = '--'
+    if (e.close_time) {
+        const diff = new Date(e.close_time.replace(' ', 'T')).getTime() - Date.now()
+        if (diff > 0) {
+            const h = Math.floor(diff / 3_600_000)
+            const m = Math.floor((diff % 3_600_000) / 60_000)
+            timeRemaining = h > 0 ? `${h}h ${m}m left` : `${m}m left`
+        }
+    }
+
+    return {
+        avatar: e.logo || '',
+        title: e.title || e.event_title || '',
+        maxLeverage: e.max_leverage ? `${e.max_leverage}x` : '--',
+        maxReturn: e.max_return ? `${Math.round(Number(e.max_return) * 100)}%` : '--',
+        options,
+        timeRemaining,
+        participantCount: Number(e.participant_count) || 0,
+        amount: amountStr
+    }
+}
 
 // 球员盘列表
 const playerPanelList = ref([
@@ -432,32 +869,6 @@ const playerPanelList = ref([
         timeRemaining: '04:30:57',
         participantCount: 1280,
         amount: '19.00'
-    },
-    {
-        avatar: tyIcon01,
-        title: '2026 FIFA 世界杯 最佳射手',
-        maxLeverage: '10X',
-        maxReturn: '182%',
-        options: [
-            { name: '姆巴佩', percent: '82%' },
-            { name: '罗伯特·莱万多夫斯基', percent: '18%' }
-        ],
-        timeRemaining: '04:30:57',
-        participantCount: 1280,
-        amount: '19.00'
-    },
-    {
-        avatar: tyIcon01,
-        title: '2026 FIFA 世界杯 金球奖',
-        maxLeverage: '8X',
-        maxReturn: '156%',
-        options: [
-            { name: '梅西', percent: '65%' },
-            { name: 'C罗', percent: '35%' }
-        ],
-        timeRemaining: '02:15:30',
-        participantCount: 890,
-        amount: '25.50'
     }
 ])
 
@@ -472,21 +883,8 @@ const nbaPlayerPanelList = ref([
         participantCount: 3284,
         amount: '1.2M',
         options: [
-            { name: 'Over 28.5 pts', percent: '62% implied' },
-            { name: 'Under 28.5 pts', percent: '38% implied' }
-        ]
-    },
-    {
-        avatar: tyIcon02,
-        title: 'J. Brunson 3-pointers made',
-        maxLeverage: '4x',
-        maxReturn: '95%',
-        timeRemaining: '3h 10m left',
-        participantCount: 1875,
-        amount: '620K',
-        options: [
-            { name: 'Over 3.5 3PM', percent: '44% implied' },
-            { name: 'Under 3.5 3PM', percent: '56% implied' }
+            { name: 'Over 28.5 pts', percent: '62%' },
+            { name: 'Under 28.5 pts', percent: '38%' }
         ]
     }
 ])
@@ -564,11 +962,11 @@ const nbaPlayerPanelList = ref([
             color: var(--text-dark-gray); // 默认图标颜色
             transition: all 0.3s;
 
-            &.worldcup {
+            &.WORLD_CUP {
                 color: #f68b24;
             }
 
-            &.nba {
+            &.NBA {
                 color: #1e88e5;
             }
         }
@@ -970,21 +1368,22 @@ const nbaPlayerPanelList = ref([
     padding-bottom: 40px;
 
     .player-card {
-        background: var(--bg-page-h5);
-        border: 1px solid var(--border-color);
-        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.02) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.085);
+        border-radius: 12px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.42);
         overflow: hidden;
 
         .card-header {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 16px;
+            padding: 16px 16px 12px;
 
             .card-avatar {
-                width: 48px;
-                height: 48px;
-                border-radius: 10px;
+                width: 46px;
+                height: 46px;
+                border-radius: 12px;
                 object-fit: cover;
             }
 
@@ -998,87 +1397,98 @@ const nbaPlayerPanelList = ref([
 
         .card-leverage {
             display: flex;
-            justify-content: space-between;
-            padding: 0 16px 12px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+            padding: 4px 16px 10px;
 
             .leverage-item {
                 display: flex;
-                align-items: center;
-                gap: 4px;
+                align-items: baseline;
+                gap: 6px;
 
                 .label {
-                    font-size: 12px;
+                    font-size: 13px;
                     color: var(--text-dark-gray);
                 }
 
                 .value {
-                    font-size: 12px;
+                    font-size: 13px;
                     color: var(--bg-opposite);
-                    font-weight: 600;
+                    font-weight: 800;
                 }
             }
         }
 
         .card-options {
-            padding: 0 16px 16px;
+            padding: 2px 16px 14px;
 
             .option-row {
-                display: flex;
+                display: grid;
+                grid-template-columns: 1fr 60px auto;
                 align-items: center;
-                justify-content: space-between;
+                column-gap: 12px;
                 margin-bottom: 12px;
 
                 &:last-child {
                     margin-bottom: 0;
                 }
 
-                .option-info {
-                    display: flex;
-                    align-items: center;
-                    gap: 16px;
-                    flex: 1;
+                .option-name {
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: var(--bg-opposite);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    line-height: 1.15;
+                }
 
-                    .option-name {
-                        font-size: 14px;
-                        color: var(--bg-opposite);
-                        min-width: 120px;
-                    }
-
-                    .option-percent {
-                        font-size: 14px;
-                        color: var(--text-dark-gray);
-                    }
+                .option-percent {
+                    font-size: 14px;
+                    font-weight: 800;
+                    color: var(--bg-opposite);
+                    text-align: right;
+                    line-height: 1.05;
                 }
 
                 .option-btns {
                     display: flex;
                     gap: 8px;
+                    justify-content: flex-end;
+                    align-items: center;
 
                     .opt-btn {
-                        width: 70px;
-                        height: 36px;
-                        border-radius: 8px;
-                        border: none;
-                        font-size: 14px;
-                        font-weight: 600;
+                        width: 72px;
+                        height: 34px;
+                        border-radius: 10px;
+                        border: 1px solid transparent;
+                        font-size: 13px;
+                        font-weight: 800;
                         cursor: pointer;
-                        transition: all 0.2s;
+                        transition: transform 0.1s, background 0.2s, border-color 0.2s;
+                        text-transform: capitalize;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
 
                         &.yes {
-                            background: rgba(47, 188, 135, 0.2);
-                            color: #2FBC87;
+                            background: var(--button-bg-y);
+                            color: var(--text-color-y);
+                            border-color: var(--theme-accent-border);
 
                             &:active {
-                                background: rgba(47, 188, 135, 0.4);
+                                background: var(--theme-accent-press);
                             }
                         }
 
                         &.no {
-                            background: rgba(155, 89, 118, 0.3);
+                            background: rgba(219, 39, 119, 0.14);
                             color: #db2777;
+                            border-color: rgba(219, 39, 119, 0.45);
 
                             &:active {
-                                background: rgba(155, 89, 118, 0.5);
+                                background: rgba(219, 39, 119, 0.26);
                             }
                         }
                     }
@@ -1091,8 +1501,9 @@ const nbaPlayerPanelList = ref([
             align-items: center;
             justify-content: space-between;
             padding: 12px 16px;
-            background: var(--bg-page);
-            border-radius: 0 0 16px 16px;
+            background: rgba(0, 0, 0, 0.14);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 0;
 
             .footer-left {
                 display: flex;
@@ -1130,6 +1541,14 @@ const nbaPlayerPanelList = ref([
             }
         }
     }
+}
+
+.list-loading,
+.list-empty {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--text-dark-gray);
+    font-size: 14px;
 }
 
 .ml-1 {

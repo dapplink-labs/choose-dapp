@@ -12,17 +12,11 @@ export default defineConfig({
     open: false, // 调试时不自动拉起系统浏览器
     cors: true, // 允许跨域请求
     proxy: {
-      "/api": {
-        target: "https://eventapi.roothashpay.com",
+      "/event-api": {
+        target: "https://eventchmeapi.roothashpay.com",
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
-      "/eventapi": {
-        target: "https://eventapi.roothashpay.com",
-        changeOrigin: true,
-        secure: false,
-        rewrite: (path) => path.replace(/^\/eventapi/, ""),
+        rewrite: (path) => path.replace(/^\/event-api/, ""),
       }
     },
   },

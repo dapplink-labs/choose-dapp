@@ -52,9 +52,17 @@
         </div>
       </div>
 
-      <button class="confirm-btn" :disabled="!canClaim" @click="handleConfirm">
+      <PrimaryActionButton
+        class="confirm-btn"
+        :disabled="!canClaim"
+        height="48px"
+        radius="12px"
+        font-size="16px"
+        font-weight="600"
+        @click="handleConfirm"
+      >
         {{ $t('collectEarnings.confirmClaim') || '确定领取' }}
-      </button>
+      </PrimaryActionButton>
     </div>
 
     <NodeSelectorModal v-model:visible="showNodeSelector" :options="nodes" :loading="loadingNodes"
@@ -74,6 +82,7 @@ import { ArrowDown } from '@element-plus/icons-vue'
 import Message from '@/utils/message'
 import BackHeaderNav from '@/components/BackHeaderNav.vue'
 import NodeSelectorModal from '@/components/NodeSelectorModal.vue'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
 import { getNodeStakingRecords, stakingclaimReward } from '@/api/API'
 import { formatDateTime } from '@/utils/format_date.js'
 import { writeContractOptimized, checkAllowance, approveToken } from '@/utils/requestWEB3.js'
@@ -463,19 +472,5 @@ onMounted(() => {
 
 .confirm-btn {
   width: 100%;
-  height: 50px;
-  background: #a4f128;
-  color: #000;
-  border: none;
-  border-radius: 25px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-
-  &:disabled {
-    background: #333;
-    color: #666;
-    cursor: not-allowed;
-  }
 }
 </style>

@@ -10,7 +10,16 @@
       <h1 class="title"> {{ $t('notice.title') }}</h1>
       <p class="subtitle">{{ $t('notice.subtitle') }}</p>
       <p class="coming-soon">{{ $t('notice.soon') }}</p>
-      <button class="btn" @click="closePopup">{{ $t('notice.btn') }}</button>
+      <PrimaryActionButton
+        class="btn"
+        height="48px"
+        radius="30px"
+        font-size="16px"
+        font-weight="600"
+        @click="closePopup"
+      >
+        {{ $t('notice.btn') }}
+      </PrimaryActionButton>
     </div>
   </div>
 </template>
@@ -20,6 +29,7 @@
 import { onMounted } from 'vue'
 import { useCounterStore } from '@/stores/counter'
 import { storeToRefs } from 'pinia'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
 
 // 拿到 store
 const counterStore = useCounterStore()
@@ -133,7 +143,7 @@ function closePopup() {
   width: 100%;
   height: 100%;
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #00CE7A;
+  border-top: 4px solid var(--text-color-y, #ffd94b);
   border-radius: 50%;
   animation: spin 2s linear infinite;
 }
@@ -152,7 +162,7 @@ function closePopup() {
   position: absolute;
   width: 15px;
   height: 15px;
-  background-color: #00CE7A;
+  background-color: var(--text-color-y, #ffd94b);
   border-radius: 50%;
   top: 50%;
   left: 50%;
@@ -199,7 +209,7 @@ function closePopup() {
 
 .coming-soon {
   font-size: 16px;
-  color: #00CE7A;
+  color: var(--text-color-y, #ffd94b);
   font-weight: 600;
   margin-bottom: 20px;
   opacity: 0;
@@ -208,16 +218,7 @@ function closePopup() {
 }
 
 .btn {
-  display: inline-block;
-  padding: 12px 30px;
-  background-color: #00CE7A;
   width: 100%;
-  color: white;
-  border: none;
-  border-radius: 30px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
   opacity: 0;
   transform: translateY(20px);
   transition: all 0.6s ease 0.8s;
@@ -229,12 +230,6 @@ function closePopup() {
 .overlay.active .btn {
   opacity: 1;
   transform: translateY(0);
-}
-
-.btn:hover {
-  background-color: #00C675;
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(255, 125, 0, 0.3);
 }
 
 /* 响应式调整 */

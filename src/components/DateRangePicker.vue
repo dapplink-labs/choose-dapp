@@ -69,9 +69,22 @@
 
         <!-- 确定按钮 -->
         <div class="footer-wrap">
-          <button type="button" class="confirm-btn" @click="handleConfirm">
-            {{ $t('common.confirm') }}
+          <button type="button" class="reset-btn" @click="handleReset">
+            {{ $t('common.reset') }}
           </button>
+          <PrimaryActionButton
+            class="confirm-btn"
+            height="52px"
+            radius="12px"
+            font-size="17px"
+            font-weight="700"
+            text-color="#000000"
+            gradient-from="var(--text-color-y)"
+            gradient-to="var(--text-color-y)"
+            @click="handleConfirm"
+          >
+            {{ $t('common.confirm') }}
+          </PrimaryActionButton>
         </div>
       </div>
     </div>
@@ -81,6 +94,7 @@
 <script setup>
 import { ref, computed, watch, nextTick, onUnmounted, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
 
 const { t } = useI18n()
 
@@ -94,7 +108,7 @@ const props = defineProps({
   showTime: { type: Boolean, default: true }
 })
 
-const emit = defineEmits(['update:modelValue', 'confirm', 'change'])
+const emit = defineEmits(['update:modelValue', 'confirm', 'change', 'reset'])
 
 const ITEM_HEIGHT = 44
 
@@ -143,7 +157,7 @@ function formatDisplayDate(date) {
   if (!date) return '--'
   const f = (n) => String(n).padStart(2, '0')
   const dateStr = `${date.getFullYear()}/${f(date.getMonth() + 1)}/${f(date.getDate())}`
-  return props.showTime ? `${dateStr} 06:00:00` : dateStr
+  return props.showTime ? `${dateStr}` : dateStr
 }
 
 // 防抖处理滑动
@@ -297,6 +311,23 @@ onUnmounted(() => {
 
 function handleClose() {
   emit('update:modelValue', false)
+}
+
+function handleReset() {
+  triggerHaptic()
+  
+  startDate.value = props.defaultStartDate ? new Date(props.defaultStartDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+  endDate.value = props.defaultEndDate ? new Date(props.defaultEndDate) : new Date()
+
+  activeField.value = 'start'
+  const d = startDate.value
+  selectedYear.value = d.getFullYear()
+  selectedMonth.value = d.getMonth() + 1
+  selectedDay.value = d.getDate()
+  nextTick(() => syncScrollPosition('auto'))
+
+  emit('reset')
+  handleClose()
 }
 
 function handleConfirm() {
@@ -519,12 +550,15 @@ function handleConfirm() {
 }
 
 .footer-wrap {
-  .confirm-btn {
-    width: 100%;
+  display: flex;
+  gap: 12px;
+
+  .reset-btn {
+    flex: 1;
     height: 52px;
-    background: var(--text-color-y);
-    color: #000000;
-    border: none;
+    background: transparent;
+    color: var(--bg-opposite);
+    border: 1px solid var(--border-color, #333333);
     border-radius: 12px;
     font-size: 17px;
     font-weight: 700;
@@ -534,13 +568,12 @@ function handleConfirm() {
 
     &:active {
       transform: scale(0.97);
-      opacity: 0.9;
+      background: rgba(255, 255, 255, 0.05);
     }
+  }
 
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+  .confirm-btn {
+    flex: 1;
   }
 }
 

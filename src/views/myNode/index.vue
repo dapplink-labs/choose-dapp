@@ -132,9 +132,22 @@
       </div>
 
       <!-- 一键领取按钮：凌晨 2-3 点禁止领取，显示“收益计算中” -->
-      <button class="claim-all-btn" :disabled="isClaimDisabledByTime" @click="openClaimPopup">
+      <PrimaryActionButton
+        class="claim-all-btn"
+        :disabled="isClaimDisabledByTime"
+        height="50px"
+        radius="25px"
+        font-size="16px"
+        font-weight="700"
+        text-color="#000000"
+        gradient-from="var(--text-color-y)"
+        gradient-to="var(--text-color-y)"
+        disabled-bg="#6b6b6b"
+        disabled-text-color="#d0d0d0"
+        @click="openClaimPopup"
+      >
         {{ isClaimDisabledByTime ? $t("myIncome.calculating") : $t("myNode.claimAll") }}
-      </button>
+      </PrimaryActionButton>
     </div>
 
     <!-- 我的团队模块 -->
@@ -279,9 +292,22 @@
           </div>
         </div>
 
-        <button class="confirm-claim-btn" :disabled="claimLoading" @click="confirmClaim">
+        <PrimaryActionButton
+          class="confirm-claim-btn"
+          :disabled="claimLoading"
+          height="50px"
+          radius="25px"
+          font-size="16px"
+          font-weight="700"
+          text-color="#000000"
+          gradient-from="var(--text-color-y)"
+          gradient-to="var(--text-color-y)"
+          disabled-bg="#6b6b6b"
+          disabled-text-color="#d0d0d0"
+          @click="confirmClaim"
+        >
           {{ claimLoading ? t("common.loading") : $t('myNode.confirmClaimBtn') }}
-        </button>
+        </PrimaryActionButton>
       </div>
     </div>
   </div>
@@ -305,6 +331,7 @@ import TeamTree from "@/components/TeamTree.vue";
 import detailsinfo from "./detailsinfo.vue";
 import BackHeaderNav from "@/components/BackHeaderNav.vue";
 import ActivationMarquee from "@/components/ActivationMarquee.vue";
+import PrimaryActionButton from "@/components/PrimaryActionButton.vue";
 import { ArrowRightBold } from "@element-plus/icons-vue";
 import {
   getNodeServiceProvidersInfo,
@@ -759,7 +786,6 @@ onMounted(async () => {
 <style scoped lang="scss">
 .theme-light {
   .claim-all-btn {
-    background-color: #2b6c18 !important;
     transition:
       opacity 0.2s ease,
       background-color 0.2s ease,
@@ -1592,13 +1618,6 @@ onMounted(async () => {
 
   .confirm-claim-btn {
     width: 100%;
-    height: 50px;
-    border: none;
-    border-radius: 25px;
-    background: var(--text-color-y);
-    font-size: 16px;
-    font-weight: bold;
-    color: #000;
 
     &:disabled {
       opacity: 0.6;

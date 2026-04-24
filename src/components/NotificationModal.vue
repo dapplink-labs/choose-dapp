@@ -11,13 +11,23 @@
                 <div class="modal-content">
                     <h2 class="title">{{ title }}</h2>
 
-                    <div class="message-body">
-                        <div v-html="content" class="message-content"></div>
-                    </div>
+                <div class="message-body">
+                    <div v-html="content" class="message-content"></div>
+                </div>
 
-                    <button class="confirm-btn" @click="close">
+                    <PrimaryActionButton
+                        class="confirm-btn"
+                        height="48px"
+                        radius="12px"
+                        font-size="16px"
+                        font-weight="600"
+                        text-color="#000000"
+                        gradient-from="#ffffff"
+                        gradient-to="#ffffff"
+                        @click="close"
+                    >
                         {{ $t('notice.btn') || '知道了' }}
-                    </button>
+                    </PrimaryActionButton>
                 </div>
             </div>
         </div>
@@ -27,6 +37,7 @@
 <script setup lang="ts">
 import { markAnnouncementAsRead } from '@/api/API';
 import { useAccount } from '@wagmi/vue';
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue';
 
 const { address } = useAccount();
 
@@ -169,23 +180,6 @@ const close = async () => {
 
 .confirm-btn {
     width: 100%;
-    height: 48px;
-    background-color: #ffffff;
-    color: #000000;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.1s, opacity 0.2s;
-
-    &:active {
-        transform: scale(0.98);
-    }
-
-    &:hover {
-        opacity: 0.9;
-    }
 }
 
 /* Transitions */

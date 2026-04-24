@@ -21,9 +21,16 @@
 
                 <!-- 分享按钮 -->
                 <div class="action-row">
-                    <button class="btn primary-btn" type="button" @click="handleShare">
+                    <PrimaryActionButton
+                        class="btn primary-btn"
+                        height="48px"
+                        radius="12px"
+                        font-size="16px"
+                        font-weight="600"
+                        @click="handleShare"
+                    >
                         {{ $t('invite.shareNow') }}
-                    </button>
+                    </PrimaryActionButton>
                 </div>
             </div>
         </div>
@@ -36,6 +43,7 @@ import { useI18n } from 'vue-i18n'
 import Message from '@/utils/message'
 import { useThemeStore } from '@/stores/theme'
 import { useAccount } from '@wagmi/vue'
+import PrimaryActionButton from '@/components/PrimaryActionButton.vue'
 
 const { t } = useI18n()
 const themeStore = useThemeStore()
@@ -204,28 +212,11 @@ const handleShare = async () => {
 
 .btn {
     width: 100%;
-    height: 48px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.2s ease;
     letter-spacing: 0.2px;
 }
 
 .primary-btn {
-    background: linear-gradient(90deg, #c8ff2d 0%, #b3ff1a 100%);
-    color: #0a0a0a;
     box-shadow: 0 12px 30px rgba(180, 255, 40, 0.28);
-
-    &:active {
-        transform: scale(0.98);
-    }
-
-    &:hover {
-        box-shadow: 0 12px 30px rgba(180, 255, 40, 0.35);
-    }
 }
 
 // 淡入淡出动画
