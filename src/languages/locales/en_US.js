@@ -670,6 +670,7 @@ export default {
     purchased: 'Purchased',
     connectWalletFirst: 'Please connect wallet first',
     activatingNode: 'Activating node...',
+    switchNode: 'Switch Node',
     insufficientBalance: 'Insufficient balance!',
     requestingAuth: 'Requesting USDT authorization...',
     payingAndActivating: 'Paying and activating node...',

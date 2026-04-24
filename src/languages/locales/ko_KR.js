@@ -651,6 +651,7 @@ export default {
     purchased: '구매 완료',
     connectWalletFirst: '먼저 지갑을 연결하세요',
     activatingNode: '노드 활성화 중...',
+    switchNode: '노드 전환',
     insufficientBalance: '잔액 부족!',
     requestingAuth: 'USDT 승인 요청 중...',
     payingAndActivating: '결제 및 노드 활성화 중...',

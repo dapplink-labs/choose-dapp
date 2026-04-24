@@ -1,258 +1,160 @@
 <template>
   <div class="myNode">
-    <BackHeaderNav :show-open-btn="true" />
+    <BackHeaderNav
+      :show-open-btn="true"
+      action-mode="icon"
+      :open-icon-src="shareIcon"
+      :action-icon-size="22"
+    />
 
-    <div class="banner1">
-      <h1 class="page-title">
-        {{
-          nodeType === 0
-            ? $t("myNode.distributedNode")
-            : $t("myNode.clusterNode")
-        }}
-      </h1>
-      <p class="page-desc">
-        {{
-          nodeType === 0
-            ? $t("myNode.distributedDesc")
-            : $t("myNode.clusterDesc")
-        }}
-      </p>
-      <div class="banner-info">
-        <p class="status-text">
-          {{ $t("myNode.networkFeeDividend") }}:
-          <span :class="{ 'activated': isActivated }">{{
-            isActivated ? $t("myNode.activated") : $t("myNode.notActivated")
-          }}</span>
-        </p>
-        <p class="time-text">
-          {{ $t("myIncome.purchaseTime") }}:
-          {{ formatDateTime(purchaseTime || 0) }}
+    <section class="earnings-hero">
+      <div class="hero-copy">
+        <h1 class="hero-title">
+          {{ t("myEarnings.nodeEarnings") || t("myNodes.title") || "节点收益" }}
+        </h1>
+        <div class="hero-badges">
+          <span class="hero-badge">{{ nodeTypeBadgeText }}</span>
+        </div>
+        <p class="hero-meta">
+          {{ t("myIncome.purchaseTime") }}: {{ formatDateTime(purchaseTime || 0) }}
         </p>
       </div>
-    </div>
-    <div class="cps-bg"></div>
+      <img class="hero-illustration" :src="heroIllustration" alt="" />
+    </section>
 
-    <div class="income">
-      <div class="box">
-        <div class="item">
-          <b>{{ $t("myNode.choIncome") }}</b>
-          <p>{{ formatAmount(choIncome) }}</p>
-          <span class="currey">≈{{ formatAmount(choIncome * cho2usdt_rate) }} USDT</span>
-        </div>
-        <div class="item">
-          <b>{{ $t("myNode.projectedReturns") }}</b>
-          <p>{{ formatAmount(projectedReturns) }}</p>
-          <span class="currey">≈{{ formatAmount(projectedReturns * cho2usdt_rate) }} USDT</span>
-        </div>
-      </div>
-
-      <!-- <ActivationMarquee :type="3" /> -->
-      <div class="processDiv">
-        <div class="progress-bar-container">
-          <div class="progress-bar" ref="progressBarRef">
-            <div class="progress-fill" :style="{
-              width:
-                (progressPercent || 0) < 4 ? 4 + '%' : progressPercent + '%',
-            }"></div>
-            <div class="progress-indicator" ref="progressIndicatorRef" :style="{ left: progressIndicatorLeft }" :class="{
-              'progress-indicator-left': (progressPercent || 0) < 20,
-              'progress-indicator-right': (progressPercent || 0) >= 90,
-            }">
-              {{ $t("myIncome.remainingClaimable") }}：
-              <span class="indicator-text">{{
-                formatUsdtAmount(
-                  parseInt(forecast_income) - parseInt(total_reward_usdt),
-                )
-              }}U</span>
-            </div>
-          </div>
-        </div>
-        <div class="text">
-          <span>
-            {{ formatUsdtAmount(parseInt(total_reward_usdt)) }} USDT
-          </span>
-          <span> {{ formatUsdtAmount(parseInt(forecast_income)) }} USDT </span>
-        </div>
-      </div>
-      <div class="pending-income-header">
-        <h3 class="pending-title">
-          <span>{{ $t("myNode.pendingIncome") }}</span>
-
-          <el-icon size="16" style="margin-top: 5px" @click="showInfo" :color="'var(--text-color)'">
-            <QuestionFilled />
-          </el-icon>
-        </h3>
+    <section class="earnings-section">
+      <div class="section-header">
+        <h2 class="section-title">{{ t("claimSuccess.congratulations").replace("恭喜获得", "已领取收益") || "已领取收益" }}</h2>
         <button class="record-link" type="button" @click="goToClaimRecord">
-          <span class="record-text">{{ $t("myNode.claimRecord") }}</span>
-          <el-icon class="record-arrow">
-            <ArrowRightBold />
-          </el-icon>
+          <span class="record-text">{{ t("myNode.claimRecord") }}</span>
+          <img class="record-arrow-icon" :src="arrowRightIcon" alt="" />
         </button>
       </div>
 
-      <div class="pending-income-grid">
-        <div class="income-item">
-          <div class="income-label">{{ $t("myNode.nodeIncome") }}</div>
-          <div class="income-value">{{ formatAmount(nodeIncome) }}</div>
-          <span class="currey">≈{{ formatAmount(nodeIncome * cho2usdt_rate) }} USDT</span>
-        </div>
-        <div class="income-item">
-          <div class="income-label">{{ $t("myNode.networkFeeIncome") }}</div>
-          <div class="income-value">{{ formatAmount(networkFeeIncome) }}</div>
-          <span class="currey">≈{{ formatAmount(networkFeeIncome * cho2usdt_rate) }} USDT</span>
-        </div>
-        <div class="income-item">
-          <div class="income-label">{{ $t("myNode.subCoinFeeIncome") }}</div>
-          <div class="income-value">{{ formatAmount(subCoinFeeIncome) }}</div>
-          <span class="currey">≈{{ formatAmount(subCoinFeeIncome * cho2usdt_rate) }} USDT</span>
-        </div>
-        <div class="income-item">
-          <div class="income-label">
-            {{ $t("myNode.secondaryMarketIncome") }}
+      <div class="earnings-card">
+        <div class="summary-grid summary-grid--two">
+          <div v-for="item in claimedSummaryItems" :key="item.label" class="summary-item">
+            <div class="summary-label">{{ item.label }}</div>
+            <div class="summary-value">{{ item.value }}</div>
+            <div class="summary-approx">{{ item.approx }}</div>
           </div>
-          <div class="income-value">
-            {{ formatAmount(secondaryMarketIncome) }}
-          </div>
-          <span class="currey">≈{{ formatAmount(secondaryMarketIncome * cho2usdt_rate) }} USDT</span>
         </div>
-        <div class="income-item">
-          <div class="income-label">
-            {{ $t("myNode.directReferralIncome") }}
+
+        <div class="progress-block">
+          <div class="progress-head">
+            <span class="progress-title">{{ t("collectEarnings.title").replace("领取收益", "领取进度") || "领取进度" }}</span>
+            <span class="progress-remaining">
+              {{ t("myIncome.remainingClaimable") }}:<span>{{ remainingClaimableText }}</span>
+            </span>
           </div>
-          <div class="income-value">
-            {{ formatAmount(directReferralIncome) }}
+
+          <div class="progress-bar" ref="progressBarRef">
+            <div
+              class="progress-fill"
+              :style="{ width: (progressPercent || 0) < 4 ? '4%' : `${progressPercent}%` }"
+            ></div>
           </div>
-          <span class="currey">≈{{ formatAmount(directReferralIncome * cho2usdt_rate) }} USDT</span>
+
+          <div class="progress-scale">
+            <span>0 U</span>
+            <span>{{ progressEndText }}</span>
+          </div>
         </div>
-        <div class="income-item">
-          <div class="income-label">{{ $t("myNode.networkIncome") }}</div>
-          <div class="income-value">{{ formatAmount(teamIncome) }}</div>
-          <span class="currey">≈{{ formatAmount(teamIncome * cho2usdt_rate) }} USDT</span>
+      </div>
+    </section>
+
+    <section class="earnings-section">
+      <div class="section-header">
+        <h2 class="section-title">{{ t("myNode.pendingIncome") }}</h2>
+      </div>
+
+      <div class="earnings-card earnings-card--spacious">
+        <div class="pending-grid">
+          <div v-for="item in pendingSummaryItems" :key="item.label" class="pending-item">
+            <div class="pending-label">{{ item.label }}</div>
+            <div :class="['pending-value', { 'pending-value--muted': item.muted }]">
+              {{ item.value }}
+            </div>
+            <div v-if="item.approx" class="pending-approx">{{ item.approx }}</div>
+          </div>
+        </div>
+
+        <PrimaryActionButton
+          class="claim-all-btn"
+          :disabled="isClaimDisabledByTime"
+          height="48px"
+          radius="14px"
+          font-size="17px"
+          font-weight="700"
+          text-color="#161616"
+          gradient-from="var(--text-color-y)"
+          gradient-to="var(--text-color-y)"
+          disabled-bg="#5d5d5d"
+          disabled-text-color="#d0d0d0"
+          @click="openClaimPopup"
+        >
+          {{ isClaimDisabledByTime ? t("myIncome.calculating") : t("myNode.claimAll") }}
+        </PrimaryActionButton>
+      </div>
+
+      <p class="earnings-footnote">
+        * {{ earningsFootnote }}
+      </p>
+    </section>
+
+    <section class="team-section">
+      <div class="team-tabs">
+        <button
+          type="button"
+          :class="['team-tab', { active: activeTab === 'direct' }]"
+          @click="activeTab = 'direct'"
+        >
+          {{ t("myNode.directAddress") }}
+        </button>
+        <button
+          type="button"
+          :class="['team-tab', { active: activeTab === 'team' }]"
+          @click="activeTab = 'team'"
+        >
+          {{ t("myNode.teamAddress") }}
+        </button>
+      </div>
+
+      <div class="team-stats">
+        <div v-for="item in teamStats" :key="item.label" class="team-stat">
+          <div class="team-stat-label">{{ item.label }}</div>
+          <div class="team-stat-value">{{ item.value }}</div>
         </div>
       </div>
 
-      <!-- 一键领取按钮：凌晨 2-3 点禁止领取，显示“收益计算中” -->
-      <PrimaryActionButton
-        class="claim-all-btn"
-        :disabled="isClaimDisabledByTime"
-        height="50px"
-        radius="25px"
-        font-size="16px"
-        font-weight="700"
-        text-color="#000000"
-        gradient-from="var(--text-color-y)"
-        gradient-to="var(--text-color-y)"
-        disabled-bg="#6b6b6b"
-        disabled-text-color="#d0d0d0"
-        @click="openClaimPopup"
-      >
-        {{ isClaimDisabledByTime ? $t("myIncome.calculating") : $t("myNode.claimAll") }}
-      </PrimaryActionButton>
-    </div>
-
-    <!-- 我的团队模块 -->
-    <div class="my-team">
-      <div class="team-content">
-        <div class="team-tabs">
-          <div :class="['tab-btn', { active: activeTab === 'direct' }]" @click="activeTab = 'direct'">
-            {{ $t("myNode.directAddress") }}
-          </div>
-          <div :class="['tab-btn', { active: activeTab === 'team' }]" @click="activeTab = 'team'">
-            {{ $t("myNode.teamAddress") }}
-          </div>
-        </div>
-
-        <div class="team-header">
-          <template v-if="activeTab === 'direct'">
-            <span class="invite-count">
-              <span>{{
-                $t("myNode.effectiveNodeDirectCount")
-              }}</span>
-              {{ effectiveNodeDirectCount }}
-            </span>
-            <span class="invite-count">
-              <span>{{
-                $t("myNode.effectiveStakingDirectCount")
-              }}</span>
-              {{ effectiveStakingDirectCount }}
-            </span>
-            <span class="invite-count">
-              <span>{{
-                $t("myNode.directIneffectiveCount")
-              }}</span>
-              {{ ineffectiveCount }}
-            </span>
-          </template>
-          <template v-else>
-            <span class="invite-count">
-              <span>{{
-                $t("myNode.effectiveNodeTeamCount")
-              }}</span>
-              {{ effectiveNodeTeamCount }}
-            </span>
-            <span class="invite-count">
-              <span>{{
-                $t("myNode.effectiveStakingTeamCount")
-              }}</span>
-              {{ effectiveStakingTeamCount }}
-            </span>
-            <span class="invite-count">
-              <span>{{
-                $t("myNode.teamIneffectiveCount")
-              }}</span>
-              {{ ineffectiveCount }}
-            </span>
-          </template>
-
-        </div>
-
-        <!-- 层级树状图占位 -->
-        <div class="team-tree-placeholder">
-          <TeamTree :type="activeTab === 'direct' ? 1 : 2" :node_type="2" :team_network_list="teamNetworkList"
-            :direct_network_list="directNetworkList" />
-        </div>
-
-        <div class="team-list" v-if="currentList.length > 0">
-          <div v-for="item in currentList" :key="item.address" class="team-item">
-            <div class="team-avatar">
-              <div class="avatar-content">
-                <img :src="item.avatar || avatarImg" alt="avatar" class="avatar-img"
-                  @error="handleInviterAvatarError" />
-              </div>
+      <div v-if="currentList.length > 0" class="team-list-card">
+        <div v-for="item in currentList" :key="item.address" class="team-row">
+          <div class="team-avatar">
+            <div class="avatar-content">
+              <img :src="item.avatar || avatarImg" alt="avatar" class="avatar-img" @error="handleInviterAvatarError" />
             </div>
-            <div class="team-info-content">
-              <div class="team-info-row">
-                <div class="team-left-info">
-                  <div class="team-address-row">
-                    <span class="team-address">{{ item.address }}</span>
-                    <span v-if="item.nodeTag" class="team-node-tag">{{
-                      item.nodeTag
-                    }}</span>
-                  </div>
-                  <!-- 直推地址列表：时间在地址下面 -->
-                  <div v-if="activeTab === 'direct'" class="team-time-direct">
-                    <span class="team-time">{{ item.activationTime }}</span>
-                  </div>
-                </div>
-                <div class="team-right-info">
-                  <span class="team-reward">+ {{ item.reward || "0" }} CHO</span>
-                </div>
+          </div>
+
+          <div class="team-main">
+            <div class="team-main-top">
+              <div class="team-identity">
+                <div class="team-address">{{ item.address }}</div>
+                <span v-if="getTeamBadgeText(item)" class="team-badge">{{ getTeamBadgeText(item) }}</span>
               </div>
-              <!-- 团队地址列表：显示Upline和时间 -->
-              <div v-if="activeTab === 'team'" class="team-upline-row">
-                <div class="team-upline-left">
-                  <span class="team-upline-label">{{ $t("myIncome.upline") }}:</span>
-                  <span class="team-upline-address">{{
-                    item.upline || item.address
-                  }}</span>
-                </div>
-                <span class="team-time">{{ item.activationTime }}</span>
+              <div class="team-reward">+ {{ item.reward || "0" }} CHO</div>
+            </div>
+
+            <div class="team-main-bottom">
+              <div v-if="activeTab === 'team'" class="team-upline">
+                <span>{{ t("myIncome.upline") }}:</span>
+                <span>{{ item.upline || item.address }}</span>
               </div>
+              <span class="team-time">{{ item.activationTime }}</span>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
     <detailsinfo ref="detailsRef" />
 
     <div v-if="showClaimPopup" class="claim-modal-mask" @click="showClaimPopup = false">
@@ -260,8 +162,8 @@
         <div class="modal-header">
           <span class="node-name-label"> {{
             nodeType === 0
-              ? $t("myNode.distributedNode")
-              : $t("myNode.clusterNode")
+              ? t("myNode.distributedNode")
+              : t("myNode.clusterNode")
           }}</span>
           <el-icon class="close-icon" @click="showClaimPopup = false">
             <Close />
@@ -270,23 +172,23 @@
 
         <div class="modal-body">
           <div class="input-wrapper">
-            <input v-model="claimInputAmount" type="number" :placeholder="$t('myNode.enterClaimAmount')"
+            <input v-model="claimInputAmount" type="number" :placeholder="t('myNode.enterClaimAmount')"
               class="claim-input" />
-            <span class="max-btn" @click="handleMaxAmount">{{ $t('myNode.maxLabel') }}</span>
+            <span class="max-btn" @click="handleMaxAmount">{{ t('myNode.maxLabel') }}</span>
             <span class="unit">CHO</span>
           </div>
           <p class="available-tip">
-            {{ $t('myNode.pendingIncome') }}: <span>{{ formatAmount(totalAvailableAmount) }} CHO</span>
+            {{ t('myNode.pendingIncome') }}: <span>{{ formatAmount(totalAvailableAmount) }} CHO</span>
           </p>
 
           <!-- 新增信息汇总区域 -->
           <div class="claim-summary-info">
             <div class="summary-row">
-              <span class="label">{{ $t('collectEarnings.youWillReceive') }}</span>
+              <span class="label">{{ t('collectEarnings.youWillReceive') }}</span>
               <span class="value highlighted">{{ formatAmount(receive80Amount) }} CHO</span>
             </div>
             <div class="summary-row">
-              <span class="label dashed-underline">{{ $t('collectEarnings.predictedAmount') }}</span>
+              <span class="label dashed-underline">{{ t('collectEarnings.predictedAmount') }}</span>
               <span class="value">{{ formatAmount(projected20Amount) }} CHO</span>
             </div>
           </div>
@@ -295,8 +197,8 @@
         <PrimaryActionButton
           class="confirm-claim-btn"
           :disabled="claimLoading"
-          height="50px"
-          radius="25px"
+          height="48px"
+          radius="14px"
           font-size="16px"
           font-weight="700"
           text-color="#000000"
@@ -306,7 +208,7 @@
           disabled-text-color="#d0d0d0"
           @click="confirmClaim"
         >
-          {{ claimLoading ? t("common.loading") : $t('myNode.confirmClaimBtn') }}
+          {{ claimLoading ? t("common.loading") : t('myNode.confirmClaimBtn') }}
         </PrimaryActionButton>
       </div>
     </div>
@@ -314,7 +216,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUpdated, ref, computed, watch, nextTick, onUnmounted } from "vue";
+import { onMounted, ref, computed, watch, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useThemeStore } from "@/stores/theme";
 import { useI18n } from "vue-i18n";
@@ -324,15 +226,16 @@ import { switchChain } from "@wagmi/core";
 import { config } from "../../wagmi.ts";
 import nodeManagerABI from "@/assets/abi/nodeManagerABI.json";
 import networks from "@/assets/json/networks.js";
-import { writeContractOptimized, computedGas } from "@/utils/requestWEB3.js";
+import { writeContractOptimized } from "@/utils/requestWEB3.js";
 import avatarImg from "@/assets/icon/avatar.png";
 import lp1Img from "@/assets/icon/LP1.png";
-import TeamTree from "@/components/TeamTree.vue";
+import arrowRightIcon from "@/assets/new_icon/LPVault/lpvault-arrow-right.png";
+import heroIllustration from "@/assets/new_icon/LPVault/lpvault-node-illustration.png";
+import shareIcon from "@/assets/new_icon/LPVault/lpvault-share.png";
 import detailsinfo from "./detailsinfo.vue";
 import BackHeaderNav from "@/components/BackHeaderNav.vue";
-import ActivationMarquee from "@/components/ActivationMarquee.vue";
 import PrimaryActionButton from "@/components/PrimaryActionButton.vue";
-import { ArrowRightBold } from "@element-plus/icons-vue";
+import { Close } from "@element-plus/icons-vue";
 import {
   getNodeServiceProvidersInfo,
   getMyTeamInfo,
@@ -462,6 +365,92 @@ const openClaimPopup = () => {
 const isActivated = computed(() => {
   return Number(directed_number.value) >= Number(target_direct_number.value);
 });
+
+const nodeTypeBadgeText = computed(() =>
+  nodeType.value === 0 ? t("myNode.distributedNode") : t("myNode.clusterNode"),
+);
+
+const formatApproxUsdt = (value) => `≈ ${formatAmount(value)} U`;
+
+const claimedSummaryItems = computed(() => [
+  {
+    label: t("myNode.choIncome"),
+    value: formatAmount(choIncome.value),
+    approx: formatApproxUsdt(Number(choIncome.value) * Number(cho2usdt_rate.value || 0)),
+  },
+  {
+    label: t("myNode.subCoinIncome"),
+    value: formatAmount(subCoinIncome.value),
+    approx: formatApproxUsdt(Number(subCoinIncome.value) * Number(cho2usdt_rate.value || 0)),
+  },
+]);
+
+const pendingSummaryItems = computed(() => [
+  {
+    label: t("myNode.nodeIncome"),
+    value: formatAmount(nodeIncome.value),
+    approx: formatApproxUsdt(Number(nodeIncome.value) * Number(cho2usdt_rate.value || 0)),
+  },
+  {
+    label: t("myNode.networkFeeIncome"),
+    value: isActivated.value ? formatAmount(networkFeeIncome.value) : t("myNode.notActivated"),
+    approx: isActivated.value
+      ? formatApproxUsdt(Number(networkFeeIncome.value) * Number(cho2usdt_rate.value || 0))
+      : "",
+    muted: !isActivated.value,
+  },
+  {
+    label: t("myNode.subCoinFeeIncome"),
+    value: formatAmount(subCoinFeeIncome.value),
+    approx: formatApproxUsdt(Number(subCoinFeeIncome.value) * Number(cho2usdt_rate.value || 0)),
+  },
+  {
+    label: t("myNode.secondaryMarketIncome"),
+    value: formatAmount(secondaryMarketIncome.value),
+    approx: formatApproxUsdt(Number(secondaryMarketIncome.value) * Number(cho2usdt_rate.value || 0)),
+  },
+  {
+    label: t("myNode.directReferralIncome"),
+    value: formatAmount(directReferralIncome.value),
+    approx: formatApproxUsdt(Number(directReferralIncome.value) * Number(cho2usdt_rate.value || 0)),
+  },
+  {
+    label: t("myNode.networkIncome"),
+    value: formatAmount(teamIncome.value),
+    approx: formatApproxUsdt(Number(teamIncome.value) * Number(cho2usdt_rate.value || 0)),
+  },
+]);
+
+const remainingClaimableText = computed(() =>
+  `${formatUsdtAmount(parseInt(forecast_income.value) - parseInt(total_reward_usdt.value))}U`,
+);
+
+const progressEndText = computed(() => `${formatUsdtAmount(parseInt(forecast_income.value))} U`);
+
+const earningsFootnote = computed(() =>
+  nodeType.value === 0 ? t("myNode.distributedDesc") : t("myNode.clusterDesc"),
+);
+
+const teamStats = computed(() => {
+  if (activeTab.value === "direct") {
+    return [
+      { label: t("myNode.effectiveNodeDirectCount"), value: effectiveNodeDirectCount.value },
+      { label: t("myNode.effectiveStakingDirectCount"), value: effectiveStakingDirectCount.value },
+      { label: t("myNode.directIneffectiveCount"), value: ineffectiveCount.value },
+    ];
+  }
+
+  return [
+    { label: t("myNode.effectiveNodeTeamCount"), value: effectiveNodeTeamCount.value },
+    { label: t("myNode.effectiveStakingTeamCount"), value: effectiveStakingTeamCount.value },
+    { label: t("myNode.teamIneffectiveCount"), value: ineffectiveCount.value },
+  ];
+});
+
+const getTeamBadgeText = (item) => {
+  if (item?.nodeTag) return item.nodeTag;
+  return activeTab.value === "direct" ? nodeTypeMap.T1.nodeTag : t("myNode.teamAddress");
+};
 
 function showInfo() {
   detailsRef.value?.refresh();
@@ -698,35 +687,7 @@ const formatProgressPercent = (value) => {
   return String(truncated);
 };
 
-const progressIndicatorRef = ref(null);
 const progressBarRef = ref(null);
-
-
-const indicatorWidth = ref(0);
-const barWidth = ref(0);
-
-const updateWidths = () => {
-  indicatorWidth.value = progressIndicatorRef.value?.offsetWidth || 0;
-  barWidth.value = progressBarRef.value?.offsetWidth || 0;
-};
-
-onMounted(() => {
-  nextTick(updateWidths);
-});
-
-onUpdated(updateWidths);
-
-const progressIndicatorLeft = computed(() => {
-  const p = Number(progressPercent.value) || 0;
-  // Use reactive widths
-  const width = indicatorWidth.value;
-  const progressBarWidth = barWidth.value;
-
-  if (p <= 20) return `${p}%`;
-  if (!progressBarWidth) return `${p}%`;
-  if (p >= 90) return `${p - ((width / progressBarWidth) * 100).toFixed(0)}%`;
-  return `${p - Math.max(0, (width / progressBarWidth) * 100 / 2).toFixed(0)}%`;
-});
 
 async function init() {
   await getNodeServiceProvidersInfo({
@@ -1489,6 +1450,438 @@ onMounted(async () => {
         }
       }
     }
+  }
+}
+
+.myNode {
+  min-height: 100vh;
+  padding: 88px 20px 40px;
+  background: #232932;
+  color: #ffffff;
+  box-sizing: border-box;
+}
+
+.myNode :deep(.cps-card-header) {
+  padding: 14px 20px 10px;
+  background: #232932 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.myNode :deep(.back-btn),
+.myNode :deep(.action-btn--icon-only) {
+  color: #ffffff !important;
+}
+
+.myNode :deep(.action-btn--icon-only) {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.earnings-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.hero-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.hero-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.12;
+  color: #ffffff;
+}
+
+.hero-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: rgba(255, 205, 31, 0.14);
+  color: #f4c94c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hero-meta {
+  margin: 16px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #9097a4;
+}
+
+.hero-illustration {
+  width: 104px;
+  max-width: 30vw;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.earnings-section + .earnings-section,
+.earnings-section + .team-section {
+  margin-top: 30px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.12;
+  color: #ffffff;
+}
+
+.record-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+}
+
+.record-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.record-arrow-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.earnings-card,
+.team-list-card {
+  border-radius: 24px;
+  background: #303845;
+  padding: 20px 18px;
+  box-sizing: border-box;
+}
+
+.earnings-card--spacious {
+  padding-bottom: 16px;
+}
+
+.summary-grid,
+.pending-grid {
+  display: grid;
+  gap: 22px 16px;
+}
+
+.summary-grid--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pending-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.summary-item,
+.pending-item {
+  min-width: 0;
+}
+
+.summary-label,
+.pending-label {
+  font-size: 11px;
+  line-height: 1.3;
+  color: #9097a4;
+}
+
+.summary-value,
+.pending-value {
+  margin-top: 7px;
+  font-size: 20px;
+  line-height: 1.1;
+  font-weight: 700;
+  color: #ffffff;
+  word-break: break-word;
+}
+
+.pending-value--muted {
+  color: #d8dbe1;
+}
+
+.summary-approx,
+.pending-approx {
+  margin-top: 5px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #9097a4;
+}
+
+.progress-block {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.progress-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.progress-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.progress-remaining {
+  font-size: 12px;
+  color: #ffffff;
+}
+
+.progress-remaining span {
+  color: #ffd33d;
+}
+
+.progress-bar {
+  position: relative;
+  height: 14px;
+  margin-top: 16px;
+  border-radius: 999px;
+  background: #7d8593;
+  overflow: hidden;
+}
+
+.progress-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+  background: linear-gradient(90deg, #ffd33d 0%, #ffcc1f 100%);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
+}
+
+.progress-scale {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 11px;
+  color: #9097a4;
+}
+
+.claim-all-btn {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.earnings-footnote {
+  margin: 12px 4px 0;
+  font-size: 11px;
+  line-height: 1.55;
+  color: #9097a4;
+}
+
+.team-section {
+  margin-top: 28px;
+}
+
+.team-tabs {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.team-tab {
+  position: relative;
+  padding: 0 0 8px;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  font-weight: 700;
+  color: #808793;
+}
+
+.team-tab.active {
+  color: #ffffff;
+}
+
+.team-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -11px;
+  width: 28px;
+  height: 4px;
+  border-radius: 999px;
+  background: #ffd33d;
+}
+
+.team-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 14px 0 16px;
+}
+
+.team-stat-label {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #9097a4;
+}
+
+.team-stat-value {
+  margin-top: 8px;
+  font-size: 18px;
+  line-height: 1.1;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.team-list-card {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.team-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.team-row + .team-row {
+  margin-top: 18px;
+}
+
+.team-avatar {
+  flex-shrink: 0;
+}
+
+.avatar-content {
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.team-main {
+  min-width: 0;
+  flex: 1;
+}
+
+.team-main-top,
+.team-main-bottom {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.team-main-bottom {
+  margin-top: 8px;
+}
+
+.team-identity {
+  min-width: 0;
+  flex: 1;
+}
+
+.team-address {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #ffffff;
+  word-break: break-all;
+}
+
+.team-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  margin-top: 8px;
+  padding: 0 9px;
+  border-radius: 8px;
+  background: rgba(255, 205, 31, 0.14);
+  color: #f4c94c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.team-reward {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: #29c98a;
+  text-align: right;
+}
+
+.team-time,
+.team-upline {
+  font-size: 11px;
+  line-height: 1.4;
+  color: #9097a4;
+}
+
+.team-upline {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+@media (max-width: 375px) {
+  .myNode {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .hero-title,
+  .section-title {
+    font-size: 21px;
+  }
+
+  .summary-value,
+  .pending-value,
+  .team-stat-value {
+    font-size: 18px;
+  }
+
+  .team-address,
+  .team-reward {
+    font-size: 15px;
   }
 }
 

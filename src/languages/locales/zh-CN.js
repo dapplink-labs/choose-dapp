@@ -716,6 +716,7 @@ export default {
     purchased: "已经购买",
     connectWalletFirst: "请先连接钱包",
     activatingNode: "正在进行节点激活...",
+    switchNode: "切换节点",
     insufficientBalance: "余额不足！",
     requestingAuth: "正在请求 USDT 授权...",
     payingAndActivating: "正在支付并激活节点...",

@@ -651,6 +651,7 @@ export default {
     purchased: '購入済み',
     connectWalletFirst: 'まずウォレットを接続してください',
     activatingNode: 'ノードをアクティベート中...',
+    switchNode: 'ノード切替',
     insufficientBalance: '残高不足！',
     requestingAuth: 'USDT 承認をリクエスト中...',
     payingAndActivating: '支払いとノードアクティベート中...',

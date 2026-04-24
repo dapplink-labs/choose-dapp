@@ -24,3 +24,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local design references and agent memory
+new_designs/
+.codex-memory/
+.tmp*
+
+# Local MQTT scratch tests
+test_mqtt*.mjs
