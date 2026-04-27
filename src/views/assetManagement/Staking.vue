@@ -280,7 +280,7 @@ const handleCardClick = (card) => {
 <style scoped lang="scss">
 .staking-container {
   min-height: calc(100vh - 122px);
-  padding: 14px 20px 28px;
+  padding: 14px 20px 32px;
   background: #232932;
   color: #ffffff;
 }

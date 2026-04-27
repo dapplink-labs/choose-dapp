@@ -803,30 +803,5 @@ watch(
   color: #ffffff;
 }
 
-@media (max-width: 390px) {
-  .overview-container {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
 
-  .hero-value {
-    font-size: 30px;
-  }
-
-  .hero-label {
-    font-size: 12px;
-  }
-
-  .action-btn {
-    font-size: 12px;
-  }
-
-  .action-btn--withdraw {
-    height: 38px;
-  }
-
-  .distribution-tab {
-    font-size: 14px;
-  }
-}
 </style>
