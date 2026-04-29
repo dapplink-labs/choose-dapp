@@ -1,210 +1,160 @@
 <template>
-  <div class="footer-nav">
+  <nav class="footer-nav" aria-label="Primary">
     <div class="nav-container">
-      <div v-for="item in navItems" :key="item.key" class="nav-item" :class="{ active: activeNav === item.key }"
-        @click="handleNavClick(item)">
-        <!-- 首页图标 -->
-        <svg v-if="item.key === 'home'" class="nav-icon" viewBox="0 0 1072 1024" version="1.1"
-          xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M535.893333 0.048762L1056.670476 470.552381l-65.340952 72.362667L926.47619 484.303238V1024H146.285714V479.47581l-64.999619 58.221714-65.048381-72.655238L535.893333 0z m-0.341333 131.169524L243.809524 392.240762 243.809524 926.47619h585.142857V396.190476l-293.400381-264.97219zM536.380952 390.095238a195.047619 195.047619 0 1 1 0 390.095238 195.047619 195.047619 0 0 1 0-390.095238z m0 97.52381a97.52381 97.52381 0 1 0 0 195.047619 97.52381 97.52381 0 0 0 0-195.047619z"
-            fill="currentColor" />
+      <button
+        v-for="item in navItems"
+        :key="item.key"
+        class="nav-item"
+        :class="{ active: activeNav === item.key }"
+        type="button"
+        @click="handleNavClick(item)"
+      >
+        <svg v-if="item.key === 'home'" class="nav-icon home-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 10.8 12 3l9 7.8v9.7a.5.5 0 0 1-.5.5H15v-6.2H9V21H3.5a.5.5 0 0 1-.5-.5v-9.7Z" fill="currentColor" />
+          <circle cx="12" cy="17" r="2.2" fill="#ffd42e" />
         </svg>
 
-        <!-- 搜索图标 -->
-        <svg v-else-if="item.key === 'search'" class="nav-icon" viewBox="0 0 24 24" fill="none"
-          xmlns="http://www.w3.org/2000/svg">
-          <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
-          <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round" />
+        <svg v-else-if="item.key === 'node-sale'" class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="4" r="2" fill="currentColor" />
+          <circle cx="5" cy="15" r="2" fill="currentColor" />
+          <circle cx="19" cy="15" r="2" fill="currentColor" />
+          <path d="M12 6.8v3.4M7 14l3.2-2.1M17 14l-3.2-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <path d="M18.8 5.2v5M16.3 7.7h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <path d="M5 17.5v2.3h14v-2.3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
         </svg>
 
-        <!-- 突发图标 -->
-        <svg v-else-if="item.key === 'breaking'" class="nav-icon" viewBox="0 0 1024 1024" version="1.1"
-          xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M511.99952 0.00096a511.99952 511.99952 0 1 0 511.99952 511.99952A511.039521 511.039521 0 0 0 511.99952 0.00096z m0 945.279114A437.11959 437.11959 0 0 1 78.719926 512.00048 437.11959 437.11959 0 0 1 511.99952 78.720886 437.11959 437.11959 0 0 1 945.279114 512.00048 437.11959 437.11959 0 0 1 511.99952 945.280074z"
-            fill="currentColor" />
-          <path
-            d="M740.479306 338.720642c-7.839993-23.679978-23.679978-39.359963-47.999955-31.99997L543.99949 346.560635a34.719967 34.719967 0 0 0-31.99997 47.999955 32.959969 32.959969 0 0 0 47.999955 23.679978l69.759935-19.999981-125.599883 176.799834-70.879933-47.999955c-15.999985-15.999985-39.359963-7.839993-55.199948 7.839993l-102.399904 133.919874c-15.999985 15.999985-7.839993 39.359963 7.839992 55.199948a28.959973 28.959973 0 0 0 23.679978 7.839993 40.959962 40.959962 0 0 0 31.99997-15.999985l78.719926-102.399904 78.719926 47.999955a47.999955 47.999955 0 0 0 55.199949-7.839993L687.999355 452.960535l13.599987 51.199952a52.319951 52.319951 0 0 0 39.359963 31.99997h7.839993c23.679978-7.839993 39.359963-23.679978 31.99997-47.999955z"
-            fill="currentColor" />
+        <svg v-else-if="item.key === 'node-staking'" class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6.5 9.5h11l2.5 10H4l2.5-10Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+          <path d="M8 9.5c0-3 1.6-5 4-5s4 2 4 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <path d="M12 12.2v4.6M9.7 14.5h4.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
         </svg>
 
-        <!-- 更多图标 -->
-        <svg v-else-if="item.key === 'more'" class="nav-icon" viewBox="0 0 24 24" fill="none"
-          xmlns="http://www.w3.org/2000/svg">
-          <line x1="3" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-          <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        <svg v-else class="nav-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="4" y="6" width="16" height="13" rx="3" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M7 6V4.8C7 3.8 7.8 3 8.8 3H18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <path d="M15 12h5v4h-5a2 2 0 1 1 0-4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+          <circle cx="16" cy="14" r=".8" fill="currentColor" />
         </svg>
 
         <span class="nav-text">{{ item.label }}</span>
-      </div>
+      </button>
     </div>
-  </div>
+  </nav>
 </template>
 
 <script setup>
-import { ref, watch, onMounted, computed } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { useI18n } from 'vue-i18n'
+import { ref, watch, onMounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
-const router = useRouter()
-const route = useRoute()
-const { t } = useI18n()
+const router = useRouter();
+const route = useRoute();
 
-
-// 导航项配置
 const navItems = computed(() => [
-  { key: 'home', label: t('footerNav.home') || '首页', path: '/home' },
-  { key: 'search', label: t('common.search') || '搜索', path: '/searchPage' },
-  { key: 'breaking', label: t('footerNav.breaking') || '突发', path: '/breaking' },
-  { key: 'more', label: t('footerNav.wallet')  || '钱包', path: '/asset-management' }
-])
+  { key: "home", label: "首页", path: "/home" },
+  { key: "node-sale", label: "节点售卖", path: "/computing-power-services" },
+  { key: "node-staking", label: "节点质押", path: "/LPVault" },
+  { key: "account", label: "账户", path: "/asset-management" },
+]);
 
-// 当前激活的导航项
-const activeNav = ref('home')
+const activeNav = ref("home");
 
-// 路由到导航key的映射
 const routeToNavKey = {
-  '/home': 'home',
-  '/breaking': 'breaking',
-  '/searchPage': 'search',
-  '/settings': 'more',
-  '/personal-center': 'more',
-  '/asset-management': 'more',
-  '/earnings': 'home',
-  '/leaderboard': 'home',
-  '/detail': 'home',
-  '/accuracy': 'home'
-}
+  "/home": "home",
+  "/computing-power-services": "node-sale",
+  "/myNode": "node-sale",
+  "/LPVault": "node-staking",
+  "/myIncome": "node-staking",
+  "/asset-management": "account",
+  "/personal-center": "account",
+  "/settings": "account",
+  "/bill": "account",
+  "/deposit": "account",
+  "/withdraw": "account",
+};
 
-// 根据当前路由自动设置激活的导航项
 const updateActiveNavFromRoute = () => {
-  const currentPath = route.path
-  const navKey = routeToNavKey[currentPath] || 'home'
-  activeNav.value = navKey
-}
+  activeNav.value = routeToNavKey[route.path] || "home";
+};
 
-// 监听路由变化
-watch(() => route.path, () => {
-  updateActiveNavFromRoute()
-})
+watch(() => route.path, updateActiveNavFromRoute);
 
-// 组件挂载时设置激活状态
-onMounted(() => {
-  updateActiveNavFromRoute()
-})
+onMounted(updateActiveNavFromRoute);
 
-// 处理导航点击
 const handleNavClick = (item) => {
-
-  if (item.isSearch) {
-    // 搜索功能：跳转到首页并滚动到搜索框（如果存在）
-    router.push('/').then(() => {
-      // 路由跳转后，根据实际路由更新激活状态
-      updateActiveNavFromRoute()
-    })
-    // 可以在这里添加滚动到搜索框的逻辑
-  } else if (item.path) {
-    // 如果是"更多"页面，传递from=footer参数
-    const path = item.key === 'more' ? `${item.path}?from=footer` : item.path
-    router.push(path).then(() => {
-      // 路由跳转后，根据实际路由更新激活状态
-      updateActiveNavFromRoute()
-    })
-  }
-}
+  if (!item.path || item.path === route.path) return;
+  router.push(item.path).then(updateActiveNavFromRoute);
+};
 </script>
 
 <style scoped lang="scss">
 .footer-nav {
   position: fixed;
+  right: 0;
   bottom: 0;
   left: 0;
-  right: 0;
-  background-color: var(--bg-page-h5, #ffffff);
-  border-top: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
   z-index: 1000;
+  background: #202833;
+  border-top: 1px solid rgba(255, 255, 255, .08);
   padding: 0;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.05);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-
-  .nav-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    height: 56px;
-    max-width: 100%;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  .nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    cursor: pointer;
-    transition: all 0.2s;
-    padding: 4px 6px;
-    min-height: 56px;
-    box-sizing: border-box;
-
-    .nav-icon {
-      width: 22px;
-      height: 22px;
-      color: #999999;
-      transition: color 0.2s;
-      margin-bottom: 3px;
-      flex-shrink: 0;
-    }
-
-    .nav-text {
-      font-size: 11px;
-      color: #999999;
-      transition: color 0.2s;
-      font-weight: 400;
-      line-height: 1.2;
-    }
-
-    &:active {
-      opacity: 0.7;
-    }
-
-    &.active {
-      .nav-icon {
-        color: #000000;
-      }
-
-      .nav-text {
-        color: #000000;
-        font-weight: 600;
-      }
-    }
-  }
 }
 
-.theme-dark {
-  .footer-nav {
-    .nav-item.active {
-      .nav-icon {
-        color: #FFFFFF;
-      }
-
-      .nav-text {
-        color: #FFFFFF;
-      }
-    }
-  }
+.nav-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: center;
+  height: 58px;
 }
 
-// 仅在移动端显示，PC端隐藏
-@media (min-width: 769px) {
+.nav-item {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #9da6b2;
+  min-width: 0;
+  height: 58px;
+  padding: 6px 4px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.nav-item:active {
+  opacity: .76;
+}
+
+.nav-icon {
+  width: 25px;
+  height: 25px;
+  color: currentColor;
+  flex: 0 0 25px;
+}
+
+.home-icon {
+  width: 27px;
+  height: 27px;
+  flex-basis: 27px;
+}
+
+.nav-text {
+  color: currentColor;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.nav-item.active {
+  color: #ffffff;
+}
+
+@media (min-width: 430px) {
   .footer-nav {
-    // display: none;
+    right: calc((100vw - 430px) / 2);
+    left: calc((100vw - 430px) / 2);
   }
 }
 </style>
